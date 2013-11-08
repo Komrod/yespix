@@ -7,11 +7,17 @@ var list = [];
 for (var t=1; t<=100; t++) list.push('resource/test/css/file_'+t+'.css');
 yp.addcss(list, function(e) {
 	window.count++;
-	document.getElementById('text').innerHTML += '<br/> increment count: '+window.count+'';
 	if (e.allComplete)
 	{
 		console.log('Unit test stop');
 		console.assert(window.count == 100, 'count must be equal to 100 after yespix.addcss()');
+	} else if (window.count>99)
+	{
+		if (yp.isUndefined(e.allComplete))
+		{
+			console.error('e.allComplete must not be undefined');
+		}
 	}
+
 });
 

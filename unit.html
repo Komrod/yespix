@@ -35,7 +35,9 @@
 <script type="text/javascript">
 
 	// init the YESPIX engine
-	var yp = yespix();
+	var yp = yespix({
+		debug: true,
+	});
 
 	function test(url)
 	{
@@ -46,12 +48,16 @@
 
 	
 </script>
-	<h1>YESPIX engin unit test</h1>
+	<h1>YESPIX engine unit test I</h1>
 
 	CSS: <button onclick="test('css/simple.js');">Simple</button> <button onclick="test('css/callback.js');">Callback</button> <button onclick="test('css/big.js');">Big</button> 
 	<button onclick="test('css/multiple.js');">Multiple</button> <button onclick="test('css/multiplex100.js');">Multiple x100</button> <button onclick="test('css/allcomplete.js');">All complete</button> 
 	<button onclick="test('css/error.js');">Error</button> <button onclick="test('css/progress.js');">Progress</button> <button onclick="test('css/skip.js');">Skip</button> 
 	<button onclick="test('css/urloptions.js');">URL options</button>
+	<br/>
+	
+	YESPIX init: <button onclick="test('init/justrun.js');">Just run</button> <button onclick="test('init/canvas.js');">Canvas basic</button> <button onclick="test('init/canvasoptions.js');">Canvas options</button> 
+	<button onclick="test('css/canvasmultiple.js');">Multiple canvas</button> 
 	
 	<br/>
 

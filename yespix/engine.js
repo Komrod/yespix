@@ -1,8 +1,10 @@
 (function(undefined) {
 
 	/**
-	 * TODO LIST:
+	 * TODO:
 	 * - do not put content in memory cache
+	 * - "cache" object switch to "file" object
+	 * - do not store the progress in the file object
 	 * - make functions to handle instances in YESPIX engine and _instances in entity
 	 * - do real js classes with prototype for entity classes
 	 * - do the shorthand functions and expose them
@@ -14,12 +16,18 @@
 	 * - debug the find function
 	 * - do a partial draw for each gfx entities
 	 * - prerender canvas for the partial draw
+	 * - function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
 	 *
+	 * 
 	 * DONE:
 	 * x make a YESPIX engine class to be instanciated
 	 * x build a system to make the unit tests
 	 *
+	 * 
+	 * CANCELED:
+	 * + override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 	 *
+	 * 
 	 */
 
 	/**
@@ -34,10 +42,6 @@
 		if (!(this instanceof yespix)) return new yespix(options);
 		this.init(options);
 		this.trigger('ready');
-		this.yespix = function(arg)
-		{
-			console.log('arg = '+arg);
-		};
 	}
 
 	/**
@@ -198,6 +202,7 @@
 			this.window = options["window"] || window;
 
 
+			initEntities(this);
 
 			for (var t = 0; t < options['modules'].length; t++) {
 				if (!/^http(s)?\:\/\//i.test(options['modules'][t])) {
@@ -214,7 +219,6 @@
 			var yespix = this;
 
 			function start(options) {
-				initEntities(yespix);
 
 				if (options['canvas']) yespix.spawn('canvas', options.canvas);
 				if (options['fps']) this.setFps(options.fps);
@@ -254,7 +258,7 @@
 		 */
 
 		/*
-		 * Returns a random float number between min and max.
+		 * Returns a random float number between min and max, included.
 		 * @method randFloat
 		 * @return {number} Float number
 		 */
@@ -263,7 +267,7 @@
 		},
 
 		/**
-		 * Returns a random integer between min and max. Each Integer have the same distribution.
+		 * Returns a random integer between min and max, included. Each Integer have the same distribution.
 		 * @method randInt
 		 * @return {number} Integer number
 		 */
@@ -367,23 +371,44 @@
 			return typeof value == "string";
 		},
 
+		/**
+		 * Trim string left and right
+		 * @param  {string} str String to trim
+		 * @return {string} Result string
+		 */
 		trim: function(str) {
 			return str.replace(/^\s+|\s+$/g, '');
 		},
 
+		/**
+		 * Left trim string
+		 * @param  {string} str String to trim
+		 * @return {string} Result string
+		 */
 		ltrim: function(str) {
 			return str.replace(/^\s+/, '');
 		},
 
+		/**
+		 * Right trim string
+		 * @param  {string} str String to trim
+		 * @return {string} Result string
+		 */
 		rtrim: function(str) {
 			return str.replace(/\s+$/, '');
 		},
 
+		/**
+		 * Trim string left and right, merge multiple spaces into one space
+		 * @param  {string} str String to trim
+		 * @return {string} Result string
+		 */
 		xtrim: function(str) {
 			return str.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, '').replace(/\s+/g, ' ');
 		},
 
 		/**
+		 * Returns True if fn is a function
 		 * @method isFunction
 		 */
 		isFunction: function(fn) {
@@ -391,14 +416,15 @@
 		},
 
 		/**
-		 * @function isObject
+		 * Returns True if obj is an object
+		 * @method isObject
 		 */
 		isObject: function(obj) {
 			return obj !== null && typeof obj === "object";
 		},
 
 		/**
-		 * @function pLength
+		 * @method pLength
 		 */
 		pLength: function(object, owned) {
 			owned = owned || true;
@@ -412,7 +438,7 @@
 		},
 
 		/**
-		 * @function getType
+		 * @method getType
 		 */
 		getType: function(obj) {
 			if (obj === null) return 'null';
@@ -581,17 +607,18 @@
 				callback: callback,
 				context: context
 			});
+			return this;
 		},
 
 
 		/**
 		 * Remove a function from an event or delete an entire event from an object
 		 * @method off
-		 * @chainable
 		 * @param {string} name Name of the event
 		 * @param {function} callback Function to remove from event, optional
 		 * @param {object} context Context of the callback, optional. Inside the function, "this" will refer to the context
 		 *		object. Default is the YESPIX engine object.
+		 * @chainable
 		 * @example unbind("ding") deletes the event "ding" of the YESPIX engine object
 		 * @example unbind("ding", entity) deletes the event "ding" of the "entity" object
 		 * @example unbind("enterFrame", fn) deletes the function "fn" from the event "enterFrame" of the YESPIX engine object
@@ -685,19 +712,19 @@
 			options['error'] = options['error'] || function() {};
 			options['progress'] = options['progress'] || function() {};
 			options['skip'] = options['skip'] || function() {};
-			options['useCache'] = options['useCache'] || true;
 			options['skipIfCache'] = options['skipIfCache'] || false;
 
 			//console.log('file.load :: fileList = ' + fileList);
-			var lastFile = fileList.length-1;
-			for (var index = 0; index < fileList.length; index++) {
+			var len = fileList.length;
+			for (var index = 0; index < len; index++) {
 				var yespix = this;
 
 				// @yespix this
 				(function() {
+
 					var url = fileList[index];
-					var isLastFile = false;
-					if (index == lastFile) isLastFile = true;
+					var isLastFile = (index == fileList.length-1);
+					var isFirstFile = (index == 0);
 					if (!yespix.data.cache[url]) yespix.data.cache[url] = {};
 					var file = yespix.data.cache[url];
 					var done = false;
@@ -713,33 +740,24 @@
 						urlOptions['useCache'] = urlOptions['useCache'] || true;
 						urlOptions['skipIfCache'] = urlOptions['skipIfCache'] || false;
 					} else var urlOptions = options;
-					if (urlOptions['skipIfCache'] && file.state == 'loaded') {
+
+					if (!file.state || file.state == 'loaded' || file.state == 'error')
+					{
+						file.state = 'pending';
+						file.loaded = 0;
+						file.progress = 0;
+						file.loaded = 0;
+						file.totalSize = 0;
+						file.lengthComputable = false;
+					} else
+					{
 						var e = {
-							file: url,
-							state: 'skipped',
-							index: index,
-							lastFile: isLastFile,
+							url: url,
+							type: 'skip'
 						};
+						if (yespix.options['debug']) console.warn('Skip the file "' + url + '": already loading');
 						urlOptions['skip'](e);
-						return yespix;
-					}
-					if (urlOptions['useCache'] && file.state == 'loaded') {
-						done = true;
-						var e = {
-							file: url,
-							index: index,
-							lastFile: isLastFile,
-							state: file.state,
-							isCache: true,
-							content: file.content,
-							lengthComputable: true,
-							loaded: file.content.length,
-							size: file.content.length,
-						};
-						processProgress(e);
-						//console.log('load :: complete, use cache');
-						urlOptions['complete'](e);
-						return yespix;
+						return false;
 					}
 
 					// start client
@@ -834,8 +852,8 @@
 							e.loaded = file.content.length;
 							e.htmlStatus = client.status;
 							file.content = this.responseText;
-							if (client.status == 404) {
-								if (yespix.options['debug']) console.error('Could not load the file "' + url + '"')
+							if (client.status != 200) {
+								if (yespix.options['debug']) console.error('Could not load the file "' + url + '"');
 								e.file = url;
 								file.state = 'error';
 								urlOptions['error'](e);
@@ -860,7 +878,7 @@
 						}
 					}, false);
 
-					file.state = 'initiated';
+					file.state = 'pending';
 					file.content = '';
 
 					client.file = url;
