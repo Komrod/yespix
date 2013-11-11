@@ -2,32 +2,31 @@
 
 	/**
 	 * TODO:
-	 * - do not put content in memory cache
-	 * - "cache" object switch to "file" object
-	 * - do not store the progress in the file object
 	 * - make functions to handle instances in YESPIX engine and _instances in entity
 	 * - do real js classes with prototype for entity classes
 	 * - do the shorthand functions and expose them
 	 * - do the children manager
 	 * - do the variable listener
-	 * - complete the find method
+	 * - complete the find method and the bunch
 	 * - function visible() returns true if entity is visible on canvas
 	 * - debug the z index
-	 * - debug the find function
 	 * - do a partial draw for each gfx entities
 	 * - prerender canvas for the partial draw
 	 * - function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
 	 *
-	 * 
+	 *
 	 * DONE:
 	 * x make a YESPIX engine class to be instanciated
 	 * x build a system to make the unit tests
+	 * x do not put content in memory cache // 2013-11-10
+	 * x do not store the progress in the file object // 2013-11-11
+	 * x "cache" object switch to "file" object // 2013-11-11
 	 *
-	 * 
+	 *
 	 * CANCELED:
 	 * + override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 	 *
-	 * 
+	 *
 	 */
 
 	/**
@@ -81,8 +80,8 @@
 
 			// initialise the data
 			this.data = {
-				// file cache
-				cache: {
+				// download files
+				file: {
 
 				},
 
@@ -654,8 +653,8 @@
 		},
 
 		/**
-		 * Add a function call to the ready event of the YESPIX engine
 		 * @method ready
+		 * Add a function call to the ready event of the YESPIX engine
 		 * @exemple
 		 * @todo ready must be triggered by the event system
 		 * @chainable
@@ -678,89 +677,144 @@
 		 */
 
 		/**
-		 * Load some files and call "complete" function. Options can also add some other function calls ("error",
-		 * "progress", "skip") and cache options. The file methods "addjs" and "addcss" both use the load method
-		 * and the same kind of options. Note: if you provide options['complete'], it will overrides the "complete"
-		 * parameter.
 		 * @method load
-		 * @todo some closure might cause memory leaks
+		 * Load some files and call "complete" function. Options can also add some other function calls ("error",
+		 * "progress", "success", "skip") and "once" option. The methods "addjs" and "addcss" both use the "load"
+		 * method and the same kind of options. If you provide options['complete'], it will overrides the
+		 * "complete" parameter.
+		 * For each functions, an event object is returned as follow:
+		 * 		event['size']: size of the file, if
+		 * 		event['loaded']: size of the file, if
+		 * 		event['progress']: size of the file, if
+		 * 		event['state']: pending / processing / loaded / error
+		 * 		event['lengthComputable'] : true if the file size is known
+		 * 		event['stat'] : object that provides the same informations (size, loaded ...) but for all the files
 		 * @param {object} options Options of the file load, optional.
-		 *		options['complete']: function called on complete
+		 *		options['complete']: function called on complete, remember that the file can be successfully
+		 *				downloaded or have an error, look at the event.status or use the "success" and "error" functions
+		 *		options['success']: function called on success, request returned an "ok" status (code 200)
 		 *		options['error']: function called on error
 		 *		options['progress']: function called on progress
 		 *		options['skip']: function called when a file is skipped
-		 *		options['useCache']: boolean, False not using the cache
-		 *		options['skipIfCache']: boolean,
-		 * @example load('folder/file.ext') loads the file and add it to the cache
-		 * @example load(['file1','file2','file3']) loads 'file1', 'file2' and 'file3' and add it to the cache
+		 *		options['ordered']: True if you want to execute the complete and success functions in the specified order the fileList
+		 *		options['once']: boolean, if file has been already downloaded successfully, the file will be skipped,
+		 *				default is False. Note that if the file was previously loaded with an error, the function will
+		 *				try another load process even if options['once'] is true.
+		 *		options[url]: This is the URL specific options where url is the URL string of the fileList and options[url]
+		 *				is the new options you want to apply to the url.
+		 * @example load('folder/file.ext') loads the file
+		 * @example load(['file1','file2','file3']) loads 'file1', 'file2' and 'file3'
 		 * @example load(files, complete) loads the files in the array "files" and call the function "complete"
 		 * @example load(files, options) loads the files and initialize with the options object
 		 */
 		load: function(fileList, complete, options) {
-			var e = null;
-
+			// do nothing if no fileList
 			if (!fileList) return this;
 
+			// init the fileList
 			if (this.isString(fileList)) fileList = [fileList];
 			if (this.isObject(complete)) {
 				options = complete;
 				complete = function() {};
 			}
 
+			// init the options
 			options = options || {};
 			options['complete'] = options['complete'] || complete || function() {};
 			options['error'] = options['error'] || function() {};
 			options['progress'] = options['progress'] || function() {};
 			options['skip'] = options['skip'] || function() {};
-			options['skipIfCache'] = options['skipIfCache'] || false;
+			options['success'] = options['success'] || function() {};
+			options['once'] = options['once'] || false;
+			options['ordered'] = options['ordered'] || false;
 
-			//console.log('file.load :: fileList = ' + fileList);
-			var len = fileList.length;
-			for (var index = 0; index < len; index++) {
-				var yespix = this;
+			var len = fileList.length,
+				index = 0,
+				stat = {
+					loaded: 0,
+					progress: 0,
+					size: 0,
+					allComplete: false,
+					allSuccess: false,
+					errorCount: 0,
+				};
 
-				// @yespix this
-				(function() {
+			// loop fileList
+			for (; index < len; index++) {
 
-					var url = fileList[index];
-					var isLastFile = (index == fileList.length-1);
-					var isFirstFile = (index == 0);
-					if (!yespix.data.cache[url]) yespix.data.cache[url] = {};
-					var file = yespix.data.cache[url];
-					var done = false;
+				if (!fileList[index]) continue;
 
-					// init url specific options
-					if (options[url]) {
-						var urlOptions = options[url];
-						urlOptions = urlOptions || {};
-						urlOptions['complete'] = urlOptions['complete'] || options['complete'] || complete || function() {};
-						urlOptions['error'] = urlOptions['error'] || options['error'] || function() {};
-						urlOptions['skip'] = urlOptions['skip'] || options['skip'] || function() {};
-						urlOptions['progress'] = urlOptions['progress'] || options['progress'] || function() {};
-						urlOptions['useCache'] = urlOptions['useCache'] || true;
-						urlOptions['skipIfCache'] = urlOptions['skipIfCache'] || false;
-					} else var urlOptions = options;
+				// init url specific options in urlOptions to store it in yespix.data.file[url]
+				if (options[fileList[index]]) {
+					var urlOptions = options[fileList[index]];
+					urlOptions = urlOptions || {};
+					urlOptions['complete'] = urlOptions['complete'] || options['complete'] || complete || function() {};
+					urlOptions['error'] = urlOptions['error'] || options['error'] || function() {};
+					urlOptions['progress'] = urlOptions['progress'] || options['progress'] || function() {};
+					urlOptions['skip'] = urlOptions['skip'] || options['skip'] || function() {};
+					urlOptions['success'] = urlOptions['success'] || options['success'] || function() {};
+					urlOptions['once'] = urlOptions['once'] || options['once'] || false;
+				} else var urlOptions = options;
 
-					if (!file.state || file.state == 'loaded' || file.state == 'error')
-					{
-						file.state = 'pending';
-						file.loaded = 0;
-						file.progress = 0;
-						file.loaded = 0;
-						file.totalSize = 0;
-						file.lengthComputable = false;
-					} else
-					{
-						var e = {
-							url: url,
-							type: 'skip'
-						};
-						if (yespix.options['debug']) console.warn('Skip the file "' + url + '": already loading');
-						urlOptions['skip'](e);
-						return false;
-					}
+				//if (this.data.file[fileList[index]]) console.log('index = '+index+', url = '+fileList[index]+', file = '+this.data.file[fileList[index]]+', state = '+this.data.file[fileList[index]].state)
+				//else console.log('index = '+index+', url = '+fileList[index]+', file = undefined, state = undefined')
+				// if the file already exists and urlOptions['once'] is set to True
+				if (urlOptions['once'] && this.data.file[fileList[index]]) {
+					// skip the file
+					if (this.options['debug']) console.warn('yespix.load: skip the file "' + fileList[index] + '"');
+					urlOptions['skip']({
+						file: this.data.file[fileList[index]],
+						url: fileList[index],
+						type: 'skip',
+					});
+					continue;
+				}
 
-					// start client
+				// Setting new variables in urlOptions
+				urlOptions.isLastFile = (index == fileList.length - 1);
+				urlOptions.isFirstFile = (index == 0);
+				urlOptions.fileList = fileList;
+
+				// stat will store the overall progress of the files load
+				urlOptions.stat = stat;
+
+
+				// init the file object if not found with no state 
+				if (!this.data.file[fileList[index]]) {
+					this.data.file[fileList[index]] = {
+						loaded: 0,
+						progress: 0,
+						size: 0,
+						done: false,
+						lengthComputable: false,
+						options: [],
+					};
+				}
+
+				// file will now refer to the current file URL object
+				var file = this.data.file[fileList[index]];
+				//console.log('load :: index = ' + index + ', file=' + file + ', url=' + fileList[index] + ', options=' + file.options + ', state=' + file.state);
+
+				// starting a XMLHttpRequest client only if the file is not currently downloading.
+				if (!this.data.file[fileList[index]] // file URL not previously loaded
+					|| !this.data.file[fileList[index]].state // file URL has no state 
+					|| this.data.file[fileList[index]].state == 'loaded' // file loaded but options['once'] is false
+					|| this.data.file[fileList[index]].state == 'error' // file complete with an error
+				) {
+
+					// overriding previous file object
+					this.data.file[fileList[index]] = {
+						state: 'pending',
+						loaded: 0,
+						progress: 0,
+						size: 0,
+						done: false,
+						lengthComputable: false,
+						options: [urlOptions],
+						url: fileList[index],
+					};
+
+					// start XMLHttpRequest client
 					var client = null;
 
 					// create XMLHttpRequest
@@ -773,123 +827,211 @@
 								break;
 							} catch (e) {};
 						}
+						// cancel load, nothing will work
 						if (!client) {
-							console.error("The browser does not support XMLHTTPRequest");
+							console.error("yespix.load: the browser does not support XMLHTTPRequest");
 							return null;
 						}
 					}
 
-					function processProgress(e) {
-						e.file = url;
-						if (file.loaded > e.loaded) return;
+					// add a reference to the yespix object in the XMLHttpRequest client
+					client.yespix = this;
 
-						if (!e.lengthComputable) {
-							file.progress = 0;
+					// add URL to the XMLHttpRequest client
+					client.url = fileList[index];
+					client.file = this.data.file[fileList[index]];
+					//console.log('load :: client.file.options=' + client.file.options);
+
+					/**
+					 * Extract data from the event and process the progress for the file and the overall progress for
+					 * all the files in fileList array
+					 * @param {object} e The event object where e.url is the URL of the file loading
+					 */
+					function progress(e) {
+
+
+						var file = client.file;
+						e.file = file;
+						//console.log('progress :: client.url = ' + client.url + ', file=' + file + ', options=' + file.options + ', done=' + file.done);
+						//						console.log('progress :: client.file.options='+client.file.options);
+						// check if the file is already finished and do not call progress anymore
+						if (file.done)
+						{
+							e.size = file.size;
+							e.totalSize = file.size;
+							e.loaded = file.loaded;
+							e.progress = file.progress;
+							return;
+						}
+
+
+						if (!file.lengthComputable && !e.lengthComputable) {
+							// the file did not start download and we dont know its size
+							console.log('NOT COMPUTABLE');
+							file.state = 'pending';
 							file.loaded = 0;
-							file.totalSize = 0;
+							file.progress = 0;
+							file.size = 0;
 							file.lengthComputable = false;
 						} else {
+							// process progress for the file
+							console.log('COMPUTABLE');
 							file.lengthComputable = true;
-							file.loaded = e.loaded;
-							file.size = e.totalSize;
-							if (file.size > 0) file.progress = parseInt(e.loaded / e.totalSize * 10000) / 100;
+							if (file.loaded < e.loaded) file.loaded = e.loaded;
+							if (file.size < e.totalSize) file.size = e.totalSize;
+							if (file.size > 0) file.progress = parseInt(file.loaded / file.size * 10000) / 100;
 							else file.progress = 100;
 							if (file.progress > 100) file.progress = 100;
+							if (file.progress == 100) file.state = 'loaded';
+							else file.state = 'processing';
 						}
-						file.progressTotal = 0;
-						var totalLoaded = 0;
-						var totalSize = 0;
-						var allLoaded = true;
-						for (var t = 0; t < fileList.length; t++) {
-							if (yespix.data.cache[fileList[t]] && yespix.data.cache[fileList[t]].lengthComputable) {
-								totalLoaded += yespix.data.cache[fileList[t]].loaded;
-								totalSize += yespix.data.cache[fileList[t]].size;
-								if (yespix.data.cache[fileList[t]].loaded < yespix.data.cache[fileList[t]].size) allLoaded = false;
-							} else if (yespix.data.cache[fileList[t]].state == 'error') {} else {
-								allLoaded = false;
-								totalLoaded = 0;
-								break
-							}
-						}
-						if (allLoaded) file.progressTotal = 100;
-						else if (totalLoaded > 0) file.progressTotal = parseInt(totalLoaded / totalSize * 10000) / 100;
-						else file.progressTotal = 0;
 
-						e.progress = file.progress;
-						e.progressTotal = file.progressTotal;
-						if (e.progressTotal==100 && e.lastFile) e.allComplete = true;
-						else e.allComplete = false;
-						// copy progressTotal to all files
-						for (var t = 0; t < fileList.length; t++) {
-							if (!yespix.data.cache[fileList[t]]) yespix.data.cache[fileList[t]] = {};
-							yespix.data.cache[fileList[t]].progressTotal = file.progressTotal;
+						var newEvent = {
+							size: file.size,
+							loaded: file.loaded,
+							progress: file.progress,
+							lengthComputable: file.lengthComputable,
+							state: file.state,
+							url: file.url,
+							file: file,
 						}
-						//console.log('processProgress :: totalLoaded=' + totalLoaded + ', totalSize=' + totalSize + ', allLoaded=' + allLoaded);
-						//console.log('file.progress=' + file.progress + ', file.progressTotal=' + file.progressTotal)
+
+						//if (!file.options) console.warn('progress :: NO FILES OPTIONS');
+						//else console.log('file.progress = ' + file.progress + ', file.size=' + file.size + ', file.loaded=' + file.loaded);
+						// loop inside file.options
+						if (file.options)
+							for (var u = 0; u < file.options.length; u++) {
+
+								if (file.options[u]) {
+									// init the stat of the file object
+									file.options[u].stat.loaded = 0;
+									file.options[u].stat.progress = 0;
+									file.options[u].stat.size = 0;
+									file.options[u].stat.allComplete = true; // init to true and set to false when a file is not complete
+									file.options[u].stat.allSuccess = true; // init to true and set to false when a file have an error
+									file.options[u].stat.errorCount = 0;
+
+									// process progress for all the files in file.options[].fileList
+									if (file.options[u].fileList)
+										for (var t = 0; t < file.options[u].fileList.length; t++) {
+											var otherFile = client.yespix.data.file[file.options[u].fileList[t]];
+											if (otherFile && otherFile.lengthComputable) {
+												// file started downloading and might be complete
+												file.options[u].stat.loaded += otherFile.loaded;
+												file.options[u].stat.size += otherFile.size;
+												if (otherFile.loaded < otherFile.size) file.options[u].stat.allComplete = false;
+											} else if (otherFile && otherFile.state == 'error') {
+												// error
+												file.options[u].stat.allSuccess = false;
+											} else {
+												// file pending
+												file.options[u].stat.allComplete = false;
+												file.options[u].stat.allSuccess = false;
+												file.options[u].stat.errorCount++;
+												break
+											}
+										}
+										// set progress to 100% if all files are complete
+									if (file.options[u].stat.allComplete == true) file.options[u].stat.progress = 100;
+									// process stat progress
+									else if (file.options[u].stat.loaded > 0) file.options[u].stat.progress = parseInt(file.options[u].stat.loaded / file.options[u].stat.size * 10000) / 100;
+									// no files started, set progress to 0%
+									else file.options[u].stat.progress = 0;
+
+								}
+							}
+						return newEvent;
 					}
 
-					//console.log('file.load :: start client');
+					client.onreadystatechange = function(e) {
+						var file = this.file;
 
-					client.onreadystatechange = function(e) //  = client.onload
-					{
-						// @this client
-						// @yespix this
-						if (e.lengthComputable) file.state = 'processing';
+						// currently downloading
+						e.url = this.url;
+						//console.log('index=' + index + ', fileList=' + fileList[index]);
 
-						processProgress(e);
+						// check the state
+						var state = this.readyState || e.type;
 
-						var state = client.readyState || e.type;
-						//console.log('onreadystatechange: file = "' + url + '", state = ' + state + ', done = ' + done);
-						if (!done && (/load|loaded|complete/i.test(state) || state == 4)) {
-							//yp.dump(client, 'onreadystatechange : complete:');
+//						console.log('avant progress :: url = ' + this.url + ', client.state = ' + state + ', e.size = ' + e.size);
 
-							e.index = index;
-							if (isLastFile) e.lastFile = true;
-							e.content = this.responseText;
-							e.progress = 100;
-							e.progressTotal = file.progressTotal;
-							e.size = file.content.length;
-							e.loaded = file.content.length;
-							e.htmlStatus = client.status;
-							file.content = this.responseText;
-							if (client.status != 200) {
-								if (yespix.options['debug']) console.error('Could not load the file "' + url + '"');
-								e.file = url;
-								file.state = 'error';
-								urlOptions['error'](e);
-								done = true;
+						// process the progress of the file
+						var newEvent = progress(e);
+
+						//if (file.lengthComputable) file.state = 'processing';
+						console.log('apres progress :: url = ' + newEvent.url + ', client.state = ' + state + ', e.size = ' + newEvent.size);
+
+						// onreadystatechange can be triggered by browsers several times with the same state. To check if the
+						// file has already been processed, check the value of file.done
+						if (!file.done && (/load|loaded|complete/i.test(state) || state == 4)) {
+							// the file is complete, might also returned an error.
+							// we do not put the content in the memory because it would take too much space for big files
+							newEvent.content = this.responseText;
+
+							newEvent.url = this.url;
+							newEvent.status = this.status;
+							file.done = true;
+
+							// exclude error HTML status 400 & 500
+							if (this.status >= 400) { // @todo this do not handle other error codes like 310 ...
+								if (this.yespix.options['debug']) console.error('Could not load the file "' + this.url + '"');
+								newEvent.state = file.state = 'error';
+
+								// executes error and complete functions
+								for (var t = 0; t < this.file.options.length; t++) {
+									newEvent.stat = this.file.options[t].stat;
+									newEvent.type = 'error';
+									this.file.options[t]['error'](newEvent);
+									newEvent.type = 'complete';
+									this.file.options[t]['complete'](newEvent);
+								}
+								this.file.options = [];
 								return;
 							}
 
-							file.state = 'loaded';
-							urlOptions['complete'](e);
-
-							//console.log('complete = ' + urlOptions['complete']);
-							done = true;
-							//console.log('load :: complete is done');
+							// executes success and complete functions
+							newEvent.state = file.state = 'loaded';
+							for (var t = 0; t < this.file.options.length; t++) {
+								newEvent.stat = this.file.options[t].stat;
+								newEvent.type = 'success';
+								this.file.options[t]['success'](newEvent);
+								newEvent.type = 'complete';
+								this.file.options[t]['complete'](newEvent);
+							}
+							this.file.options = [];
 						}
-					};
-					// @this yespix
+					}
 
 					client.addEventListener('progress', function(e) {
-						if (!done) {
-							processProgress(e);
-							urlOptions['progress'](e);
+						if (!file.done) {
+							var newEvent = progress(e);
+
+							// executes progress functions
+							newEvent.type = 'progress';
+							for (var t = 0; t < this.file.options.length; t++) {
+								newEvent.stat = this.file.options[t].stat;
+								this.file.options[t]['progress'](newEvent);
+							}
 						}
 					}, false);
 
-					file.state = 'pending';
-					file.content = '';
-
-					client.file = url;
-					client.open('GET', url);
+					// 
+					client.open('GET', client.url);
 					client.send('');
-				})();
+				} else {
+					// If the file object has a state == 'pending' or 'processing', it means it's still downloading and the 
+					// current load options will be added to the file object
+					if (!file.options || file.options.length == 0) file.options = [urlOptions];
+					// or adding the urlOptions to the list
+					else file.options.push(urlOptions);
+				}
 
 			}
+			// end fileList loop
 
 			return this;
 		},
+
 
 		/**
 		 * Load a js script file and execute it
@@ -899,7 +1041,7 @@
 		 * @param options {function} Called when a script load throw an error
 		 * @use addjs('my/js/file.js');
 		 * @use addjs(['file01.js', 'file02.js', 'file03.js'], function() { });
-		 * @use addjs(['file01.js', 'file02.js', 'file03.js'], { complete: ... , error: ... , useCache: false});
+		 * @use addjs(['file01.js', 'file02.js', 'file03.js'], { complete: ... , error: ... , once: true});
 		 */
 		addjs: function(fileList, complete, options) {
 			var e = null;
@@ -915,34 +1057,34 @@
 			options['complete'] = options['complete'] || complete || function() {};
 			options['error'] = options['error'] || function() {};
 			options['progress'] = options['progress'] || function() {};
+			options['success'] = options['success'] || function() {};
 			options['skip'] = options['skip'] || function() {};
-			options['useCache'] = options['useCache'] || true;
-			options['skipIfCache'] = false;
-			options['orderedExec'] = options['orderedExec'] || false;
+			options['once'] = options['once'] || false;
+			options['ordered'] = options['ordered'] || false;
 
-			complete = options['complete'];
+			success = options['success'];
 
-			if (!options['orderedExec']) {
-				options['complete'] = function(e) {
+			if (!options['ordered']) {
+				options['success'] = function(e) {
 					eval(e.content);
-					complete(e);
+					success(e);
 				};
 				return this.load(fileList, options);
 			} else {
 				var token = 0;
-				options['complete'] = function(e) {
+				options['success'] = function(e) {
 					if (fileList[token] == e.file) {
 						eval(e.content);
-						complete(e);
+						success(e);
 						token++;
 						while (fileList[token]) {
-							if (this.data.cache[fileList[token]] && this.data.cache[fileList[token]].state == 'loaded') {
-								eval(this.data.cache[fileList[token]].content);
-								complete(this.data.cache[fileList[token]].eventComplete);
+							if (this.data.file[fileList[token]] && this.data.file[fileList[token]].state == 'loaded') {
+								eval(this.data.file[fileList[token]].content);
+								success(this.data.file[fileList[token]].eventComplete);
 								token++;
 							} else break;
 						}
-					} else this.data.cache[fileList[token]].eventComplete;
+					} else this.data.file[fileList[token]].eventComplete;
 				};
 
 				return this.load(fileList, options);
@@ -975,15 +1117,15 @@
 			options['error'] = options['error'] || function() {};
 			options['progress'] = options['progress'] || function() {};
 			options['skip'] = options['skip'] || function() {};
-			options['useCache'] = options['useCache'] || true;
-			options['skipIfCache'] = false;
-			options['orderedExec'] = options['orderedExec'] || false;
+			options['success'] = options['success'] || function() {};
+			options['once'] = false;
+			options['ordered'] = options['ordered'] || false;
 			options['document'] = options['document'] || this.document || document;
 
 			complete = options['complete'];
 			var error = options['error'];
 
-			if (!options['orderedExec']) {
+			if (!options['ordered']) {
 				//console.log('addcss :: not ordered');
 				options['complete'] = function(e) {
 					//console.log('addcss :: complete css, e.file = '+e.file);
@@ -992,7 +1134,7 @@
 					var s = document.createElement('link');
 					s.type = 'text/css';
 					s.rel = 'stylesheet';
-					s.href = e.file;
+					s.href = e.url;
 					s.async = true;
 					delete s.crossOrigin;
 					document.getElementsByTagName('head')[0].appendChild(s);
@@ -1028,12 +1170,12 @@
 				var token = 0;
 				options['complete'] = function(e) {
 					//						console.log('complete::: token ='+token+', url = '+fileList[token]);
-					if (fileList[token] == e.file) {
+					if (fileList[token] == e.url) {
 						//console.log('complete css '+e.file);
 						var s = document.createElement('link');
 						s.type = 'text/css';
 						s.rel = 'stylesheet';
-						s.href = e.file;
+						s.href = e.url;
 						s.async = true;
 						delete s.crossOrigin;
 						document.getElementsByTagName('head')[0].appendChild(s);
@@ -1054,15 +1196,15 @@
 									complete(e);
 									token++;
 									while (fileList[token]) {
-										if (this.data.cache[fileList[token]] && this.data.cache[fileList[token]].state == 'loaded') {
-											eval(this.data.cache[fileList[token]].content);
-											complete(this.data.cache[fileList[token]].eventComplete);
+										if (this.data.file[fileList[token]] && this.data.file[fileList[token]].state == 'loaded') {
+											eval(this.data.file[fileList[token]].content);
+											complete(this.data.file[fileList[token]].eventComplete);
 											token++;
 										} else break;
 									}
 								}
 							} catch (e) {} finally {}
-						}, 10), // how often to check if the stylesheet is loaded
+						}, 20), // how often to check if the stylesheet is loaded
 							timeout_id = setTimeout(function() { // start counting down till fail
 								clearInterval(interval_id); // clear the counters
 								clearTimeout(timeout_id);
@@ -1070,14 +1212,14 @@
 								error(e); // fire the callback with success == false
 								token++;
 								while (fileList[token]) {
-									if (this.data.cache[fileList[token]] && this.data.cache[fileList[token]].state == 'loaded') {
-										eval(this.data.cache[fileList[token]].content);
-										complete(this.data.cache[fileList[token]].eventComplete);
+									if (this.data.file[fileList[token]] && this.data.file[fileList[token]].state == 'loaded') {
+										eval(this.data.file[fileList[token]].content);
+										complete(this.data.file[fileList[token]].eventComplete);
 										token++;
 									} else break;
 								}
 							}, 15000); // how long to wait before failing
-					} else this.data.cache[e.file].eventComplete = e;
+					} else this.data.file[e.file].eventComplete = e;
 				};
 
 				return this.load(fileList, options);
