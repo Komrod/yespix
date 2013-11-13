@@ -2,11 +2,6 @@
 
 	/**
 	 * TODO:
-	 * - make functions to handle instances in YESPIX engine and _instances in entity
-	 * - change _name to name because it's not unique and private
-	 * - do real js classes with prototype for entity classes
-	 * - do the shorthand functions and expose them
-	 * - do the children manager
 	 * - do the variable listener
 	 * - complete the find method and the bunch
 	 * - function visible() returns true if entity is visible on canvas
@@ -17,16 +12,21 @@
 	 *
 	 *
 	 * DONE:
-	 * x make a YESPIX engine class to be instanciated
-	 * x build a system to make the unit tests
-	 * x do not put content in memory cache // 2013-11-10
+	 * x do the children manager // 2013-11-13
+	 * x make functions to handle instances in YESPIX engine and _instances in entity
+	 * x change _name to name because it's not unique and private // 2013-11-13
 	 * x do not store the progress in the file object // 2013-11-11
 	 * x "cache" object switch to "file" object // 2013-11-11
+	 * x do not put content in memory cache // 2013-11-10
+	 * x make a YESPIX engine class to be instanciated
+	 * x build a system to make the unit tests
 	 *
 	 *
 	 * CANCELED:
 	 * + override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 	 *
+	 * PENDING:
+	 * - do real js classes with prototype for entity classes
 	 *
 	 */
 
@@ -180,6 +180,68 @@
 
 				},
 
+				key: {
+					pressed: {
+
+					},
+					up: {
+
+					},
+					down: {
+
+					},
+					hold: {
+
+					},
+					special: {
+						backspace: 8,
+						tab: 9,
+						enter: 13,
+						shift: 16,
+						ctrl: 17,
+						alt: 18,
+						pause: 19,
+						capsLock: 20,
+						escape: 27,
+						pageUp: 33,
+						pageDown: 34,
+						end: 35,
+						home: 36,
+						left: 37,
+						up: 38,
+						right: 39,
+						down: 40,
+						insert: 45,
+						delete: 46,
+						leftWindowKey: 91,
+						rightWindowKey: 92,
+						selectKey: 93,
+						numpad0: 96,
+						numpad1: 97,
+						numpad2: 98,
+						numpad3: 99,
+						numpad4: 100,
+						numpad5: 101,
+						numpad6: 102,
+						numpad7: 103,
+						numpad8: 104,
+						numpad9: 105,
+						f1: 112,
+						f2: 113,
+						f3: 114,
+						f4: 115,
+						f5: 116,
+						f6: 117,
+						f7: 118,
+						f8: 119,
+						f9: 120,
+						f10: 121,
+						f11: 122,
+						f12: 123,
+						numLock: 144,
+						scrollLock: 145,
+					}
+				},
 			};
 
 
@@ -224,13 +286,21 @@
 				if (options['fps']) this.setFps(options.fps);
 
 				yespix.on("draw", function(e) {
-					/*					if (this.entity.classInstances['gfx']) for (var t=0; t<yespix.entity.classInstances['gfx'].length; t++)
-					{
-						if (yespix.entity.classInstances['gfx'][t] && yespix.entity.classInstances['gfx'][t].draw)
-						{
-							yespix.entity.classInstances['gfx'][t].draw();
+					//console.log('draw :: ');
+					// sort by z and zGlobal
+					function compare(a, b) {
+						if (a.z > b.z) return true;
+						if (a.z == b.z && a.zGlobal > b.zGlobal) return true;
+						return false;
+					}
+					if (yespix.isArray(yespix.entityInstances['gfx'])) yespix.entityInstances['gfx'].sort(compare);
+
+					if (yespix.entityInstances['gfx'])
+						for (var t = 0; t < yespix.entityInstances['gfx'].length; t++) {
+							if (yespix.entityInstances['gfx'][t] && yespix.entityInstances['gfx'][t].draw) {
+								yespix.entityInstances['gfx'][t].draw();
+							}
 						}
-					}*/
 				});
 				options['init']();
 				yespix.trigger('ready');
@@ -523,8 +593,8 @@
 							}
 							t++;
 						}
-					if (str === '') console.log(' - ' + n + ' (array), length ' + obj[n].length + '');
-					else console.log(' - ' + n + ' (array), length ' + obj[n].length + ', content: ' + str);
+					if (str === '') console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + '');
+					else console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + ', content: ' + str);
 				} else console.log(' - ' + n + ' : "' + obj[n] + '" (' + (typeof obj[n]) + ')');
 			}
 			console.groupEnd();
@@ -856,8 +926,7 @@
 						//console.log('progress :: client.url = ' + client.url + ', file=' + file + ', options=' + file.options + ', done=' + file.done);
 						//						console.log('progress :: client.file.options='+client.file.options);
 						// check if the file is already finished and do not call progress anymore
-						if (file.done)
-						{
+						if (file.done) {
 							e.size = file.size;
 							e.totalSize = file.size;
 							e.loaded = file.loaded;
@@ -897,8 +966,6 @@
 							file: file,
 						}
 
-						//if (!file.options) console.warn('progress :: NO FILES OPTIONS');
-						//else console.log('file.progress = ' + file.progress + ', file.size=' + file.size + ', file.loaded=' + file.loaded);
 						// loop inside file.options
 						if (file.options)
 							for (var u = 0; u < file.options.length; u++) {
@@ -954,7 +1021,7 @@
 						// check the state
 						var state = this.readyState || e.type;
 
-//						console.log('avant progress :: url = ' + this.url + ', client.state = ' + state + ', e.size = ' + e.size);
+						//						console.log('avant progress :: url = ' + this.url + ', client.state = ' + state + ', e.size = ' + e.size);
 
 						// process the progress of the file
 						var newEvent = progress(e);
@@ -1247,7 +1314,7 @@
 		frameTickNext: (new Date).getTime(), // nextGameTick
 
 		time: +new Date(), // currentTime
-		fps: 50,
+		fps: 60,
 
 		timerStart: function() {
 			// Init the requestAnimationFrame in this.frameRequest
@@ -1288,8 +1355,6 @@
 		timerStep: function() {
 			loops = 0;
 			this.frameTime = +new Date();
-			//yespix.dump(this);
-			//this.stop();
 			if (this.frameTime - this.frameTickNext > 60 * this.frameMs) {
 				this.frameTickNext = this.frameTime - this.frameMs;
 			}
@@ -1520,16 +1585,16 @@
 			var propMatch = this.pLength(properties);
 			var result = [];
 
-			// @todo search with the classname instead of parsing all the entities
+			// @todo search with the classname array instead of parsing all the entities
 			for (var t = 0; t < this.entityInstances[''].length; t++) {
 				var count = 0;
 				//console.log('find: checking entity ['+t+'] with name "'+this.instances[t]._name+'"');
 				for (var n in properties) {
-					if (this.instances[t][n] !== undefined && this.selectorCompare(this.instances[t][n], properties[n])) count++;
+					if (this.entityInstances[t] !== undefined && this.entityInstances[t][n] !== undefined && this.selectorCompare(this.entityInstances[t][n], properties[n])) count++;
 					//console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
 					if (count >= propMatch) {
 						//console.log('find: adding entity to result');
-						result.push(this.instances[t]);
+						result.push(this.entityInstances[t]);
 					}
 				}
 			}
@@ -1579,13 +1644,14 @@
 		selectorType: function(str) {
 			if (str[0] == '.') return '_class';
 			if (str[0] == '#') return '_id';
-			return '_name';
+			return 'name';
 		},
 
 		selectorValue: function(str) {
 			if (str[0] == '.' || str[0] == '#') return str.substr(1, str.length);
 			return str;
 		},
+
 
 		/**
 		 * Convert an array of entities into a bunch of entities.The bunch object is an array of entities on which you can call a function on all entities with
@@ -1597,6 +1663,7 @@
 
 			return list;
 		},
+
 
 		/**
 		 *
@@ -1615,6 +1682,7 @@
 			//console.log('mixin :: end mixin');
 		},
 
+
 		ancestors: function(name) {
 			//				console.log('ancestors :: name = '+name);
 			if (this.entityClasses[name]) {
@@ -1631,6 +1699,7 @@
 				return [];
 			}
 		},
+
 
 		define: function(name, list, properties) {
 			//console.log('define :: defining the entity "'+name+'"');
@@ -1690,13 +1759,14 @@
 			//console.log('----');
 		},
 
+
 		spawn: function(name, properties) {
 			if (properties === true) properties = {};
 			else properties = properties || {};
 
 			if (name.indexOf(',') != -1) {
 				var list = name;
-				if (properties._name && !this.entityClasses[properties._name]) name = properties._name;
+				if (properties.name && !this.entityClasses[properties.name]) name = properties.name;
 				else name = 'tempclass' + this.entityNextClassId++;
 				this.define(name, list, properties);
 				properties = {};
@@ -1710,7 +1780,6 @@
 			//yespix.dump(this.entityClasses[name], 'spawn :: classname "'+name+'" with class:');
 
 			var entity = {};
-
 			//			var init = [];
 			//			if (yespix.isFunction(properties['init'])) init.unshift(properties['init'])
 
@@ -1729,6 +1798,7 @@
 				} else console.warn('spawn :: entity class ancestor "' + this.entityClasses[name].ancestors[t] + '" does not exist for entity class name "' + name + '"')
 			}
 
+
 			// mixin with the class name
 			this.mixin(entity, this.entityClasses[name].properties);
 
@@ -1739,6 +1809,7 @@
 			}
 			entity._class = name;
 			entity._ancestors = this.entityClasses[name]['ancestors'];
+			entity._id = this.entityNextId++;
 
 			this.instanceAdd(entity);
 
@@ -1762,38 +1833,41 @@
 		},
 
 
-
+		/**
+		 *
+		 * A reference of the entity will be the inserted in:
+		 * yespix.entityInstances[''] 				at the index entity._instances[''] (integer)
+		 * yespix.entityInstances[entity._id] 		at the index entity._id (integer)
+		 * yespix.entityInstances[entity._class]	at the index entity._instances[entity._class]
+		 * yespix.entityInstances[ancestorClass]	at the index entity._instances[ancestorClass]
+		 */
 		instanceAdd: function(entity) {
 			// the entity must not be in any instances list because we are overriding his _instances object
+			if (entity._instances) this / instanceRemove(entity);
 			entity._instances = {};
 
-			// The entity will be the inserted in:
-			// yespix.entityInstances[''] 				at the index entity._instances['']
-			// yespix.entityInstances[entity._id] 		at the index entity._id (integer)
-			// yespix.entityInstances[entity._class]	at the index entity._instances[entity._class]
-			// yespix.entityInstances[ancestorClass]	at the index entity._instances[ancestorClass]
-			
-			// initialize the global instances list
+
+			// insert reference in the global instances list
 			if (!this.entityInstances['']) {
 				this.entityInstances[''] = [entity];
 				entity._instances[''] = 0;
 			} else {
 				this.entityInstances[''].push(entity);
-				entity._instances[''] = this.instances.length - 1;
+				entity._instances[''] = this.entityInstances[''].length - 1;
 			}
+			// insert reference with the entity Id
+			this.entityInstances[+entity._id] = entity;
 
-			// initialize the Id instances list
-			this.entityInstances[+entity._id] = [entity];
-
-			// initialize the class instances list
+			// insert reference in the class instances list for its own class name
 			if (!this.entityInstances[entity._class]) {
 				this.entityInstances[entity._class] = [entity];
 				entity._instances[entity._class] = 0;
 			} else {
 				this.entityInstances[entity._class].push(entity);
-				entity._instances[name] = this.entityInstances[name].length - 1;
+				entity._instances[entity._class] = this.entityInstances[entity._class].length - 1;
 			}
 
+			// insert a reference in the class instances list for all its ancestors
 			if (entity._ancestors.length > 0)
 				for (var t = 0; t < entity._ancestors.length; t++) {
 					if (!this.entityInstances[entity._ancestors[t]]) {
@@ -1804,11 +1878,22 @@
 						entity._instances[entity._ancestors[t]] = this.entityInstances[entity._ancestors[t]].length - 1;
 					}
 				}
-
 		},
 
 		instanceRemove: function(entity) {
+			// remove reference from the global instances list
+			if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
 
+			// remove reference with the entity Id
+			delete this.entityInstances[+entity._id];
+
+			// remove reference from the class instances list for its own class name
+			if (this.entityInstances[entity._class]) this.entityInstances[entity._class].splice(entity._instances[entity._class], 1);
+
+			// insert a reference in the class instances list for all its ancestors
+			if (entity._ancestors.length > 0)
+				for (var t = 0; t < entity._ancestors.length; t++)
+					if (this.entityInstances[entity._ancestors[t]]) this.entityInstances[entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
 		},
 
 		/**
@@ -1903,12 +1988,104 @@
 			return result;
 		},
 
+
+		/**
+		 ************************************************************************************************************
+		 * CHILDREN
+		 */
+
+		/**
+		 * @todo  moving rotating the parent will affect the children
+		 * @param {entity} parent The parent
+		 * @param {entity|array} child An entity to attached or an array of entities
+		 * @example attach(entity1, entity2) attaches entity2 to entity1
+		 * @example attach(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
+		 */
+		attach: function(parent, child) {
+			// multiple children
+			if (this.isArray(child)) {
+				for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
+				return this;
+			}
+
+			// try to attach an entity already attached to the parent
+			if (child._parent == parent) return null;
+
+			// attach
+			if (!parent._children) parent._children = [child];
+			else parent._children.push(child);
+
+			if (child._parent) this.detach(child._parent, child);
+			child._parent = parent;
+			return this;
+		},
+
+		detach: function(parent, child) {
+			// detach everything 
+			if (!child) {
+				if (parent._children) {
+					for (var t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
+					parent._children = null;
+				}
+				return this;
+			}
+
+			// detach all the children
+			if (this.isArray(child)) {
+				for (var t = 0; t < child.length; t++) this.detach(parent, child[t]);
+				return this;
+			}
+
+			// try to detach an entity already detached
+			if (child._parent != parent) return null;
+
+			// detach one child
+			child._parent = null;
+			for (var t = 0; t < parent._children.length; t++)
+				if (parent._children[t] == child) {
+					parent._children.splice(t, 1);
+					break;
+				}
+			return this;
+		},
+
+		/**
+		 ************************************************************************************************************
+		 * INPUT KEYBOARD AND MOUSE
+		 */
+
+		key: function(s, type) {
+			type = type || 'pressed';
+
+			if (this.isString(s)) {
+				if (s.indexOf('-') != -1) return this.key(s.split('-'), type);
+				if (s.length > 1) return this.specialKey(s, type);
+				return !!this.data.key[type][s.charCodeAt(0)];
+			}
+
+			if (this.isArray(s)) {
+				for (var t = 0; t < s.length; t++)
+					if (!this.key(s[t])) return false;
+				return true;
+			}
+			if (this.isInt(s)) return !!this.data.key[type][s];
+			return false;
+		},
+
+		specialKey: function(s, type) {
+			type = type || 'pressed';
+			if (type=='hold') !!this.data.key['hold'][this.data.key.special[s]] || !!this.data.key['up'][this.data.key.special[s]];;
+			return !!this.data.key[type][this.data.key.special[s]];
+		},
+
 	};
 
 
 
 	/**
+	 *
 	 * @module entity
+	 *
 	 */
 
 	function initEntities(yespix) {
@@ -1988,10 +2165,9 @@
 			isGlobal: false,
 
 			/**
-			 * Unique name of the entity instance
+			 * Name of the entity, not unique
 			 * @property name
 			 * @type string
-			 * @default "entity" + entity.id
 			 */
 			name: '',
 
@@ -1999,34 +2175,40 @@
 			///////////////////////////////// Main functions ////////////////////////////////
 
 			/**
-			 * Return the array of assets used for the entity
-			 * @sync
+			 * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
 			 */
 			assets: function() {
 				return [];
 			},
 
-			// initilize object
+			/**
+			 * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
+			 */
 			init: function(properties) {
-				/*
-				this._id = yespix.entity.nextEntityId;
-				if (!this._name) this._name = 'entity' + this._id;
-				yespix.entity.nextEntityId++;
-				*/
 				return true;
 			},
 
+			attach: function(entity) {
+				yespix.attach(this, entity);
+				return this;
+			},
+
+			detach: function(entity) {
+				yespix.detach(this, entity);
+				return this;
+			},
 
 			trigger: function(name, e) {
-				yespix.events.bind(this, name, e);
+				yespix.trigger(this, name, e);
+				return this;
 			},
 
 			on: function(name, callback) {
-				yespix.events.bind(this, name, callback);
+				yespix.on(this, name, callback);
 			},
 
 			off: function(name, callback) {
-				yespix.events.unbind(this, name, callback);
+				yespix.off(this, name, callback);
 			},
 
 			destroy: function() {
@@ -2042,7 +2224,7 @@
 					}
 				}
 
-				delete yespix.entities[this._id];
+				yespix.instanceRemove(this);
 			}
 
 		});
@@ -2124,7 +2306,7 @@
 				if (this._parent == null) {
 					(function(obj) {
 						//					var obj = this;
-						yespix.entity.find('.canvas', function() {
+						yespix.find('.canvas', function() {
 							if (!obj._context) obj._context = this.context;
 							//console.log('find canvas!');
 						});
@@ -2133,201 +2315,7 @@
 				//console.log('getContext : _context = '+this._context);
 			},
 
-			/**
-			 * @param dir - Direction to move (n,s,e,w,ne,nw,se,sw)
-			 * @param by - Amount to move in the specified direction
-			 * Quick method to move the entity in a direction (n, s, e, w, ne, nw, se, sw) by an amount of pixels.
-			 * @chainable
-			 */
-			move: function(dir, by) {
-				if (dir.charAt(0) === 'n') this.y -= by;
-				if (dir.charAt(0) === 's') this.y += by;
-				if (dir === 'e' || dir.charAt(1) === 'e') this.x += by;
-				if (dir === 'w' || dir.charAt(1) === 'w') this.x -= by;
-				return this;
-			},
-
-			/**
-			 * @param x - Amount to move X
-			 * @param y - Amount to move Y
-			 * @param w - Amount to widen
-			 * @param h - Amount to increase height
-			 * Shift or move the entity by an amount. Use negative values
-			 * for an opposite direction.
-			 */
-			shift: function(x, y, w, h) {
-				if (x) this.x += x;
-				if (y) this.y += y;
-				if (w) this.w += w;
-				if (h) this.h += h;
-				return this;
-			},
-			/**@
-			 * #.attach
-			 * @comp 2D
-			 * @sign public this .attach(Entity obj[, .., Entity objN])
-			 * @param obj - Child entity(s) to attach
-			 * Sets one or more entities to be children, with the current entity (`this`)
-			 * as the parent. When the parent moves or rotates, its children move or
-			 * rotate by the same amount. (But not vice-versa: If you move a child, it
-			 * will not move the parent.) When the parent is destroyed, its children are
-			 * destroyed.
-			 *
-			 * For any entity, `this._children` is the array of its children entity
-			 * objects (if any), and `this._parent` is its parent entity object (if any).
-			 *
-			 * As many objects as wanted can be attached, and a hierarchy of objects is
-			 * possible by attaching.
-			 */
-			attach: function() {
-				var i = 0,
-					arg = arguments,
-					l = arguments.length,
-					obj;
-				for (; i < l; ++i) {
-					obj = arg[i];
-					if (obj._parent) {
-						obj._parent.detach(obj);
-					}
-					obj._parent = this;
-					this._children.push(obj);
-				}
-
-				return this;
-			},
-
-			/**@
-			 * #.detach
-			 * @comp 2D
-			 * @sign public this .detach([Entity obj])
-			 * @param obj - The entity to detach. Left blank will remove all attached entities
-			 * Stop an entity from following the current entity. Passing no arguments will stop
-			 * every entity attached.
-			 */
-			detach: function(obj) {
-				//if nothing passed, remove all attached objects
-				if (!obj) {
-					for (var i = 0; i < this._children.length; i++) {
-						this._children[i]._parent = null;
-					}
-					this._children = [];
-					return this;
-				}
-
-				//if obj passed, find the handler and unbind
-				for (var i = 0; i < this._children.length; i++) {
-					if (this._children[i] == obj) {
-						this._children.splice(i, 1);
-					}
-				}
-				obj._parent = null;
-
-				return this;
-			},
-
-			/**@
-			 * #.origin
-			 * @comp 2D
-			 * @sign public this .origin(Number x, Number y)
-			 * @param x - Pixel value of origin offset on the X axis
-			 * @param y - Pixel value of origin offset on the Y axis
-			 * @sign public this .origin(String offset)
-			 * @param offset - Combination of center, top, bottom, middle, left and right
-			 * Set the origin point of an entity for it to rotate around.
-			 *
-			 * @example
-			 * ~~~
-			 * this.origin("top left")
-			 * this.origin("center")
-			 * this.origin("bottom right")
-			 * this.origin("middle right")
-			 * ~~~
-			 *
-			 * @see .rotation
-			 */
-			origin: function(x, y) {
-				//text based origin
-				if (typeof x === "string") {
-					if (x === "centre" || x === "center" || x.indexOf(' ') === -1) {
-						x = this.width / 2;
-						y = this.height / 2;
-					} else {
-						var cmd = x.split(' ');
-						if (cmd[0] === "top") y = 0;
-						else if (cmd[0] === "bottom") y = this._h;
-						else if (cmd[0] === "middle" || cmd[1] === "center" || cmd[1] === "centre") y = this._h / 2;
-
-						if (cmd[1] === "center" || cmd[1] === "centre" || cmd[1] === "middle") x = this._w / 2;
-						else if (cmd[1] === "left") x = 0;
-						else if (cmd[1] === "right") x = this._w;
-					}
-				}
-
-				this._origin.x = x;
-				this._origin.y = y;
-
-				return this;
-			},
-
-			/**@
-			 * #.flip
-			 * @comp 2D
-			 * @trigger Change - when the entity has flipped
-			 * @sign public this .flip(String dir)
-			 * @param dir - Flip direction
-			 *
-			 * Flip entity on passed direction
-			 *
-			 * @example
-			 * ~~~
-			 * this.flip("X")
-			 * ~~~
-			 */
-			flip: function(dir) {
-				dir = dir || "X";
-				if (!this["_flip" + dir]) {
-					this["_flip" + dir] = true;
-					this.trigger("Change");
-				}
-			},
 		});
-
-		/**
-		 * @todo shoouldnt do that on each spawn, just on enter frame
-		 */
-		yespix.on('spawn:gfx',
-			function(e) {
-				//if (!e.entity) return;
-				//if (e.entity.instancesIndex['gfx']==0) return;
-				/*
-		console.log('spawn:gfx start :');
-		for (t=0; t<yespix.entity.classInstances['gfx'].length; t++)
-		{
-			if (!yespix.entity.classInstances['gfx'][t]) console.log('['+t+'] undefined');
-			else console.log('['+t+'] name='+yespix.entity.classInstances['gfx'][t]._name
-				+', z='+yespix.entity.classInstances['gfx'][t].z+', zGlobal='
-				+yespix.entity.classInstances['gfx'][t].zGlobal);
-		}
-		*/
-
-				function compare(a, b) {
-					if (a.z > b.z) return true;
-					if (a.z == b.z && a.zGlobal > b.zGlobal) return true;
-					return false;
-				}
-				if (yespix.isArray(yespix.entity.classInstances['gfx'])) yespix.entity.classInstances['gfx'].sort(compare);
-				/*
-		console.log('spawn:gfx finish :');
-		for (t=0; t<yespix.entity.classInstances['gfx'].length; t++)
-		{
-			if (!yespix.entity.classInstances['gfx'][t]) console.log('['+t+'] undefined');
-			else console.log('['+t+'] name='+yespix.entity.classInstances['gfx'][t]._name
-				+', z='+yespix.entity.classInstances['gfx'][t].z+', zGlobal='
-				+yespix.entity.classInstances['gfx'][t].zGlobal);
-		}
-		*/
-
-			});
 
 
 
@@ -2647,6 +2635,7 @@
 				options.height = options.height || 600; // @todo default must be set to client height
 				options.style = options.style || {};
 				options.id = options.id || 'canvas' + this._id;
+				options.class = options.class || '';
 				options.autoAppend = options.autoAppend || true;
 
 				this.canvasOptions = options;
@@ -2656,6 +2645,7 @@
 				canvas.id = options.id;
 				canvas.width = options.width;
 				canvas.height = options.height;
+				canvas.className = options.className;
 				for (var n in options.style) canvas.style[n] = options.style[n];
 
 				if (options.autoAppend) {
@@ -2712,6 +2702,22 @@
 
 		});
 
+
+		yespix.define('move', {
+			speedX: 0,
+			speedY: 0,
+
+			init: function() {
+				console.log('init move');
+				yespix.on('enterFrame', function() {
+					this.x += this.speedX;
+					this.y += this.speedY;
+				}, this, yespix);
+
+				//yespix.dump(this);
+			},
+
+		});
 
 
 		yespix.define('image', 'gfx', {
@@ -2854,15 +2860,118 @@
 					this.height // height on canvas
 				);
 			},
-
-
 		});
 
-	}
+
+
+		/**
+		 ************************************************************************************************************
+		 ************************************************************************************************************
+		 * Bindings
+		 *
+		 */
+
+		/**
+		 * Key down bindings
+		 * @param  {object} e Event
+		 */
+		document.onkeydown = function(e) {
+			// get the event
+			e = e || window.event;
+
+			// get the key code
+			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+			// main key pressed
+			yespix.data.key.pressed[parseInt(code)] = true;
+			yespix.data.key.hold[parseInt(code)] = true;
+
+			// special key pressed
+			if (e.ctrlKey) yespix.data.key.down[yespix.data.key.special['ctrl']] = true;
+			if (e.altKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
+			if (e.ctrlKey) yespix.data.key.hold[yespix.data.key.special['ctrl']] = true;
+			if (e.altKey) yespix.data.key.hold[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.hold[yespix.data.key.special['alt']] = true;
+
+			// triggers on YESPIX engine
+			yespix.trigger(e.type, e);
+		};
+
+		/**
+		 * Key up bindings
+		 * @param  {object} e Event
+		 */
+		document.onkeyup = function(e) {
+			// get the event
+			e = e || window.event;
+
+			// get the key code
+			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+			// main key pressed
+			yespix.data.key.up[parseInt(code)] = true;
+			yespix.data.key.hold[parseInt(code)] = false;
+
+			// special key pressed
+			if (e.ctrlKey) yespix.data.key.up[yespix.data.key.special['ctrl']] = true;
+			if (e.altKey) yespix.data.key.up[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.up[yespix.data.key.special['alt']] = true;
+			if (e.ctrlKey) yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
+			if (e.altKey) yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+			if (e.shiftKey) yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+
+			// triggers on YESPIX engine
+			yespix.trigger(e.type, e);
+		};
+
+		/**
+		 * Key pressed bindings
+		 * @param  {object} e Event
+		 */
+		document.onkeypressed = function(e) {
+			// get the event
+			e = e || window.event;
+
+			// get the key code
+			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+			// main key pressed
+			yespix.data.key.pressed[parseInt(code)] = true;
+
+			// special key pressed
+			if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
+			if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+
+			// triggers on YESPIX engine
+			yespix.trigger(e.type, e);
+		};
+
+		yespix.on('exitFrame', function(e) {
+			//this.dump(this);
+			// delete old keypressed
+			if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
+			if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
+			if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
+
+			// save current keypressed as old keypressed and delete current keypressed
+			this.data.key.pressed = {
+				old: this.data.key.pressed
+			};
+			this.data.key.up = {
+				old: this.data.key.up
+			};
+			this.data.key.down = {
+				old: this.data.key.down
+			};
+		});
+	};
 
 
 
 	// expose the YESPIX function constructor
 	window.yespix = yespix;
+
 
 })();
