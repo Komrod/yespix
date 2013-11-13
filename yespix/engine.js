@@ -3,6 +3,7 @@
 	/**
 	 * TODO:
 	 * - make functions to handle instances in YESPIX engine and _instances in entity
+	 * - change _name to name because it's not unique and private
 	 * - do real js classes with prototype for entity classes
 	 * - do the shorthand functions and expose them
 	 * - do the children manager
@@ -73,7 +74,7 @@
 			});
 
 			// current version of the engine
-			this.version = "0.11";
+			this.version = "0.112";
 
 			// initialise the modules array
 			var modules = []; // yespix common modules
@@ -1034,8 +1035,8 @@
 
 
 		/**
-		 * Load a js script file and execute it
-		 * @function js
+		 * Loads a js script file and execute it
+		 * @method js
 		 * @param fileList {array|string} Array of the script files to load
 		 * @param complete {function} Called when the load of the whole list is complete
 		 * @param options {function} Called when a script load throw an error
@@ -1043,7 +1044,7 @@
 		 * @use addjs(['file01.js', 'file02.js', 'file03.js'], function() { });
 		 * @use addjs(['file01.js', 'file02.js', 'file03.js'], { complete: ... , error: ... , once: true});
 		 */
-		addjs: function(fileList, complete, options) {
+		js: function(fileList, complete, options) {
 			var e = null;
 
 			if (!fileList) return this;
@@ -1092,15 +1093,15 @@
 		},
 
 		/**
+		 * @method css
 		 * Load a css file and add it to the document
-		 * @function css
 		 * @param list {array|string} Array of the script files to load
 		 * @param complete {function} Called when the load of the whole list is complete
 		 * @param error {function} Called when a script load throw an error
 		 * @param progress {function} Called on the progress of each script load
 		 * @chainable
 		 */
-		addcss: function(fileList, complete, options) {
+		css: function(fileList, complete, options) {
 
 			var e = null;
 
@@ -1463,9 +1464,20 @@
 
 		entityRootClassname: '',
 
+		/**
+		 * Stores some informations about the entity classes
+		 * @type {Object}
+		 */
 		entityClasses: {}, // entity classes
 
-		entityInstances: {}, // list of entity instances
+		/**
+		 * List of entity instances
+		 * @type {Object}
+		 * @example entityInstances[entity._id] refers to the entity with integer id "entity._id"
+		 * @example entityInstances[classname] refers to an array of entities directly with the class or with an ancestor with the class name "classname"
+		 * @example entityInstances[''] refers to an array of all the entity instances
+		 */
+		entityInstances: {},
 
 		entityNextId: 1,
 		entityNextClassId: 1,
@@ -1508,6 +1520,7 @@
 			var propMatch = this.pLength(properties);
 			var result = [];
 
+			// @todo search with the classname instead of parsing all the entities
 			for (var t = 0; t < this.entityInstances[''].length; t++) {
 				var count = 0;
 				//console.log('find: checking entity ['+t+'] with name "'+this.instances[t]._name+'"');
@@ -1575,7 +1588,7 @@
 		},
 
 		/**
-		 * Convert an array of entities into a bunch of entities. A bunch object is an array of entities on which you can call a function on all entities with
+		 * Convert an array of entities into a bunch of entities.The bunch object is an array of entities on which you can call a function on all entities with
 		 *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property. The bunch object also have all the
 		 *		array functions and properties such as length, concat ...
 		 * @todo
@@ -1677,29 +1690,6 @@
 			//console.log('----');
 		},
 
-		/*
-		dump: function(name) {
-			console.log('----------------------------------------');
-			name = name || '';
-			if (name == '') console.log('Engine dump :: Dump all entity classes: length ' + yespix.pLength(this.entityClasses));
-			else console.log('Engine dump :: Dump entity class "' + name + '"');
-			var count = 1;
-			for (var n in this.entityClasses) {
-				if (name == '' || n == name) yespix.dump(this.entityClasses[n], 'class ' + count + ': "' + n + '" ');
-				count++;
-			}
-			console.log('----------------------------------------');
-			if (name == '') console.log('Engine dump :: Dump all entities instances: length ' + this.instances.length);
-			else console.log('Engine dump :: Dump entity instance "' + name + '"');
-			var count = 1;
-			for (var t = 0; t < this.instances.length; t++) {
-				if (name == '' || n == name) yespix.dump(this.instances[n], 'instance ' + count + ': "' + n + '" ');
-				count++;
-			}
-			console.log('----------------------------------------');
-		},
-		*/
-
 		spawn: function(name, properties) {
 			if (properties === true) properties = {};
 			else properties = properties || {};
@@ -1774,9 +1764,15 @@
 
 
 		instanceAdd: function(entity) {
-			// the entity is not in any instances list
+			// the entity must not be in any instances list because we are overriding his _instances object
 			entity._instances = {};
 
+			// The entity will be the inserted in:
+			// yespix.entityInstances[''] 				at the index entity._instances['']
+			// yespix.entityInstances[entity._id] 		at the index entity._id (integer)
+			// yespix.entityInstances[entity._class]	at the index entity._instances[entity._class]
+			// yespix.entityInstances[ancestorClass]	at the index entity._instances[ancestorClass]
+			
 			// initialize the global instances list
 			if (!this.entityInstances['']) {
 				this.entityInstances[''] = [entity];
@@ -2020,24 +2016,6 @@
 				return true;
 			},
 
-			/*
-		get: function(name)
-		{
-			return this[name];
-		},
-
-		set: function(name, value)
-		{
-			this[name] = value;
-			return this;
-		},
-
-		prop: function(obj)
-		{
-			for (n in obj) this.set(n, obj[n]);
-			return this;
-		}
-		*/
 
 			trigger: function(name, e) {
 				yespix.events.bind(this, name, e);
