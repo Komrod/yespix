@@ -2,6 +2,7 @@
 
 	/**
 	 * TODO:
+	 * - capture keypressed
 	 * - do the variable listener
 	 * - complete the find method and the bunch
 	 * - function visible() returns true if entity is visible on canvas
@@ -628,7 +629,7 @@
 			// Function can't trigger anything if there is no name
 			if (!name) return this;
 
-			// initialiee the object
+			// initialize the object
 			obj = obj || this;
 
 			// initialise the event
@@ -2055,11 +2056,13 @@
 		 */
 
 		key: function(s, type) {
-			type = type || 'pressed';
-
+			type = type || 'hold';
+//console.log('type = '+type);
 			if (this.isString(s)) {
 				if (s.indexOf('-') != -1) return this.key(s.split('-'), type);
 				if (s.length > 1) return this.specialKey(s, type);
+
+				if (type == 'hold' && this.data.key['up'][s]) return true;
 				return !!this.data.key[type][s.charCodeAt(0)];
 			}
 
@@ -2068,13 +2071,17 @@
 					if (!this.key(s[t])) return false;
 				return true;
 			}
-			if (this.isInt(s)) return !!this.data.key[type][s];
+			if (this.isInt(s))
+			{
+				if (type == 'hold' && this.data.key['up'][s]) return true;
+				return !!this.data.key[type][s];
+			}
 			return false;
 		},
 
 		specialKey: function(s, type) {
-			type = type || 'pressed';
-			if (type=='hold') !!this.data.key['hold'][this.data.key.special[s]] || !!this.data.key['up'][this.data.key.special[s]];;
+			type = type || 'hold';
+			if (type == 'hold' && this.data.key['up'][this.data.key.special[s]]) return true;
 			return !!this.data.key[type][this.data.key.special[s]];
 		},
 
@@ -2880,19 +2887,16 @@
 			e = e || window.event;
 
 			// get the key code
-			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+			e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
 
 			// main key pressed
-			yespix.data.key.pressed[parseInt(code)] = true;
-			yespix.data.key.hold[parseInt(code)] = true;
+			yespix.data.key.pressed[parseInt(e.code)] = true;
+			yespix.data.key.hold[parseInt(e.code)] = true;
 
 			// special key pressed
 			if (e.ctrlKey) yespix.data.key.down[yespix.data.key.special['ctrl']] = true;
 			if (e.altKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
-			if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
-			if (e.ctrlKey) yespix.data.key.hold[yespix.data.key.special['ctrl']] = true;
-			if (e.altKey) yespix.data.key.hold[yespix.data.key.special['alt']] = true;
-			if (e.shiftKey) yespix.data.key.hold[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['shift']] = true;
 
 			// triggers on YESPIX engine
 			yespix.trigger(e.type, e);
@@ -2907,19 +2911,16 @@
 			e = e || window.event;
 
 			// get the key code
-			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+			e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
 
 			// main key pressed
-			yespix.data.key.up[parseInt(code)] = true;
-			yespix.data.key.hold[parseInt(code)] = false;
+			yespix.data.key.up[parseInt(e.code)] = true;
+			yespix.data.key.hold[parseInt(e.code)] = false;
 
 			// special key pressed
-			if (e.ctrlKey) yespix.data.key.up[yespix.data.key.special['ctrl']] = true;
-			if (e.altKey) yespix.data.key.up[yespix.data.key.special['alt']] = true;
-			if (e.shiftKey) yespix.data.key.up[yespix.data.key.special['alt']] = true;
-			if (e.ctrlKey) yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
-			if (e.altKey) yespix.data.key.hold[yespix.data.key.special['alt']] = false;
-			if (e.shiftKey) yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+			if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
+			if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['shift']] = true;
 
 			// triggers on YESPIX engine
 			yespix.trigger(e.type, e);
@@ -2927,26 +2928,43 @@
 
 		/**
 		 * Key pressed bindings
+		 * 
 		 * @param  {object} e Event
 		 */
-		document.onkeypressed = function(e) {
+		document.onkeypress = function(e) {
 			// get the event
 			e = e || window.event;
 
 			// get the key code
-			var code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+			e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
 
 			// main key pressed
-			yespix.data.key.pressed[parseInt(code)] = true;
+			yespix.data.key.pressed[parseInt(e.code)] = true;
+			yespix.data.key.hold[parseInt(e.code)] = true;
 
 			// special key pressed
 			if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
 			if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
-			if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+			if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['shift']] = true;
 
 			// triggers on YESPIX engine
 			yespix.trigger(e.type, e);
 		};
+
+		/**
+		 * blur
+		 */
+		document.onblur = function(e) {
+			console.log('blur');
+			yespix.data.key.pressed = {};
+			yespix.data.key.hold = {};
+			yespix.data.key.down = {};
+			yespix.data.key.up = {};
+
+			// triggers on YESPIX engine
+			yespix.trigger(e.type, e);
+		};
+
 
 		yespix.on('exitFrame', function(e) {
 			//this.dump(this);

@@ -14,7 +14,25 @@
 	
 	var yp = yespix({ canvas: true, });
 
-	yp.load('test');
+	yp.on('keypress', function(e)
+	{
+		console.log('keypress :: code = '+e.code);
+	});
+	yp.on('keyup', function(e)
+	{
+		console.log('keyup :: code = '+e.code);
+	});
+	yp.on('keydown', function(e)
+	{
+		console.log('keydown :: code = '+e.code);
+	});
+
+	setInterval(function()
+	{
+		var code = 'a';
+		if (yp.key(code, 'hold') || yp.key(code, 'pressed') || yp.key(code, 'up') || yp.key(code, 'down'))
+			console.log('code = "'+code+'", hold = '+yp.key(code, 'hold')+', press = '+yp.key(code, 'pressed')+', up = '+yp.key(code, 'up')+', down = '+yp.key(code, 'down'));
+	}, 1);
 	
 </script>
 
