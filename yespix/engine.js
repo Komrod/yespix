@@ -2,7 +2,6 @@
 
 	/**
 	 * TODO:
-	 * - capture keypressed
 	 * - do the variable listener
 	 * - complete the find method and the bunch
 	 * - function visible() returns true if entity is visible on canvas
@@ -13,6 +12,7 @@
 	 *
 	 *
 	 * DONE:
+	 * x handle keys // 2013-11-14
 	 * x do the children manager // 2013-11-13
 	 * x make functions to handle instances in YESPIX engine and _instances in entity
 	 * x change _name to name because it's not unique and private // 2013-11-13
@@ -2058,13 +2058,13 @@
 
 		/**
 		 * Returns True if some keys are pressed, hold, down or up for this frame. Note: the key arrays are reset every frame, only the "hold"
-		 * keys are kept until "keyup" event. Depending on the framerate, you will sometimes miss the "pressed", "up" and "down" event. If you 
-		 * want to trigger an event on a key, it's better to use yespix.on('keypress'), yespix.on('keydown') or yespix.on('keyup'). The operators 
+		 * keys are kept until "keyup" event. Depending on the framerate, you will sometimes miss the "pressed", "up" and "down" event. If you
+		 * want to trigger an event on a key, it's better to use yespix.on('keypress'), yespix.on('keydown') or yespix.on('keyup'). The operators
 		 * AND "-" and OR "|" can be used in the selector.
 		 * @param  {int|string} s The selector or the key code of the character. Selector can be special keys ("shift", "ctrl" ...), multiple keys separated
-		 *                        with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority 
+		 *                        with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority
 		 *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for character "|" and "-", the character
-		 *                        must be escaped if there is more than one character in the selector, like "\|" and "\-". 
+		 *                        must be escaped if there is more than one character in the selector, like "\|" and "\-".
 		 * @param  {string} type "pressed" / "hold" / "down" / "up", default is "hold"
 		 * @return {boolean} Returns True on success
 		 * @example key("w") return true if the keys "w" is hold
@@ -2081,13 +2081,13 @@
 			type = type || 'hold';
 			//console.log('type = '+type);
 			if (this.isString(s)) {
-				if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|')-1)!='\\' && s.length>1)
-				{
+				if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
 					var arr = s.split('|', 2);
-					for (var t=0; t<arr.length; t++) if (this.key(arr[t], type)) return true;
+					for (var t = 0; t < arr.length; t++)
+						if (this.key(arr[t], type)) return true;
 					return false;
 				}
-				if (s.indexOf('-') != -1 && s.charAt(s.indexOf('-')-1)!='\\' && s.length>1) return this.key(s.split('-', 2), type);
+				if (s.indexOf('-') != -1 && s.charAt(s.indexOf('-') - 1) != '\\' && s.length > 1) return this.key(s.split('-', 2), type);
 				if (s.length > 1) return this.specialKey(s, type);
 				if (type != 'pressed') s = s.toUpperCase();
 				if (type == 'hold' && this.data.key['up'][s.charCodeAt(0)]) return true;
@@ -2112,8 +2112,39 @@
 			return !!this.data.key[type][this.data.key.special[s.toLowerCase()]];
 		},
 
+
+		/**
+		 ************************************************************************************************************
+		 * LISTEN VARIABLE CHANGES
+		 */
+
+		listen: function(obj, pname) {
+			if (Object.defineProperty) {
+				//				var value = obj[pname];
+				//				console.log('value = '+value);
+				Object.defineProperty(obj, 'x', {
+					set: function(v) {
+						console.log('v=' + v);
+						obj.trigger('change:' + pname, {
+							'v': v
+						});
+						return v;
+					},
+					configurable: true
+				});
+				//				obj[pname] = value;
+				//				console.log('value = '+value+', obj[pname] = '+obj[pname]);
+			} else {
+				console.log('NO defineProperty');
+			}
+		},
 	};
 
+
+	/*
+	 
+	 
+	 */
 
 
 	/**

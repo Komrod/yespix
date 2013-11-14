@@ -7,33 +7,24 @@
 <script type="text/javascript">
 	
 
-
-
-
-	
-	
 	var yp = yespix({ canvas: true, });
 
-	yp.on('keypress', function(e)
-	{
-		console.log('keypress :: code = '+e.code);
-	});
-	yp.on('keyup', function(e)
-	{
-		console.log('keyup :: code = '+e.code);
-	});
-	yp.on('keydown', function(e)
-	{
-		console.log('keydown :: code = '+e.code);
-	});
-
-	setInterval(function()
-	{
-		var code = 'a';
-		if (yp.key(code, 'hold') || yp.key(code, 'pressed') || yp.key(code, 'up') || yp.key(code, 'down'))
-			console.log('code = "'+code+'", hold = '+yp.key(code, 'hold')+', press = '+yp.key(code, 'pressed')+', up = '+yp.key(code, 'up')+', down = '+yp.key(code, 'down'));
-	}, 1);
 	
+	test = yp.spawn('base', {x: 100, name: 'test'});
+	console.log('x='+test.x);
+	yp.listen(test, 'x');
+	console.log('x='+test.x);
+	test.on('change:x', function(e)
+	{
+		//yp.dump(this);
+		yp.dump(e, 'change event');
+	});
+	console.log('x='+test.x);
+	test.x = 10;
+	console.log('x='+test.x);
+	test.x++;
+	console.log('x='+test.x);
+
 </script>
 
 </body>
