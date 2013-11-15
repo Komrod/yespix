@@ -626,6 +626,8 @@
 		 *		object "entity" and provides an event object with some data
 		 */
 		trigger: function(name, event, obj) {
+			if (name.indexOf(':')!=-1) console.log('yespix:trigger :: name='+name+', event='+event+', obj='+obj);
+
 			// Function can't trigger anything if there is no name
 			if (!name) return this;
 
@@ -2119,21 +2121,30 @@
 		 */
 
 		listen: function(obj, pname) {
+			var initValue = obj[pname];
 			if (Object.defineProperty) {
 				//				var value = obj[pname];
 				//				console.log('value = '+value);
-				Object.defineProperty(obj, 'x', {
-					set: function(v) {
-						console.log('v=' + v);
+				Object.defineProperty(obj, pname, {
+					get: function() { return this.value; },
+					set: function(value) {
+						this.oldValue = this.value;
+						this.value = value;
+						console.log('trigger on obj _class="'+obj._class+'", name="'+obj.name+'"');
 						obj.trigger('change:' + pname, {
-							'v': v
+							'newValue': value,
+							'oldValue': this.oldValue,
 						});
-						return v;
+						obj._changed = true;
+						if (!obj._changedList) obj._changedList = {pname: true};
+						else obj._changedList[pname] = true;
 					},
-					configurable: true
+					oldValue: initValue,
+					//configurable: true
 				});
+				obj[pname] = initValue;
 				//				obj[pname] = value;
-				//				console.log('value = '+value+', obj[pname] = '+obj[pname]);
+				//console.log('pname = '+pname+', obj[pname] = '+obj[pname]+', oldValue = '+obj[pname].oldValue);
 			} else {
 				console.log('NO defineProperty');
 			}
@@ -2264,16 +2275,17 @@
 			},
 
 			trigger: function(name, e) {
-				yespix.trigger(this, name, e);
+				console.log('entity:trigger :: name='+name+', event='+e);
+				yespix.trigger(name, e, this);
 				return this;
 			},
 
 			on: function(name, callback) {
-				yespix.on(this, name, callback);
+				yespix.on(name, callback, this);
 			},
 
 			off: function(name, callback) {
-				yespix.off(this, name, callback);
+				yespix.off(name, callback, this);
 			},
 
 			destroy: function() {
