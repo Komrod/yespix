@@ -7,23 +7,66 @@
 <script type="text/javascript">
 	
 
-	var yp = yespix({ canvas: true, });
+	var yp = yespix();
 
-	
-	test = yp.spawn('base', {x: 100, name: 'test'});
-	console.log('x='+test.x);
-	yp.listen(test, 'x');
-	console.log('x='+test.x);
-	test.on('change:x', function(e)
-	{
-		//yp.dump(this);
-		yp.dump(e, 'change event');
+	var test0 = yp.spawn('base', {
+		name: 'test0',
+		visible: false,
 	});
-	console.log('x='+test.x);
-	test.x = 10;
-	console.log('x='+test.x);
-	test.x++;
-	console.log('x='+test.x);
+
+	var test1 = yp.spawn('base', {
+		name: 'test1',
+		visible: false,
+	});
+	
+	var test2 = yp.spawn('image', {
+		name: 'test2',
+		images: 'resource/test/image/sean.jpg',
+		x: 100,
+		y: 100,
+	});
+	
+	var test3 = yp.spawn('sound', {
+		sounds: 'resource/test/sound/ludicrous.mp3',
+		visible: false,
+	});
+	
+	var test4 = yp.spawn('sound, image', {
+		sounds: 'resource/test/sound/ludicrous.mp3',
+		images: 'resource/test/image/sean.jpg',
+		name: 'ludicrous',
+		x: 100,
+		y: 100,
+	});
+	
+	yp.define('testme',
+	{
+		test: 'test',
+	});
+
+	var test5 = yp.spawn('testme', {
+		test123: function()
+		{
+			console.log('test123 :: test = '+this.test);
+		}
+	});
+	
+	var count = 1;
+
+
+	// #1
+	console.assert(yp.find().length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find().length);
+	console.assert(yp.find('').length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find('').length);
+	console.assert(yp.find({}).length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find({}).length);
+	console.assert(yp.find('.base').length == 6, '#'+(count++)+' :: "base" entities count must be 6 but equals '+yp.find('.base').length);
+	console.assert(yp.find('.image').length == 2, '#'+(count++)+' :: "image" entities count must be 2 but equals '+yp.find('.image').length);
+
+	// #6
+	console.assert(yp.find('.testme').length == 1, '#'+(count++)+' :: "testme" entities count must be 1 but equals '+yp.find('.testme').length);
+	console.assert(yp.find('.image test2').length == 1, '#'+(count++)+' :: ".image test2" entities count must be 1 but equals '+yp.find('.image test2').length);
+	console.assert(yp.find('.image test2')[0] && yp.find('.image test2')[0].name == 'test2', '#'+(count++)+' :: ".image test2" entity name must be "test2"');
+
+	yp.dump(yp.entityInstances['base']);
 
 </script>
 

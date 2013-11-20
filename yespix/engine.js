@@ -2,16 +2,17 @@
 
 	/**
 	 * TODO:
-	 * - do the variable listener
 	 * - complete the find method and the bunch
 	 * - function visible() returns true if entity is visible on canvas
 	 * - debug the z index
 	 * - do a partial draw for each gfx entities
 	 * - prerender canvas for the partial draw
 	 * - function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
+	 * - use Object.create for the mixin and delete mixin function
 	 *
 	 *
 	 * DONE:
+	 * x do the variable listener // 2013-11-18
 	 * x handle keys // 2013-11-14
 	 * x do the children manager // 2013-11-13
 	 * x make functions to handle instances in YESPIX engine and _instances in entity
@@ -75,7 +76,7 @@
 			});
 
 			// current version of the engine
-			this.version = "0.112";
+			this.version = "0.113";
 
 			// initialise the modules array
 			var modules = []; // yespix common modules
@@ -263,6 +264,8 @@
 			// set document and window
 			this.document = options["document"] || document;
 			this.window = options["window"] || window;
+
+
 
 
 			initEntities(this);
@@ -626,7 +629,7 @@
 		 *		object "entity" and provides an event object with some data
 		 */
 		trigger: function(name, event, obj) {
-			if (name.indexOf(':')!=-1) console.log('yespix:trigger :: name='+name+', event='+event+', obj='+obj);
+			if (name.indexOf(':') != -1) console.log('yespix:trigger :: name=' + name + ', event=' + event + ', obj=' + obj);
 
 			// Function can't trigger anything if there is no name
 			if (!name) return this;
@@ -1564,40 +1567,85 @@
 		 * @example find(4, fn)					// find the entities with the id 4 (number), only one since the id is unique
 		 * @example find('#4', fn)				// find the entities with the id 4 (number), only one since the id is unique
 		 * @example find('test, #2, .image', fn) // find the entities with name "test" OR id 2 OR class "image"
-		 * @exemple find({_name: 'test'}, fn)	// find the entities with name "test", only one since the entity name is unique
-		 * @exemple find({_name: /te/}, fn)		// find the entities with name corresponding to the regex /te/
+		 * @exemple find({_name: 'test'}, fn)	// find the entities with name "test"
+		 * @exemple find({_name: /te/}, fn)		// find the entities with name corresponding to the regex /te/ @todo
 		 * @exemple find({_name: ['lady', 'gaga']}, fn) // find the entities with name "lady" or "gaga"
 		 * @return {bunch} YESPIX bunch of entities, an array of entities on which you can call a function on all entities with
 		 *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property
 		 */
 		find: function(selector, fn) {
-			//console.log('find: properties:'+properties+', fn:'+fn);
+
+			if (this.isUndefined(selector))
+			{
+				var result = this.bunch(this.entityInstances['']);
+				console.log('undefined, length = '+result.length);
+				if (fn) this.each(result, fn);
+				return result;
+			}
 
 			// init selector and properties to find
 			var properties = {};
-			if (this.isString(selector)) properties = this.selectorInit(selector);
-			else if (this.isObject(selector)) properties = selector;
-			if (this.isArray(selector)) {
-				var result = [];
-				for (var n in selector) result = result.concat(this.find(selector[n]));
-				return this.bunch(result);
+
+			if (this.isString(selector)) {
+				// return all entities if the selector is an empty string
+				if (selector === '') {
+					var result = this.bunch(this.entityInstances['']);
+					console.log('empty "", length = '+result.length);
+					if (fn) this.each(result, fn);
+					return result;
+				}
+
+				// init the properties with the selector
+				properties = this.selectorInit(selector);
+			} else
+			// if the selector is an object, we use it as properties to search for
+			if (this.isObject(selector))
+			{
+				if (this.pLength(selector)==0) {
+					var result = this.bunch(this.entityInstances['']);
+					console.log('empty {}, length = '+result.length);
+					if (fn) this.each(result, fn);
+					return result;
+				}
+				properties = selector;
 			}
 
-			//this.dump(properties, 'find: properties');
+			// "selector" is an array of selector strings, each one will be parsed and the results will be merged
+			if (this.isArray(selector)) {
+				var result = this.bunch();
+				for (var n in selector) result = result.concat(this.find(selector[n]));
+				return result;
+			}
 
+			// number of properties to match to put the entity in the result
 			var propMatch = this.pLength(properties);
-			var result = [];
+			var result = this.bunch();
+			
+			if (propMatch>0 && properties['_class']!='canvas') yp.dump(properties, 'find :: properties');
+			
+			// if the class property is set, choose the class array to parse
+			if (properties['_class'] && properties['_class']!='')
+			{
+				if (this.entityInstances[properties['_class']])
+				{
+					var instances = this.entityInstances[properties['_class']];
+					if (propMatch==1) return this.bunch(instances);
+				}
+				// no class, return empty bunch
+				else return this.bunch();
+			} else var instances = this.entityInstances[properties['']];
 
-			// @todo search with the classname array instead of parsing all the entities
-			for (var t = 0; t < this.entityInstances[''].length; t++) {
+			for (var t = 0; t < instances.length; t++) {
 				var count = 0;
 				//console.log('find: checking entity ['+t+'] with name "'+this.instances[t]._name+'"');
 				for (var n in properties) {
-					if (this.entityInstances[t] !== undefined && this.entityInstances[t][n] !== undefined && this.selectorCompare(this.entityInstances[t][n], properties[n])) count++;
+					//if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
+					//else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
+					if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
 					//console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
 					if (count >= propMatch) {
 						//console.log('find: adding entity to result');
-						result.push(this.entityInstances[t]);
+						result.push(instances[t]);
 					}
 				}
 			}
@@ -1605,7 +1653,7 @@
 
 			if (fn) this.each(result, fn);
 
-			return this.bunch(result);
+			return result;
 		},
 
 		selectorInit: function(selector) {
@@ -1658,13 +1706,13 @@
 
 		/**
 		 * Convert an array of entities into a bunch of entities.The bunch object is an array of entities on which you can call a function on all entities with
-		 *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property. The bunch object also have all the
-		 *		array functions and properties such as length, concat ...
-		 * @todo
+		 * bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property. The bunch object also have all the
+		 * array functions and properties such as length, concat ...
 		 */
 		bunch: function(list) {
-
-			return list;
+			if (!list || list.length == 0)
+				return new Bunch();
+			return new Bunch(list);
 		},
 
 
@@ -1676,13 +1724,14 @@
 		 */
 		mixin: function(object, properties) {
 			for (fn in properties) {
-				//				if (properties.hasOwnProperty(fn) && fn != '__mixin')
 				{
-					//						console.log('mixin :: copy property "'+fn+'" into object');
 					object[fn] = properties[fn];
+					if (this.isFunction(object[fn])) Bunch.prototype[fn] = function()
+					{
+						this.each(fn, arguments);
+					};
 				}
 			}
-			//console.log('mixin :: end mixin');
 		},
 
 
@@ -2060,12 +2109,12 @@
 
 		/**
 		 * Returns True if some keys are pressed, hold, down or up for this frame. Note: the key arrays are reset every frame, only the "hold"
-		 * keys are kept until "keyup" event. Depending on the framerate, you will sometimes miss the "pressed", "up" and "down" event. If you
+		 * keys are kept until "keyup" event. Depending on the framerate, you will sometimes miss the "pressed", "up" and "down" True value. If you
 		 * want to trigger an event on a key, it's better to use yespix.on('keypress'), yespix.on('keydown') or yespix.on('keyup'). The operators
 		 * AND "-" and OR "|" can be used in the selector.
 		 * @param  {int|string} s The selector or the key code of the character. Selector can be special keys ("shift", "ctrl" ...), multiple keys separated
 		 *                        with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority
-		 *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for character "|" and "-", the character
+		 *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for character "|" and "-", the characters
 		 *                        must be escaped if there is more than one character in the selector, like "\|" and "\-".
 		 * @param  {string} type "pressed" / "hold" / "down" / "up", default is "hold"
 		 * @return {boolean} Returns True on success
@@ -2117,38 +2166,80 @@
 
 		/**
 		 ************************************************************************************************************
-		 * LISTEN VARIABLE CHANGES
+		 * LISTEN TO VARIABLE CHANGES
 		 */
 
-		listen: function(obj, pname) {
+		listen: function(obj, pname, callback) {
+			console.log('listen :: obj[pname] = ' + obj[pname]);
 			var initValue = obj[pname];
-			if (Object.defineProperty) {
+			callback = callback || this.listenTrigger;
+			if (0 && Object.defineProperty) {
 				//				var value = obj[pname];
 				//				console.log('value = '+value);
+				obj['__var_callback_' + pname] = callback;
+
 				Object.defineProperty(obj, pname, {
-					get: function() { return this.value; },
-					set: function(value) {
-						this.oldValue = this.value;
-						this.value = value;
-						console.log('trigger on obj _class="'+obj._class+'", name="'+obj.name+'"');
-						obj.trigger('change:' + pname, {
-							'newValue': value,
-							'oldValue': this.oldValue,
-						});
-						obj._changed = true;
-						if (!obj._changedList) obj._changedList = {pname: true};
-						else obj._changedList[pname] = true;
+					get: function() {
+						return obj['__var_new_' + pname];
 					},
-					oldValue: initValue,
-					//configurable: true
+					set: function(value) {
+						obj['__var_old_' + pname] = obj['__var_new_' + pname];
+						obj['__var_new_' + pname] = value;
+						obj['__var_callback_' + pname].call(obj, obj, {
+							target: obj,
+							name: pname,
+							oldValue: obj['__var_old_' + pname],
+							newValue: value,
+						});
+					},
 				});
-				obj[pname] = initValue;
-				//				obj[pname] = value;
-				//console.log('pname = '+pname+', obj[pname] = '+obj[pname]+', oldValue = '+obj[pname].oldValue);
+			} else if (0 && '__defineSetter__' in obj && '__defineSetter__' in obj) {
+				obj._changedCallback = callback;
+				obj.__defineGetter__(pname, function() {
+					return obj['__var_new_' + pname];
+				});
+				obj.__defineSetter__(pname, function(value) {
+					obj['__var_old_' + pname] = obj['__var_new_' + pname];
+					obj['__var_new_' + pname] = value;
+					obj['__var_callback_' + pname].call(obj, obj, {
+						target: obj,
+						name: pname,
+						oldValue: obj['__var_old_' + pname],
+						newValue: value,
+					});
+				});
 			} else {
-				console.log('NO defineProperty');
+				obj['__var_old_' + pname] = initValue;
+				obj['__var_new_' + pname] = initValue;
+				obj['__var_callback_' + pname] = callback;
+				console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
+				this.on('enterFrame', function() {
+					//console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
+					if (this[pname] != this['__var_new_' + pname]) {
+						this['__var_old_' + pname] = this['__var_new_' + pname];
+						this['__var_new_' + pname] = this[pname];
+						this['__var_callback_' + pname].call(this, this, {
+							target: this,
+							name: pname,
+							oldValue: obj['__var_old_' + pname],
+							newValue: obj['__var_new_' + pname],
+						});
+					}
+				}, obj, this);
+
 			}
+			console.log('listen :: before set obj[pname] = ' + obj[pname]);
+			obj[pname] = initValue;
+			console.log('listen :: after set obj[pname] = ' + obj[pname]);
 		},
+
+		listenTrigger: function(obj, e) {
+			obj._changed = true;
+			if (!obj._changedList) obj._changedList = {};
+			obj._changedList[e.name] = true;
+			obj.trigger('change:' + e.name, e);
+		},
+
 	};
 
 
@@ -2275,7 +2366,7 @@
 			},
 
 			trigger: function(name, e) {
-				console.log('entity:trigger :: name='+name+', event='+e);
+				console.log('entity:trigger :: name=' + name + ', event=' + e);
 				yespix.trigger(name, e, this);
 				return this;
 			},
@@ -2886,7 +2977,8 @@
 							entity.width = this.width;
 							entity.height = this.height;
 							delete this.onload;
-							entity.trigger('change');
+							entity.trigger('imageReady');
+							image.ready = true;
 						};
 					}
 					// add source to the image element
@@ -2937,6 +3029,91 @@
 					this.height // height on canvas
 				);
 			},
+		});
+
+
+
+		yespix.define('anim', 'image',
+		{
+			animDefault:
+			{
+				width: 32, // default tile width
+				height: 32, // default tile height
+				name: '', // default animation name to run
+				speed: 1,
+
+			},
+
+			animSelected: '',
+			animFrame: 0,
+			animSpeed: 1,
+			
+
+			/**
+			 * Array of anim informations:
+			 * name: Name of the animation
+			 * imageIndex: Image index of the sprite
+			 * imageName: Image name of the sprite
+			 * image: Image reference
+			 * width: pixel width
+			 * height: pixel height
+			 * x: position X in the image
+			 * y: position Y in the image
+			 */
+			anims: {},
+
+			animInit: function()
+			{
+				this.on('imageReady', function()
+				{
+					console.log('animInit :: imageReady');
+				});
+			},
+			
+			animPlay: function(name, from, speed)
+			{
+				if (!name) name = this.animDefaults.name;
+				if (!this.anims[name]) return null;
+
+				from = from || 0;
+				speed = speed || 1;
+
+				this.animSpeed = speed;
+
+			},
+
+			animStop: function()
+			{
+
+			},
+
+			draw: function(context) {
+				//yespix.dump(this, 'draw');
+				if (!this.isVisible) return;
+
+				if (!context) {
+					if (!this._context) this.getContext();
+					if (this._context) context = this._context;
+				}
+
+				if (!context) context = this._context;
+
+				//console.log('context = '+context+', element = '+this.image(this.selectedImage).element+', src = '+this.image(this.selectedImage).element.src);
+				var img = this.image(this.selectedImage);
+				//yespix.dump(img);
+				if (context && img && img.element)
+				 context.drawImage(img.element, //image element
+					0, // x position on image
+					0, // y position on image
+					this.width, // width on image
+					this.height, // height on image
+					this.x, // x position on canvas
+					this.y, // y position on canvas
+					this.width, // width on canvas
+					this.height // height on canvas
+				);
+			},
+
 		});
 
 
@@ -3039,26 +3216,69 @@
 		};
 
 
+		yespix.on('enterFrame', function(e) {
+			//console.log('enterFrame');
+
+
+		});
+
 		yespix.on('exitFrame', function(e) {
 			//this.dump(this);
 			// delete old keypressed
+			/*
 			if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
 			if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
 			if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
-
+			*/
 			// save current keypressed as old keypressed and delete current keypressed
 			this.data.key.pressed = {
-				old: this.data.key.pressed
+				//	old: this.data.key.pressed
 			};
 			this.data.key.up = {
-				old: this.data.key.up
+				//	old: this.data.key.up
 			};
 			this.data.key.down = {
-				old: this.data.key.down
+				//	old: this.data.key.down
 			};
 		});
 	};
 
+
+
+	// bunch init
+	Bunch = function(list) {
+		// if (list) console.log('Bunch :: list = '+list+', length = '+list.length+', instanceOf Bunch = '+(this instanceof Bunch));
+		//else console.log('Bunch :: list = '+list+', length = -');
+		//console.log('Bunch :: instanceOf Bunch = '+(this instanceof Bunch));
+		if (!(this instanceof Bunch)) return new Bunch(list);
+		this.__bunch_init.apply(this, arguments);
+	};
+	Bunch.prototype = new Array;
+	Bunch.prototype.__bunch_init = function(list)
+	{
+		// if (list) console.log('Bunch.init :: list = '+list+', length = '+list.length);
+		// else console.log('Bunch.init :: list = '+list+', length = -');
+
+		if (list && list.length > 0) {
+			console.log('Bunch :: list length = '+list.length);
+			for (var t = 0; t < list.length; t++) this.push(list[t]);
+		}
+	};
+	Bunch.prototype.__bunch_each = function(fn)
+	{
+/*		if (fn)
+		{
+			var args = [].concat(arguments);
+			args.shift();
+			for (var t=0; t<this.length; t++)
+			{
+				if (this[t] && this[t][fn])
+				{
+					this[t][fn].apply(this[t], args);
+				}
+			}
+		}*/
+	};
 
 
 	// expose the YESPIX function constructor
