@@ -1556,7 +1556,13 @@
 		/**
 		 * Find an entity or multiple entities from the selector, possibly executes a function fn and returns a bunch of
 		 * entities. The function fn is executed in the context of each entities, meaning that inside the function "this"
-		 * will refer to an entity.
+		 * will refer to an entity. When comparing the selector property to the entity property, the comparision is 
+		 * (selector vs. entity): // @todo
+		 * - same type 			vs. same type: 		returns True if strictly equals "==="
+		 * - bool|string type 	vs. array: 			returns True if the selector match one item of the array
+		 * - regular expression vs. string : 		returns True if the regex matches the string
+		 * - regular expression vs. array : 		returns True if the regex matches one item of the array
+		 * - array 				vs. bool|string: 	returns True if one item 
 		 * @exemple find('')					// find all the entities
 		 * @exemple find('test', function(e) { alert(e._id); }) // find entities with name "test" and show its id
 		 * @exemple find({}, fn)				// find all the entities and executes "fn" function
@@ -1564,6 +1570,8 @@
 		 * @example find('lady,gaga', fn)		// find the entities with name "lady" OR "gaga"
 		 * @example find('.image', fn)			// find the entities with class "image"
 		 * @example find('.sound test', fn)		// find the entities with class "sound" AND name
+		 * @example find('/image')				// find the entities with a class or an ancestor of "image" // @todo
+		 * @example find({_ancestors: 'image'})	// find the entities with an ancestor of "image"
 		 * @example find(4, fn)					// find the entities with the id 4 (number), only one since the id is unique
 		 * @example find('#4', fn)				// find the entities with the id 4 (number), only one since the id is unique
 		 * @example find('test, #2, .image', fn) // find the entities with name "test" OR id 2 OR class "image"
@@ -1623,17 +1631,21 @@
 			
 			if (propMatch>0 && properties['_class']!='canvas') yp.dump(properties, 'find :: properties');
 			
+			var instances = [];
+
 			// if the class property is set, choose the class array to parse
 			if (properties['_class'] && properties['_class']!='')
 			{
 				if (this.entityInstances[properties['_class']])
 				{
-					var instances = this.entityInstances[properties['_class']];
+					instances = this.entityInstances[properties['_class']];
 					if (propMatch==1) return this.bunch(instances);
 				}
 				// no class, return empty bunch
 				else return this.bunch();
-			} else var instances = this.entityInstances[properties['']];
+			} else instances = this.entityInstances[''];
+
+			if (!instances) yp.dump(instances, 'instances');
 
 			for (var t = 0; t < instances.length; t++) {
 				var count = 0;
@@ -1695,11 +1707,14 @@
 		selectorType: function(str) {
 			if (str[0] == '.') return '_class';
 			if (str[0] == '#') return '_id';
+			if (str[0] == '/') return '_ancestors';
 			return 'name';
 		},
 
 		selectorValue: function(str) {
-			if (str[0] == '.' || str[0] == '#') return str.substr(1, str.length);
+			if (str[0] == '.') return str.substr(1, str.length);
+			if (str[0] == '#') return +str.substr(1, str.length);
+			if (str[0] == '/') return str.substr(1, str.length);
 			return str;
 		},
 

@@ -54,19 +54,43 @@
 	var count = 1;
 
 
-	// #1
-	console.assert(yp.find().length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find().length);
-	console.assert(yp.find('').length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find('').length);
-	console.assert(yp.find({}).length == 6, '#'+(count++)+' :: Global entities count must be 6 but equals '+yp.find({}).length);
-	console.assert(yp.find('.base').length == 6, '#'+(count++)+' :: "base" entities count must be 6 but equals '+yp.find('.base').length);
-	console.assert(yp.find('.image').length == 2, '#'+(count++)+' :: "image" entities count must be 2 but equals '+yp.find('.image').length);
+	// #1 global and global class
+	console.assert(yp.find().length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find().length);
+	console.assert(yp.find('').length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find('').length);
+	console.assert(yp.find({}).length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find({}).length);
+	console.assert(yp.find('.base').length == 6, '#'+(count++)+' :: "base" count must be 6 but equals '+yp.find('.base').length);
+	console.assert(yp.find('.image').length == 1, '#'+(count++)+' :: "image" count must be 1 but equals '+yp.find('.image').length);
 
-	// #6
-	console.assert(yp.find('.testme').length == 1, '#'+(count++)+' :: "testme" entities count must be 1 but equals '+yp.find('.testme').length);
-	console.assert(yp.find('.image test2').length == 1, '#'+(count++)+' :: ".image test2" entities count must be 1 but equals '+yp.find('.image test2').length);
+	// #6 class property
+	console.assert(yp.find({_class: 'image', _visible: true}).length == 1, '#'+(count++)+' :: "{_class: image, _visible: true}" count must be 1 but equals '+yp.find({_class: 'image', _visible: true}).length);
+	console.assert(yp.find({_class: 'image', doNotExist: true}).length == 0, '#'+(count++)+' :: "{_class: image, doNotExist: true}" count must be 0 but equals '+yp.find({_class: 'image', doNotExist: true}).length);
+	console.assert(yp.find({_class: 'image', _visible: false}).length == 0, '#'+(count++)+' :: "{_class: image, _visible: false}" count must be 1 but equals '+yp.find({_class: 'image', _visible: false}).length);
+	console.assert(yp.find({_class: 'image', name: true}).length == 0, '#'+(count++)+' :: "{_class: image, name: true}" count must be 1 but equals '+yp.find({_class: 'image', name: true}).length);
+	console.assert(yp.find({_class: true}).length == 0, '#'+(count++)+' :: "{_class: true}" count must be 1 but equals '+yp.find({_class: true}).length);
+
+	// #11 . class
+	console.assert(yp.find('.testme').length == 1, '#'+(count++)+' :: "testme" count must be 1 but equals '+yp.find('.testme').length);
+	console.assert(yp.find('.image test2').length == 1, '#'+(count++)+' :: ".image test2" count must be 1 but equals '+yp.find('.image test2').length);
+	console.assert(yp.find('.notme test2').length == 0, '#'+(count++)+' :: ".notme test2" count must be 0 but equals '+yp.find('.notme test2').length);
+	console.assert(yp.find('.image notme').length == 0, '#'+(count++)+' :: ".testme notme" count must be 0 but equals '+yp.find('.image notme').length);
 	console.assert(yp.find('.image test2')[0] && yp.find('.image test2')[0].name == 'test2', '#'+(count++)+' :: ".image test2" entity name must be "test2"');
 
+	// #16 # id
+	console.assert(yp.find('#4').length == 1, '#'+(count++)+' :: "#4" count must be 1 but equals '+yp.find('#4').length);
+	console.assert(yp.find(1).length == 1, '#'+(count++)+' :: 4 (int) count must be 1 but equals '+yp.find(4).length);
+	console.assert(yp.find(1)[0] && yp.find(1)[0].name == 'test0', '#'+(count++)+' :: 1 (int) name must be "test0"');
+	console.assert(yp.find('#999').length == 0, '#'+(count++)+' :: "#999" count must be 0 but equals '+yp.find('#999').length);
+	console.assert(yp.find(999).length == 0, '#'+(count++)+' :: 999 (int) count must be 0 but equals '+yp.find(999).length);
+	 
+	 // #21 "/" extend
+	 
+	
+	
+
 	yp.dump(yp.entityInstances['base']);
+
+
+
 
 </script>
 
