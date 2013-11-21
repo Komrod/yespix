@@ -2,16 +2,19 @@
 
 	/**
 	 * TODO:
-	 * - complete the find method and the bunch
-	 * - function visible() returns true if entity is visible on canvas
-	 * - debug the z index
-	 * - do a partial draw for each gfx entities
-	 * - prerender canvas for the partial draw
+	 * - animation entity
+	 * - change the YESPIX draw to sort instances by z
+	 * - function to get the draw box
+	 * - collision and function to get the hit box
+	 * - function over() inside() intersect()
+	 * - function visible() returns true if gfx entity is visible on canvas
+	 * - debug the z index overlay
 	 * - function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
 	 * - use Object.create for the mixin and delete mixin function
 	 *
 	 *
 	 * DONE:
+	 * x complete the find method and the bunch // 2013-11-21
 	 * x do the variable listener // 2013-11-18
 	 * x handle keys // 2013-11-14
 	 * x do the children manager // 2013-11-13
@@ -29,6 +32,8 @@
 	 *
 	 * PENDING:
 	 * - do real js classes with prototype for entity classes
+	 * - do a partial draw for each gfx entities
+	 * - prerender canvas for the partial draw
 	 *
 	 */
 
@@ -267,7 +272,6 @@
 
 
 
-
 			initEntities(this);
 
 			for (var t = 0; t < options['modules'].length; t++) {
@@ -287,7 +291,7 @@
 			function start(options) {
 
 				if (options['canvas']) yespix.spawn('canvas', options.canvas);
-				if (options['fps']) this.setFps(options.fps);
+				if (options['fps']) yespix.setFps(options.fps);
 
 				yespix.on("draw", function(e) {
 					//console.log('draw :: ');
@@ -297,12 +301,13 @@
 						if (a.z == b.z && a.zGlobal > b.zGlobal) return true;
 						return false;
 					}
-					if (yespix.isArray(yespix.entityInstances['gfx'])) yespix.entityInstances['gfx'].sort(compare);
+					// @todo should probably do that in another list
+					if (yespix.isArray(yespix.entityInstances['/gfx'])) yespix.entityInstances['/gfx'].sort(compare);
 
-					if (yespix.entityInstances['gfx'])
-						for (var t = 0; t < yespix.entityInstances['gfx'].length; t++) {
-							if (yespix.entityInstances['gfx'][t] && yespix.entityInstances['gfx'][t].draw) {
-								yespix.entityInstances['gfx'][t].draw();
+					if (yespix.entityInstances['/gfx'])
+						for (var t = 0; t < yespix.entityInstances['/gfx'].length; t++) {
+							if (yespix.entityInstances['/gfx'][t] && yespix.entityInstances['/gfx'][t].draw) {
+								yespix.entityInstances['/gfx'][t].draw();
 							}
 						}
 				});
@@ -443,6 +448,13 @@
 		 */
 		isString: function(value) {
 			return typeof value == "string";
+		},
+
+		/**
+		 * @method isRegex
+		 */
+		isRegexp: function(value) {
+			return (value instanceof RegExp);
 		},
 
 		/**
@@ -629,7 +641,7 @@
 		 *		object "entity" and provides an event object with some data
 		 */
 		trigger: function(name, event, obj) {
-			if (name.indexOf(':') != -1) console.log('yespix:trigger :: name=' + name + ', event=' + event + ', obj=' + obj);
+			//if (name.indexOf(':') != -1) console.log('yespix:trigger :: name=' + name + ', event=' + event + ', obj=' + obj);
 
 			// Function can't trigger anything if there is no name
 			if (!name) return this;
@@ -943,7 +955,7 @@
 
 						if (!file.lengthComputable && !e.lengthComputable) {
 							// the file did not start download and we dont know its size
-							console.log('NOT COMPUTABLE');
+							//console.log('NOT COMPUTABLE');
 							file.state = 'pending';
 							file.loaded = 0;
 							file.progress = 0;
@@ -951,7 +963,7 @@
 							file.lengthComputable = false;
 						} else {
 							// process progress for the file
-							console.log('COMPUTABLE');
+							//console.log('COMPUTABLE');
 							file.lengthComputable = true;
 							if (file.loaded < e.loaded) file.loaded = e.loaded;
 							if (file.size < e.totalSize) file.size = e.totalSize;
@@ -1033,7 +1045,7 @@
 						var newEvent = progress(e);
 
 						//if (file.lengthComputable) file.state = 'processing';
-						console.log('apres progress :: url = ' + newEvent.url + ', client.state = ' + state + ', e.size = ' + newEvent.size);
+						//console.log('apres progress :: url = ' + newEvent.url + ', client.state = ' + state + ', e.size = ' + newEvent.size);
 
 						// onreadystatechange can be triggered by browsers several times with the same state. To check if the
 						// file has already been processed, check the value of file.done
@@ -1545,7 +1557,8 @@
 		 * List of entity instances
 		 * @type {Object}
 		 * @example entityInstances[entity._id] refers to the entity with integer id "entity._id"
-		 * @example entityInstances[classname] refers to an array of entities directly with the class or with an ancestor with the class name "classname"
+		 * @example entityInstances['.'+classname] refers to an array of entities with the class name "classname"
+		 * @example entityInstances['/'+classname] refers to an array of entities with an ancestor "classname"
 		 * @example entityInstances[''] refers to an array of all the entity instances
 		 */
 		entityInstances: {},
@@ -1556,13 +1569,16 @@
 		/**
 		 * Find an entity or multiple entities from the selector, possibly executes a function fn and returns a bunch of
 		 * entities. The function fn is executed in the context of each entities, meaning that inside the function "this"
-		 * will refer to an entity. When comparing the selector property to the entity property, the comparision is 
+		 * will refer to an entity. When comparing the selector property to the entity property, the comparision is
 		 * (selector vs. entity): // @todo
 		 * - same type 			vs. same type: 		returns True if strictly equals "==="
 		 * - bool|string type 	vs. array: 			returns True if the selector match one item of the array
 		 * - regular expression vs. string : 		returns True if the regex matches the string
 		 * - regular expression vs. array : 		returns True if the regex matches one item of the array
-		 * - array 				vs. bool|string: 	returns True if one item 
+		 * - array 				vs. bool|string: 	returns True if one item of the array match
+		 * The entity selector is intentionnally close to the JQuery selector but there is differences. Not working:
+		 * find('name.class') // ERROR: no space between selector elements
+		 * find('class#id') // ERROR: no space between selector elements
 		 * @exemple find('')					// find all the entities
 		 * @exemple find('test', function(e) { alert(e._id); }) // find entities with name "test" and show its id
 		 * @exemple find({}, fn)				// find all the entities and executes "fn" function
@@ -1576,17 +1592,16 @@
 		 * @example find('#4', fn)				// find the entities with the id 4 (number), only one since the id is unique
 		 * @example find('test, #2, .image', fn) // find the entities with name "test" OR id 2 OR class "image"
 		 * @exemple find({_name: 'test'}, fn)	// find the entities with name "test"
-		 * @exemple find({_name: /te/}, fn)		// find the entities with name corresponding to the regex /te/ @todo
+		 * @exemple find({_name: /test/}, fn)	// find the entities with name corresponding to the regex /test/ @todo
 		 * @exemple find({_name: ['lady', 'gaga']}, fn) // find the entities with name "lady" or "gaga"
 		 * @return {bunch} YESPIX bunch of entities, an array of entities on which you can call a function on all entities with
 		 *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property
 		 */
 		find: function(selector, fn) {
 
-			if (this.isUndefined(selector))
-			{
+			if (this.isUndefined(selector)) {
 				var result = this.bunch(this.entityInstances['']);
-				console.log('undefined, length = '+result.length);
+				//console.log('undefined, length = '+result.length);
 				if (fn) this.each(result, fn);
 				return result;
 			}
@@ -1598,7 +1613,7 @@
 				// return all entities if the selector is an empty string
 				if (selector === '') {
 					var result = this.bunch(this.entityInstances['']);
-					console.log('empty "", length = '+result.length);
+					//console.log('empty "", length = '+result.length);
 					if (fn) this.each(result, fn);
 					return result;
 				}
@@ -1606,12 +1621,19 @@
 				// init the properties with the selector
 				properties = this.selectorInit(selector);
 			} else
+			// if selector is the entity._id (integer)
+			if (this.isInt(selector)) {
+				//console.log('selector is an int, entity = '+this.entityInstances[+selector]);
+				// return the entity
+				if (this.entityInstances[+selector]) return this.bunch([this.entityInstances[+selector]]);
+				return this.bunch();
+			} else
 			// if the selector is an object, we use it as properties to search for
-			if (this.isObject(selector))
-			{
-				if (this.pLength(selector)==0) {
+			if (this.isObject(selector)) {
+				// empty properties return all the entities
+				if (this.pLength(selector) == 0) {
 					var result = this.bunch(this.entityInstances['']);
-					console.log('empty {}, length = '+result.length);
+					//console.log('empty {}, length = '+result.length);
 					if (fn) this.each(result, fn);
 					return result;
 				}
@@ -1628,31 +1650,40 @@
 			// number of properties to match to put the entity in the result
 			var propMatch = this.pLength(properties);
 			var result = this.bunch();
-			
-			if (propMatch>0 && properties['_class']!='canvas') yp.dump(properties, 'find :: properties');
-			
+
+			//if (propMatch>0 && properties['_class']!='canvas') yp.dump(properties, 'find :: properties');
+
 			var instances = [];
 
 			// if the class property is set, choose the class array to parse
-			if (properties['_class'] && properties['_class']!='')
-			{
-				if (this.entityInstances[properties['_class']])
-				{
-					instances = this.entityInstances[properties['_class']];
-					if (propMatch==1) return this.bunch(instances);
+			if (properties['_class'] && properties['_class'] != '') {
+				if (this.entityInstances['.' + properties['_class']]) {
+					instances = this.entityInstances['.' + properties['_class']];
+					if (propMatch == 1) return this.bunch(instances);
 				}
 				// no class, return empty bunch
 				else return this.bunch();
-			} else instances = this.entityInstances[''];
+			} else
+			// if the ancestor class is set, choose the ancestor array to parse
+			// Work only with string ancestor class name, not array of ancestor class names
+			if (properties['_ancestors'] && this.isString(properties['_ancestors']) && properties['_ancestors'] != '') {
+				if (this.entityInstances['/' + properties['_ancestors']]) {
+					instances = this.entityInstances['/' + properties['_ancestors']];
+					if (propMatch == 1) return this.bunch(instances);
+				}
+				// no class, return empty bunch
+				else return this.bunch();
+			}
+			// if not, parse the whole list (slow)
+			else instances = this.entityInstances[''];
 
-			if (!instances) yp.dump(instances, 'instances');
-
+			// console.log('instances length = '+instances.length);
 			for (var t = 0; t < instances.length; t++) {
 				var count = 0;
-				//console.log('find: checking entity ['+t+'] with name "'+this.instances[t]._name+'"');
+				// console.log('find: checking entity ['+t+'] with name "'+instances[t]._name+'"');
 				for (var n in properties) {
-					//if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
-					//else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
+					// if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
+					// else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
 					if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
 					//console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
 					if (count >= propMatch) {
@@ -1661,7 +1692,7 @@
 					}
 				}
 			}
-			//console.log('find: result length = '+result.length);
+			// console.log('find: result length = '+result.length);
 
 			if (fn) this.each(result, fn);
 
@@ -1696,12 +1727,21 @@
 		},
 
 		selectorCompare: function(entityValue, value) {
-			var type1 = this.getType(entityValue);
-			var type2 = this.getType(value);
-			//console.log('entityValue = '+entityValue+', type1 = '+type1+', value = '+value+', type2 = '+type2);
-			if (type1 == type2) return entityValue === value;
-
-			return false;
+			if (this.isString(value)) {
+				if (this.isArray(entityValue)) return this.inArray(entityValue, value);
+				//if (this.isString(entityValue)) return entityValue === value; 
+				return entityValue === value;
+			}
+			if (this.isArray(value)) {
+				if (this.isString(entityValue)) return this.inArray(value, entityValue);
+				//if (this.isString(entityValue)) return entityValue === value; 
+				return entityValue === value;
+			}
+			if (this.isRegexp(value)) {
+				if (this.isString(entityValue)) return value.test(entityValue);
+				return entityValue === value;
+			}
+			return entityValue === value;
 		},
 
 		selectorType: function(str) {
@@ -1741,8 +1781,7 @@
 			for (fn in properties) {
 				{
 					object[fn] = properties[fn];
-					if (this.isFunction(object[fn])) Bunch.prototype[fn] = function()
-					{
+					if (this.isFunction(object[fn])) Bunch.prototype[fn] = function() {
 						this.each(fn, arguments);
 					};
 				}
@@ -1903,14 +1942,14 @@
 		/**
 		 *
 		 * A reference of the entity will be the inserted in:
-		 * yespix.entityInstances[''] 				at the index entity._instances[''] (integer)
-		 * yespix.entityInstances[entity._id] 		at the index entity._id (integer)
-		 * yespix.entityInstances[entity._class]	at the index entity._instances[entity._class]
-		 * yespix.entityInstances[ancestorClass]	at the index entity._instances[ancestorClass]
+		 * yespix.entityInstances[''] 					at the index entity._instances[''] (integer)
+		 * yespix.entityInstances[entity._id]	 		at the index entity._id (integer)
+		 * yespix.entityInstances['.'+entity._class]	at the index entity._instances[entity._class]
+		 * yespix.entityInstances['/'+ancestorClass]	at the index entity._instances[ancestorClass]
 		 */
 		instanceAdd: function(entity) {
 			// the entity must not be in any instances list because we are overriding his _instances object
-			if (entity._instances) this / instanceRemove(entity);
+			if (entity._instances) this.instanceRemove(entity);
 			entity._instances = {};
 
 
@@ -1922,27 +1961,28 @@
 				this.entityInstances[''].push(entity);
 				entity._instances[''] = this.entityInstances[''].length - 1;
 			}
+
 			// insert reference with the entity Id
 			this.entityInstances[+entity._id] = entity;
 
 			// insert reference in the class instances list for its own class name
-			if (!this.entityInstances[entity._class]) {
-				this.entityInstances[entity._class] = [entity];
+			if (!this.entityInstances['.' + entity._class]) {
+				this.entityInstances['.' + entity._class] = [entity];
 				entity._instances[entity._class] = 0;
 			} else {
-				this.entityInstances[entity._class].push(entity);
-				entity._instances[entity._class] = this.entityInstances[entity._class].length - 1;
+				this.entityInstances['.' + entity._class].push(entity);
+				entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
 			}
 
-			// insert a reference in the class instances list for all its ancestors
+			// insert a reference in the ancestor instances list for all its ancestors
 			if (entity._ancestors.length > 0)
 				for (var t = 0; t < entity._ancestors.length; t++) {
-					if (!this.entityInstances[entity._ancestors[t]]) {
-						this.entityInstances[entity._ancestors[t]] = [entity];
+					if (!this.entityInstances['/' + entity._ancestors[t]]) {
+						this.entityInstances['/' + entity._ancestors[t]] = [entity];
 						entity._instances[entity._ancestors[t]] = 0;
 					} else {
-						this.entityInstances[entity._ancestors[t]].push(entity);
-						entity._instances[entity._ancestors[t]] = this.entityInstances[entity._ancestors[t]].length - 1;
+						this.entityInstances['/' + entity._ancestors[t]].push(entity);
+						entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
 					}
 				}
 		},
@@ -1955,12 +1995,12 @@
 			delete this.entityInstances[+entity._id];
 
 			// remove reference from the class instances list for its own class name
-			if (this.entityInstances[entity._class]) this.entityInstances[entity._class].splice(entity._instances[entity._class], 1);
+			if (this.entityInstances['.' + entity._class]) this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1);
 
 			// insert a reference in the class instances list for all its ancestors
 			if (entity._ancestors.length > 0)
 				for (var t = 0; t < entity._ancestors.length; t++)
-					if (this.entityInstances[entity._ancestors[t]]) this.entityInstances[entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
+					if (this.entityInstances['/' + entity._ancestors[t]]) this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
 		},
 
 		/**
@@ -2370,6 +2410,17 @@
 				return true;
 			},
 
+			prop: function(name, value) {
+				if (yespix.isObject(name)) {
+					for (var n in name) {
+						this[n] = name[n];
+					}
+					return this;
+				}
+				this[name] = value;
+				return this;
+			},
+
 			attach: function(entity) {
 				yespix.attach(this, entity);
 				return this;
@@ -2445,35 +2496,7 @@
 
 			// initilize object
 			init: function() {
-				var lp =
-					[{
-					name: 'x',
-					init: 0,
-				}, {
-					name: 'y',
-					init: 0,
-				}, {
-					name: 'z',
-					init: 0,
-				}, {
-					name: 'zGlobal',
-					init: 0,
-				}, {
-					name: 'rotation',
-					init: 0,
-				}, {
-					name: 'alpha',
-					init: 1.0,
-				}, {
-					name: 'origin',
-					init: {
-						x: 0,
-						y: 0
-					},
-				}, {
-					name: '_numChildren',
-					init: 0,
-				}, ];
+
 				//yespix.listen(this.lp);
 				//console.log('init gfx!');
 
@@ -2487,13 +2510,11 @@
 				}
 				//console.log('getContext : looking for context');
 				if (this._parent == null) {
-					(function(obj) {
-						//					var obj = this;
-						yespix.find('.canvas', function() {
-							if (!obj._context) obj._context = this.context;
-							//console.log('find canvas!');
-						});
-					})(this);
+					//console.log('count canvas = '+yespix.find('.canvas').length);
+					var canvas = yespix.find('.canvas')[0];
+					if (!this._context && canvas) this._context = canvas.context;
+					//if (canvas) console.log('find canvas!');
+					//yespix.dump(canvas);
 				}
 				//console.log('getContext : _context = '+this._context);
 			},
@@ -2512,7 +2533,6 @@
 			soundDefaults: {
 				isInitiated: false, // true if soundInit() was called
 				isSupported: false, // 
-				isLoaded: false,
 				isReady: false,
 				volume: 1.0,
 				duration: 0,
@@ -2913,7 +2933,7 @@
 
 			imageDefaults: {
 				isInitiated: false, // true if imageInit() was called
-				isLoaded: false,
+				isReady: false,
 				src: '',
 				element: null,
 				document: yespix.document,
@@ -2925,12 +2945,18 @@
 
 				//console.log('init image');
 				//yespix.dump(this);
+
 				if (yespix.isString(this.images)) this.images = [{
 					src: this.images
 				}];
 				//console.log('init image: array of '+this.images.length+' images');
 
 				for (var t = 0; t < this.images.length; t++) {
+					// if the array element is a string, it's the src of the image
+					if (yespix.isString(this.images[t])) this.images[t] = {
+						src: this.images[t],
+					};
+
 					// init the default properties
 					//console.log('init the image ['+t+'] with the default properties');
 					for (var n in this.imageDefaults) {
@@ -2941,128 +2967,134 @@
 					if (this.images[t].name === '') this.images[t].name = 'image' + count++;
 				}
 
-				this.image = function(properties) {
-					//console.log('image :: properties = '+properties);
-
-					if (properties == undefined)
-						if (this.images[0]) return this.imageInit(this.images[0]);
-						else return null;
-					if (typeof properties == 'string') properties = {
-						name: properties
-					};
-					else if (yespix.isInt(properties))
-						if (this.images[properties]) return this.imageInit(this.images[properties]);
-						else return null;
-
-					var max = Object.keys(properties).length;
-					var count = 0;
-					for (var t = 0; t < this.images.length; t++) {
-						//console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
-						for (var n in properties) {
-							if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
-							//console.log('property "'+n+'", max = '+max+', count = '+count);
-							if (count >= max) return this.imageInit(this.images[t]);
-						}
-					}
-					return null;
-
-
-				};
-
-				this.imageInit = function(image, index) {
-					var entity = this;
-
-					// no sound, init all the sounds
-					if (image == undefined) {
-						for (var t = 0; t < this.images.length; t++) {
-							this.imageInit(this.images[t], t);
-						}
-						return true;
-					}
-
-					// image already initiated
-					if (image.isInitiated) return image;
-
-					image.isInitiated = true;
-					image.index = index;
-					image.entity = entity;
-					image.element = document.createElement('img');
-					if (index !== undefined && entity.selectedImage == index) {
-						image.element.onload = function() {
-							entity.width = this.width;
-							entity.height = this.height;
-							delete this.onload;
-							entity.trigger('imageReady');
-							image.ready = true;
-						};
-					}
-					// add source to the image element
-					image.changeSource = function(source) {
-						this.element.src = source;
-						entity.trigger('change');
-						return true;
-					};
-
-					if (image.src !== undefined && image.src !== '') {
-						image.changeSource(image.src);
-					}
-
-					//console.log('imageInit :: src #1 = '+image.element.src);
-
-					return image; //source != '';
-				};
-
 				this.imageInit();
+			},
 
-				yespix.on('change', function() {
-					this.hasChanged = true;
-				}, this);
+			image: function(properties) {
+				//console.log('image :: properties = '+properties);
+
+				if (properties == undefined)
+					if (this.images[0]) return this.imageInit(this.images[0]);
+					else return null;
+				if (typeof properties == 'string') properties = {
+					name: properties
+				};
+				else if (yespix.isInt(properties))
+					if (this.images[properties]) return this.imageInit(this.images[properties]);
+					else return null;
+
+				var max = Object.keys(properties).length;
+				var count = 0;
+				for (var t = 0; t < this.images.length; t++) {
+					//console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
+					for (var n in properties) {
+						if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
+						//console.log('property "'+n+'", max = '+max+', count = '+count);
+						if (count >= max) return this.imageInit(this.images[t]);
+					}
+				}
+				return null;
+			},
+
+			imageInit: function(image) {
+				var entity = this;
+
+				// no image, init all the images
+				if (image == undefined) {
+					for (var t = 0; t < this.images.length; t++) {
+						this.imageInit(this.images[t]);
+					}
+					return true;
+				}
+
+				// image already initiated
+				if (image.isInitiated) return image;
+
+				image.isReady = false;
+				image.isInitiated = true;
+				image.entity = entity;
+				image.element = document.createElement('img');
+				console.log('createElement :: selectedImage = '+entity.selectedImage+', src = '+image.src+', image.element = '+image.element);
+
+				if (image.element) image.element.onload = image.element.onLoad = function() {
+					image.realWidth = this.width;
+					image.realHeight = this.height;
+					delete this.onload;
+					image.isReady = true;
+					entity.trigger('imageReady', {
+						target: image,
+					});
+				};
+
+				// add source to the image element
+				image.changeSource = function(source) {
+					this.element.src = source;
+					entity.trigger('change');
+					return true;
+				};
+
+				if (image.src !== undefined && image.src !== '') {
+					image.changeSource(image.src);
+				}
+
+				//console.log('imageInit :: src #1 = '+image.element.src);
+
+				return image; //source != '';
 			},
 
 			draw: function(context) {
-				//yespix.dump(this, 'draw');
+				yespix.dump(this, 'draw');
 				if (!this.isVisible) return;
 
 				if (!context) {
-					if (!this._context) this.getContext();
-					if (this._context) context = this._context;
+					if (!this._context) {
+						this.getContext();
+						if (this._context) context = this._context;
+					} else context = this._context;
 				}
 
-				if (!context) context = this._context;
-
-				//console.log('context = '+context+', element = '+this.image(this.selectedImage).element+', src = '+this.image(this.selectedImage).element.src);
+				console.log('context = '+context+', element = '+this.image(this.selectedImage).element+', src = '+this.image(this.selectedImage).element.src);
 				var img = this.image(this.selectedImage);
-				//yespix.dump(img);
-				if (context && img && img.element) context.drawImage(img.element, //image element
+				yespix.dump(img);
+				var width = this.width || img.width || img.realWidth;
+				var height = this.height || img.height || img.realHeight;
+				if (context && img && img.element && img.isReady) context.drawImage(img.element, //image element
 					0, // x position on image
 					0, // y position on image
-					this.width, // width on image
-					this.height, // height on image
+					img.realWidth, // width on image
+					img.realHeight, // height on image
 					this.x, // x position on canvas
 					this.y, // y position on canvas
-					this.width, // width on canvas
-					this.height // height on canvas
+					width, // width on canvas
+					height // height on canvas
 				);
+				yespix.timerStop();
 			},
 		});
 
 
 
-		yespix.define('anim', 'image',
-		{
-			animDefault:
-			{
+		yespix.define('anim', 'image', {
+			animDefault: {
 				width: 32, // default tile width
 				height: 32, // default tile height
 				name: '', // default animation name to run
-				speed: 1,
-
 			},
 
 			animSelected: '',
 			animFrame: 0,
 			animSpeed: 1,
-			
+			animReady: false,
+
+			init: function() {
+				console.log('init :: anim');
+				this.animInit();
+				this.on('imageReady', function() {
+					console.log('init :: imageReady');
+					this.animFramesInit();
+				});
+			},
+
 
 			/**
 			 * Array of anim informations:
@@ -3077,16 +3109,123 @@
 			 */
 			anims: {},
 
-			animInit: function()
-			{
-				this.on('imageReady', function()
-				{
-					console.log('animInit :: imageReady');
-				});
+			/**
+			 * When all anim frames are ready, animSetup will initiated the frames
+			 * @return {[type]} [description]
+			 */
+			animFramesInit: function() {
+				console.log('animFramesInit');
+
+				// check every animation
+				for (var name in this.anims) {
+					var anim = this.anims[name];
+
+					console.log('animFramesInit :: name = '+name);
+
+					// only animation that is not ready
+					if (!anim.isReady)
+					{
+						// init the ready variable
+						var ready = true;
+						for (var t = 0; t < anim.frames.length; t++)
+						{
+							var frame = anim.frames[t];
+							console.log('animFramesInit :: frame '+t+', isReady = '+frame.isReady+', image = '+frame.image);
+							if (frame.image) console.log('image.isReady = '+frame.image.isReady);
+							if (frame.isReady) continue;
+							if (!frame.image || !frame.image.isReady)
+							{
+								yespix.dump(frame.image, 'image not ready');
+								frame.isReady = false;
+								ready = false;
+								break;
+							}
+						}
+
+						// If all the images are ready, we must complete the frame objects
+						if (ready)
+						{
+							// animation is ready
+							anim.ready = true;
+
+							var maxLine;
+
+							// maximum frame in one line
+							for (var t = 0; t < anim.frames.length; t++)
+							{
+								// x and y position already defined
+								if (!yespix.isUndefined(frame.x) && !yespix.isUndefined(frame.y)) continue;
+
+								var frame = anim.frames[t];
+
+								// process maximum number of frames in one line for this frame and image. Each frame can have its own image
+								// so we need to update this variable on each frame
+								maxLine = Math.floor(frame.image.realWidth/frame.width);
+								if (maxLine>0)
+								{
+									frame.x = (anim.offsetX || 0) + (t % maxLine) * frame.width;
+									frame.y = frame.y || anim.offsetY || 0;
+									console.log('frame :: t='+t+', maxLine='+maxLine+', x='+frame.x+', y='+frame.y);
+								} else console.log('frame :: t='+t+', maxLine='+maxLine);
+							}
+						} else console.log('animFramesInit :: an image is not ready for anim "'+name+'"');
+					} else console.log('animFramesInit :: anim "'+name+'" is ready');
+				}
 			},
-			
-			animPlay: function(name, from, speed)
-			{
+
+			animInit: function() {
+				console.log('animInit :: this.anims = ' + this.anims);
+
+				for (var name in this.anims) {
+
+					var anim = this.anims[name];
+					console.log('animInit :: anim name = ' + name);
+
+					// check if all images are ready
+					anim.name = name;
+					anim.isReady = false;
+
+					// init the default animation
+					if (anim.isDefault) {
+						this.animDefault['name'] = name;
+						if (!this.animSelected) this.animSelected = name;
+					}
+
+					// "frames" is an array of frames
+					if (yespix.isArray(anim['frames'])) {
+						// frames are already set
+						if (!anim.length) anim.length = anim['frames'].length;
+
+					} else
+					// "frames" is not set and must be initiated
+					{
+						if (!anim.length) anim.length = 1;
+						if (!anim.from) anim.from = 0;
+						anim['frames'] = [];
+
+						for (var t = 0; t < anim.length; t++) {
+							var frame = {
+								index: t,
+								anim: name,
+								isReady: false,
+								width: anim.width || this.animDefault.width,
+								height: anim.height || this.animDefault.height,
+							};
+
+							if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
+							if (!yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
+							if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
+
+							anim['frames'].push(frame);
+							yespix.dump(frame, 'frame pushed');
+						}
+					}
+				}
+				//				if (this.anims.walkleft) yespix.dump(this.anims.walkleft, 'Anims walkleft');
+				this.animFramesInit();
+			},
+
+			animPlay: function(name, from, speed) {
 				if (!name) name = this.animDefaults.name;
 				if (!this.anims[name]) return null;
 
@@ -3097,8 +3236,15 @@
 
 			},
 
-			animStop: function()
-			{
+			animStop: function() {
+
+			},
+
+			animStep: function() {
+
+			},
+
+			animNext: function() {
 
 			},
 
@@ -3107,26 +3253,30 @@
 				if (!this.isVisible) return;
 
 				if (!context) {
-					if (!this._context) this.getContext();
-					if (this._context) context = this._context;
+					if (!this._context) {
+						this.getContext();
+						if (this._context) context = this._context;
+					} else context = this._context;
 				}
-
-				if (!context) context = this._context;
 
 				//console.log('context = '+context+', element = '+this.image(this.selectedImage).element+', src = '+this.image(this.selectedImage).element.src);
 				var img = this.image(this.selectedImage);
 				//yespix.dump(img);
+				//
+				var width = this.width || img.width || img.realWidth;
+				var height = this.height || img.height || img.realHeight;
+
 				if (context && img && img.element)
-				 context.drawImage(img.element, //image element
-					0, // x position on image
-					0, // y position on image
-					this.width, // width on image
-					this.height, // height on image
-					this.x, // x position on canvas
-					this.y, // y position on canvas
-					this.width, // width on canvas
-					this.height // height on canvas
-				);
+					if (context && img && img.element && img.isReady) context.drawImage(img.element, //image element
+						0, // x position on image
+						0, // y position on image
+						img.realWidth, // width on image
+						img.realHeight, // height on image
+						this.x, // x position on canvas
+						this.y, // y position on canvas
+						width, // width on canvas
+						height // height on canvas
+					);
 			},
 
 		});
@@ -3269,19 +3419,17 @@
 		this.__bunch_init.apply(this, arguments);
 	};
 	Bunch.prototype = new Array;
-	Bunch.prototype.__bunch_init = function(list)
-	{
+	Bunch.prototype.__bunch_init = function(list) {
 		// if (list) console.log('Bunch.init :: list = '+list+', length = '+list.length);
 		// else console.log('Bunch.init :: list = '+list+', length = -');
 
 		if (list && list.length > 0) {
-			console.log('Bunch :: list length = '+list.length);
+			//console.log('Bunch :: list length = '+list.length);
 			for (var t = 0; t < list.length; t++) this.push(list[t]);
 		}
 	};
-	Bunch.prototype.__bunch_each = function(fn)
-	{
-/*		if (fn)
+	Bunch.prototype.__bunch_each = function(fn) {
+		/*		if (fn)
 		{
 			var args = [].concat(arguments);
 			args.shift();

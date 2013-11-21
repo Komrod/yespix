@@ -7,91 +7,72 @@
 <script type="text/javascript">
 	
 
-	var yp = yespix();
 
-	var test0 = yp.spawn('base', {
-		name: 'test0',
-		visible: false,
-	});
 
-	var test1 = yp.spawn('base', {
-		name: 'test1',
-		visible: false,
-	});
+	var yp = yespix({canvas: true, fps: 1});
+
 	
-	var test2 = yp.spawn('image', {
-		name: 'test2',
-		images: 'resource/test/image/sean.jpg',
-		x: 100,
+	var test1 = yp.spawn('image', {
+		name: 'sean',
+		images: ['resource/test/image/sean.png'],
+		x: 200,
 		y: 100,
 	});
-	
-	var test3 = yp.spawn('sound', {
-		sounds: 'resource/test/sound/ludicrous.mp3',
-		visible: false,
-	});
-	
-	var test4 = yp.spawn('sound, image', {
-		sounds: 'resource/test/sound/ludicrous.mp3',
-		images: 'resource/test/image/sean.jpg',
-		name: 'ludicrous',
+
+	/*
+	var test0 = yp.spawn('anim', {
+		name: 'perso',
+		images: 'resource/test/image/persos.png',
 		x: 100,
 		y: 100,
+		anims: {
+			walkleft:
+			{
+				length: 3,
+			},
+			walkright:
+			{
+				from: 3,
+				length: 3,
+			},
+			standleft:
+			{
+				from:0,
+				length: 1,
+			},
+			standright:
+			{
+				from:3,
+				length: 1,
+				default: true,
+			},
+		},
 	});
-	
-	yp.define('testme',
-	{
-		test: 'test',
+	*/
+
+	/*
+	var test1 = yp.spawn('anim', {
+		name: 'perso',
+		images: ['resource/test/image/persos.png', 'resource/test/image/sean.png'],
+		x: 200,
+		y: 100,
+		anims: {
+			face:
+			{
+				length: 3,
+				image:1,
+				isDefault: true,
+			},
+			walkright:
+			{
+				from: 3,
+				length: 3,
+			},
+		},
 	});
+	*/
 
-	var test5 = yp.spawn('testme', {
-		test123: function()
-		{
-			console.log('test123 :: test = '+this.test);
-		}
-	});
 	
-	var count = 1;
-
-
-	// #1 global and global class
-	console.assert(yp.find().length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find().length);
-	console.assert(yp.find('').length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find('').length);
-	console.assert(yp.find({}).length == 6, '#'+(count++)+' :: Global count must be 6 but equals '+yp.find({}).length);
-	console.assert(yp.find('.base').length == 6, '#'+(count++)+' :: "base" count must be 6 but equals '+yp.find('.base').length);
-	console.assert(yp.find('.image').length == 1, '#'+(count++)+' :: "image" count must be 1 but equals '+yp.find('.image').length);
-
-	// #6 class property
-	console.assert(yp.find({_class: 'image', _visible: true}).length == 1, '#'+(count++)+' :: "{_class: image, _visible: true}" count must be 1 but equals '+yp.find({_class: 'image', _visible: true}).length);
-	console.assert(yp.find({_class: 'image', doNotExist: true}).length == 0, '#'+(count++)+' :: "{_class: image, doNotExist: true}" count must be 0 but equals '+yp.find({_class: 'image', doNotExist: true}).length);
-	console.assert(yp.find({_class: 'image', _visible: false}).length == 0, '#'+(count++)+' :: "{_class: image, _visible: false}" count must be 1 but equals '+yp.find({_class: 'image', _visible: false}).length);
-	console.assert(yp.find({_class: 'image', name: true}).length == 0, '#'+(count++)+' :: "{_class: image, name: true}" count must be 1 but equals '+yp.find({_class: 'image', name: true}).length);
-	console.assert(yp.find({_class: true}).length == 0, '#'+(count++)+' :: "{_class: true}" count must be 1 but equals '+yp.find({_class: true}).length);
-
-	// #11 . class
-	console.assert(yp.find('.testme').length == 1, '#'+(count++)+' :: "testme" count must be 1 but equals '+yp.find('.testme').length);
-	console.assert(yp.find('.image test2').length == 1, '#'+(count++)+' :: ".image test2" count must be 1 but equals '+yp.find('.image test2').length);
-	console.assert(yp.find('.notme test2').length == 0, '#'+(count++)+' :: ".notme test2" count must be 0 but equals '+yp.find('.notme test2').length);
-	console.assert(yp.find('.image notme').length == 0, '#'+(count++)+' :: ".testme notme" count must be 0 but equals '+yp.find('.image notme').length);
-	console.assert(yp.find('.image test2')[0] && yp.find('.image test2')[0].name == 'test2', '#'+(count++)+' :: ".image test2" entity name must be "test2"');
-
-	// #16 # id
-	console.assert(yp.find('#4').length == 1, '#'+(count++)+' :: "#4" count must be 1 but equals '+yp.find('#4').length);
-	console.assert(yp.find(1).length == 1, '#'+(count++)+' :: 4 (int) count must be 1 but equals '+yp.find(4).length);
-	console.assert(yp.find(1)[0] && yp.find(1)[0].name == 'test0', '#'+(count++)+' :: 1 (int) name must be "test0"');
-	console.assert(yp.find('#999').length == 0, '#'+(count++)+' :: "#999" count must be 0 but equals '+yp.find('#999').length);
-	console.assert(yp.find(999).length == 0, '#'+(count++)+' :: 999 (int) count must be 0 but equals '+yp.find(999).length);
-	 
-	 // #21 "/" extend
-	 
-	
-	
-
-	yp.dump(yp.entityInstances['base']);
-
-
-
-
 </script>
 
 </body>
