@@ -1,5 +1,5 @@
 TODO list:
-- make drawDebug(), drawDebugPosition(), drawDebugCollision(), derawDebugMove();
+- make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
 - Make a basic Zombie Sim
@@ -30,7 +30,15 @@ TODO list:
 - create temporary class with space, not only with "," like yespix.spawn('rect move')
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
+- VERSION 0.19
+- Create a function to add / remove modules
+- Create a DEV trunk and separate modules with entity definitions
+- Add optional CombineWith and conflictWith properties to the entity definitions
+- Add SVG entity
+- Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
+- Make a
 - VERSION 0.20
+
 
 DONE:
 - function visible() returns true if gfx entity is visible on canvas
