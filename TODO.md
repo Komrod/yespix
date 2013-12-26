@@ -2,6 +2,7 @@ TODO list:
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
+- Make an entity dump where you can see where properties come from
 - Make a basic Zombie Sim
 - VERSION 0.14
 - limit image draw to visible canvas when an image try to draw partialy outside the canvas
