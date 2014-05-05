@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="yespix/engine.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+	
+
+
+
+	var yp = yespix({canvas: true, fps: 1});
+
+	
+	var test1 = yp.spawn('image', {
+		name: 'sean',
+		images: ['resource/test/image/sean.png'],
+		x: 200,
+		y: 100,
+	});
+
+	/*
+	var test0 = yp.spawn('anim', {
+		name: 'perso',
+		images: 'resource/test/image/persos.png',
+		x: 100,
+		y: 100,
+		anims: {
+			walkleft:
+			{
+				length: 3,
+			},
+			walkright:
+			{
+				from: 3,
+				length: 3,
+			},
+			standleft:
+			{
+				from:0,
+				length: 1,
+			},
+			standright:
+			{
+				from:3,
+				length: 1,
+				default: true,
+			},
+		},
+	});
+	*/
+
+	/*
+	var test1 = yp.spawn('anim', {
+		name: 'perso',
+		images: ['resource/test/image/persos.png', 'resource/test/image/sean.png'],
+		x: 200,
+		y: 100,
+		anims: {
+			face:
+			{
+				length: 3,
+				image:1,
+				isDefault: true,
+			},
+			walkright:
+			{
+				from: 3,
+				length: 3,
+			},
+		},
+	});
+	*/
+
+	
+</script>
+
+</body>
+</html>

@@ -3,6 +3,7 @@
 	/**
 	 *
 	 * TODO:
+	 * - rearranging folders
 	 * - first(), first(50), last(), last(5), not(id), not(this), filter('even'), filter('odd')
 	 * - switch speed to pixel-per-second and optionnaly pixel-per-frame
 	 * - function visible() returns true if gfx entity is visible on canvas
