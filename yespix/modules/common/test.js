@@ -1,1 +1,0 @@
-yespix.entity.define('test', 'base');
