@@ -26,12 +26,14 @@
  * @example key("a-z|e-r") return true if the keys ("a" || "z") && ("e" || "r") are hold
  */
 yespix.fn.key = function(s, type) {
+	var t;
+
 	type = type || 'hold';
 	//console.log('type = '+type);
 	if (this.isString(s)) {
 		if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
 			var arr = s.split('|', 2);
-			for (var t = 0; t < arr.length; t++)
+			for (t = 0; t < arr.length; t++)
 				if (this.key(arr[t], type)) return true;
 			return false;
 		}
@@ -43,7 +45,7 @@ yespix.fn.key = function(s, type) {
 	}
 
 	if (this.isArray(s)) {
-		for (var t = 0; t < s.length; t++)
+		for (t = 0; t < s.length; t++)
 			if (!this.key(s[t], type)) return false;
 		return true;
 	}
@@ -72,16 +74,17 @@ yespix.fn.specialKey = function(s, type) {
  */
 
 yespix.fn.listen = function(obj, pname, callback) {
+	var t;
 
 	// listen to multiple properties
 	if (this.isArray(pname)) {
-		for (var t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
+		for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
 		return true;
 	}
 
 	// listen to multiple objects
 	if (this.isArray(obj)) {
-		for (var t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
+		for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
 		return true;
 	}
 

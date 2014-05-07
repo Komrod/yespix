@@ -10,8 +10,7 @@ module.exports = function(grunt) {
         'grunt-contrib-concat',
         'grunt-contrib-copy',
         'grunt-contrib-jshint',
-        'grunt-shell',
-        'grunt-fixmyjs'
+        'grunt-shell'
     ];
 
 
@@ -44,25 +43,19 @@ module.exports = function(grunt) {
             }
         },
 
-        // fixing code
-        fixmyjs: {
+        // jshint
+        jshint: {
             options: {
-                indent: 'spaces'
+//                  reporterOutput: '../engine/jshint.txt',
+                jshintrc: 'jshintrc.json'
             },
-            test: {
-                files: [{
-                    src: ['../**/*.js'],
-                    dest: '../build/',
-                    ext: '.js'
-                }]
+            out: {
+                src: [
+                    '../engine/core/*.js'
+                ]
             }
         },
 
-        // jshint
-        jshint: {
-            beforeconcat: ['../engine/core/*.js'],
-            afterconcat: ['../engine/yespix.js']
-        },
         // clean config
         clean: {
             options: {
@@ -115,11 +108,8 @@ module.exports = function(grunt) {
     // default task
     grunt.registerTask('default', ['clean:build', 'concat:build', 'uglify:minify']);
 
-    // fix
-    grunt.registerTask('fix', ['fixmyjs:test']);
-
     // jshint
-    grunt.registerTask('check', ['jshint:beforeconcat']);
+    grunt.registerTask('check', ['jshint:out']);
 
     // delete build files
     grunt.registerTask('mop', ['clean:build']);
@@ -129,5 +119,4 @@ module.exports = function(grunt) {
 
     // minify
     grunt.registerTask('mini', ['uglify:minify']);
-
 };

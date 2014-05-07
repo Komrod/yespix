@@ -213,14 +213,16 @@ yespix.fn.inArray = function(arr, value) {
 };
 
 yespix.fn.each = function(array, fn, args) {
+	var i;
+
 	if (!this.isArray(array)) array = [].slice.call(array);
 	var length = array.length;
 	args = args || [];
 	if (length) {
 		if (this.isFunction(fn)) {
-			for (var i in array) fn.apply(array[i], args);
+			for (i in array) fn.apply(array[i], args);
 		} else if (this.isString(fn)) {
-			for (var i in array)
+			for (i in array)
 				if (array[i][fn] && this.isFunction(array[i][fn])) array[i][fn].apply(array[i], args);
 		}
 	}
@@ -237,7 +239,10 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 
 	console.group();
 	console.info('Object dump: ' + string);
-	var count = 1;
+
+	var count = 1,
+		str = '',
+		t;
 	for (var n in obj) {
 		if (this.isObject(obj) && properties.length > 0 && !this.inArray(properties, n)) continue;
 
@@ -248,9 +253,9 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 		else if (typeof obj[n] === 'function') console.log(' - ' + n + ' (function)');
 		else if (this.isString(obj[n])) console.log(' - ' + n + ' = "' + obj[n] + '" (string)');
 		else if (this.isArray(obj[n])) {
-			var str = '';
+			str = '';
 			if (expand)
-				for (var t = 0; t < obj[n].length; t++) {
+				for (t = 0; t < obj[n].length; t++) {
 					if (t > 0) str += ', ';
 					str += '[' + t + '] ';
 					if (obj[n][t] === null) str += 'null';
@@ -269,7 +274,7 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 			if (str === '') console.log(' - ' + n + ' (array), length ' + obj[n].length + '');
 			else console.log(' - ' + n + ' (array), length ' + obj[n].length + ', content: ' + str);
 		} else if (this.isObject(obj[n])) {
-			var str = '';
+			str = '';
 			t = 0;
 			if (expand)
 				for (var f in obj[n]) {

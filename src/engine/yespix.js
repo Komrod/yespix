@@ -129,7 +129,7 @@ Bunch = function(list) {
 	this.__bunch_init.apply(this, arguments);
 };
 
-Bunch.prototype = new Array;
+Bunch.prototype = [];
 
 Bunch.prototype.unique = function() {
 	for (var t = 0; t < this.length; t++) {
@@ -211,10 +211,12 @@ yespix.fn.attach = function(parent, child) {
 };
 
 yespix.fn.detach = function(parent, child) {
+	var t;
+
 	// detach everything 
 	if (!child) {
 		if (parent._children) {
-			for (var t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
+			for (t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
 			parent._children = null;
 		}
 		return this;
@@ -222,7 +224,7 @@ yespix.fn.detach = function(parent, child) {
 
 	// detach all the children
 	if (this.isArray(child)) {
-		for (var t = 0; t < child.length; t++) this.detach(parent, child[t]);
+		for (t = 0; t < child.length; t++) this.detach(parent, child[t]);
 		return this;
 	}
 
@@ -231,7 +233,7 @@ yespix.fn.detach = function(parent, child) {
 
 	// detach one child
 	child._parent = null;
-	for (var t = 0; t < parent._children.length; t++)
+	for (t = 0; t < parent._children.length; t++)
 		if (parent._children[t] == child) {
 			parent._children.splice(t, 1);
 			break;
@@ -370,7 +372,7 @@ yespix.fn.collisionTouch = function(entity1, entity2, pixel) {
 	return false;
 };
 
-yespix.fn.collisionInside: function(entity1, entity2) {
+yespix.fn.collisionInside = function(entity1, entity2) {
 	var box1 = entity1.collisionBox();
 	var box2 = entity2.collisionBox();
 
@@ -379,7 +381,7 @@ yespix.fn.collisionInside: function(entity1, entity2) {
 	return false;
 };
 
-yespix.fn.collision: function(entity) {
+yespix.fn.collision = function(entity) {
 	//if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
 	var entities = []; // store checked entities to check for collision only once
 
@@ -431,7 +433,7 @@ yespix.fn.entityRootClassname = '';
  * Stores some informations about the entity classes
  * @type {Object}
  */
-yespix.fn.entityClasses: {}; // entity classes
+yespix.fn.entityClasses = {}; // entity classes
 
 /**
  * List of entity instances
@@ -441,10 +443,10 @@ yespix.fn.entityClasses: {}; // entity classes
  * @example entityInstances['/'+classname] refers to an array of entities with an ancestor "classname"
  * @example entityInstances[''] refers to an array of all the entity instances
  */
-yespix.fn.entityInstances: {};
+yespix.fn.entityInstances = {};
 
-yespix.fn.entityNextId: 1;
-yespix.fn.entityNextClassId: 1;
+yespix.fn.entityNextId = 1;
+yespix.fn.entityNextClassId = 1;
 
 /**
  * Find an entity or multiple entities from the selector, possibly executes a function fn and returns a bunch of
@@ -478,7 +480,7 @@ yespix.fn.entityNextClassId: 1;
  * @return {bunch} YESPIX bunch of entities, an array of entities on which you can call a function on all entities with
  *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property
  */
-yespix.fn.find: function(selector, fn) {
+yespix.fn.find = function(selector, fn) {
 
 	if (this.isUndefined(selector)) {
 		var result = this.bunch(this.entityInstances['']);
@@ -1180,7 +1182,8 @@ yespix.fn.load = function(fileList, complete, options) {
 			allComplete: false,
 			allSuccess: false,
 			errorCount: 0,
-		};
+		},
+		urlOptions;
 
 	// loop fileList
 	for (; index < len; index++) {
@@ -1189,7 +1192,7 @@ yespix.fn.load = function(fileList, complete, options) {
 
 		// init url specific options in urlOptions to store it in yespix.data.file[url]
 		if (options[fileList[index]]) {
-			var urlOptions = options[fileList[index]];
+			urlOptions = options[fileList[index]];
 			urlOptions = urlOptions || {};
 			urlOptions['complete'] = urlOptions['complete'] || options['complete'] || complete || function() {};
 			urlOptions['error'] = urlOptions['error'] || options['error'] || function() {};
@@ -1197,7 +1200,7 @@ yespix.fn.load = function(fileList, complete, options) {
 			urlOptions['skip'] = urlOptions['skip'] || options['skip'] || function() {};
 			urlOptions['success'] = urlOptions['success'] || options['success'] || function() {};
 			urlOptions['once'] = urlOptions['once'] || options['once'] || false;
-		} else var urlOptions = options;
+		} else urlOptions = options;
 
 		// if the file already exists and urlOptions['once'] is set to True
 		if (urlOptions['once'] && this.data.file[fileList[index]]) {
@@ -1266,7 +1269,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					try {
 						client = new ActiveXObject(names[i]);
 						break;
-					} catch (e) {};
+					} catch (e) {}
 				}
 				// cancel load, nothing will work
 				if (!client) {
@@ -1329,7 +1332,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					url: file.url,
 					file: file,
 					entity: options['entity'],
-				}
+				};
 				console.log('file.options.entity: ' + file.options.entity);
 
 				// loop inside file.options
@@ -1362,7 +1365,7 @@ yespix.fn.load = function(fileList, complete, options) {
 										file.options[u].stat.allComplete = false;
 										file.options[u].stat.allSuccess = false;
 										file.options[u].stat.errorCount++;
-										break
+										break;
 									}
 								}
 								// set progress to 100% if all files are complete
@@ -1428,7 +1431,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					}
 					this.file.options = [];
 				}
-			}
+			};
 
 			client.addEventListener('progress', function(e) {
 				if (!file.done) {
@@ -1587,7 +1590,7 @@ yespix.fn.css = function(fileList, complete, options) {
 					clearTimeout(timeout_id);
 					//document.getElementsByTagName('head').removeChild(s); // since the style sheet didn't load, remove the link node from the DOM
 					error(e); // fire the callback with success == false
-				}, 15000); // how long to wait before failing
+				}, 30000); // how long to wait before failing
 		};
 		return this.load(fileList, options);
 	} else {
@@ -1866,14 +1869,16 @@ yespix.fn.inArray = function(arr, value) {
 };
 
 yespix.fn.each = function(array, fn, args) {
+	var i;
+
 	if (!this.isArray(array)) array = [].slice.call(array);
 	var length = array.length;
 	args = args || [];
 	if (length) {
 		if (this.isFunction(fn)) {
-			for (var i in array) fn.apply(array[i], args);
+			for (i in array) fn.apply(array[i], args);
 		} else if (this.isString(fn)) {
-			for (var i in array)
+			for (i in array)
 				if (array[i][fn] && this.isFunction(array[i][fn])) array[i][fn].apply(array[i], args);
 		}
 	}
@@ -1890,7 +1895,10 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 
 	console.group();
 	console.info('Object dump: ' + string);
-	var count = 1;
+
+	var count = 1,
+		str = '',
+		t;
 	for (var n in obj) {
 		if (this.isObject(obj) && properties.length > 0 && !this.inArray(properties, n)) continue;
 
@@ -1901,9 +1909,9 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 		else if (typeof obj[n] === 'function') console.log(' - ' + n + ' (function)');
 		else if (this.isString(obj[n])) console.log(' - ' + n + ' = "' + obj[n] + '" (string)');
 		else if (this.isArray(obj[n])) {
-			var str = '';
+			str = '';
 			if (expand)
-				for (var t = 0; t < obj[n].length; t++) {
+				for (t = 0; t < obj[n].length; t++) {
 					if (t > 0) str += ', ';
 					str += '[' + t + '] ';
 					if (obj[n][t] === null) str += 'null';
@@ -1922,7 +1930,7 @@ yespix.fn.dump = function(obj, string, properties, expand) {
 			if (str === '') console.log(' - ' + n + ' (array), length ' + obj[n].length + '');
 			else console.log(' - ' + n + ' (array), length ' + obj[n].length + ', content: ' + str);
 		} else if (this.isObject(obj[n])) {
-			var str = '';
+			str = '';
 			t = 0;
 			if (expand)
 				for (var f in obj[n]) {
@@ -2297,12 +2305,14 @@ yespix.fn.init = function(options) {
  * @example key("a-z|e-r") return true if the keys ("a" || "z") && ("e" || "r") are hold
  */
 yespix.fn.key = function(s, type) {
+	var t;
+
 	type = type || 'hold';
 	//console.log('type = '+type);
 	if (this.isString(s)) {
 		if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
 			var arr = s.split('|', 2);
-			for (var t = 0; t < arr.length; t++)
+			for (t = 0; t < arr.length; t++)
 				if (this.key(arr[t], type)) return true;
 			return false;
 		}
@@ -2314,7 +2324,7 @@ yespix.fn.key = function(s, type) {
 	}
 
 	if (this.isArray(s)) {
-		for (var t = 0; t < s.length; t++)
+		for (t = 0; t < s.length; t++)
 			if (!this.key(s[t], type)) return false;
 		return true;
 	}
@@ -2343,16 +2353,17 @@ yespix.fn.specialKey = function(s, type) {
  */
 
 yespix.fn.listen = function(obj, pname, callback) {
+	var t;
 
 	// listen to multiple properties
 	if (this.isArray(pname)) {
-		for (var t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
+		for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
 		return true;
 	}
 
 	// listen to multiple objects
 	if (this.isArray(obj)) {
-		for (var t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
+		for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
 		return true;
 	}
 
@@ -2578,20 +2589,22 @@ yespix.fn.support = function(type) {
 	}
 
 
-	if (this.data.support[types[0]] != undefined && this.data.support[types[0]][types[1]] != undefined) return this.data.support[types[0]][types[1]];
+	if (this.data.support[types[0]] !== undefined && this.data.support[types[0]][types[1]] !== undefined) return this.data.support[types[0]][types[1]];
 
 	// create element if needed
-	if (this.data.support.elements[types[0]] == undefined) {
+	if (this.data.support.elements[types[0]] === undefined) {
 		//console.log('type='+type+', types[0]='+types[0]+', types[1]='+types[1]);
 		this.data.support.elements[types[0]] = document.createElement(types[0]);
-		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
+//		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
+		if ( this.data.support.elements[types[0]] === false) this.data.support.elements[types[0]] = false;
 	}
 
 	var e = this.data.support.elements[types[0]];
-	if (!e || !! e.canPlayType == false) return false;
+//	if (!e || !! e.canPlayType == false) return false;
+	if (!e || e.canPlayType === false) return false;
 
 	var str = e.canPlayType(type);
-	if (str.toLowerCase() == 'no' || str == '') this.data.support[types[0]][types[1]] = false;
+	if (str.toLowerCase() == 'no' || str === '') this.data.support[types[0]][types[1]] = false;
 	else this.data.support[types[0]][types[1]] = true;
 
 	return this.data.support[types[0]][types[1]];
@@ -2672,15 +2685,15 @@ yespix.fn.browser = function(type) {
 
 
 yespix.fn.frameIndex = 0; // frame
-yespix.fn.frameTime: 0;
-yespix.fn.frameMs: 1; // milliSecPerFrame
-yespix.fn.frameRequest: null; // onFrame
-yespix.fn.frameRequestId: null; // requestId
-yespix.fn.frameTick: null;
-yespix.fn.frameTickNext: (new Date).getTime(); // nextGameTick
+yespix.fn.frameTime= 0;
+yespix.fn.frameMs = 1; // milliSecPerFrame
+yespix.fn.frameRequest = null; // onFrame
+yespix.fn.frameRequestId = null; // requestId
+yespix.fn.frameTick = null;
+yespix.fn.frameTickNext = (new Date()).getTime(); // nextGameTick
 
-yespix.fn.time: +new Date(); // currentTime
-yespix.fn.fps: 60;
+yespix.fn.time = +new Date(); // currentTime
+yespix.fn.fps = 60;
 
 yespix.fn.timerStart = function() {
 	// Init the requestAnimationFrame in this.frameRequest

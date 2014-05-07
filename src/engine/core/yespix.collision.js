@@ -130,7 +130,7 @@ yespix.fn.collisionTouch = function(entity1, entity2, pixel) {
 	return false;
 };
 
-yespix.fn.collisionInside: function(entity1, entity2) {
+yespix.fn.collisionInside = function(entity1, entity2) {
 	var box1 = entity1.collisionBox();
 	var box2 = entity2.collisionBox();
 
@@ -139,7 +139,7 @@ yespix.fn.collisionInside: function(entity1, entity2) {
 	return false;
 };
 
-yespix.fn.collision: function(entity) {
+yespix.fn.collision = function(entity) {
 	//if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
 	var entities = []; // store checked entities to check for collision only once
 

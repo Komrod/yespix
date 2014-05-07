@@ -30,10 +30,12 @@ yespix.fn.attach = function(parent, child) {
 };
 
 yespix.fn.detach = function(parent, child) {
+	var t;
+
 	// detach everything 
 	if (!child) {
 		if (parent._children) {
-			for (var t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
+			for (t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
 			parent._children = null;
 		}
 		return this;
@@ -41,7 +43,7 @@ yespix.fn.detach = function(parent, child) {
 
 	// detach all the children
 	if (this.isArray(child)) {
-		for (var t = 0; t < child.length; t++) this.detach(parent, child[t]);
+		for (t = 0; t < child.length; t++) this.detach(parent, child[t]);
 		return this;
 	}
 
@@ -50,7 +52,7 @@ yespix.fn.detach = function(parent, child) {
 
 	// detach one child
 	child._parent = null;
-	for (var t = 0; t < parent._children.length; t++)
+	for (t = 0; t < parent._children.length; t++)
 		if (parent._children[t] == child) {
 			parent._children.splice(t, 1);
 			break;

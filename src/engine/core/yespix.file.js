@@ -67,7 +67,8 @@ yespix.fn.load = function(fileList, complete, options) {
 			allComplete: false,
 			allSuccess: false,
 			errorCount: 0,
-		};
+		},
+		urlOptions;
 
 	// loop fileList
 	for (; index < len; index++) {
@@ -76,7 +77,7 @@ yespix.fn.load = function(fileList, complete, options) {
 
 		// init url specific options in urlOptions to store it in yespix.data.file[url]
 		if (options[fileList[index]]) {
-			var urlOptions = options[fileList[index]];
+			urlOptions = options[fileList[index]];
 			urlOptions = urlOptions || {};
 			urlOptions['complete'] = urlOptions['complete'] || options['complete'] || complete || function() {};
 			urlOptions['error'] = urlOptions['error'] || options['error'] || function() {};
@@ -84,7 +85,7 @@ yespix.fn.load = function(fileList, complete, options) {
 			urlOptions['skip'] = urlOptions['skip'] || options['skip'] || function() {};
 			urlOptions['success'] = urlOptions['success'] || options['success'] || function() {};
 			urlOptions['once'] = urlOptions['once'] || options['once'] || false;
-		} else var urlOptions = options;
+		} else urlOptions = options;
 
 		// if the file already exists and urlOptions['once'] is set to True
 		if (urlOptions['once'] && this.data.file[fileList[index]]) {
@@ -153,7 +154,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					try {
 						client = new ActiveXObject(names[i]);
 						break;
-					} catch (e) {};
+					} catch (e) {}
 				}
 				// cancel load, nothing will work
 				if (!client) {
@@ -216,7 +217,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					url: file.url,
 					file: file,
 					entity: options['entity'],
-				}
+				};
 				console.log('file.options.entity: ' + file.options.entity);
 
 				// loop inside file.options
@@ -249,7 +250,7 @@ yespix.fn.load = function(fileList, complete, options) {
 										file.options[u].stat.allComplete = false;
 										file.options[u].stat.allSuccess = false;
 										file.options[u].stat.errorCount++;
-										break
+										break;
 									}
 								}
 								// set progress to 100% if all files are complete
@@ -315,7 +316,7 @@ yespix.fn.load = function(fileList, complete, options) {
 					}
 					this.file.options = [];
 				}
-			}
+			};
 
 			client.addEventListener('progress', function(e) {
 				if (!file.done) {
@@ -474,7 +475,7 @@ yespix.fn.css = function(fileList, complete, options) {
 					clearTimeout(timeout_id);
 					//document.getElementsByTagName('head').removeChild(s); // since the style sheet didn't load, remove the link node from the DOM
 					error(e); // fire the callback with success == false
-				}, 15000); // how long to wait before failing
+				}, 30000); // how long to wait before failing
 		};
 		return this.load(fileList, options);
 	} else {

@@ -37,20 +37,22 @@ yespix.fn.support = function(type) {
 	}
 
 
-	if (this.data.support[types[0]] != undefined && this.data.support[types[0]][types[1]] != undefined) return this.data.support[types[0]][types[1]];
+	if (this.data.support[types[0]] !== undefined && this.data.support[types[0]][types[1]] !== undefined) return this.data.support[types[0]][types[1]];
 
 	// create element if needed
-	if (this.data.support.elements[types[0]] == undefined) {
+	if (this.data.support.elements[types[0]] === undefined) {
 		//console.log('type='+type+', types[0]='+types[0]+', types[1]='+types[1]);
 		this.data.support.elements[types[0]] = document.createElement(types[0]);
-		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
+//		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
+		if ( this.data.support.elements[types[0]] === false) this.data.support.elements[types[0]] = false;
 	}
 
 	var e = this.data.support.elements[types[0]];
-	if (!e || !! e.canPlayType == false) return false;
+//	if (!e || !! e.canPlayType == false) return false;
+	if (!e || e.canPlayType === false) return false;
 
 	var str = e.canPlayType(type);
-	if (str.toLowerCase() == 'no' || str == '') this.data.support[types[0]][types[1]] = false;
+	if (str.toLowerCase() == 'no' || str === '') this.data.support[types[0]][types[1]] = false;
 	else this.data.support[types[0]][types[1]] = true;
 
 	return this.data.support[types[0]][types[1]];

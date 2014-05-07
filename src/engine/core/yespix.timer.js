@@ -6,15 +6,15 @@
 
 
 yespix.fn.frameIndex = 0; // frame
-yespix.fn.frameTime: 0;
-yespix.fn.frameMs: 1; // milliSecPerFrame
-yespix.fn.frameRequest: null; // onFrame
-yespix.fn.frameRequestId: null; // requestId
-yespix.fn.frameTick: null;
-yespix.fn.frameTickNext: (new Date).getTime(); // nextGameTick
+yespix.fn.frameTime= 0;
+yespix.fn.frameMs = 1; // milliSecPerFrame
+yespix.fn.frameRequest = null; // onFrame
+yespix.fn.frameRequestId = null; // requestId
+yespix.fn.frameTick = null;
+yespix.fn.frameTickNext = (new Date()).getTime(); // nextGameTick
 
-yespix.fn.time: +new Date(); // currentTime
-yespix.fn.fps: 60;
+yespix.fn.time = +new Date(); // currentTime
+yespix.fn.fps = 60;
 
 yespix.fn.timerStart = function() {
 	// Init the requestAnimationFrame in this.frameRequest

@@ -10,7 +10,7 @@ yespix.fn.entityRootClassname = '';
  * Stores some informations about the entity classes
  * @type {Object}
  */
-yespix.fn.entityClasses: {}; // entity classes
+yespix.fn.entityClasses = {}; // entity classes
 
 /**
  * List of entity instances
@@ -20,10 +20,10 @@ yespix.fn.entityClasses: {}; // entity classes
  * @example entityInstances['/'+classname] refers to an array of entities with an ancestor "classname"
  * @example entityInstances[''] refers to an array of all the entity instances
  */
-yespix.fn.entityInstances: {};
+yespix.fn.entityInstances = {};
 
-yespix.fn.entityNextId: 1;
-yespix.fn.entityNextClassId: 1;
+yespix.fn.entityNextId = 1;
+yespix.fn.entityNextClassId = 1;
 
 /**
  * Find an entity or multiple entities from the selector, possibly executes a function fn and returns a bunch of
@@ -57,7 +57,7 @@ yespix.fn.entityNextClassId: 1;
  * @return {bunch} YESPIX bunch of entities, an array of entities on which you can call a function on all entities with
  *		bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property
  */
-yespix.fn.find: function(selector, fn) {
+yespix.fn.find = function(selector, fn) {
 
 	if (this.isUndefined(selector)) {
 		var result = this.bunch(this.entityInstances['']);

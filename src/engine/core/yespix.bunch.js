@@ -14,7 +14,7 @@ Bunch = function(list) {
 	this.__bunch_init.apply(this, arguments);
 };
 
-Bunch.prototype = new Array;
+Bunch.prototype = [];
 
 Bunch.prototype.unique = function() {
 	for (var t = 0; t < this.length; t++) {
