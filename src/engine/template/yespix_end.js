@@ -1,7 +1,5 @@
-
-
-	// expose the YESPIX function constructor
-	window.yespix = yespix;
+// expose the YESPIX function constructor
+window.yespix = yespix;
 
 
 })();

@@ -10,7 +10,9 @@ module.exports = function(grunt) {
         'grunt-contrib-concat',
         'grunt-contrib-copy',
         'grunt-contrib-jshint',
-        'grunt-shell'
+        'grunt-shell',
+        'grunt-jsbeautifier',
+        'grunt-contrib-watch'
     ];
 
 
@@ -43,16 +45,30 @@ module.exports = function(grunt) {
             }
         },
 
-        // jshint
+        // js hint
         jshint: {
             options: {
-//                  reporterOutput: '../engine/jshint.txt',
                 jshintrc: 'jshintrc.json'
             },
             out: {
                 src: [
                     '../engine/core/*.js'
                 ]
+            }
+        },
+
+        jsbeautifier:
+        {
+            all: {
+                src : [
+                    '../engine/**/*.js',
+                    '../engine/yespix.js'
+                    ]
+            },
+            yp: {
+                src : [
+                    '../engine/yespix.js'
+                    ]
             }
         },
 
@@ -100,16 +116,32 @@ module.exports = function(grunt) {
             }
         },
 
+        watch: {
+            scripts: {
+                files: ['../**/*.js'],
+                tasks: ['default'],
+                options: {
+                    spawn: false,
+                    livereload: true,
+                }
+            },
+        },
     });
 
     // update grunt packages
     grunt.registerTask('selfupdate', ['shell:update']);
 
     // default task
-    grunt.registerTask('default', ['clean:build', 'concat:build', 'uglify:minify']);
+    grunt.registerTask('default', ['clean:build', 'concat:build', 'uglify:minify', 'jsbeautifier:yp']);
 
-    // jshint
+    // prepare commit
+    grunt.registerTask('commit', ['clean:build', 'jsbeautifier:all', 'concat:build', 'uglify:minify', 'jsbeautifier:yp']);
+
+    // js hint
     grunt.registerTask('check', ['jshint:out']);
+
+    // beautifier
+    grunt.registerTask('beauty', ['jsbeautifier:all']);
 
     // delete build files
     grunt.registerTask('mop', ['clean:build']);
@@ -119,4 +151,8 @@ module.exports = function(grunt) {
 
     // minify
     grunt.registerTask('mini', ['uglify:minify']);
+
+    // watch
+    grunt.registerTask('dog', ['watch:scripts']);
+    
 };

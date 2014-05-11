@@ -22,25 +22,25 @@
  *		object "entity" and provides an event object with some data
  */
 yespix.fn.trigger = function(name, event, obj) {
-	// Function can't trigger anything if there is no name
-	if (!name) return this;
+    // Function can't trigger anything if there is no name
+    if (!name) return this;
 
-	// initialize the object
-	obj = obj || this;
+    // initialize the object
+    obj = obj || this;
 
-	// initialise the event
-	event = event || {};
-	event.type = name;
+    // initialise the event
+    event = event || {};
+    event.type = name;
 
-	// loop inside the list of events stored in the obj._eventList[name]
-	if (obj._eventList && obj._eventList[name]) {
-		for (var t = 0, length = obj._eventList[name].length; t < length; t++) {
-			// The context is needed for the function. By default, the context will be the YESPIX object
-			var context = obj._eventList[name][t].context || this;
-			obj._eventList[name][t].callback.apply(context, [event]);
-		}
-	}
-	return this;
+    // loop inside the list of events stored in the obj._eventList[name]
+    if (obj._eventList && obj._eventList[name]) {
+        for (var t = 0, length = obj._eventList[name].length; t < length; t++) {
+            // The context is needed for the function. By default, the context will be the YESPIX object
+            var context = obj._eventList[name][t].context || this;
+            obj._eventList[name][t].callback.apply(context, [event]);
+        }
+    }
+    return this;
 };
 
 /**
@@ -57,24 +57,24 @@ yespix.fn.trigger = function(name, event, obj) {
  * @example on('ding', fn, entity) call "fn" on the trigger of "ding" of the YESPIX engine
  */
 yespix.fn.on = function(name, callback, context, obj) {
-	// Function can't bind event with no name
-	if (!name || !callback) return null;
+    // Function can't bind event with no name
+    if (!name || !callback) return null;
 
-	// initialize context, by default the YESPIX engine object
-	context = context || this;
-	obj = obj || context;
-	if (!obj._eventList) obj._eventList = {};
-	if (!obj._eventList[name]) obj._eventList[name] = [{
-		name: name,
-		callback: callback,
-		context: context
-	}];
-	else obj._eventList[name].push({
-		name: name,
-		callback: callback,
-		context: context
-	});
-	return this;
+    // initialize context, by default the YESPIX engine object
+    context = context || this;
+    obj = obj || context;
+    if (!obj._eventList) obj._eventList = {};
+    if (!obj._eventList[name]) obj._eventList[name] = [{
+        name: name,
+        callback: callback,
+        context: context
+    }];
+    else obj._eventList[name].push({
+        name: name,
+        callback: callback,
+        context: context
+    });
+    return this;
 };
 
 
@@ -92,32 +92,32 @@ yespix.fn.on = function(name, callback, context, obj) {
  * @example unbind("tick", fn, entity) removes the function "fn" from the event "tick" of the "entity" object
  */
 yespix.fn.off = function(name, callback, obj) {
-	// Function can't unbind event with no name
-	if (!name) return null;
+    // Function can't unbind event with no name
+    if (!name) return null;
 
-	// initialize the argument
-	if (this.isObject(callback)) {
-		obj = callback;
-		callback = null;
-	}
-	obj = obj || this;
-	if (!obj._eventList || !obj._eventList[name]) return this;
+    // initialize the argument
+    if (this.isObject(callback)) {
+        obj = callback;
+        callback = null;
+    }
+    obj = obj || this;
+    if (!obj._eventList || !obj._eventList[name]) return this;
 
-	// remove all events
-	if (!callback) {
-		delete obj._eventList[name];
-		return this;
-	}
-	// remove only events matching with the callback function
-	if (obj._eventList[name])
-		for (var t = 0, len = obj._eventList[name].length; t < len; t++) {
-			if (obj._eventList[name][t] && obj._eventList[name][t].callback == callback) {
-				delete obj._eventList[name][t];
-				obj._eventList[name].splice(t, 1);
-				t--;
-			}
-		}
-	return this;
+    // remove all events
+    if (!callback) {
+        delete obj._eventList[name];
+        return this;
+    }
+    // remove only events matching with the callback function
+    if (obj._eventList[name])
+        for (var t = 0, len = obj._eventList[name].length; t < len; t++) {
+            if (obj._eventList[name][t] && obj._eventList[name][t].callback == callback) {
+                delete obj._eventList[name][t];
+                obj._eventList[name].splice(t, 1);
+                t--;
+            }
+        }
+    return this;
 };
 
 /**
@@ -128,9 +128,9 @@ yespix.fn.off = function(name, callback, obj) {
  * @chainable
  */
 yespix.fn.ready = function(fn, context) {
-	if (isReady) fn.call(context, {
-		type: "ready"
-	});
-	else on('ready', fn, context);
-	return this;
+    if (isReady) fn.call(context, {
+        type: "ready"
+    });
+    else on('ready', fn, context);
+    return this;
 };

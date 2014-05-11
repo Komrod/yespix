@@ -1,0 +1,1 @@
+	yespix.initEntities = function(yespix) {
