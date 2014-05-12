@@ -1,4 +1,9 @@
-npm install grunt --save-dev
-npm install grunt-cli --save-dev
+#
+# Install grunt and grunt-cli globaly
+# Install necessary packages to run the grunt tasks
+#
+
+npm install grunt -g
+npm install grunt-cli -g
 npm install grunt-shell --save-dev
-grunt pupdate
+grunt packupdate

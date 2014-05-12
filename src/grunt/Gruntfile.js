@@ -125,7 +125,7 @@ module.exports = function(grunt) {
     });
 
     // install and update grunt packages
-    grunt.registerTask('pupdate', ['shell:update']);
+    grunt.registerTask('packupdate', ['shell:update']);
 
     // default task
     grunt.registerTask('default', ['clean:build', 'concat:build', 'uglify:minify', 'jsbeautifier:yp']);
