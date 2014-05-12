@@ -2,89 +2,6 @@
 (function(undefined) {
 
     /**
-     *
-     * TODO:
-     * - rearranging folders
-     * - first(), first(50), last(), last(5), not(id), not(this), filter('even'), filter('odd')
-     * - switch speed to pixel-per-second and optionnaly pixel-per-frame
-     * - function visible() returns true if gfx entity is visible on canvas
-     * - make drawDebug(), drawDebugPosition(), drawDebugCollision(), derawDebugMove();
-     * - make a debug panel where you can change variables and see entities
-     * - Zombie Sim
-     * - limit image draw to visible canvas when an image try to draw partialy outside the canvas
-     * - animate properties
-     * - tiled level import
-     * - draw text
-     * - draw polygon, line, rectangle, circle, elipse
-     * - rotation
-     * - Arkanoid game
-     * - parent position and rotation affect children
-     * - font from image
-     * - typewritter: text showing letter by letter with sound
-     * - panel
-     * - button
-     * - Steel Sky game (raiden)
-     * - duplicate, add, remove image
-     * - use Object.create in the mixin() function
-     * - function key() detects if any key is pressed
-     * - function keyCapture() stops the propagation of the pressed key
-     * - Bunch must concat, splice, push with arrays
-     * - create temporary class with space, not only with "," like yespix.spawn('rect move')
-     * - check if all YESPIX classes are fully loaded on first frame
-     * - Raider game (platform indiana)
-     *
-     * DONE:
-     * x gravity and objects colliding on floor // 2013-12-19
-     * x fix diagonal collision
-     * x create actor and player entity
-     * x fix pixelSize bug with animation and collision
-     * x function clone() on entity
-     * x function over() under() inside() outside() intersect() touch() // 2013-12-05
-     * x use alpha transparency
-     * x Pong Tennis game
-     * x collision and function to get the hit box // 2013-12-04
-     * x chainable function calls on Bunch
-     * x function prop() to change an entity property (to use it with Bunch)
-     * x Call entity functions on a Bunch // 2013-11-28
-     * x Bunch entities must be unique
-     * x function to get the draw box coordinates
-     * x show some debug on image // 2013-11-26
-     * x on change z or zGlobal, sort on the next draw
-     * x on insert or delete gfx entities, change the draw list
-     * x change the YESPIX draw to sort instances by z
-     * x change an image width and height // 2013-11-26
-     * x pixel scale of an image
-     * x extends animation // 2013-11-25
-     * x Snap image to pixel grid on entity // 2013-11-25
-     * x Make a basic 4 ways player // 2013-11-25
-     * x animation entity // 2013-11-22
-     * x complete the find method and the bunch // 2013-11-21
-     * x do the variable listener // 2013-11-18
-     * x handle keys // 2013-11-14
-     * x do the children manager // 2013-11-13
-     * x make functions to handle instances in YESPIX engine and _instances in entity
-     * x change _name to name because it's not unique and private // 2013-11-13
-     * x do not store the progress in the file object // 2013-11-11
-     * x "cache" object switch to "file" object // 2013-11-11
-     * x do not put content in memory cache // 2013-11-10
-     * x make a YESPIX engine class to be instanciated
-     * x build a system to make the unit tests
-     *
-     *
-     * CANCELED:
-     * + override the yespix function to do something else after init // cant instanciate new YESPIX object after that
-     *
-     *
-     * PENDING:
-     * - do real js classes with prototype for entity classes
-     * - do a partial draw for each gfx entities
-     * - prerender canvas for the partial draw
-     * - function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
-     *
-     *
-     */
-
-    /**
      * Credit:
      * Komrod
      *
@@ -111,6 +28,7 @@
      * YESPIX prototype
      */
     yespix.fn = yespix.prototype;
+
 
     /**
      ************************************************************************************************************
@@ -438,6 +356,14 @@
     yespix.fn.entityClasses = {}; // entity classes
 
     /**
+     * Stores entity informations for the creation on init
+     * @type {array}
+     */
+    yespix.fn.entityPending = []; // list of entity classes pending their creation
+
+
+
+    /**
      * List of entity instances
      * @type {Object}
      * @example entityInstances[entity._id] refers to the entity with integer id "entity._id"
@@ -610,7 +536,7 @@
             properties[this.selectorType(selector)] = this.selectorValue(selector);
         }
         return properties;
-    },
+    };
 
     yespix.fn.selectorCompare = function(entityValue, value) {
         if (this.isString(value)) {
@@ -646,7 +572,7 @@
 
 
     /**
-     * Convert an array of entities into a bunch of entities.The bunch object is an array of entities on which you can call a function on all entities with
+     * Convert an array of entities into a bunch of entities. The bunch object is an array of entities on which you can call a function on all entities with
      * bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property. The bunch object also have all the
      * array functions and properties such as length, concat ...
      */
@@ -722,26 +648,13 @@
         // init the entity class
         this.entityClasses[name] = {
             ancestors: [],
+            list: list,
             classname: name,
             properties: properties,
         };
 
         // adding the ancestors
-        for (var t = 0; t < list.length; t++) {
-            if (list[t] != '') {
-                if (!this.entityClasses[list[t]]) {
-                    console.warn('define :: cannot find the entity class name "' + list[t] + '", skipping');
-                } else if (list[t] == name) {
-                    console.warn('define :: entity class cannot add itself to ancestors, skipping');
-                } else {
-                    //							console.log('register :: adding ancestors "'+list[t]+'": ');
-                    this.entityClasses[name].ancestors = this.entityClasses[name].ancestors.concat(this.ancestors(list[t]));
-                    //							this.entityClasses[name].ancestors.push(list[t]);
-                    //this.mixin(name, this.entityClasses[list[t]]);
-                    //							console.log('register :: ancestors are now "'+this.entityClasses[name].ancestors.join(', ')+'": ');
-                }
-            }
-        }
+        this.entityFetchAncestors(name);
 
         this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
 
@@ -754,6 +667,50 @@
         //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
         //console.log('----');
     };
+
+    /**
+     * @param {string} className The class name of the entity to
+     * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
+     */
+    yespix.fn.entityFetchAncestors = function(className, mode) {
+        if (!this.entityClasses[className]) {
+            console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
+            return;
+        }
+
+        mode = mode || 'pending';
+        var list = this.entityClasses[className].list;
+
+        for (var t = 0; t < list.length; t++) {
+            if (list[t] != '') {
+                if (!this.entityClasses[list[t]]) {
+                    if (mode == 'pending') {
+                        console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
+                        this.entityPending.push(className);
+                        this.entityClasses[className].ancestors = [];
+                        break;
+                    } else {
+                        console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                    }
+                } else if (list[t] == className) {
+                    console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                } else {
+                    this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
+                }
+            }
+        }
+    };
+
+    yespix.fn.isEntityPending = function(className) {
+        var len = this.entityPending.length;
+        for (var t = 0; t < len; t++) {
+            if (this.entityPending[t] == className) return true;
+        }
+        console.log('isEntityPending :: entity "' + className + '" not pending');
+
+        return false;
+    };
+
 
 
     yespix.fn.spawn = function(name, properties) {
@@ -773,6 +730,12 @@
         }
 
         var entity = {};
+
+        // check if the entity was waiting other classes to load
+        if (this.isEntityPending(name)) {
+            console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
+            this.entityFetchAncestors(name, 'force');
+        } else console.log('spawn :: entity "' + name + '" is NOT pending');
 
         // mixin with the ancestors
         for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -2006,7 +1969,7 @@
         });
 
         // current version of the engine
-        this.version = "0.13";
+        this.version = "0.13.1";
 
         // initialise the modules array @todo
         var modules = []; // yespix common modules
@@ -2207,6 +2170,7 @@
 
         initEntities(this);
 
+
         for (var t = 0; t < options['modules'].length; t++) {
             if (!/^http(s)?\:\/\//i.test(options['modules'][t])) {
                 options['modules'][t] = options['dir_modules'] + options['modules'][t];
@@ -2279,6 +2243,126 @@
             },
             orderedExec: true,
         });
+
+
+
+
+        // init functions for input keys 
+
+        yespix.on('exitFrame', function(e) {
+            // delete old keypressed
+            /*
+				if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
+				if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
+				if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
+				*/
+            // save current keypressed as old keypressed and delete current keypressed
+            this.data.key.pressed = {
+                //	old: this.data.key.pressed
+            };
+            this.data.key.up = {
+                //	old: this.data.key.up
+            };
+            this.data.key.down = {
+                //	old: this.data.key.down
+            };
+        });
+
+
+        /**
+         * Key down bindings
+         * @param  {object} e Event
+         * @todo use the yespix document and window instead of the main objects
+         */
+        document.onkeydown = function(e) {
+            // get the event
+            e = e || window.event;
+
+            // get the key code
+            e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+            // main key pressed
+            yespix.data.key.pressed[parseInt(e.code)] = true;
+            yespix.data.key.hold[parseInt(e.code)] = true;
+
+            // special key pressed
+            if (e.ctrlKey) yespix.data.key.down[yespix.data.key.special['ctrl']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
+            if (e.altKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+            if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['shift']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
+
+            // triggers on YESPIX engine
+            yespix.trigger(e.type, e);
+            console.log('trigger ' + e.type);
+            //return false;
+        };
+
+        /**
+         * Key up bindings
+         * @param  {object} e Event
+         */
+        document.onkeyup = function(e) {
+            // get the event
+            e = e || window.event;
+
+            // get the key code
+            e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+            // main key pressed
+            yespix.data.key.up[parseInt(e.code)] = true;
+            yespix.data.key.hold[parseInt(e.code)] = false;
+
+            // special key pressed
+            if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
+            if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+            if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['shift']] = true;
+            else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
+
+            // triggers on YESPIX engine
+            yespix.trigger(e.type, e);
+            //return false;
+        };
+
+        /**
+         * Key pressed bindings
+         *
+         * @param  {object} e Event
+         */
+        document.onkeypress = function(e) {
+            // get the event
+            e = e || window.event;
+
+            // get the key code
+            e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+            // main key pressed
+            yespix.data.key.pressed[parseInt(e.code)] = true;
+
+            // triggers on YESPIX engine
+            yespix.trigger(e.type, e);
+            //return false;
+        };
+
+        /**
+         * blur
+         */
+        document.onblur = function(e) {
+            //console.log('blur');
+            yespix.data.key.pressed = {};
+            yespix.data.key.hold = {};
+            yespix.data.key.down = {};
+            yespix.data.key.up = {};
+
+            // triggers on YESPIX engine
+            yespix.trigger(e.type, e);
+        };
+
+
+
 
         return this;
 
@@ -2446,116 +2530,7 @@
 
 
 
-    /**
-     * Key down bindings
-     * @param  {object} e Event
-     */
-    document.onkeydown = function(e) {
-        // get the event
-        e = e || window.event;
 
-        // get the key code
-        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
-
-        // main key pressed
-        yespix.data.key.pressed[parseInt(e.code)] = true;
-        yespix.data.key.hold[parseInt(e.code)] = true;
-
-        // special key pressed
-        if (e.ctrlKey) yespix.data.key.down[yespix.data.key.special['ctrl']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
-        if (e.altKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
-        if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['shift']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
-
-        // triggers on YESPIX engine
-        yespix.trigger(e.type, e);
-        console.log('trigger ' + e.type);
-        //return false;
-    };
-
-    /**
-     * Key up bindings
-     * @param  {object} e Event
-     */
-    document.onkeyup = function(e) {
-        // get the event
-        e = e || window.event;
-
-        // get the key code
-        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
-
-        // main key pressed
-        yespix.data.key.up[parseInt(e.code)] = true;
-        yespix.data.key.hold[parseInt(e.code)] = false;
-
-        // special key pressed
-        if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
-        if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
-        if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['shift']] = true;
-        else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
-
-        // triggers on YESPIX engine
-        yespix.trigger(e.type, e);
-        //return false;
-    };
-
-    /**
-     * Key pressed bindings
-     *
-     * @param  {object} e Event
-     */
-    document.onkeypress = function(e) {
-        // get the event
-        e = e || window.event;
-
-        // get the key code
-        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
-
-        // main key pressed
-        yespix.data.key.pressed[parseInt(e.code)] = true;
-
-        // triggers on YESPIX engine
-        yespix.trigger(e.type, e);
-        //return false;
-    };
-
-    /**
-     * blur
-     */
-    document.onblur = function(e) {
-        //console.log('blur');
-        yespix.data.key.pressed = {};
-        yespix.data.key.hold = {};
-        yespix.data.key.down = {};
-        yespix.data.key.up = {};
-
-        // triggers on YESPIX engine
-        yespix.trigger(e.type, e);
-    };
-
-
-    yespix.on('exitFrame', function(e) {
-        // delete old keypressed
-        /*
-			if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
-			if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
-			if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
-			*/
-        // save current keypressed as old keypressed and delete current keypressed
-        this.data.key.pressed = {
-            //	old: this.data.key.pressed
-        };
-        this.data.key.up = {
-            //	old: this.data.key.up
-        };
-        this.data.key.down = {
-            //	old: this.data.key.down
-        };
-    });
 
     /**
      ************************************************************************************************************
@@ -2792,1105 +2767,1101 @@
         this.frameMs = 1000 / this.fps;
     };
 
-    // expose the YESPIX function constructor
-    window.yespix = yespix;
+    function initEntities(yespix) {
 
+        yespix.define('actor', 'anim move collision', {
 
-})();
+            isAttacking: false,
+            isFalling: false,
+            isJumping: false,
+            isOnGround: false,
 
-yespix.define('actor', 'anim move collision', {
+            actorMove: {},
+            actorSpeed: 2,
+            actorSpeedMin: 0.05,
+            actorDirection: '',
+            actorAnims: {},
+            actorInit: function(options) {},
+            init: function() {},
 
-    isAttacking: false,
-    isFalling: false,
-    isJumping: false,
-    isOnGround: false,
-
-    actorMove: {},
-    actorSpeed: 2,
-    actorSpeedMin: 0.05,
-    actorDirection: '',
-    actorAnims: {},
-    actorInit: function(options) {},
-    init: function() {},
-
-    applyFriction: function() {
-        this.speedX *= (1 - this.moveFriction);
-        this.speedY *= (1 - this.moveFriction);
-        if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
-        if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
-    }
-});
-
-yespix.define('player2w', 'actor2w', {
-
-    actorKeys: {
-        left: 'left',
-        right: 'right',
-        attack: 'x',
-        jump: ' ',
-    },
-
-    actorAnims: {
-        'idleright': 'idleright',
-        'idleleft': 'idleleft',
-
-        'walkright': 'walkright',
-        'walkleft': 'walkleft',
-
-        'lookup': 'lookup',
-        'lookdown': 'lookdown',
-
-        'jumpleft': 'jumpleft',
-        'jumpright': 'jumpright',
-
-        'airleft': 'airleft',
-        'airright': 'airright',
-
-        'attackleft': 'punch1left',
-        'attackright': 'punch1right',
-    },
-
-    playerAirFriction: 0.02,
-    playerGroundFriction: 0.13,
-
-    actorOptions: {
-        alwaysRun: false,
-    },
-
-    init: function() {
-        yespix.on('enterFrame', function() {
-            var move = '';
-
-            if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
-            else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
-            else this.accelX = 0;
-
-            //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
-            //console.log('isOnGround = '+this.isOnGround+'');
-
-            if (this.actorMove.attack && yespix.key(this.actorKeys.attack) && !this.isAttacking) {
-                this.isAttacking = true;
-                move = 'attack' + this.actorDirection;
-                this.animWait = false;
-                this.animPlay(this.actorAnims[move]);
-                this.animWait = true;
-                //yespix.dump(this);
+            applyFriction: function() {
+                this.speedX *= (1 - this.moveFriction);
+                this.speedY *= (1 - this.moveFriction);
+                if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
+                if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
             }
-
-            if (this.actorMove.jump && this.isOnGround && yespix.key(this.actorKeys.jump)) {
-                move = 'jump' + this.actorDirection;
-                this.animWait = false;
-                this.animPlay(this.actorAnims[move]);
-                this.animWait = true;
-                this.accelY = -this.actorSpeedJump;
-                this.animNext = 'air' + this.actorDirection;
-                this.isJumping = true;
-                this.jumpTime = (new Date).getTime();
-                console.log('this.jumpTime = ' + this.jumpTime);
-            } else if (this.isJumping) {
-                console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
-                if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
-                    this.accelY = -(this.actorSpeedJump / 6);
-                    //this.accelY = 0;
-                } else this.accelY = 0;
-            } else this.accelY = 0;
-
-            if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
-                this.actorDirection = 'right';
-                if (this.isOnGround) move = 'walk';
-            } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
-                this.actorDirection = 'left';
-                if (this.isOnGround) move = 'walk';
-            }
-            if (!this.isOnGround) {
-                if (this.speedY > 0) {
-                    this.isJumping = false;
-                    this.isFalling = true;
-                }
-                move = 'air';
-            }
-
-            if (move == '') move = this.actorMove['default'] + this.actorDirection;
-            else move = move + this.actorDirection;
-            this.animNext = this.actorAnims[move];
-
-
-            if (this.animWait || this.isAttacking) return;
-
-
-            this.animPlay(this.actorAnims[move]);
-            //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
-
-        }, this, yespix);
-    },
-
-    applyFriction: function() {
-        this.speedX *= (1 - this.playerGroundFriction);
-        this.speedY *= (1 - this.playerAirFriction);
-        if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
-        if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
-        return true;
-    },
-
-
-});
-
-yespix.define('actor4w', 'actor', {
-    actorMove: {
-        'idle': true,
-        'up': true,
-        'right': true,
-        'down': true,
-        'left': true,
-        'walk': true,
-        'run': true,
-        'jump': true,
-        'damage': true,
-        'crouch': true,
-        'guard': true,
-        'dead': true,
-        'throw': true,
-        'attack': true,
-        'use': true,
-        'default': 'idle',
-    },
-    actorDirection: 'down',
-    actorAnims: {
-        'walkup': 'walkup',
-        'walkright': 'walkright',
-        'walkdown': 'walkdown',
-        'walkleft': 'walkleft',
-
-        'idleup': 'idleup',
-        'idleright': 'idleright',
-        'idledown': 'idledown',
-        'idleleft': 'idleleft',
-
-        'runup': 'runup',
-        'runright': 'runright',
-        'rundown': 'rundown',
-        'runleft': 'runleft',
-    },
-    actorInit: function(options) {},
-    init: function() {},
-});
-
-yespix.define('actor2w', 'actor', {
-    actorMove: {
-        'idle': true,
-
-        'right': true,
-        'left': true,
-
-        'lookup': true,
-        'lookdown': true,
-
-        'walk': true,
-        'run': true,
-
-        'jump': true,
-        'longjump': true,
-        'doublejump': true,
-
-        'crouch': true,
-        'guard': true,
-
-        'damage': true,
-        'dead': true,
-
-        'throw': true,
-        'attack': true,
-        'use': true,
-        'default': 'idle',
-    },
-
-    actorSpeedJump: 1.1,
-    actorGravity: true,
-    actorDirection: 'right',
-
-    actorAnims: {
-        'idleright': 'idleright',
-        'idleleft': 'idleleft',
-
-        'walkright': 'walkright',
-        'walkleft': 'walkleft',
-
-        'lookup': 'lookup',
-        'lookdown': 'lookdown',
-
-        'lookup': 'lookup',
-        'lookdown': 'lookdown',
-
-        'attackleft': 'attackleft',
-        'attackright': 'attackright',
-
-        'jumpleft': 'jumpleft',
-        'jumpright': 'jumpright',
-        'airleft': 'airleft',
-        'airright': 'airright',
-        'landleft': 'landleft',
-        'landright': 'landright',
-
-        'left': 'left',
-        'right': 'right',
-    },
-
-    actorInit: function(options) {},
-
-    init: function() {},
-
-    move: function() {
-        this.speedX += this.accelX;
-        this.speedY += this.accelY;
-
-        this.applyFriction();
-        this.applyGravity();
-
-        if (yespix.level) yespix.level.collision(this);
-        this.x += this.speedX;
-        this.y += this.speedY;
-    },
-
-    applyGravity: function() {
-        if (!yespix.gravity) return false;
-        if (!this.isOnGround && yespix.gravity) {
-            //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
-            if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
-            if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
-        }
-    },
-
-    applyFriction: function() {
-        this.speedX *= (1 - this.moveFriction);
-        this.speedY *= (1 - this.moveFriction);
-        if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
-        if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
-        return true;
-    },
-
-});
-
-/**
- ************************************************************************************************************
- * @class entity.base
- */
-
-yespix.define('base', {
-
-    /**
-     * Reference to the YESPIX engine (in case you lost it)
-     * @property _yespix
-     * @type {object}
-     */
-    _yespix: yespix,
-
-
-    /**
-     * Entity class name initiated on the spawn of the entity
-     * @property _class
-     * @type string
-     */
-    _class: '',
-
-    /**
-     * Array of ancestor names initiated on the spawn of the entity
-     * @property _ancestors
-     * @type array
-     */
-    _ancestors: [],
-
-    /**
-     * Reference to the scene of the entity initiated by the scene entity
-     * @property _scene
-     * @type object
-     */
-    _scene: null,
-
-    /**
-     * Unique integer of the entity instance
-     * @property _id
-     * @type integer
-     */
-    _id: 1,
-
-    /**
-     * Array of children reference
-     * @property _children
-     * @type array
-     */
-    _children: null,
-
-    /**
-     * Reference to the parent
-     * @property _parent
-     * @type object
-     */
-    _parent: null,
-
-    /**
-     * Set True if the entity is active
-     * @property isActive
-     * @type boolean
-     * @default true
-     */
-    isActive: true,
-
-    /**
-     * Set True if the entity is visible
-     * @property isVisible
-     * @type boolean
-     * @default false
-     */
-    isVisible: false,
-
-    /**
-     * Set True if the entity is global
-     * @property isGlobal
-     * @type boolean
-     * @default false
-     */
-    isGlobal: false,
-
-    /**
-     * Name of the entity, not unique
-     * @property name
-     * @type string
-     */
-    name: '',
-
-
-    ///////////////////////////////// Main functions ////////////////////////////////
-
-    /**
-     * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
-     */
-    assets: function() {
-        return [];
-    },
-
-    /**
-     * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
-     */
-    init: function(properties) {
-        return true;
-    },
-
-    ancestor: function(name) {
-        return yespix.inArray(this._ancestors, name);
-    },
-
-    typeof: function(name) {
-        if (yespix.isArray(name)) {
-            for (var t = 0; t < name.length; t++)
-                if (this.typeOf(name[t])) return true;
-            return false;
-        }
-        return (this.ancestor(name) || this._class == name);
-    },
-
-    prop: function(name, value) {
-        if (yespix.isObject(name)) {
-            for (var n in name) {
-                this[n] = name[n];
-            }
-            return this;
-        }
-        this[name] = value;
-        return this;
-    },
-
-    /**
-     * Clone an entity
-     */
-    clone: function(properties) {
-        var entity = yespix.clone(this);
-        entity._id = yespix.entityNextId++;
-        if (properties) entity.prop(properties);
-        entity._instances = null;
-        yespix.dump(yespix.entityInstances);
-        yespix.instanceAdd(entity);
-        yespix.dump(yespix.entityInstances);
-        return entity;
-    },
-
-    attach: function(entity) {
-        yespix.attach(this, entity);
-        return this;
-    },
-
-    detach: function(entity) {
-        yespix.detach(this, entity);
-        return this;
-    },
-
-    trigger: function(name, e) {
-        yespix.trigger(name, e, this);
-        return this;
-    },
-
-    on: function(name, callback) {
-        yespix.on(name, callback, this);
-        return this;
-    },
-
-    off: function(name, callback) {
-        yespix.off(name, callback, this);
-        return this;
-    },
-
-    listen: function(pname, callback) {
-        return yespix.listen(this, pname, callback);
-        return this;
-    },
-
-    destroy: function() {
-        this._deleting = true;
-        this.isActive = false;
-        this.isVisible = false;
-
-        if (this._children) {
-            for (var t = 0; t < this._children.length; t++) {
-                if (this._children[t] && !this._children[t].deleting) {
-                    this._children[t].destroy();
-                }
-            }
-        }
-
-        yespix.instanceRemove(this);
-        return this;
-    }
-
-});
-yespix.entityRootClassname = 'base';
-
-yespix.define('canvas', {
-    canvasOptions: null,
-    element: null,
-    context: null,
-    document: null,
-
-    init: function(options) {
-        this.create(options);
-    },
-
-    create: function(options) {
-        options = options || {};
-        options.document = options.document || yespix.document;
-        options.width = options.width || 800; // @todo default must be set to client width
-        options.height = options.height || 600; // @todo default must be set to client height
-        options.style = options.style || {};
-        options.id = options.id || 'canvas' + this._id;
-        options.class = options.class || '';
-        options.autoAppend = options.autoAppend || true;
-
-        this.canvasOptions = options;
-        this.document = options.document;
-
-        var canvas = this.document.createElement('canvas');
-        canvas.id = options.id;
-        canvas.width = options.width;
-        canvas.height = options.height;
-        canvas.className = options.className;
-        for (var n in options.style) canvas.style[n] = options.style[n];
-
-        if (options.autoAppend) {
-            var body = this.document.getElementsByTagName("body")[0];
-            body.appendChild(canvas);
-        }
-
-        this.use(canvas, options);
-    },
-
-    use: function(canvasElement, options) {
-        options = options || {};
-        options.backgroundColor = options.backgroundColor || '#ffffff';
-        options.clearOnEnterFrame = options.clearOnEnterFrame || true;
-
-        this.element = canvasElement;
-        this.context = this.element.getContext('2d');
-
-        var canvas = this;
-
-        if (options.clearOnEnterFrame) yespix.on('enterFrame', function() {
-            canvas.clear();
         });
-    },
 
-    clear: function() {
-        //			this.context.clearRect(0,0,this.element.width, this.element.height);
-        if (this.element) this.element.width = this.element.width;
-    },
-});
+        yespix.define('player2w', 'actor2w', {
+
+            actorKeys: {
+                left: 'left',
+                right: 'right',
+                attack: 'x',
+                jump: ' ',
+            },
+
+            actorAnims: {
+                'idleright': 'idleright',
+                'idleleft': 'idleleft',
+
+                'walkright': 'walkright',
+                'walkleft': 'walkleft',
+
+                'lookup': 'lookup',
+                'lookdown': 'lookdown',
+
+                'jumpleft': 'jumpleft',
+                'jumpright': 'jumpright',
+
+                'airleft': 'airleft',
+                'airright': 'airright',
+
+                'attackleft': 'punch1left',
+                'attackright': 'punch1right',
+            },
+
+            playerAirFriction: 0.02,
+            playerGroundFriction: 0.13,
+
+            actorOptions: {
+                alwaysRun: false,
+            },
+
+            init: function() {
+                yespix.on('enterFrame', function() {
+                    var move = '';
+
+                    if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
+                    else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
+                    else this.accelX = 0;
+
+                    //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
+                    //console.log('isOnGround = '+this.isOnGround+'');
+
+                    if (this.actorMove.attack && yespix.key(this.actorKeys.attack) && !this.isAttacking) {
+                        this.isAttacking = true;
+                        move = 'attack' + this.actorDirection;
+                        this.animWait = false;
+                        this.animPlay(this.actorAnims[move]);
+                        this.animWait = true;
+                        //yespix.dump(this);
+                    }
+
+                    if (this.actorMove.jump && this.isOnGround && yespix.key(this.actorKeys.jump)) {
+                        move = 'jump' + this.actorDirection;
+                        this.animWait = false;
+                        this.animPlay(this.actorAnims[move]);
+                        this.animWait = true;
+                        this.accelY = -this.actorSpeedJump;
+                        this.animNext = 'air' + this.actorDirection;
+                        this.isJumping = true;
+                        this.jumpTime = (new Date).getTime();
+                        console.log('this.jumpTime = ' + this.jumpTime);
+                    } else if (this.isJumping) {
+                        console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
+                        if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
+                            this.accelY = -(this.actorSpeedJump / 6);
+                            //this.accelY = 0;
+                        } else this.accelY = 0;
+                    } else this.accelY = 0;
+
+                    if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
+                        this.actorDirection = 'right';
+                        if (this.isOnGround) move = 'walk';
+                    } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
+                        this.actorDirection = 'left';
+                        if (this.isOnGround) move = 'walk';
+                    }
+                    if (!this.isOnGround) {
+                        if (this.speedY > 0) {
+                            this.isJumping = false;
+                            this.isFalling = true;
+                        }
+                        move = 'air';
+                    }
+
+                    if (move == '') move = this.actorMove['default'] + this.actorDirection;
+                    else move = move + this.actorDirection;
+                    this.animNext = this.actorAnims[move];
 
 
-yespix.define('scene', {
-    sceneOptions: null,
-    document: null,
-
-    init: function(options) {
-        this.create(options);
-    },
-
-    create: function(options) {
-        options = options || {};
-        options.document = options.document || yespix.document;
-
-        this.sceneOptions = options;
-    },
-
-});
+                    if (this.animWait || this.isAttacking) return;
 
 
+                    this.animPlay(this.actorAnims[move]);
+                    //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
 
-yespix.define('move', {
-    speedX: 0,
-    speedY: 0,
-    accelX: 0,
-    accelY: 0,
-    moveFriction: 0.05,
+                }, this, yespix);
+            },
 
-    moveStop: function() {
-        this.speedX = this.speedY = this.accelX = this.accelY = 0;
-    },
+            applyFriction: function() {
+                this.speedX *= (1 - this.playerGroundFriction);
+                this.speedY *= (1 - this.playerAirFriction);
+                if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
+                if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
+                return true;
+            },
 
 
-    init: function() {
-        yespix.on('enterFrame', this.move, this, yespix);
-    },
+        });
 
-    move: function() {
-        if (this.applyGravity && yespix.gravity) this.applyGravity();
-        this.speedX += this.accelX;
-        this.speedY += this.accelY;
-        this.speedX *= 1 - this.moveFriction;
-        this.speedY *= 1 - this.moveFriction;
-        if (yespix.level) yespix.level.collision(this);
-        this.x += this.speedX;
-        this.y += this.speedY;
-    },
+        yespix.define('actor4w', 'actor', {
+            actorMove: {
+                'idle': true,
+                'up': true,
+                'right': true,
+                'down': true,
+                'left': true,
+                'walk': true,
+                'run': true,
+                'jump': true,
+                'damage': true,
+                'crouch': true,
+                'guard': true,
+                'dead': true,
+                'throw': true,
+                'attack': true,
+                'use': true,
+                'default': 'idle',
+            },
+            actorDirection: 'down',
+            actorAnims: {
+                'walkup': 'walkup',
+                'walkright': 'walkright',
+                'walkdown': 'walkdown',
+                'walkleft': 'walkleft',
 
-    applyGravity: function() {
-        /*
+                'idleup': 'idleup',
+                'idleright': 'idleright',
+                'idledown': 'idledown',
+                'idleleft': 'idleleft',
+
+                'runup': 'runup',
+                'runright': 'runright',
+                'rundown': 'rundown',
+                'runleft': 'runleft',
+            },
+            actorInit: function(options) {},
+            init: function() {},
+        });
+
+        yespix.define('actor2w', 'actor', {
+            actorMove: {
+                'idle': true,
+
+                'right': true,
+                'left': true,
+
+                'lookup': true,
+                'lookdown': true,
+
+                'walk': true,
+                'run': true,
+
+                'jump': true,
+                'longjump': true,
+                'doublejump': true,
+
+                'crouch': true,
+                'guard': true,
+
+                'damage': true,
+                'dead': true,
+
+                'throw': true,
+                'attack': true,
+                'use': true,
+                'default': 'idle',
+            },
+
+            actorSpeedJump: 1.1,
+            actorGravity: true,
+            actorDirection: 'right',
+
+            actorAnims: {
+                'idleright': 'idleright',
+                'idleleft': 'idleleft',
+
+                'walkright': 'walkright',
+                'walkleft': 'walkleft',
+
+                'lookup': 'lookup',
+                'lookdown': 'lookdown',
+
+                'lookup': 'lookup',
+                'lookdown': 'lookdown',
+
+                'attackleft': 'attackleft',
+                'attackright': 'attackright',
+
+                'jumpleft': 'jumpleft',
+                'jumpright': 'jumpright',
+                'airleft': 'airleft',
+                'airright': 'airright',
+                'landleft': 'landleft',
+                'landright': 'landright',
+
+                'left': 'left',
+                'right': 'right',
+            },
+
+            actorInit: function(options) {},
+
+            init: function() {},
+
+            move: function() {
+                this.speedX += this.accelX;
+                this.speedY += this.accelY;
+
+                this.applyFriction();
+                this.applyGravity();
+
+                if (yespix.level) yespix.level.collision(this);
+                this.x += this.speedX;
+                this.y += this.speedY;
+            },
+
+            applyGravity: function() {
+                if (!yespix.gravity) return false;
+                if (!this.isOnGround && yespix.gravity) {
+                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
+                    if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
+                    if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
+                }
+            },
+
+            applyFriction: function() {
+                this.speedX *= (1 - this.moveFriction);
+                this.speedY *= (1 - this.moveFriction);
+                if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
+                if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
+                return true;
+            },
+
+        });
+
+        /**
+         ************************************************************************************************************
+         * @class entity.base
+         */
+
+        yespix.define('base', {
+
+            /**
+             * Reference to the YESPIX engine (in case you lost it)
+             * @property _yespix
+             * @type {object}
+             */
+            _yespix: yespix,
+
+
+            /**
+             * Entity class name initiated on the spawn of the entity
+             * @property _class
+             * @type string
+             */
+            _class: '',
+
+            /**
+             * Array of ancestor names initiated on the spawn of the entity
+             * @property _ancestors
+             * @type array
+             */
+            _ancestors: [],
+
+            /**
+             * Reference to the scene of the entity initiated by the scene entity
+             * @property _scene
+             * @type object
+             */
+            _scene: null,
+
+            /**
+             * Unique integer of the entity instance
+             * @property _id
+             * @type integer
+             */
+            _id: 1,
+
+            /**
+             * Array of children reference
+             * @property _children
+             * @type array
+             */
+            _children: null,
+
+            /**
+             * Reference to the parent
+             * @property _parent
+             * @type object
+             */
+            _parent: null,
+
+            /**
+             * Set True if the entity is active
+             * @property isActive
+             * @type boolean
+             * @default true
+             */
+            isActive: true,
+
+            /**
+             * Set True if the entity is visible
+             * @property isVisible
+             * @type boolean
+             * @default false
+             */
+            isVisible: false,
+
+            /**
+             * Set True if the entity is global
+             * @property isGlobal
+             * @type boolean
+             * @default false
+             */
+            isGlobal: false,
+
+            /**
+             * Name of the entity, not unique
+             * @property name
+             * @type string
+             */
+            name: '',
+
+
+            ///////////////////////////////// Main functions ////////////////////////////////
+
+            /**
+             * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
+             */
+            assets: function() {
+                return [];
+            },
+
+            /**
+             * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
+             */
+            init: function(properties) {
+                return true;
+            },
+
+            ancestor: function(name) {
+                return yespix.inArray(this._ancestors, name);
+            },
+
+            typeof: function(name) {
+                if (yespix.isArray(name)) {
+                    for (var t = 0; t < name.length; t++)
+                        if (this.typeOf(name[t])) return true;
+                    return false;
+                }
+                return (this.ancestor(name) || this._class == name);
+            },
+
+            prop: function(name, value) {
+                if (yespix.isObject(name)) {
+                    for (var n in name) {
+                        this[n] = name[n];
+                    }
+                    return this;
+                }
+                this[name] = value;
+                return this;
+            },
+
+            /**
+             * Clone an entity
+             */
+            clone: function(properties) {
+                var entity = yespix.clone(this);
+                entity._id = yespix.entityNextId++;
+                if (properties) entity.prop(properties);
+                entity._instances = null;
+                yespix.dump(yespix.entityInstances);
+                yespix.instanceAdd(entity);
+                yespix.dump(yespix.entityInstances);
+                return entity;
+            },
+
+            attach: function(entity) {
+                yespix.attach(this, entity);
+                return this;
+            },
+
+            detach: function(entity) {
+                yespix.detach(this, entity);
+                return this;
+            },
+
+            trigger: function(name, e) {
+                yespix.trigger(name, e, this);
+                return this;
+            },
+
+            on: function(name, callback) {
+                yespix.on(name, callback, this);
+                return this;
+            },
+
+            off: function(name, callback) {
+                yespix.off(name, callback, this);
+                return this;
+            },
+
+            listen: function(pname, callback) {
+                return yespix.listen(this, pname, callback);
+                return this;
+            },
+
+            destroy: function() {
+                this._deleting = true;
+                this.isActive = false;
+                this.isVisible = false;
+
+                if (this._children) {
+                    for (var t = 0; t < this._children.length; t++) {
+                        if (this._children[t] && !this._children[t].deleting) {
+                            this._children[t].destroy();
+                        }
+                    }
+                }
+
+                yespix.instanceRemove(this);
+                return this;
+            }
+
+        });
+        yespix.entityRootClassname = 'base';
+
+        yespix.define('canvas', {
+            canvasOptions: null,
+            element: null,
+            context: null,
+            document: null,
+
+            init: function(options) {
+                this.create(options);
+            },
+
+            create: function(options) {
+                options = options || {};
+                options.document = options.document || yespix.document;
+                options.width = options.width || 800; // @todo default must be set to client width
+                options.height = options.height || 600; // @todo default must be set to client height
+                options.style = options.style || {};
+                options.id = options.id || 'canvas' + this._id;
+                options.class = options.class || '';
+                options.autoAppend = options.autoAppend || true;
+
+                this.canvasOptions = options;
+                this.document = options.document;
+
+                var canvas = this.document.createElement('canvas');
+                canvas.id = options.id;
+                canvas.width = options.width;
+                canvas.height = options.height;
+                canvas.className = options.className;
+                for (var n in options.style) canvas.style[n] = options.style[n];
+
+                if (options.autoAppend) {
+                    var body = this.document.getElementsByTagName("body")[0];
+                    body.appendChild(canvas);
+                }
+
+                this.use(canvas, options);
+            },
+
+            use: function(canvasElement, options) {
+                options = options || {};
+                options.backgroundColor = options.backgroundColor || '#ffffff';
+                options.clearOnEnterFrame = options.clearOnEnterFrame || true;
+
+                this.element = canvasElement;
+                this.context = this.element.getContext('2d');
+
+                var canvas = this;
+
+                if (options.clearOnEnterFrame) yespix.on('enterFrame', function() {
+                    canvas.clear();
+                });
+            },
+
+            clear: function() {
+                //			this.context.clearRect(0,0,this.element.width, this.element.height);
+                if (this.element) this.element.width = this.element.width;
+            },
+        });
+
+
+        yespix.define('scene', {
+            sceneOptions: null,
+            document: null,
+
+            init: function(options) {
+                this.create(options);
+            },
+
+            create: function(options) {
+                options = options || {};
+                options.document = options.document || yespix.document;
+
+                this.sceneOptions = options;
+            },
+
+        });
+
+
+
+        yespix.define('move', {
+            speedX: 0,
+            speedY: 0,
+            accelX: 0,
+            accelY: 0,
+            moveFriction: 0.05,
+
+            moveStop: function() {
+                this.speedX = this.speedY = this.accelX = this.accelY = 0;
+            },
+
+
+            init: function() {
+                yespix.on('enterFrame', this.move, this, yespix);
+            },
+
+            move: function() {
+                if (this.applyGravity && yespix.gravity) this.applyGravity();
+                this.speedX += this.accelX;
+                this.speedY += this.accelY;
+                this.speedX *= 1 - this.moveFriction;
+                this.speedY *= 1 - this.moveFriction;
+                if (yespix.level) yespix.level.collision(this);
+                this.x += this.speedX;
+                this.y += this.speedY;
+            },
+
+            applyGravity: function() {
+                /*
 				if (!this.isOnGround && yespix.gravity) {
 					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
 					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
 					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
 				}
 				*/
-    },
+            },
 
-});
-
-yespix.define('collision', {
-
-    colOffsetX: 0,
-    colOffsetY: 0,
-
-    colType: 'all', // "all" / "passive" / "active" / "none"
-    colClass: [],
-
-    init: function() {
-        if (yespix.isUndefined(this.colWidth)) this.colWidth = this.width;
-        if (yespix.isUndefined(this.colHeight)) this.colHeight = this.height;
-    },
-
-    collisionWith: function(entity) {
-        if (this.colClass.length == 0) return true;
-        if (entity.typeof(this.colClass)) return true;
-        return false;
-    },
-
-    collisionBox: function() {
-        return {
-            x: this.x + this.colOffsetX * this.pixelSize,
-            y: this.y + this.colOffsetY * this.pixelSize,
-            width: this.colWidth * this.pixelSize,
-            height: this.colHeight * this.pixelSize,
-            offsetX: this.colOffsetX * this.pixelSize,
-            offsetY: this.colOffsetY * this.pixelSize,
-        };
-    },
-
-    collision: function() {
-        if (this.colType == 'all' || this.colType == 'active') yespix.collision(this);
-    },
-
-    collisionOccupy: function() {
-        if (this.colType != 'none') yespix.collisionOccupy(this);
-    },
-
-    over: function(entity) {
-        if (!this.intersect(entity)) return false;
-        if (this.z > entity.z) return true;
-        if (this.z == entity.z && this.globalZ > entity.globalZ) return true;
-        return false;
-    },
-
-    under: function() {
-        if (!this.intersect(entity)) return false;
-        if (this.z < entity.z) return true;
-        if (this.z == entity.z && this.globalZ < entity.globalZ) return true;
-        return false;
-    },
-
-    touch: function(entity) {
-        return yespix.collisionTouch(this, entity);
-    },
-
-    intersect: function(entity) {
-        return yespix.collisionCheck(this, entity);
-    },
-
-    inside: function(entity) {
-        return yespix.collisionInside(this, entity);
-    }
-
-
-
-});
-
-/**
- * @class entity.gfx
- */
-yespix.define('gfx', {
-    _changed: false,
-
-    isReady: false,
-    isVisible: true,
-    snapToPixel: false,
-
-    x: 0,
-    y: 0,
-    z: 0,
-    zGlobal: 0,
-    alpha: 1,
-    rotation: 0,
-
-    _flipX: false,
-    _flipY: false,
-
-    ///////////////////////////////// Main functions ////////////////////////////////
-
-    asset: function() {
-        return [];
-    },
-
-    // initilize object
-    init: function() {
-
-        yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
-            yespix.drawEntitiesSort = true;
         });
 
-        return true;
-    },
+        yespix.define('collision', {
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
-        } else {
-            var x = this.x;
-            var y = this.y;
-        }
-        var width = this.width;
-        var height = this.height;
+            colOffsetX: 0,
+            colOffsetY: 0,
 
-        if (this.typeof('image')) {
-            var img = this.image(this.imageSelected);
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        } else if (this.typeof('anim')) {
-            var img = this.image(this.imageSelected);
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        }
+            colType: 'all', // "all" / "passive" / "active" / "none"
+            colClass: [],
 
-        return {
-            x: x,
-            y: y,
-            width: width,
-            height: height
-        };
-    },
+            init: function() {
+                if (yespix.isUndefined(this.colWidth)) this.colWidth = this.width;
+                if (yespix.isUndefined(this.colHeight)) this.colHeight = this.height;
+            },
 
-    getContext: function() {
-        if (this._context) return this._context;
-        if (this._parent == null) {
-            var canvas = yespix.find('.canvas')[0];
-            if (!this._context && canvas) this._context = canvas.context;
-        }
-        return this._context;
-    },
+            collisionWith: function(entity) {
+                if (this.colClass.length == 0) return true;
+                if (entity.typeof(this.colClass)) return true;
+                return false;
+            },
 
-});
+            collisionBox: function() {
+                return {
+                    x: this.x + this.colOffsetX * this.pixelSize,
+                    y: this.y + this.colOffsetY * this.pixelSize,
+                    width: this.colWidth * this.pixelSize,
+                    height: this.colHeight * this.pixelSize,
+                    offsetX: this.colOffsetX * this.pixelSize,
+                    offsetY: this.colOffsetY * this.pixelSize,
+                };
+            },
 
-yespix.define('image', 'gfx', {
-    isVisible: true,
+            collision: function() {
+                if (this.colType == 'all' || this.colType == 'active') yespix.collision(this);
+            },
 
-    // images
-    images: [],
+            collisionOccupy: function() {
+                if (this.colType != 'none') yespix.collisionOccupy(this);
+            },
 
-    imageSelected: 0,
+            over: function(entity) {
+                if (!this.intersect(entity)) return false;
+                if (this.z > entity.z) return true;
+                if (this.z == entity.z && this.globalZ > entity.globalZ) return true;
+                return false;
+            },
 
-    imageDefaults: {
-        isInitiated: false, // true if imageInit() was called
-        isReady: false,
-        src: '',
-        element: null,
-        document: yespix.document,
-    },
+            under: function() {
+                if (!this.intersect(entity)) return false;
+                if (this.z < entity.z) return true;
+                if (this.z == entity.z && this.globalZ < entity.globalZ) return true;
+                return false;
+            },
 
-    init: function() {
-        var entity = this,
-            count = 1;
+            touch: function(entity) {
+                return yespix.collisionTouch(this, entity);
+            },
 
-        if (!this.pixelSize) this.pixelSize = 1;
+            intersect: function(entity) {
+                return yespix.collisionCheck(this, entity);
+            },
 
-        if (yespix.isString(this.images)) this.images = [{
-            src: this.images
-        }];
-
-        for (var t = 0; t < this.images.length; t++) {
-            // if the array element is a string, it's the src of the image
-            if (yespix.isString(this.images[t])) this.images[t] = {
-                src: this.images[t],
-            };
-
-            // init the default properties
-            for (var n in this.imageDefaults) {
-                this.images[t][n] = this.images[t][n] || this.imageDefaults[n];
+            inside: function(entity) {
+                return yespix.collisionInside(this, entity);
             }
-            if (this.images[t].name === '') this.images[t].name = 'image' + count++;
-        }
-
-        this.imageInit();
-    },
-
-    resize: function(img, scale) {
-        // Takes an image and a scaling factor and returns the scaled image
-        // The original image is drawn into an offscreen canvas of the same size
-        // and copied, pixel by pixel into another offscreen canvas with the 
-        // new size.
-
-        var widthScaled = img.width * scale;
-        var heightScaled = img.height * scale;
-
-        var orig = document.createElement('canvas');
-        orig.width = img.width;
-        orig.height = img.height;
-        var origCtx = orig.getContext('2d');
-        origCtx.drawImage(img, 0, 0);
-        var origPixels = origCtx.getImageData(0, 0, img.width, img.height);
-
-        var scaled = document.createElement('canvas');
-        scaled.width = widthScaled;
-        scaled.height = heightScaled;
-        var scaledCtx = scaled.getContext('2d');
-        var scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
-
-        for (var y = 0; y < heightScaled; y++) {
-            for (var x = 0; x < widthScaled; x++) {
-                var index = (Math.floor(y / scale) * img.width + Math.floor(x / scale)) * 4;
-                var indexScaled = (y * widthScaled + x) * 4;
-                scaledPixels.data[indexScaled] = origPixels.data[index];
-                scaledPixels.data[indexScaled + 1] = origPixels.data[index + 1];
-                scaledPixels.data[indexScaled + 2] = origPixels.data[index + 2];
-                scaledPixels.data[indexScaled + 3] = origPixels.data[index + 3];
-            }
-        }
-        scaledCtx.putImageData(scaledPixels, 0, 0);
-        return scaled;
-    },
-
-    image: function(properties) {
-        //console.log('image :: properties = '+properties);
-
-        if (properties == undefined)
-            if (this.images[0]) return this.imageInit(this.images[0]);
-            else return null;
-        if (typeof properties == 'string') properties = {
-            name: properties
-        };
-        else if (yespix.isInt(properties))
-            if (this.images[properties]) return this.imageInit(this.images[properties]);
-            else return null;
-
-        var max = Object.keys(properties).length;
-        var count = 0;
-        for (var t = 0; t < this.images.length; t++) {
-            //console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
-            for (var n in properties) {
-                if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
-                //console.log('property "'+n+'", max = '+max+', count = '+count);
-                if (count >= max) return this.imageInit(this.images[t]);
-            }
-        }
-        return null;
-    },
-
-    imageInit: function(image) {
-        var entity = this;
-
-        // no image, init all the images
-        if (image == undefined) {
-            for (var t = 0; t < this.images.length; t++) {
-                this.imageInit(this.images[t]);
-            }
-            return true;
-        }
-
-        // image already initiated
-        if (image.isInitiated) return image;
-
-        image.isReady = false;
-        image.isInitiated = true;
-        image.entity = entity;
-        image.element = document.createElement('img');
-        //console.log('createElement :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
-
-        if (image.element) image.element.onload = image.element.onLoad = function() {
-            //console.log('image.onlad :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
-            image.realWidth = this.width;
-            image.realHeight = this.height;
-            image.isReady = true;
-
-            if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
-                image.element = entity.resize(image.element, entity.pixelSize);
-                image.realWidth = this.width * entity.pixelSize;
-                image.realHeight = this.height * entity.pixelSize;
-
-                //console.log('image resized');
-                //yespix.call(entity, 'draw', 'gfx');
-                //yespix.error();
-            }
-            //yespix.timerStop();
-
-            entity.trigger('imageReady', {
-                target: image,
-            });
-
-            delete this.onload;
-        };
-
-        // add source to the image element
-        image.changeSource = function(source) {
-            this.element.src = source;
-            entity.trigger('change');
-            return true;
-        };
-
-        if (image.src !== undefined && image.src !== '') {
-            image.changeSource(image.src);
-        }
 
 
-        return image; //source != '';
-    },
 
-    draw: function(context) {
-        if (!this.isVisible) return;
+        });
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+        /**
+         * @class entity.gfx
+         */
+        yespix.define('gfx', {
+            _changed: false,
 
-        //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
-        var img = this.image(this.imageSelected);
-        var box = this.getDrawBox();
-        var scaleX = this.flipX ? -1 : 1;
-        var scaleY = this.flipY ? -1 : 1;
+            isReady: false,
+            isVisible: true,
+            snapToPixel: false,
 
-        if (context && img && img.element && img.isReady) {
-            context.globalAlpha = this.alpha;
-            context.drawImage(img.element, //image element
-                0, // x position on image
-                0, // y position on image
-                img.realWidth, // width on image
-                img.realHeight, // height on image
-                box.x, // x position on canvas
-                box.y, // y position on canvas
-                box.width, // width on canvas
-                box.height // height on canvas
-            );
-            if (this.debug) {
-                context.globalAlpha = 1;
-                context.lineWidth = 0.5;
-                context.strokeStyle = "#ff1111";
-                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                context.fillStyle = '#999999';
-                context.font = "10px sans-serif";
-                context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
+            x: 0,
+            y: 0,
+            z: 0,
+            zGlobal: 0,
+            alpha: 1,
+            rotation: 0,
 
-                if (this.collisionBox) {
-                    var box = this.collisionBox();
-                    context.lineWidth = 0.5;
-                    context.strokeStyle = "#000099";
-                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+            _flipX: false,
+            _flipY: false,
+
+            ///////////////////////////////// Main functions ////////////////////////////////
+
+            asset: function() {
+                return [];
+            },
+
+            // initilize object
+            init: function() {
+
+                yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
+                    yespix.drawEntitiesSort = true;
+                });
+
+                return true;
+            },
+
+            getDrawBox: function() {
+                if (this.snapToPixel) {
+                    var x = parseInt(this.x);
+                    var y = parseInt(this.y);
+                } else {
+                    var x = this.x;
+                    var y = this.y;
                 }
-            }
-        }
-    },
-});
+                var width = this.width;
+                var height = this.height;
 
-/**
- ************************************************************************************************************
- ************************************************************************************************************
- * Level
- *
- */
+                if (this.typeof('image')) {
+                    var img = this.image(this.imageSelected);
+                    width = this.width || img.width || img.realWidth;
+                    height = this.height || img.height || img.realHeight;
+                } else if (this.typeof('anim')) {
+                    var img = this.image(this.imageSelected);
+                    width = this.width || img.width || img.realWidth;
+                    height = this.height || img.height || img.realHeight;
+                }
 
-yespix.define('level', 'gfx', {
-    data: {},
+                return {
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height
+                };
+            },
 
-    isVisible: true,
+            getContext: function() {
+                if (this._context) return this._context;
+                if (this._parent == null) {
+                    var canvas = yespix.find('.canvas')[0];
+                    if (!this._context && canvas) this._context = canvas.context;
+                }
+                return this._context;
+            },
 
-    isReady: false,
+        });
 
-    layers: [],
+        yespix.define('image', 'gfx', {
+            isVisible: true,
 
-    canvas: null,
-    context: null,
+            // images
+            images: [],
+
+            imageSelected: 0,
+
+            imageDefaults: {
+                isInitiated: false, // true if imageInit() was called
+                isReady: false,
+                src: '',
+                element: null,
+                document: yespix.document,
+            },
+
+            init: function() {
+                var entity = this,
+                    count = 1;
+
+                if (!this.pixelSize) this.pixelSize = 1;
+
+                if (yespix.isString(this.images)) this.images = [{
+                    src: this.images
+                }];
+
+                for (var t = 0; t < this.images.length; t++) {
+                    // if the array element is a string, it's the src of the image
+                    if (yespix.isString(this.images[t])) this.images[t] = {
+                        src: this.images[t],
+                    };
+
+                    // init the default properties
+                    for (var n in this.imageDefaults) {
+                        this.images[t][n] = this.images[t][n] || this.imageDefaults[n];
+                    }
+                    if (this.images[t].name === '') this.images[t].name = 'image' + count++;
+                }
+
+                this.imageInit();
+            },
+
+            resize: function(img, scale) {
+                // Takes an image and a scaling factor and returns the scaled image
+                // The original image is drawn into an offscreen canvas of the same size
+                // and copied, pixel by pixel into another offscreen canvas with the 
+                // new size.
+
+                var widthScaled = img.width * scale;
+                var heightScaled = img.height * scale;
+
+                var orig = document.createElement('canvas');
+                orig.width = img.width;
+                orig.height = img.height;
+                var origCtx = orig.getContext('2d');
+                origCtx.drawImage(img, 0, 0);
+                var origPixels = origCtx.getImageData(0, 0, img.width, img.height);
+
+                var scaled = document.createElement('canvas');
+                scaled.width = widthScaled;
+                scaled.height = heightScaled;
+                var scaledCtx = scaled.getContext('2d');
+                var scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
+
+                for (var y = 0; y < heightScaled; y++) {
+                    for (var x = 0; x < widthScaled; x++) {
+                        var index = (Math.floor(y / scale) * img.width + Math.floor(x / scale)) * 4;
+                        var indexScaled = (y * widthScaled + x) * 4;
+                        scaledPixels.data[indexScaled] = origPixels.data[index];
+                        scaledPixels.data[indexScaled + 1] = origPixels.data[index + 1];
+                        scaledPixels.data[indexScaled + 2] = origPixels.data[index + 2];
+                        scaledPixels.data[indexScaled + 3] = origPixels.data[index + 3];
+                    }
+                }
+                scaledCtx.putImageData(scaledPixels, 0, 0);
+                return scaled;
+            },
+
+            image: function(properties) {
+                //console.log('image :: properties = '+properties);
+
+                if (properties == undefined)
+                    if (this.images[0]) return this.imageInit(this.images[0]);
+                    else return null;
+                if (typeof properties == 'string') properties = {
+                    name: properties
+                };
+                else if (yespix.isInt(properties))
+                    if (this.images[properties]) return this.imageInit(this.images[properties]);
+                    else return null;
+
+                var max = Object.keys(properties).length;
+                var count = 0;
+                for (var t = 0; t < this.images.length; t++) {
+                    //console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
+                    for (var n in properties) {
+                        if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
+                        //console.log('property "'+n+'", max = '+max+', count = '+count);
+                        if (count >= max) return this.imageInit(this.images[t]);
+                    }
+                }
+                return null;
+            },
+
+            imageInit: function(image) {
+                var entity = this;
+
+                // no image, init all the images
+                if (image == undefined) {
+                    for (var t = 0; t < this.images.length; t++) {
+                        this.imageInit(this.images[t]);
+                    }
+                    return true;
+                }
+
+                // image already initiated
+                if (image.isInitiated) return image;
+
+                image.isReady = false;
+                image.isInitiated = true;
+                image.entity = entity;
+                image.element = document.createElement('img');
+                //console.log('createElement :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
+
+                if (image.element) image.element.onload = image.element.onLoad = function() {
+                    //console.log('image.onlad :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
+                    image.realWidth = this.width;
+                    image.realHeight = this.height;
+                    image.isReady = true;
+
+                    if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
+                        image.element = entity.resize(image.element, entity.pixelSize);
+                        image.realWidth = this.width * entity.pixelSize;
+                        image.realHeight = this.height * entity.pixelSize;
+
+                        //console.log('image resized');
+                        //yespix.call(entity, 'draw', 'gfx');
+                        //yespix.error();
+                    }
+                    //yespix.timerStop();
+
+                    entity.trigger('imageReady', {
+                        target: image,
+                    });
+
+                    delete this.onload;
+                };
+
+                // add source to the image element
+                image.changeSource = function(source) {
+                    this.element.src = source;
+                    entity.trigger('change');
+                    return true;
+                };
+
+                if (image.src !== undefined && image.src !== '') {
+                    image.changeSource(image.src);
+                }
 
 
-    block: function(x, y) {
-        var index = y * this.data.width + x;
-        var tileIndex = this.data.layers[0].data[index];
-        //console.log('block :: index = ' + index + ', tileIndex = ' + tileIndex);
-        if (tileIndex > 1) return true;
-        return false;
-    },
+                return image; //source != '';
+            },
 
-    hit: function(cellX, cellY, direction, speed) {
-        return true;
-    },
+            draw: function(context) {
+                if (!this.isVisible) return;
 
-    collisionRight: function(entity, box, cellX, cellY) {
-        this.hit(cellX, cellY, 'right', entity.speedX);
-        entity.x = this.x + cellX * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
-        entity.speedX = 0;
-    },
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
 
-    collisionLeft: function(entity, box, cellX, cellY) {
-        this.hit(cellX, cellY, 'left', entity.speedX);
-        entity.x = this.x + (cellX + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
-        entity.speedX = 0;
-    },
+                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
+                var img = this.image(this.imageSelected);
+                var box = this.getDrawBox();
+                var scaleX = this.flipX ? -1 : 1;
+                var scaleY = this.flipY ? -1 : 1;
 
-    collisionUp: function(entity, box, cellX, cellY) {
-        this.hit(cellX, cellY, 'up', entity.speedY);
-        var posY = this.y + (cellY + 1) * this.data.tileheight + 1 - box.offsetY;
-        entity.y = posY;
-        entity.speedY = 0;
-    },
+                if (context && img && img.element && img.isReady) {
+                    context.globalAlpha = this.alpha;
+                    context.drawImage(img.element, //image element
+                        0, // x position on image
+                        0, // y position on image
+                        img.realWidth, // width on image
+                        img.realHeight, // height on image
+                        box.x, // x position on canvas
+                        box.y, // y position on canvas
+                        box.width, // width on canvas
+                        box.height // height on canvas
+                    );
+                    if (this.debug) {
+                        context.globalAlpha = 1;
+                        context.lineWidth = 0.5;
+                        context.strokeStyle = "#ff1111";
+                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                        context.fillStyle = '#999999';
+                        context.font = "10px sans-serif";
+                        context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
 
-    collisionDown: function(entity, box, cellX, cellY) {
-        this.hit(cellX, cellY, 'down', entity.speedY);
-        entity.y = this.y + (cellY) * this.data.tileheight - box.offsetY - box.height - 1;
-        entity.speedY = 0;
-        entity.isOnGround = true;
-        entity.isJumping = false;
-        entity.isFalling = false;
-        this.accelY = 0;
-    },
-
-    collision: function(entity) {
-        if (entity.speedX == 0 && entity.speedY == 0) return;
-
-        var left = false,
-            right = false,
-            up = false,
-            down = false;
-
-        //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
-
-        var box = entity.collisionBox();
-
-
-        if (entity.speedX > 0) {
-            // check every collision on the right
-            var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
-
-            // cellNext is the final cell on the right of the entity
-            var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-
-            if (cellNext > cellRight) {
-
-                right = true;
-
-                var cellTop = Math.floor(box.y / this.data.tileheight);
-                var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
-                var stopped = false;
-                for (var x = cellRight; x <= cellNext; x++) {
-                    for (var y = cellTop; y <= cellBottom; y++) {
-                        if (this.block(x, y)) {
-                            this.collisionRight(entity, box, x, y);
-                            //var posX = this.x + (x) * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
-                            //entity.x = posX;
-                            //entity.speedX = 0;
-                            stopped = true;
-                            break;
+                        if (this.collisionBox) {
+                            var box = this.collisionBox();
+                            context.lineWidth = 0.5;
+                            context.strokeStyle = "#000099";
+                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
                         }
                     }
-                    if (stopped) break;
                 }
-            }
-        } else if (entity.speedX < 0) {
-            // check every collision on the left
-            var cellLeft = Math.floor(box.x / this.data.tilewidth);
+            },
+        });
 
-            // cellNext is the final cell on the left of the entity
-            var cellNext = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
+        /**
+         ************************************************************************************************************
+         ************************************************************************************************************
+         * Level
+         *
+         */
 
-            //console.log('cellLeft = '+cellLeft+', cellNext = '+cellNext);
+        yespix.define('level', 'gfx', {
+            data: {},
 
-            if (cellNext < cellLeft) {
+            isVisible: true,
 
-                left = true;
+            isReady: false,
 
-                var cellTop = Math.floor(box.y / this.data.tileheight);
-                var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
-                var stopped = false;
-                for (var x = cellLeft; x >= cellNext; x--) {
-                    for (var y = cellTop; y <= cellBottom; y++) {
-                        if (this.block(x, y)) {
-                            this.collisionLeft(entity, box, x, y);
-                            /*var posX = this.x + (x + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
+            layers: [],
+
+            canvas: null,
+            context: null,
+
+
+            block: function(x, y) {
+                var index = y * this.data.width + x;
+                var tileIndex = this.data.layers[0].data[index];
+                //console.log('block :: index = ' + index + ', tileIndex = ' + tileIndex);
+                if (tileIndex > 1) return true;
+                return false;
+            },
+
+            hit: function(cellX, cellY, direction, speed) {
+                return true;
+            },
+
+            collisionRight: function(entity, box, cellX, cellY) {
+                this.hit(cellX, cellY, 'right', entity.speedX);
+                entity.x = this.x + cellX * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                entity.speedX = 0;
+            },
+
+            collisionLeft: function(entity, box, cellX, cellY) {
+                this.hit(cellX, cellY, 'left', entity.speedX);
+                entity.x = this.x + (cellX + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
+                entity.speedX = 0;
+            },
+
+            collisionUp: function(entity, box, cellX, cellY) {
+                this.hit(cellX, cellY, 'up', entity.speedY);
+                var posY = this.y + (cellY + 1) * this.data.tileheight + 1 - box.offsetY;
+                entity.y = posY;
+                entity.speedY = 0;
+            },
+
+            collisionDown: function(entity, box, cellX, cellY) {
+                this.hit(cellX, cellY, 'down', entity.speedY);
+                entity.y = this.y + (cellY) * this.data.tileheight - box.offsetY - box.height - 1;
+                entity.speedY = 0;
+                entity.isOnGround = true;
+                entity.isJumping = false;
+                entity.isFalling = false;
+                this.accelY = 0;
+            },
+
+            collision: function(entity) {
+                if (entity.speedX == 0 && entity.speedY == 0) return;
+
+                var left = false,
+                    right = false,
+                    up = false,
+                    down = false;
+
+                //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
+
+                var box = entity.collisionBox();
+
+
+                if (entity.speedX > 0) {
+                    // check every collision on the right
+                    var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+
+                    // cellNext is the final cell on the right of the entity
+                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
+
+                    if (cellNext > cellRight) {
+
+                        right = true;
+
+                        var cellTop = Math.floor(box.y / this.data.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var stopped = false;
+                        for (var x = cellRight; x <= cellNext; x++) {
+                            for (var y = cellTop; y <= cellBottom; y++) {
+                                if (this.block(x, y)) {
+                                    this.collisionRight(entity, box, x, y);
+                                    //var posX = this.x + (x) * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                                    //entity.x = posX;
+                                    //entity.speedX = 0;
+                                    stopped = true;
+                                    break;
+                                }
+                            }
+                            if (stopped) break;
+                        }
+                    }
+                } else if (entity.speedX < 0) {
+                    // check every collision on the left
+                    var cellLeft = Math.floor(box.x / this.data.tilewidth);
+
+                    // cellNext is the final cell on the left of the entity
+                    var cellNext = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
+
+                    //console.log('cellLeft = '+cellLeft+', cellNext = '+cellNext);
+
+                    if (cellNext < cellLeft) {
+
+                        left = true;
+
+                        var cellTop = Math.floor(box.y / this.data.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var stopped = false;
+                        for (var x = cellLeft; x >= cellNext; x--) {
+                            for (var y = cellTop; y <= cellBottom; y++) {
+                                if (this.block(x, y)) {
+                                    this.collisionLeft(entity, box, x, y);
+                                    /*var posX = this.x + (x + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
 									entity.x = posX;
 									entity.speedX = 0;*/
-                            stopped = true;
-                            break;
+                                    stopped = true;
+                                    break;
+                                }
+                            }
+                            if (stopped) break;
                         }
                     }
-                    if (stopped) break;
                 }
-            }
-        }
 
-        if (entity.speedY > 0) {
-            // check every collision on the bottom
-            var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                if (entity.speedY > 0) {
+                    // check every collision on the bottom
+                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
 
-            // cellNext is the final cell on the right of the entity
-            var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    // cellNext is the final cell on the right of the entity
+                    var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
 
-            //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
+                    //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
 
-            if (cellNext > cellBottom) {
+                    if (cellNext > cellBottom) {
 
-                down = true;
+                        down = true;
 
-                var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
-                var stopped = false;
-                for (var y = cellBottom; y <= cellNext; y++) {
-                    for (var x = cellLeft; x <= cellRight; x++) {
-                        if (this.block(x, y)) {
-                            this.collisionDown(entity, box, x, y);
-                            /*
+                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var stopped = false;
+                        for (var y = cellBottom; y <= cellNext; y++) {
+                            for (var x = cellLeft; x <= cellRight; x++) {
+                                if (this.block(x, y)) {
+                                    this.collisionDown(entity, box, x, y);
+                                    /*
 									var posY = this.y + (y) * this.data.tileheight - box.offsetY - box.height - 1;
 									//console.log('block :: x = '+x+', y = '+y+', poxY = '+posY);
 									console.log('entity posY from ' + entity.y + ' to ' + posY);
@@ -3900,573 +3871,580 @@ yespix.define('level', 'gfx', {
 									entity.isJumping = false;
 									entity.isFalling = false;
 									this.accelY = 0;*/
-                            stopped = true;
-                            break;
+                                    stopped = true;
+                                    break;
+                                }
+                            }
+                            if (stopped) break;
                         }
                     }
-                    if (stopped) break;
-                }
-            }
-        } else if (entity.speedY < 0) {
-            // check every collision on the bottom
-            var cellTop = Math.floor(box.y / this.data.tileheight);
+                } else if (entity.speedY < 0) {
+                    // check every collision on the bottom
+                    var cellTop = Math.floor(box.y / this.data.tileheight);
 
-            // cellNext is the final cell on the right of the entity
-            var cellNext = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    // cellNext is the final cell on the right of the entity
+                    var cellNext = Math.floor((box.y + entity.speedY) / this.data.tileheight);
 
-            //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
+                    //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
 
-            if (cellNext < cellTop) {
+                    if (cellNext < cellTop) {
 
-                up = true;
+                        up = true;
 
-                var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
-                var stopped = false;
-                for (var y = cellTop; y >= cellNext; y--) {
-                    for (var x = cellLeft; x <= cellRight; x++) {
-                        //console.log('level.collision :: x=' + x + ', y=' + y + ', block=' + this.block(x, y));
-                        if (this.block(x, y)) {
-                            this.collisionUp(entity, box, x, y);
-                            /*
+                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var stopped = false;
+                        for (var y = cellTop; y >= cellNext; y--) {
+                            for (var x = cellLeft; x <= cellRight; x++) {
+                                //console.log('level.collision :: x=' + x + ', y=' + y + ', block=' + this.block(x, y));
+                                if (this.block(x, y)) {
+                                    this.collisionUp(entity, box, x, y);
+                                    /*
 									var posY = this.y + (y + 1) * this.data.tileheight + 1 - box.offsetY;
 									console.log('entity posY from ' + entity.y + ' to ' + posY);
 									entity.y = posY;
 									entity.speedY = 0;
 									*/
-                            stopped = true;
-                            break;
+                                    stopped = true;
+                                    break;
+                                }
+                            }
+                            if (stopped) break;
                         }
                     }
-                    if (stopped) break;
                 }
-            }
-        }
 
-        if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
-            var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-            var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
-            if (this.block(cellRight, cellTop)) {
-                console.log('Double collision right top');
-                this.collisionUp(entity, box, cellRight, cellTop);
-                this.collisionRight(entity, box, cellRight, cellTop);
-            }
-        } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
-            var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-            var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
-            if (this.block(cellRight, cellBottom)) {
-                console.log('Double collision right down');
-                this.collisionDown(entity, box, cellRight, cellBottom);
-                this.collisionRight(entity, box, cellRight, cellBottom);
-            }
-        } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
-            var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-            var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
-            if (this.block(cellLeft, cellBottom)) {
-                console.log('Double collision left down');
-                this.collisionDown(entity, box, cellLeft, cellBottom);
-                this.collisionLeft(entity, box, cellLeft, cellBottom);
-            }
-        } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {
-            var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-            var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
-            if (this.block(cellLeft, cellTop)) {
-                console.log('Double collision left up');
-                this.collisionUp(entity, box, cellLeft, cellTop);
-                this.collisionLeft(entity, box, cellLeft, cellTop);
-            }
-        }
-
-        if (entity.speedY == 0) {
-            // check if the entity is on ground
-            var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
-            var cellNext = Math.floor((box.y + box.height + 1) / this.data.tileheight);
-            if (cellNext == cellBottom) {
-                entity.isOnGround = false;
-                //console.log('entity NOT on ground');
-            } else {
-                entity.isOnGround = false;
-                var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
-                var stopped = false;
-                for (var y = cellBottom; y <= cellNext; y++) {
-                    for (var x = cellLeft; x <= cellRight; x++) {
-                        if (this.block(x, y)) {
-                            //console.log('entity on ground');
-                            entity.isOnGround = true;
-                            entity.isJumping = false;
-                            entity.isFalling = false;
-                            this.accelY = 0;
-                            stopped = true;
-                            break;
-                        }
+                if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    if (this.block(cellRight, cellTop)) {
+                        console.log('Double collision right top');
+                        this.collisionUp(entity, box, cellRight, cellTop);
+                        this.collisionRight(entity, box, cellRight, cellTop);
                     }
-                    if (stopped) break;
-                }
-            }
-        } else entity.isOnGround = false;
-
-    },
-
-
-    load: function(src) {
-        // destroy other loaded levels @todo
-        //yespix.find('/level').not(this).destroy();
-
-        yespix.load(src, {
-            'complete': function(e) {
-                yespix.dump(e);
-
-                var entity = e.entity;
-                entity.data = JSON.parse(e.content);
-
-
-                entity.canvas = document.createElement('canvas');
-                entity.context = entity.canvas.getContext('2d');
-
-                var index = 0;
-                var colors = ['', '', '#ff9900', '#FF0000', '#006600', '#000099'];
-
-                entity.canvas.width = entity.data.width * entity.data.tilewidth;
-                entity.canvas.height = entity.data.height * entity.data.tileheight;
-
-                for (var y = 0; y < entity.data.height; y++) {
-                    for (var x = 0; x < entity.data.width; x++) {
-                        var tileIndex = entity.data.layers[0].data[index];
-                        if (tileIndex > 1) {
-                            //console.log('x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
-                            entity.context.fillStyle = colors[tileIndex];
-                            entity.context.fillRect(x * entity.data.tilewidth, y * entity.data.tileheight, entity.data.tilewidth, entity.data.tileheight);
-                        }
-                        index++;
+                } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    if (this.block(cellRight, cellBottom)) {
+                        console.log('Double collision right down');
+                        this.collisionDown(entity, box, cellRight, cellBottom);
+                        this.collisionRight(entity, box, cellRight, cellBottom);
+                    }
+                } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    if (this.block(cellLeft, cellBottom)) {
+                        console.log('Double collision left down');
+                        this.collisionDown(entity, box, cellLeft, cellBottom);
+                        this.collisionLeft(entity, box, cellLeft, cellBottom);
+                    }
+                } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    if (this.block(cellLeft, cellTop)) {
+                        console.log('Double collision left up');
+                        this.collisionUp(entity, box, cellLeft, cellTop);
+                        this.collisionLeft(entity, box, cellLeft, cellTop);
                     }
                 }
-                entity.isReady = true;
-                yespix.level = entity;
+
+                if (entity.speedY == 0) {
+                    // check if the entity is on ground
+                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                    var cellNext = Math.floor((box.y + box.height + 1) / this.data.tileheight);
+                    if (cellNext == cellBottom) {
+                        entity.isOnGround = false;
+                        //console.log('entity NOT on ground');
+                    } else {
+                        entity.isOnGround = false;
+                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var stopped = false;
+                        for (var y = cellBottom; y <= cellNext; y++) {
+                            for (var x = cellLeft; x <= cellRight; x++) {
+                                if (this.block(x, y)) {
+                                    //console.log('entity on ground');
+                                    entity.isOnGround = true;
+                                    entity.isJumping = false;
+                                    entity.isFalling = false;
+                                    this.accelY = 0;
+                                    stopped = true;
+                                    break;
+                                }
+                            }
+                            if (stopped) break;
+                        }
+                    }
+                } else entity.isOnGround = false;
+
             },
-            'entity': this,
-        });
-    },
 
-    draw: function(context) {
-        //console.log('level draw');
-        if (!this.isVisible) return;
 
-        //console.log('level draw #2');
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+            load: function(src) {
+                // destroy other loaded levels @todo
+                //yespix.find('/level').not(this).destroy();
 
-        //console.log('level draw #3 context = '+context+', isReady = '+this.isReady);
-        if (context && this.isReady) {
-            context.globalAlpha = this.alpha;
-            //console.log('level draw #4');
-            context.drawImage(this.canvas, //image element
-                0, // x position on image
-                0, // y position on image
-                this.canvas.width, // width on image
-                this.canvas.height, // height on image
-                0, // x position on canvas
-                0, // y position on canvas
-                this.canvas.width, // width on canvas
-                this.canvas.height // height on canvas
-            );
-        }
-    },
-});
+                yespix.load(src, {
+                    'complete': function(e) {
+                        yespix.dump(e);
 
-yespix.define('rect', 'gfx', {
+                        var entity = e.entity;
+                        entity.data = JSON.parse(e.content);
 
-    lineWidth: 0,
-    lineColor: '#000000',
-    rectColor: '#999999',
-    isVisible: true,
 
-    init: function() {},
+                        entity.canvas = document.createElement('canvas');
+                        entity.context = entity.canvas.getContext('2d');
 
-    draw: function(context) {
-        if (!this.isVisible) return;
+                        var index = 0;
+                        var colors = ['', '', '#ff9900', '#FF0000', '#006600', '#000099'];
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+                        entity.canvas.width = entity.data.width * entity.data.tilewidth;
+                        entity.canvas.height = entity.data.height * entity.data.tileheight;
 
-        var box = this.getDrawBox();
-        var scaleX = this.flipX ? -1 : 1;
-        var scaleY = this.flipY ? -1 : 1;
+                        for (var y = 0; y < entity.data.height; y++) {
+                            for (var x = 0; x < entity.data.width; x++) {
+                                var tileIndex = entity.data.layers[0].data[index];
+                                if (tileIndex > 1) {
+                                    //console.log('x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
+                                    entity.context.fillStyle = colors[tileIndex];
+                                    entity.context.fillRect(x * entity.data.tilewidth, y * entity.data.tileheight, entity.data.tilewidth, entity.data.tileheight);
+                                }
+                                index++;
+                            }
+                        }
+                        entity.isReady = true;
+                        yespix.level = entity;
+                    },
+                    'entity': this,
+                });
+            },
 
-        if (context) {
-            context.globalAlpha = this.alpha;
-            if (this.lineWidth > 0) {
-                context.lineWidth = this.lineWidth;
-                context.strokeStyle = this.lineColor;
-                context.strokeRect(box.x, box.y, box.width, box.height);
-            }
+            draw: function(context) {
+                //console.log('level draw');
+                if (!this.isVisible) return;
 
-            context.fillStyle = this.rectColor;
-            context.fillRect(
-                box.x, // x position on canvas
-                box.y, // y position on canvas
-                box.width, // width on canvas
-                box.height // height on canvas
-            );
-            if (this.debug) {
-                context.globalAlpha = 1;
-                context.lineWidth = 0.5;
-                context.strokeStyle = "#ff1111";
-                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                context.fillStyle = '#999999';
-
-                if (this.collisionBox) {
-                    var box = this.collisionBox();
-                    context.lineWidth = 0.5;
-                    context.strokeStyle = "#000099";
-                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+                //console.log('level draw #2');
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
                 }
-            }
-        }
-    },
 
-});
+                //console.log('level draw #3 context = '+context+', isReady = '+this.isReady);
+                if (context && this.isReady) {
+                    context.globalAlpha = this.alpha;
+                    //console.log('level draw #4');
+                    context.drawImage(this.canvas, //image element
+                        0, // x position on image
+                        0, // y position on image
+                        this.canvas.width, // width on image
+                        this.canvas.height, // height on image
+                        0, // x position on canvas
+                        0, // y position on canvas
+                        this.canvas.width, // width on canvas
+                        this.canvas.height // height on canvas
+                    );
+                }
+            },
+        });
 
-/**
- *
- */
-yespix.define('sound', {
-    // sounds
-    sounds: [],
+        yespix.define('rect', 'gfx', {
 
-    soundDefaults: {
-        isInitiated: false, // true if soundInit() was called
-        isSupported: false, // 
-        isReady: false,
-        volume: 1.0,
-        duration: 0,
-        formats: [],
-        src: '',
-        mimeType: '',
-        loop: false,
-        autoplay: false,
-        element: null,
-        document: yespix.document,
-        assets: this.assets,
-    },
+            lineWidth: 0,
+            lineColor: '#000000',
+            rectColor: '#999999',
+            isVisible: true,
 
-    init: function() {
-        var entity = this,
-            count = 1;
+            init: function() {},
 
-        if (yespix.isString(this.sounds)) this.sounds = [{
-            src: this.sounds,
-        }];
-        //console.log('init sound: array of '+this.sounds.length+' sounds');
+            draw: function(context) {
+                if (!this.isVisible) return;
 
-        for (var t = 0; t < this.sounds.length; t++) {
-            // init the default properties
-            //console.log('init the sound ['+t+'] with the default properties');
-            for (var n in this.soundDefaults) {
-                //console.log('copy property '+n+' : sound = '+this.sounds[t][n]+', default = '+this.soundDefaults[n]);
-                this.sounds[t][n] = this.sounds[t][n] || this.soundDefaults[n];
-                //console.log('init as '+this.sounds[t][n]);
-            }
-            if (this.sounds[t].name === '') this.sounds[t].name = 'sound' + count++;
-        }
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                var box = this.getDrawBox();
+                var scaleX = this.flipX ? -1 : 1;
+                var scaleY = this.flipY ? -1 : 1;
+
+                if (context) {
+                    context.globalAlpha = this.alpha;
+                    if (this.lineWidth > 0) {
+                        context.lineWidth = this.lineWidth;
+                        context.strokeStyle = this.lineColor;
+                        context.strokeRect(box.x, box.y, box.width, box.height);
+                    }
+
+                    context.fillStyle = this.rectColor;
+                    context.fillRect(
+                        box.x, // x position on canvas
+                        box.y, // y position on canvas
+                        box.width, // width on canvas
+                        box.height // height on canvas
+                    );
+                    if (this.debug) {
+                        context.globalAlpha = 1;
+                        context.lineWidth = 0.5;
+                        context.strokeStyle = "#ff1111";
+                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                        context.fillStyle = '#999999';
+
+                        if (this.collisionBox) {
+                            var box = this.collisionBox();
+                            context.lineWidth = 0.5;
+                            context.strokeStyle = "#000099";
+                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+                        }
+                    }
+                }
+            },
+
+        });
 
         /**
-         * returns a sound and executes a function on it
-         * @function sound
-         * @example sound() returns the first sound
-         * @example sound('test') returns the sound with name "test"
-         * @example sound('/play') plays the first sound and returns it
-         * @example sound('test/stop') stop the sound with name "test"
-         * @example sound(1) returns the sound at index 1 (index is from 0 to sounds.length-1)
-         * @example sound({name: 'test' }) returns the sound with name "test"
-         * @example sound({ volume: 0.7 }) return the first sound with volume set to 0.7
+         *
          */
-        this.sound = function(properties) {
-            //console.log('sound :: properties = '+properties);
+        yespix.define('sound', {
+            // sounds
+            sounds: [],
 
-            var fn = '';
-            if (properties == undefined)
-                if (this.sounds[0]) return this.soundInit(this.sounds[0]);
-                else return null;
-            if (typeof properties == 'string') {
-                properties = {
-                    name: properties
+            soundDefaults: {
+                isInitiated: false, // true if soundInit() was called
+                isSupported: false, // 
+                isReady: false,
+                volume: 1.0,
+                duration: 0,
+                formats: [],
+                src: '',
+                mimeType: '',
+                loop: false,
+                autoplay: false,
+                element: null,
+                document: yespix.document,
+                assets: this.assets,
+            },
+
+            init: function() {
+                var entity = this,
+                    count = 1;
+
+                if (yespix.isString(this.sounds)) this.sounds = [{
+                    src: this.sounds,
+                }];
+                //console.log('init sound: array of '+this.sounds.length+' sounds');
+
+                for (var t = 0; t < this.sounds.length; t++) {
+                    // init the default properties
+                    //console.log('init the sound ['+t+'] with the default properties');
+                    for (var n in this.soundDefaults) {
+                        //console.log('copy property '+n+' : sound = '+this.sounds[t][n]+', default = '+this.soundDefaults[n]);
+                        this.sounds[t][n] = this.sounds[t][n] || this.soundDefaults[n];
+                        //console.log('init as '+this.sounds[t][n]);
+                    }
+                    if (this.sounds[t].name === '') this.sounds[t].name = 'sound' + count++;
+                }
+
+                /**
+                 * returns a sound and executes a function on it
+                 * @function sound
+                 * @example sound() returns the first sound
+                 * @example sound('test') returns the sound with name "test"
+                 * @example sound('/play') plays the first sound and returns it
+                 * @example sound('test/stop') stop the sound with name "test"
+                 * @example sound(1) returns the sound at index 1 (index is from 0 to sounds.length-1)
+                 * @example sound({name: 'test' }) returns the sound with name "test"
+                 * @example sound({ volume: 0.7 }) return the first sound with volume set to 0.7
+                 */
+                this.sound = function(properties) {
+                    //console.log('sound :: properties = '+properties);
+
+                    var fn = '';
+                    if (properties == undefined)
+                        if (this.sounds[0]) return this.soundInit(this.sounds[0]);
+                        else return null;
+                    if (typeof properties == 'string') {
+                        properties = {
+                            name: properties
+                        };
+                        if (properties.name.indexOf('/') != -1) {
+                            var list = properties.name.split('/');
+                            properties.name = list[0];
+                            fn = list[1];
+                            if (list[0] == '') return this.soundInit(this.sounds[0])[fn]();
+                        }
+                    } else if (Object.isInt(properties))
+                        if (this.sounds[properties]) return this.soundInit(this.sounds[properties]);
+                        else return null;
+
+                    var max = Object.keys(properties).length;
+                    var count = 0;
+                    for (var t = 0; t < this.sounds.length; t++) {
+                        //console.log('checking sound ['+t+'] with name "'+this.sounds[t].name+'"');
+                        for (var n in properties) {
+                            if (this.sounds[t][n] !== undefined && properties[n] == this.sounds[t][n]) count++;
+                            //console.log('property "'+n+'", max = '+max+', count = '+count);
+                            if (fn != '') return this.soundInit(this.sounds[t])[fn]();
+                            if (count >= max) return this.soundInit(this.sounds[t]);
+                        }
+                    }
+                    return null;
                 };
-                if (properties.name.indexOf('/') != -1) {
-                    var list = properties.name.split('/');
-                    properties.name = list[0];
-                    fn = list[1];
-                    if (list[0] == '') return this.soundInit(this.sounds[0])[fn]();
-                }
-            } else if (Object.isInt(properties))
-                if (this.sounds[properties]) return this.soundInit(this.sounds[properties]);
-                else return null;
 
-            var max = Object.keys(properties).length;
-            var count = 0;
-            for (var t = 0; t < this.sounds.length; t++) {
-                //console.log('checking sound ['+t+'] with name "'+this.sounds[t].name+'"');
-                for (var n in properties) {
-                    if (this.sounds[t][n] !== undefined && properties[n] == this.sounds[t][n]) count++;
-                    //console.log('property "'+n+'", max = '+max+', count = '+count);
-                    if (fn != '') return this.soundInit(this.sounds[t])[fn]();
-                    if (count >= max) return this.soundInit(this.sounds[t]);
-                }
-            }
-            return null;
-        };
+                this.soundInit = function(sound) {
+                    parent = this;
 
-        this.soundInit = function(sound) {
-            parent = this;
+                    // no sound, init all the sounds
+                    if (sound == undefined) {
+                        for (var t = 0; t < this.sounds.length; t++) this.soundInit(this.sounds[t]);
+                        return true;
+                    }
 
-            // no sound, init all the sounds
-            if (sound == undefined) {
-                for (var t = 0; t < this.sounds.length; t++) this.soundInit(this.sounds[t]);
-                return true;
-            }
+                    // sound already initiated
+                    if (sound.isInitiated) return sound;
 
-            // sound already initiated
-            if (sound.isInitiated) return sound;
+                    sound.isInitiated = true;
+                    sound.element = document.createElement("audio");
 
-            sound.isInitiated = true;
-            sound.element = document.createElement("audio");
+                    // alias of yespix.support
+                    sound.support = function(format) {
+                        if (format == undefined) return false;
+                        return yespix.support(format);
+                    };
 
-            // alias of yespix.support
-            sound.support = function(format) {
-                if (format == undefined) return false;
-                return yespix.support(format);
-            };
+                    // add source to the audio element and to the assets list
+                    sound.changeSource = function(source) {
+                        if (this.support('.' + yespix.getExtension(source))) {
+                            this.isSupported = true;
+                            this.element.src = source;
 
-            // add source to the audio element and to the assets list
-            sound.changeSource = function(source) {
-                if (this.support('.' + yespix.getExtension(source))) {
-                    this.isSupported = true;
-                    this.element.src = source;
-
-                    if (this.volume < 0) this.volume = 0;
-                    else if (this.volume > 1) this.volume = 1;
-                    this.element.volume = this.volume;
-                    return true;
-                }
-                return false;
-            };
-
-            sound.load = function() {
-                if (!this.isSupported) return this;
-                this.element.load();
-                return this;
-            };
-
-            sound.play = function() {
-                if (!this.isSupported) return this;
-                this.element.play();
-                return this;
-            };
-
-            sound.isPlaying = function() {
-                if (!this.isSupported) return null;
-                return !this.element.paused;
-            };
-
-            sound.pause = function() {
-                if (!this.isSupported) return this;
-                this.element.pause();
-                return this;
-            };
-
-            sound.isPaused = function() {
-                if (!this.isSupported) return null;
-                return !!this.element.paused;
-            };
-
-            sound.mute = function() {
-                if (!this.isSupported) return null;
-                this.element.muted = true;
-                return this;
-            };
-
-            sound.unmute = function() {
-                if (!this.isSupported) return this;
-                this.element.muted = false;
-                return this;
-            };
-
-            sound.muteToggle = function() {
-                if (!this.isSupported) return this;
-                if (this.isMuted()) this.unmute();
-                else this.mute();
-                return this;
-            };
-
-            sound.isMuted = function() {
-                if (!this.isSupported) return null;
-                return this.element.muted;
-            };
-
-            sound.restart = function() {
-                if (!this.isSupported) return this;
-                this.stop().play();
-                return this;
-            };
-
-            sound.stop = function() {
-                if (!this.isSupported) return this;
-                this.element.pause();
-                this.setTime(0);
-                return this;
-            };
-
-            sound.setVolume = function(n) {
-                if (!this.isSupported) return this;
-                this.volume = n;
-                if (this.volume < 0) this.volume = 0;
-                else if (this.volume > 1) this.volume = 1;
-                this.element.volume = this.volume;
-                return this;
-            };
-
-            sound.volumeUp = function() {
-                if (!this.isSupported) return this;
-                this.volume -= 0.1;
-                if (this.volume < 0) this.volume = 0;
-                else if (this.volume > 1) this.volume = 1;
-                this.element.volume = this.volume;
-                return this;
-            };
-
-            sound.volumeDown = function() {
-                if (!this.isSupported) return this;
-                this.volume += 0.1;
-                if (this.volume < 0) this.volume = 0;
-                else if (this.volume > 1) this.volume = 1;
-                this.element.volume = this.volume;
-                return this;
-            };
-
-            sound.setTime = function(time) {
-                if (!this.isSupported) return this;
-                this.element.currentTime = time;
-                return this;
-            };
-
-            sound.isEnded = function() {
-                if (!this.isSupported) return null;
-                return this.element.ended;
-            };
-
-            if (sound.src !== undefined && sound.src !== '') {
-                if (yespix.isArray(sound.src)) {
-                    // check every sources to add the source element
-                    for (var t = 0; t < sound.src.length; t++)
-                        if (sound.src[t] && !sound.isSupported) sound.changeSource(sound.src[t]);
-                } else if (yespix.isArray(sound.formats) && sound.formats.length > 0) {
-                    // check every formats to add the source element
-                    for (var t = 0; t < sound.formats.length; t++)
-                        if (sound.formats[t] && !sound.isSupported) sound.changeSource(sound.src + '.' + sound.formats[t]);
-                } else if (yespix.isString(sound.src) && sound.src != '') {
-                    // add the source
-                    sound.changeSource(sound.src);
-                }
-            }
-            //this.soundInit();
-            return sound;
-        };
-
-        this.assets = function(sound) {
-            parent = this;
-
-            // no sound defined, call assets on all the sounds
-            if (sound == undefined) {
-                var assets = []
-                for (var t = 0; t < this.sounds.length; t++) assets = assets.concat(this.assets(this.sounds[t]));
-                return assets;
-            }
-
-            if (sound.src !== undefined && sound.src !== '') {
-                if (yespix.isArray(sound.src)) {
-                    // check every sources in array to add the source element
-                    for (var t = 0; t < sound.src.length; t++)
-                        if (sound.src[t] && yespix.support('.' + yespix.getExtension(sound.src[t]))) {
-                            sound.src = sound.src[t];
-                            sound.isSupported = true;
-                            return [sound.src];
+                            if (this.volume < 0) this.volume = 0;
+                            else if (this.volume > 1) this.volume = 1;
+                            this.element.volume = this.volume;
+                            return true;
                         }
+                        return false;
+                    };
+
+                    sound.load = function() {
+                        if (!this.isSupported) return this;
+                        this.element.load();
+                        return this;
+                    };
+
+                    sound.play = function() {
+                        if (!this.isSupported) return this;
+                        this.element.play();
+                        return this;
+                    };
+
+                    sound.isPlaying = function() {
+                        if (!this.isSupported) return null;
+                        return !this.element.paused;
+                    };
+
+                    sound.pause = function() {
+                        if (!this.isSupported) return this;
+                        this.element.pause();
+                        return this;
+                    };
+
+                    sound.isPaused = function() {
+                        if (!this.isSupported) return null;
+                        return !!this.element.paused;
+                    };
+
+                    sound.mute = function() {
+                        if (!this.isSupported) return null;
+                        this.element.muted = true;
+                        return this;
+                    };
+
+                    sound.unmute = function() {
+                        if (!this.isSupported) return this;
+                        this.element.muted = false;
+                        return this;
+                    };
+
+                    sound.muteToggle = function() {
+                        if (!this.isSupported) return this;
+                        if (this.isMuted()) this.unmute();
+                        else this.mute();
+                        return this;
+                    };
+
+                    sound.isMuted = function() {
+                        if (!this.isSupported) return null;
+                        return this.element.muted;
+                    };
+
+                    sound.restart = function() {
+                        if (!this.isSupported) return this;
+                        this.stop().play();
+                        return this;
+                    };
+
+                    sound.stop = function() {
+                        if (!this.isSupported) return this;
+                        this.element.pause();
+                        this.setTime(0);
+                        return this;
+                    };
+
+                    sound.setVolume = function(n) {
+                        if (!this.isSupported) return this;
+                        this.volume = n;
+                        if (this.volume < 0) this.volume = 0;
+                        else if (this.volume > 1) this.volume = 1;
+                        this.element.volume = this.volume;
+                        return this;
+                    };
+
+                    sound.volumeUp = function() {
+                        if (!this.isSupported) return this;
+                        this.volume -= 0.1;
+                        if (this.volume < 0) this.volume = 0;
+                        else if (this.volume > 1) this.volume = 1;
+                        this.element.volume = this.volume;
+                        return this;
+                    };
+
+                    sound.volumeDown = function() {
+                        if (!this.isSupported) return this;
+                        this.volume += 0.1;
+                        if (this.volume < 0) this.volume = 0;
+                        else if (this.volume > 1) this.volume = 1;
+                        this.element.volume = this.volume;
+                        return this;
+                    };
+
+                    sound.setTime = function(time) {
+                        if (!this.isSupported) return this;
+                        this.element.currentTime = time;
+                        return this;
+                    };
+
+                    sound.isEnded = function() {
+                        if (!this.isSupported) return null;
+                        return this.element.ended;
+                    };
+
+                    if (sound.src !== undefined && sound.src !== '') {
+                        if (yespix.isArray(sound.src)) {
+                            // check every sources to add the source element
+                            for (var t = 0; t < sound.src.length; t++)
+                                if (sound.src[t] && !sound.isSupported) sound.changeSource(sound.src[t]);
+                        } else if (yespix.isArray(sound.formats) && sound.formats.length > 0) {
+                            // check every formats to add the source element
+                            for (var t = 0; t < sound.formats.length; t++)
+                                if (sound.formats[t] && !sound.isSupported) sound.changeSource(sound.src + '.' + sound.formats[t]);
+                        } else if (yespix.isString(sound.src) && sound.src != '') {
+                            // add the source
+                            sound.changeSource(sound.src);
+                        }
+                    }
+                    //this.soundInit();
+                    return sound;
+                };
+
+                this.assets = function(sound) {
+                    parent = this;
+
+                    // no sound defined, call assets on all the sounds
+                    if (sound == undefined) {
+                        var assets = []
+                        for (var t = 0; t < this.sounds.length; t++) assets = assets.concat(this.assets(this.sounds[t]));
+                        return assets;
+                    }
+
+                    if (sound.src !== undefined && sound.src !== '') {
+                        if (yespix.isArray(sound.src)) {
+                            // check every sources in array to add the source element
+                            for (var t = 0; t < sound.src.length; t++)
+                                if (sound.src[t] && yespix.support('.' + yespix.getExtension(sound.src[t]))) {
+                                    sound.src = sound.src[t];
+                                    sound.isSupported = true;
+                                    return [sound.src];
+                                }
+                            return [];
+                        } else if (yespix.isArray(sound.formats) && sound.formats.length > 0) {
+                            // check every formats to add the source element
+                            for (var t = 0; t < sound.formats.length; t++)
+                                if (sound.formats[t] && yespix.support('.' + sound.formats[t])) {
+                                    sound.src = sound.src + '.' + sound.formats[t];
+                                    sound.isSupported = true;
+                                    return [sound.src];
+                                }
+                        } else if (yespix.isString(sound.src) && sound.src.indexOf('|') != -1) {
+                            var s = sound.src.split('|');
+                            for (var t = 0; t < s.length; t++)
+                                if (s[t] && yespix.support('.' + yespix.getExtension(s[t]))) {
+                                    sound.src = s[t];
+                                    sound.isSupported = true;
+                                    return [sound.src];
+                                }
+                            return [];
+                        } else if (yespix.isString(sound.src) && sound.src != '') {
+                            if (yespix.support('.' + yespix.getExtension(sound.src))) {
+                                sound.isSupported = true;
+                                return [sound.src];
+                            }
+                        }
+                    }
                     return [];
-                } else if (yespix.isArray(sound.formats) && sound.formats.length > 0) {
-                    // check every formats to add the source element
-                    for (var t = 0; t < sound.formats.length; t++)
-                        if (sound.formats[t] && yespix.support('.' + sound.formats[t])) {
-                            sound.src = sound.src + '.' + sound.formats[t];
-                            sound.isSupported = true;
-                            return [sound.src];
+                };
+
+            },
+        });
+
+        yespix.define('text', 'gfx', {
+            textAlign: 'left', // "left" / "right" / "center"
+            textFont: '16px sans-serif',
+            textColor: '#000000',
+            text: '',
+
+            draw: function(context) {
+                if (!this.isVisible) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                if (context) {
+
+                    context.globalAlpha = this.alpha;
+                    context.fillStyle = this.textColor;
+                    context.font = this.textFont;
+                    context.fillText(this.text, this.x, this.y);
+
+                    if (this.debug) {
+                        context.globalAlpha = 1;
+                        context.lineWidth = 0.5;
+                        context.strokeStyle = "#ff1111";
+                        context.strokeRect(this.x - 0.5, this.x - 0.5, this.width, this.height);
+
+                        if (this.collisionBox) {
+                            var box = this.collisionBox();
+                            context.lineWidth = 0.5;
+                            context.strokeStyle = "#000099";
+                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
                         }
-                } else if (yespix.isString(sound.src) && sound.src.indexOf('|') != -1) {
-                    var s = sound.src.split('|');
-                    for (var t = 0; t < s.length; t++)
-                        if (s[t] && yespix.support('.' + yespix.getExtension(s[t]))) {
-                            sound.src = s[t];
-                            sound.isSupported = true;
-                            return [sound.src];
-                        }
-                    return [];
-                } else if (yespix.isString(sound.src) && sound.src != '') {
-                    if (yespix.support('.' + yespix.getExtension(sound.src))) {
-                        sound.isSupported = true;
-                        return [sound.src];
                     }
                 }
-            }
-            return [];
-        };
+            },
 
-    },
-});
+        });
 
-yespix.define('text', 'gfx', {
-    textAlign: 'left', // "left" / "right" / "center"
-    textFont: '16px sans-serif',
-    textColor: '#000000',
-    text: '',
+    }
 
-    draw: function(context) {
-        if (!this.isVisible) return;
+    // expose the YESPIX function constructor
+    window.yespix = yespix;
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
-
-        if (context) {
-
-            context.globalAlpha = this.alpha;
-            context.fillStyle = this.textColor;
-            context.font = this.textFont;
-            context.fillText(this.text, this.x, this.y);
-
-            if (this.debug) {
-                context.globalAlpha = 1;
-                context.lineWidth = 0.5;
-                context.strokeStyle = "#ff1111";
-                context.strokeRect(this.x - 0.5, this.x - 0.5, this.width, this.height);
-
-                if (this.collisionBox) {
-                    var box = this.collisionBox();
-                    context.lineWidth = 0.5;
-                    context.strokeStyle = "#000099";
-                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                }
-            }
-        }
-    },
-
-});
+})();

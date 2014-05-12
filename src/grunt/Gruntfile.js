@@ -87,18 +87,16 @@ module.exports = function(grunt) {
             },
             build: {
                 src: [
-                    // start
-                    '../engine/template/yespix_start.js',
-
                     // core
+                    '../engine/template/core_start.js',
                     '../engine/core/*.js',
 
-                    // end
-                    '../engine/template/yespix_end.js',
-
                     // entities
+                    '../engine/template/entities_start.js',
                     '../engine/entities/*.js',
+                    '../engine/template/entities_end.js',
                     
+                    '../engine/template/core_end.js',
                 ],
                 dest: '../engine/yespix.js',
                 nonull: true,
@@ -116,7 +114,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: ['../**/*.js'],
+                files: ['../engine/**/*.js'],
                 tasks: ['default'],
                 options: {
                     spawn: false,

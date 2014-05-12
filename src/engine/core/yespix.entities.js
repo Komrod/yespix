@@ -13,6 +13,14 @@ yespix.fn.entityRootClassname = '';
 yespix.fn.entityClasses = {}; // entity classes
 
 /**
+ * Stores entity informations for the creation on init
+ * @type {array}
+ */
+yespix.fn.entityPending = []; // list of entity classes pending their creation
+
+
+
+/**
  * List of entity instances
  * @type {Object}
  * @example entityInstances[entity._id] refers to the entity with integer id "entity._id"
@@ -185,7 +193,7 @@ yespix.fn.selectorInit = function(selector) {
         properties[this.selectorType(selector)] = this.selectorValue(selector);
     }
     return properties;
-},
+};
 
 yespix.fn.selectorCompare = function(entityValue, value) {
     if (this.isString(value)) {
@@ -221,7 +229,7 @@ yespix.fn.selectorValue = function(str) {
 
 
 /**
- * Convert an array of entities into a bunch of entities.The bunch object is an array of entities on which you can call a function on all entities with
+ * Convert an array of entities into a bunch of entities. The bunch object is an array of entities on which you can call a function on all entities with
  * bunch.function(args), access the first entity with bunch[0] and access a property with bunch[0].property. The bunch object also have all the
  * array functions and properties such as length, concat ...
  */
@@ -297,27 +305,14 @@ yespix.fn.define = function(name, list, properties) {
     // init the entity class
     this.entityClasses[name] = {
         ancestors: [],
+        list: list,
         classname: name,
         properties: properties,
     };
 
     // adding the ancestors
-    for (var t = 0; t < list.length; t++) {
-        if (list[t] != '') {
-            if (!this.entityClasses[list[t]]) {
-                console.warn('define :: cannot find the entity class name "' + list[t] + '", skipping');
-            } else if (list[t] == name) {
-                console.warn('define :: entity class cannot add itself to ancestors, skipping');
-            } else {
-                //							console.log('register :: adding ancestors "'+list[t]+'": ');
-                this.entityClasses[name].ancestors = this.entityClasses[name].ancestors.concat(this.ancestors(list[t]));
-                //							this.entityClasses[name].ancestors.push(list[t]);
-                //this.mixin(name, this.entityClasses[list[t]]);
-                //							console.log('register :: ancestors are now "'+this.entityClasses[name].ancestors.join(', ')+'": ');
-            }
-        }
-    }
-
+    this.entityFetchAncestors(name);
+    
     this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
 
     this.trigger('define', {
@@ -329,6 +324,54 @@ yespix.fn.define = function(name, list, properties) {
     //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
     //console.log('----');
 };
+
+/**
+ * @param {string} className The class name of the entity to
+ * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
+ */
+yespix.fn.entityFetchAncestors = function(className, mode)
+{
+    if (!this.entityClasses[className]) {
+        console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
+        return;
+    }
+    
+	mode = mode || 'pending';
+	var list = this.entityClasses[className].list;
+	
+    for (var t = 0; t < list.length; t++) {
+        if (list[t] != '') {
+            if (!this.entityClasses[list[t]]) {
+                if (mode == 'pending') {
+                	console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
+                    this.entityPending.push(className);
+                    this.entityClasses[className].ancestors = [];
+                    break;
+                } else
+              	{
+                	console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+               	}
+            } else if (list[t] == className) {
+                console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+            } else {
+                this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
+            }
+        }
+    }
+};
+
+yespix.fn.isEntityPending = function(className)
+{
+	var len = this.entityPending.length;
+	for (var t = 0; t<len; t++)
+	{
+		if (this.entityPending[t] == className) return true;
+	}
+    console.log('isEntityPending :: entity "'+className+'" not pending');
+    
+	return false;
+};
+
 
 
 yespix.fn.spawn = function(name, properties) {
@@ -348,7 +391,14 @@ yespix.fn.spawn = function(name, properties) {
     }
 
     var entity = {};
-
+    
+    // check if the entity was waiting other classes to load
+    if (this.isEntityPending(name))
+   	{
+        console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
+    	this.entityFetchAncestors(name, 'force');
+   	} else console.log('spawn :: entity "' + name + '" is NOT pending');
+    
     // mixin with the ancestors
     for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
         var c = this.entityClasses[this.entityClasses[name].ancestors[t]];

@@ -39,7 +39,7 @@ yespix.fn.init = function(options) {
     });
 
     // current version of the engine
-    this.version = "0.13";
+    this.version = "0.13.1";
 
     // initialise the modules array @todo
     var modules = []; // yespix common modules
@@ -239,7 +239,8 @@ yespix.fn.init = function(options) {
 
 
     initEntities(this);
-
+    
+    
     for (var t = 0; t < options['modules'].length; t++) {
         if (!/^http(s)?\:\/\//i.test(options['modules'][t])) {
             options['modules'][t] = options['dir_modules'] + options['modules'][t];
@@ -312,6 +313,126 @@ yespix.fn.init = function(options) {
         },
         orderedExec: true,
     });
+    
+    
+
+
+    // init functions for input keys 
+    
+	yespix.on('exitFrame', function(e) {
+	    // delete old keypressed
+	    /*
+				if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
+				if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
+				if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
+				*/
+	    // save current keypressed as old keypressed and delete current keypressed
+	    this.data.key.pressed = {
+	        //	old: this.data.key.pressed
+	    };
+	    this.data.key.up = {
+	        //	old: this.data.key.up
+	    };
+	    this.data.key.down = {
+	        //	old: this.data.key.down
+	    };
+	});
+
+
+    /**
+     * Key down bindings
+     * @param  {object} e Event
+     * @todo use the yespix document and window instead of the main objects
+     */
+    document.onkeydown = function(e) {
+        // get the event
+        e = e || window.event;
+
+        // get the key code
+        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+        // main key pressed
+        yespix.data.key.pressed[parseInt(e.code)] = true;
+        yespix.data.key.hold[parseInt(e.code)] = true;
+
+        // special key pressed
+        if (e.ctrlKey) yespix.data.key.down[yespix.data.key.special['ctrl']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
+        if (e.altKey) yespix.data.key.down[yespix.data.key.special['alt']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+        if (e.shiftKey) yespix.data.key.down[yespix.data.key.special['shift']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
+
+        // triggers on YESPIX engine
+        yespix.trigger(e.type, e);
+        console.log('trigger ' + e.type);
+        //return false;
+    };
+
+    /**
+     * Key up bindings
+     * @param  {object} e Event
+     */
+    document.onkeyup = function(e) {
+        // get the event
+        e = e || window.event;
+
+        // get the key code
+        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+        // main key pressed
+        yespix.data.key.up[parseInt(e.code)] = true;
+        yespix.data.key.hold[parseInt(e.code)] = false;
+
+        // special key pressed
+        if (e.ctrlKey) yespix.data.key.pressed[yespix.data.key.special['ctrl']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['ctrl']] = false;
+        if (e.altKey) yespix.data.key.pressed[yespix.data.key.special['alt']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['alt']] = false;
+        if (e.shiftKey) yespix.data.key.pressed[yespix.data.key.special['shift']] = true;
+        else yespix.data.key.hold[yespix.data.key.special['shift']] = false;
+
+        // triggers on YESPIX engine
+        yespix.trigger(e.type, e);
+        //return false;
+    };
+
+    /**
+     * Key pressed bindings
+     *
+     * @param  {object} e Event
+     */
+    document.onkeypress = function(e) {
+        // get the event
+        e = e || window.event;
+
+        // get the key code
+        e.code = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+
+        // main key pressed
+        yespix.data.key.pressed[parseInt(e.code)] = true;
+
+        // triggers on YESPIX engine
+        yespix.trigger(e.type, e);
+        //return false;
+    };
+
+    /**
+     * blur
+     */
+    document.onblur = function(e) {
+        //console.log('blur');
+        yespix.data.key.pressed = {};
+        yespix.data.key.hold = {};
+        yespix.data.key.down = {};
+        yespix.data.key.up = {};
+
+        // triggers on YESPIX engine
+        yespix.trigger(e.type, e);
+    };
+
+
+
 
     return this;
 
