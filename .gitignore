@@ -213,3 +213,14 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+
+#############
+## grunt
+#############
+
+src/grunt/node_modules/*
+
+
+
