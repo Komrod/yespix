@@ -1,4 +1,6 @@
 TODO list:
+
+- new initialisation for entities
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
@@ -42,6 +44,8 @@ TODO list:
 
 
 DONE:
+- Change the TODO list // 2014-05-12
+- rearranging folders
 - function visible() returns true if gfx entity is visible on canvas
 - switch speed to pixel-per-second and optionnaly pixel-per-frame
 - first(), first(50), last(), last(5), not(id), not(this), filter('even'), filter('odd') for Bunch
