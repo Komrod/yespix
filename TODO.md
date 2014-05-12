@@ -1,7 +1,13 @@
 TODO list:
 
 - new initialisation for entities
-- new unit tests
+- new unit test system
+- unit test: general function
+- unit test: instanciation
+- unit test: file load
+- unit test: sound
+- unit test: entities init
+- make examples work
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
