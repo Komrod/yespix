@@ -12,7 +12,8 @@ module.exports = function(grunt) {
         'grunt-contrib-jshint',
         'grunt-shell',
         'grunt-jsbeautifier',
-        'grunt-contrib-watch'
+        'grunt-contrib-watch',
+        'grunt-contrib-qunit'
     ];
 
 
@@ -82,10 +83,10 @@ module.exports = function(grunt) {
 
         // build js files
         concat: {
-            options: {
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
-            },
             build: {
+                options: {
+                    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
+                },
                 src: [
                     // core
                     '../engine/template/core_start.js',
@@ -122,6 +123,15 @@ module.exports = function(grunt) {
                 }
             },
         },
+
+
+        qunit: {
+            all: [
+                '../unit/*.html',
+            ],
+            options: {
+            }
+        }        
     });
 
     // install and update grunt packages
@@ -151,4 +161,6 @@ module.exports = function(grunt) {
     // watch
     grunt.registerTask('dog', ['watch:scripts']);
     
+    // unit test
+    grunt.registerTask('unit', ['qunit:all']);
 };

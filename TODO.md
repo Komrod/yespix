@@ -1,6 +1,7 @@
 TODO list:
 
 - new initialisation for entities
+- new unit tests
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
