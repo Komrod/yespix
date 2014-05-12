@@ -3,7 +3,7 @@ module.exports = function(grunt) {
     /**
      * List of pgrunt packages
      */
-    var packages = ['grunt',
+    var packages = [
         'grunt-contrib-uglify',
         'grunt-contrib-clean',
         'grunt-contrib-watch',
@@ -17,19 +17,17 @@ module.exports = function(grunt) {
 
 
     var packages_count = 0;
-
-    var selfupdate_cmd = '';
-
+    var pupdate_cmd = '';
+    
     // load packages and build selfupdate command
     console.log('--------------------------');
     for (index = 0; index < packages.length; ++index) {
-        if (packages[index] != 'grunt') {
-            console.log('Loading package "' + packages[index] + '"');
-            grunt.loadNpmTasks(packages[index]);
-            packages_count++;
-        }
-        selfupdate_cmd = selfupdate_cmd + 'npm install ' + packages[index] + ' --save-dev; ';
+        console.log('Loading package "' + packages[index] + '"');
+        grunt.loadNpmTasks(packages[index]);
+        packages_count++;
+        pupdate_cmd = pupdate_cmd + 'npm install ' + packages[index] + ' --save-dev; ';
     }
+    
     console.info(packages_count + ' package(s) loaded');
     console.log('--------------------------');
 
@@ -41,7 +39,7 @@ module.exports = function(grunt) {
                 options: {
                     stderr: false
                 },
-                command: selfupdate_cmd
+                command: pupdate_cmd
             }
         },
 
@@ -95,12 +93,12 @@ module.exports = function(grunt) {
                     // core
                     '../engine/core/*.js',
 
+                    // end
+                    '../engine/template/yespix_end.js',
+
                     // entities
                     '../engine/entities/*.js',
-
-                    // end
-                    '../engine/template/yespix_end.js'
-
+                    
                 ],
                 dest: '../engine/yespix.js',
                 nonull: true,
@@ -128,8 +126,8 @@ module.exports = function(grunt) {
         },
     });
 
-    // update grunt packages
-    grunt.registerTask('selfupdate', ['shell:update']);
+    // install and update grunt packages
+    grunt.registerTask('pupdate', ['shell:update']);
 
     // default task
     grunt.registerTask('default', ['clean:build', 'concat:build', 'uglify:minify', 'jsbeautifier:yp']);
