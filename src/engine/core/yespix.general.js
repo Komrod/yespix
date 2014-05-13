@@ -68,7 +68,7 @@ yespix.fn.getFilename = function(str) {
  */
 yespix.fn.getDir = function(str) {
     if (str.lastIndexOf("/") == -1) return '';
-    return str.substring(0, this.lastIndexOf("/") + 1);
+    return str.substring(0, str.lastIndexOf("/") + 1);
 };
 
 /**
@@ -165,7 +165,7 @@ yespix.fn.xtrim = function(str) {
  * @method isFunction
  */
 yespix.fn.isFunction = function(fn) {
-    return fn && {}.toString.call(fn) === "[object Function]";
+    return fn !== undefined && fn && {}.toString.call(fn) === "[object Function]";
 };
 
 /**
