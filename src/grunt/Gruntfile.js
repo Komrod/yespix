@@ -126,11 +126,9 @@ module.exports = function(grunt) {
 
 
         qunit: {
-            all: [
-                '../unit/*.html',
-            ],
-            options: {
-            }
+            all: ['../unit/*.html'],
+            basic: ['../unit/basic.html'],
+            core_general: ['../unit/core_general.html']
         }        
     });
 
@@ -163,4 +161,7 @@ module.exports = function(grunt) {
     
     // unit test
     grunt.registerTask('unit', ['qunit:all']);
+    grunt.registerTask('unit_basic', ['qunit:basic']);
+    grunt.registerTask('unit_core_general', ['qunit:core_general']);
+    
 };
