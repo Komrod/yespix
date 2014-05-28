@@ -41,9 +41,6 @@ yespix.fn.init = function(options) {
     // current version of the engine
     this.version = "0.13.1";
 
-    // initialise the modules array @todo
-    var modules = []; // yespix common modules
-
     // initialise the data
     this.data = {
 
@@ -219,10 +216,8 @@ yespix.fn.init = function(options) {
     // initialisation of the options 
     options = options || {};
     options.namespace = options.namespace || 'yespix';
-    options['dir_resources'] = options['dir_resources'] || 'resources/';
-    options['dir_engine'] = options['dir_engine'] || 'yespix/';
-    options['dir_modules'] = options['dir_modules'] || 'yespix/modules/';
-    options['modules'] = this.unique(modules.concat(options['modules'] || []));
+    options['dir_resources'] = options['dir_resources'] || '../resources/';
+    options['dir_engine'] = options['dir_engine'] || '../engine/';
     options['ready'] = options['ready'] || function() {};
     options['init'] = options['init'] || function() {};
     options['collisionSize'] = options['collisionSize'] || 64;
@@ -241,13 +236,6 @@ yespix.fn.init = function(options) {
     initEntities(this);
     
     
-    for (var t = 0; t < options['modules'].length; t++) {
-        if (!/^http(s)?\:\/\//i.test(options['modules'][t])) {
-            options['modules'][t] = options['dir_modules'] + options['modules'][t];
-            if (!/\.js$/i.test(options['modules'][t])) options['modules'][t] = options['modules'][t] + '.js';
-        }
-    }
-
     this.options = options;
 
     this.window[options['namespace']] = this;
@@ -303,22 +291,11 @@ yespix.fn.init = function(options) {
         yespix.trigger('ready');
     }
 
-    if (options['modules'].length === 0) {
-        start(options);
-        return this;
-    }
-    this.addjs(options['modules'], {
-        complete: function() {
-            start(options);
-        },
-        orderedExec: true,
-    });
+    start(options);
+
     
     
-
-
     // init functions for input keys 
-    
 	yespix.on('exitFrame', function(e) {
 	    // delete old keypressed
 	    /*
