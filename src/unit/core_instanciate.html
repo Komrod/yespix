@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="qunit.js"></script>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+test( "Engine instanciate entities", function() {
+	console.log('');
+	var yp = yespix(), n, t;
+
+	yp.spawn('actor4w');
+	yp.spawn('actor2w');
+	yp.spawn('actor');
+	yp.spawn('base');
+	yp.spawn('canvas');
+	yp.spawn('collision');
+	yp.spawn('gfx');
+	yp.spawn('image');
+	yp.spawn('level');
+	yp.spawn('rect');
+	yp.spawn('sound');
+	yp.spawn('text');
+
+	var list = yp.find();
+	ok(list.length == 12, 'spawn :: not 12 entity instances')
+});
+
+	</script>
+</body>
+</html>
