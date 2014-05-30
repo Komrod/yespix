@@ -312,7 +312,7 @@ yespix.fn.define = function(name, list, properties) {
 
     // adding the ancestors
     this.entityFetchAncestors(name);
-    
+
     this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
 
     this.trigger('define', {
@@ -329,28 +329,26 @@ yespix.fn.define = function(name, list, properties) {
  * @param {string} className The class name of the entity to
  * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
  */
-yespix.fn.entityFetchAncestors = function(className, mode)
-{
+yespix.fn.entityFetchAncestors = function(className, mode) {
     if (!this.entityClasses[className]) {
         console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
         return;
     }
-    
-	mode = mode || 'pending';
-	var list = this.entityClasses[className].list;
-	
+
+    mode = mode || 'pending';
+    var list = this.entityClasses[className].list;
+
     for (var t = 0; t < list.length; t++) {
         if (list[t] != '') {
             if (!this.entityClasses[list[t]]) {
                 if (mode == 'pending') {
-                	console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
+                    console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                     this.entityPending.push(className);
                     this.entityClasses[className].ancestors = [];
                     break;
-                } else
-              	{
-                	console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
-               	}
+                } else {
+                    console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                }
             } else if (list[t] == className) {
                 console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
             } else {
@@ -360,16 +358,14 @@ yespix.fn.entityFetchAncestors = function(className, mode)
     }
 };
 
-yespix.fn.isEntityPending = function(className)
-{
-	var len = this.entityPending.length;
-	for (var t = 0; t<len; t++)
-	{
-		if (this.entityPending[t] == className) return true;
-	}
-    console.log('isEntityPending :: entity "'+className+'" not pending');
-    
-	return false;
+yespix.fn.isEntityPending = function(className) {
+    var len = this.entityPending.length;
+    for (var t = 0; t < len; t++) {
+        if (this.entityPending[t] == className) return true;
+    }
+    console.log('isEntityPending :: entity "' + className + '" not pending');
+
+    return false;
 };
 
 
@@ -391,14 +387,13 @@ yespix.fn.spawn = function(name, properties) {
     }
 
     var entity = {};
-    
+
     // check if the entity was waiting other classes to load
-    if (this.isEntityPending(name))
-   	{
+    if (this.isEntityPending(name)) {
         console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
-    	this.entityFetchAncestors(name, 'force');
-   	} else console.log('spawn :: entity "' + name + '" is NOT pending');
-    
+        this.entityFetchAncestors(name, 'force');
+    } else console.log('spawn :: entity "' + name + '" is NOT pending');
+
     // mixin with the ancestors
     for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
         var c = this.entityClasses[this.entityClasses[name].ancestors[t]];

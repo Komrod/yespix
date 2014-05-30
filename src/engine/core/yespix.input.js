@@ -66,7 +66,3 @@ yespix.fn.specialKey = function(s, type) {
     if (type == 'hold' && this.data.key['up'][this.data.key.special[s.toLowerCase()]]) return true;
     return !!this.data.key[type][this.data.key.special[s.toLowerCase()]];
 };
-
-
-
-

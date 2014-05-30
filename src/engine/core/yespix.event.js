@@ -229,4 +229,3 @@ yespix.fn.listenTrigger = function(obj, e) {
     obj._changedList[e.name] = true;
     obj.trigger('change:' + e.name, e);
 };
-

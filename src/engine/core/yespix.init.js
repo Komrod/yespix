@@ -234,8 +234,8 @@ yespix.fn.init = function(options) {
 
 
     initEntities(this);
-    
-    
+
+
     this.options = options;
 
     this.window[options['namespace']] = this;
@@ -293,27 +293,27 @@ yespix.fn.init = function(options) {
 
     start(options);
 
-    
-    
+
+
     // init functions for input keys 
-	yespix.on('exitFrame', function(e) {
-	    // delete old keypressed
-	    /*
+    yespix.on('exitFrame', function(e) {
+        // delete old keypressed
+        /*
 				if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
 				if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
 				if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
 				*/
-	    // save current keypressed as old keypressed and delete current keypressed
-	    this.data.key.pressed = {
-	        //	old: this.data.key.pressed
-	    };
-	    this.data.key.up = {
-	        //	old: this.data.key.up
-	    };
-	    this.data.key.down = {
-	        //	old: this.data.key.down
-	    };
-	});
+        // save current keypressed as old keypressed and delete current keypressed
+        this.data.key.pressed = {
+            //	old: this.data.key.pressed
+        };
+        this.data.key.up = {
+            //	old: this.data.key.up
+        };
+        this.data.key.down = {
+            //	old: this.data.key.down
+        };
+    });
 
 
     /**
