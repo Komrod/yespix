@@ -60,7 +60,8 @@ module.exports = function(grunt) {
         {
             all: {
                 src : [
-                    '../engine/**/*.js',
+                    '../engine/core/*.js',
+                    '../engine/entities/*.js',
                     '../engine/yespix.js'
                     ]
             },
