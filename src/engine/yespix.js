@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-05-13 */
+/*! yespix - v0.1.0 - 2014-05-30 */
 (function(undefined) {
 
     /**
@@ -1080,6 +1080,101 @@
         return this;
     };
 
+
+
+    /**
+     * @method listen
+     * Listen to variable change
+     * @param {object} obj Objet reference
+     * @param {string|aray} pname Property name of the object to listen to
+     * @param {function} callback Callback function
+     */
+
+    yespix.fn.listen = function(obj, pname, callback) {
+        var t;
+
+        // listen to multiple properties
+        if (this.isArray(pname)) {
+            for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
+            return true;
+        }
+
+        // listen to multiple objects
+        if (this.isArray(obj)) {
+            for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
+            return true;
+        }
+
+        //console.log('listen :: obj[pname] = ' + obj[pname]);
+        var initValue = obj[pname];
+        callback = callback || this.listenTrigger;
+        if (Object.defineProperty) {
+            //				var value = obj[pname];
+            //				console.log('value = '+value);
+            obj['__var_callback_' + pname] = callback;
+
+            Object.defineProperty(obj, pname, {
+                get: function() {
+                    return obj['__var_new_' + pname];
+                },
+                set: function(value) {
+                    obj['__var_old_' + pname] = obj['__var_new_' + pname];
+                    obj['__var_new_' + pname] = value;
+                    obj['__var_callback_' + pname].call(obj, obj, {
+                        target: obj,
+                        name: pname,
+                        oldValue: obj['__var_old_' + pname],
+                        newValue: value,
+                    });
+                },
+            });
+        } else if ('__defineSetter__' in obj && '__defineSetter__' in obj) {
+            obj._changedCallback = callback;
+            obj.__defineGetter__(pname, function() {
+                return obj['__var_new_' + pname];
+            });
+            obj.__defineSetter__(pname, function(value) {
+                obj['__var_old_' + pname] = obj['__var_new_' + pname];
+                obj['__var_new_' + pname] = value;
+                obj['__var_callback_' + pname].call(obj, obj, {
+                    target: obj,
+                    name: pname,
+                    oldValue: obj['__var_old_' + pname],
+                    newValue: value,
+                });
+            });
+        } else {
+            obj['__var_old_' + pname] = initValue;
+            obj['__var_new_' + pname] = initValue;
+            obj['__var_callback_' + pname] = callback;
+            //console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
+            this.on('enterFrame', function() {
+                //console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
+                if (this[pname] != this['__var_new_' + pname]) {
+                    this['__var_old_' + pname] = this['__var_new_' + pname];
+                    this['__var_new_' + pname] = this[pname];
+                    this['__var_callback_' + pname].call(this, this, {
+                        target: this,
+                        name: pname,
+                        oldValue: obj['__var_old_' + pname],
+                        newValue: obj['__var_new_' + pname],
+                    });
+                }
+            }, obj, this);
+
+        }
+        //console.log('listen :: before set obj[pname] = ' + obj[pname]);
+        obj[pname] = initValue;
+        //console.log('listen :: after set obj[pname] = ' + obj[pname]);
+    };
+
+    yespix.fn.listenTrigger = function(obj, e) {
+        obj._changed = true;
+        if (!obj._changedList) obj._changedList = {};
+        obj._changedList[e.name] = true;
+        obj.trigger('change:' + e.name, e);
+    };
+
     /**
      ************************************************************************************************************
      ************************************************************************************************************
@@ -1971,9 +2066,6 @@
         // current version of the engine
         this.version = "0.13.1";
 
-        // initialise the modules array @todo
-        var modules = []; // yespix common modules
-
         // initialise the data
         this.data = {
 
@@ -2149,10 +2241,8 @@
         // initialisation of the options 
         options = options || {};
         options.namespace = options.namespace || 'yespix';
-        options['dir_resources'] = options['dir_resources'] || 'resources/';
-        options['dir_engine'] = options['dir_engine'] || 'yespix/';
-        options['dir_modules'] = options['dir_modules'] || 'yespix/modules/';
-        options['modules'] = this.unique(modules.concat(options['modules'] || []));
+        options['dir_resources'] = options['dir_resources'] || '../resources/';
+        options['dir_engine'] = options['dir_engine'] || '../engine/';
         options['ready'] = options['ready'] || function() {};
         options['init'] = options['init'] || function() {};
         options['collisionSize'] = options['collisionSize'] || 64;
@@ -2170,13 +2260,6 @@
 
         initEntities(this);
 
-
-        for (var t = 0; t < options['modules'].length; t++) {
-            if (!/^http(s)?\:\/\//i.test(options['modules'][t])) {
-                options['modules'][t] = options['dir_modules'] + options['modules'][t];
-                if (!/\.js$/i.test(options['modules'][t])) options['modules'][t] = options['modules'][t] + '.js';
-            }
-        }
 
         this.options = options;
 
@@ -2233,22 +2316,11 @@
             yespix.trigger('ready');
         }
 
-        if (options['modules'].length === 0) {
-            start(options);
-            return this;
-        }
-        this.addjs(options['modules'], {
-            complete: function() {
-                start(options);
-            },
-            orderedExec: true,
-        });
-
+        start(options);
 
 
 
         // init functions for input keys 
-
         yespix.on('exitFrame', function(e) {
             // delete old keypressed
             /*
@@ -2436,101 +2508,6 @@
         if (type == 'hold' && this.data.key['up'][this.data.key.special[s.toLowerCase()]]) return true;
         return !!this.data.key[type][this.data.key.special[s.toLowerCase()]];
     };
-
-
-    /**
-     ************************************************************************************************************
-     * LISTEN TO VARIABLE CHANGES
-     */
-
-    yespix.fn.listen = function(obj, pname, callback) {
-        var t;
-
-        // listen to multiple properties
-        if (this.isArray(pname)) {
-            for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
-            return true;
-        }
-
-        // listen to multiple objects
-        if (this.isArray(obj)) {
-            for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
-            return true;
-        }
-
-        //console.log('listen :: obj[pname] = ' + obj[pname]);
-        var initValue = obj[pname];
-        callback = callback || this.listenTrigger;
-        if (Object.defineProperty) {
-            //				var value = obj[pname];
-            //				console.log('value = '+value);
-            obj['__var_callback_' + pname] = callback;
-
-            Object.defineProperty(obj, pname, {
-                get: function() {
-                    return obj['__var_new_' + pname];
-                },
-                set: function(value) {
-                    obj['__var_old_' + pname] = obj['__var_new_' + pname];
-                    obj['__var_new_' + pname] = value;
-                    obj['__var_callback_' + pname].call(obj, obj, {
-                        target: obj,
-                        name: pname,
-                        oldValue: obj['__var_old_' + pname],
-                        newValue: value,
-                    });
-                },
-            });
-        } else if ('__defineSetter__' in obj && '__defineSetter__' in obj) {
-            obj._changedCallback = callback;
-            obj.__defineGetter__(pname, function() {
-                return obj['__var_new_' + pname];
-            });
-            obj.__defineSetter__(pname, function(value) {
-                obj['__var_old_' + pname] = obj['__var_new_' + pname];
-                obj['__var_new_' + pname] = value;
-                obj['__var_callback_' + pname].call(obj, obj, {
-                    target: obj,
-                    name: pname,
-                    oldValue: obj['__var_old_' + pname],
-                    newValue: value,
-                });
-            });
-        } else {
-            obj['__var_old_' + pname] = initValue;
-            obj['__var_new_' + pname] = initValue;
-            obj['__var_callback_' + pname] = callback;
-            //console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
-            this.on('enterFrame', function() {
-                //console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
-                if (this[pname] != this['__var_new_' + pname]) {
-                    this['__var_old_' + pname] = this['__var_new_' + pname];
-                    this['__var_new_' + pname] = this[pname];
-                    this['__var_callback_' + pname].call(this, this, {
-                        target: this,
-                        name: pname,
-                        oldValue: obj['__var_old_' + pname],
-                        newValue: obj['__var_new_' + pname],
-                    });
-                }
-            }, obj, this);
-
-        }
-        //console.log('listen :: before set obj[pname] = ' + obj[pname]);
-        obj[pname] = initValue;
-        //console.log('listen :: after set obj[pname] = ' + obj[pname]);
-    };
-
-    yespix.fn.listenTrigger = function(obj, e) {
-        obj._changed = true;
-        if (!obj._changedList) obj._changedList = {};
-        obj._changedList[e.name] = true;
-        obj.trigger('change:' + e.name, e);
-    };
-
-
-
-
 
     /**
      ************************************************************************************************************
@@ -3372,14 +3349,25 @@
             },
 
             collisionBox: function() {
-                return {
-                    x: this.x + this.colOffsetX * this.pixelSize,
-                    y: this.y + this.colOffsetY * this.pixelSize,
-                    width: this.colWidth * this.pixelSize,
-                    height: this.colHeight * this.pixelSize,
-                    offsetX: this.colOffsetX * this.pixelSize,
-                    offsetY: this.colOffsetY * this.pixelSize,
-                };
+                if (yespix.isUndefined(this.pixelSize)) {
+                    return {
+                        x: this.x + this.colOffsetX,
+                        y: this.y + this.colOffsetY,
+                        width: this.colWidth,
+                        height: this.colHeight,
+                        offsetX: this.colOffsetX,
+                        offsetY: this.colOffsetY,
+                    };
+                } else {
+                    return {
+                        x: this.x + this.colOffsetX * this.pixelSize,
+                        y: this.y + this.colOffsetY * this.pixelSize,
+                        width: this.colWidth * this.pixelSize,
+                        height: this.colHeight * this.pixelSize,
+                        offsetX: this.colOffsetX * this.pixelSize,
+                        offsetY: this.colOffsetY * this.pixelSize,
+                    };
+                }
             },
 
             collision: function() {
