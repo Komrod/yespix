@@ -21,6 +21,7 @@ TODO list:
 - typewritter: text showing letter by letter with sound
 - panel
 - button
+- Add fillAlpha and lineAlpha in rect entity
 - Make a Steel Sky game (raiden like)
 - tag version 0.17
 - duplicate, add, remove image

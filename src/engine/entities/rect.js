@@ -37,18 +37,7 @@ yespix.define('rect', 'gfx', {
                 box.height // height on canvas
             );
             if (this.debug) {
-                context.globalAlpha = 1;
-                context.lineWidth = 0.5;
-                context.strokeStyle = "#ff1111";
-                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                context.fillStyle = '#999999';
-
-                if (this.collisionBox) {
-                    var box = this.collisionBox();
-                    context.lineWidth = 0.5;
-                    context.strokeStyle = "#000099";
-                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                }
+            	this.drawDebug(context, box);
             }
         }
     },

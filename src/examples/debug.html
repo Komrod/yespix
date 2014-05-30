@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+	var yp = yespix({canvas: true, fps: 50});
+    
+	var cube = yp.spawn('rect, move, collision',
+	{
+		x: 10,
+		y: 10,
+		width: 20,
+		height: 20,
+		colWidth: 20,
+		colHeight: 60,
+		rectColor: '#123456',
+		init: function()
+		{
+			//
+		}
+	});
+    
+    cube.clone({
+        x:40,
+        rectColor: '#234567',
+        debug: true,
+    });
+    
+    cube.clone({
+        x:70,
+        colWidth:10,
+        colHeight:10,
+        colOffsetX:5,
+        colOffsetY:5,
+        rectColor: '#345678',
+        debug: true,
+    });
+    
+</script>
+
+</body>
+</html>

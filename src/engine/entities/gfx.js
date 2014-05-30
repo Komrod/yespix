@@ -72,4 +72,21 @@ yespix.define('gfx', {
         return this._context;
     },
 
+    drawDebug: function (context, box)
+    {
+    	if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
+    	if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
+    	if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
+    	if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+    },
+
+    drawDebugPosition: function(context, drawBox)
+    {
+        var box = drawBox || this.getDrawBox();
+        context.globalAlpha = 1;
+        context.lineWidth = 0.5;
+        context.strokeStyle = "#ff1111";
+        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+    },
+    
 });
