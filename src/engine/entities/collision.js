@@ -18,14 +18,27 @@ yespix.define('collision', {
     },
 
     collisionBox: function() {
-        return {
-            x: this.x + this.colOffsetX * this.pixelSize,
-            y: this.y + this.colOffsetY * this.pixelSize,
-            width: this.colWidth * this.pixelSize,
-            height: this.colHeight * this.pixelSize,
-            offsetX: this.colOffsetX * this.pixelSize,
-            offsetY: this.colOffsetY * this.pixelSize,
-        };
+    	if (yespix.isUndefined(this.pixelSize))
+    	{
+	        return {
+	            x: this.x + this.colOffsetX,
+	            y: this.y + this.colOffsetY,
+	            width: this.colWidth,
+	            height: this.colHeight,
+	            offsetX: this.colOffsetX,
+	            offsetY: this.colOffsetY,
+	        };
+    	} else
+   		{
+	        return {
+	            x: this.x + this.colOffsetX * this.pixelSize,
+	            y: this.y + this.colOffsetY * this.pixelSize,
+	            width: this.colWidth * this.pixelSize,
+	            height: this.colHeight * this.pixelSize,
+	            offsetX: this.colOffsetX * this.pixelSize,
+	            offsetY: this.colOffsetY * this.pixelSize,
+	        };
+   		}
     },
 
     collision: function() {
