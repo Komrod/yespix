@@ -1,8 +1,5 @@
 TODO list:
 
-- new initialisation for entities
-- new unit test system
-- unit test: general function
 - unit test: instanciation
 - unit test: file load
 - unit test: sound
@@ -51,6 +48,9 @@ TODO list:
 
 
 DONE:
+- unit test: general function
+- new unit test system
+- new initialisation for entities
 - Change the TODO list // 2014-05-12
 - rearranging folders
 - function visible() returns true if gfx entity is visible on canvas
