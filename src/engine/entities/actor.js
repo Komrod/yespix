@@ -1,4 +1,4 @@
-yespix.define('actor', 'anim move collision', {
+yespix.define('actor', 'anim, move, collision', {
 
     isAttacking: false,
     isFalling: false,
