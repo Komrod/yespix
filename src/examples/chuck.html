@@ -17,8 +17,8 @@
 		colWidth: 14,
 		colHeight: 29,
 		//debug: true,
-		actorSpeed: 20,
-		actorSpeedJump: 200,
+		actorSpeed: 1,
+		actorSpeedJump: 10,
 		snapToPixel: true,
 
 		init: function()
@@ -151,10 +151,10 @@
 
 
 
-	yp.gravity = { y: 300 };
-/*
+	yp.gravity = { y: 30 };
+
 	yp.spawn('level').prop({z: 100, alpha: 0.5}).load('chuck/test.json');
-*/
+
 	yp.spawn('chuck',{ x: 300, y: 450, z: 1000});
 
 
