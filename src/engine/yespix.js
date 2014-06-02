@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-05-30 */
+/*! yespix - v0.1.0 - 2014-06-03 */
 (function(undefined) {
 
     /**
@@ -353,13 +353,13 @@
      * Stores some informations about the entity classes
      * @type {Object}
      */
-    yespix.fn.entityClasses = {}; // entity classes
+    yespix.fn.entityClasses = {};
 
     /**
-     * Stores entity informations for the creation on init
+     * Stores list of entity classes waiting for ancestors list creation
      * @type {array}
      */
-    yespix.fn.entityPending = []; // list of entity classes pending their creation
+    yespix.fn.entityAncestorsPending = [];
 
 
 
@@ -379,7 +379,7 @@
     /**
      * Find an entity or multiple entities from the selector, possibly executes a function fn and returns a bunch of
      * entities. The function fn is executed in the context of each entities, meaning that inside the function "this"
-     * will refer to an entity. When comparing the selector property to the entity property, the comparision is
+     * will refer to the entity. When comparing the selector property to the entity property, the comparision is
      * (selector vs. entity): // @todo
      * - same type 			vs. same type: 		returns True if strictly equals "==="
      * - bool|string type 	vs. array: 			returns True if the selector match one item of the array
@@ -390,7 +390,7 @@
      * The entity selector is intentionnally close to the JQuery selector but there is differences. Not working:
      * find('name.class') // ERROR: no space between selector elements
      * find('class#id') // ERROR: no space between selector elements
-     * @exemple find('') of find()			// find all the entities
+     * @exemple find('') or find()			// find all the entities
      * @exemple find('test', function() { alert(this._id); }) // find entities with name "test" and show its id
      * @exemple find({}, fn)				// find all the entities and executes "fn" function
      * @example find('test', fn)			// find the entities with name "test"
@@ -528,7 +528,7 @@
             var items = selector.split(' ');
             for (var t in items)
                 if (items != '') {
-                    if (properties[this.selectorType(items[t])]) console.warn('entity.selectorInit: ambiguous selector item: "' + items[t] + '" defined twice in "' + selector + '"')
+                    if (properties[this.selectorType(items[t])]) console.warn('entity.selectorInit: ambiguous selector item: "' + items[t] + '" defined twice in "' + selector + '"');
                     else properties[this.selectorType(items[t])] = this.selectorValue(items[t]);
                 }
         } else // simple selector
@@ -602,7 +602,7 @@
                 }(fn, this);
             }
         }
-    },
+    };
 
 
     yespix.fn.ancestors = function(name) {
@@ -624,7 +624,6 @@
 
 
     yespix.fn.define = function(name, list, properties) {
-        //console.log('define :: defining the entity "'+name+'"');
 
         // error if the entity class name already exists
         if (this.entityClasses[name]) {
@@ -648,6 +647,7 @@
         // init the entity class
         this.entityClasses[name] = {
             ancestors: [],
+            ancestorsReady: false,
             list: list,
             classname: name,
             properties: properties,
@@ -655,8 +655,24 @@
 
         // adding the ancestors
         this.entityFetchAncestors(name);
-
         this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
+
+        if (!this.isEntityAncestorsPending[name]) {
+            if (this.entityAncestorsPending.length > 0) {
+                var length = this.entityAncestorsPending.length;
+                var count = 0; // number of entity ancestors initiated
+                for (var t = 0; t < length; t++) {
+                    if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
+                }
+                if (count > 0) {
+                    var newList = [];
+                    for (var t = 0; t < length; t++) {
+                        if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
+                    }
+                    this.entityAncestorsPending = newList;
+                }
+            }
+        }
 
         this.trigger('define', {
             class: this.entityClasses[name]
@@ -675,8 +691,10 @@
     yespix.fn.entityFetchAncestors = function(className, mode) {
         if (!this.entityClasses[className]) {
             console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
-            return;
+            return false;
         }
+
+        if (this.entityClasses[className].ancestorsReady) return true;
 
         mode = mode || 'pending';
         var list = this.entityClasses[className].list;
@@ -686,27 +704,33 @@
                 if (!this.entityClasses[list[t]]) {
                     if (mode == 'pending') {
                         console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
-                        this.entityPending.push(className);
+                        this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
+                        this.entityClasses[className].ancestorsReady = false;
+                        return false;
                         break;
                     } else {
-                        console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                        if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                        this.entityClasses[className].ancestorsReady = false;
+                        return false;
                     }
                 } else if (list[t] == className) {
-                    console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                    if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
                 } else {
                     this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
                 }
             }
         }
+        this.entityClasses[className].ancestorsReady = true;
+        return true;
     };
 
-    yespix.fn.isEntityPending = function(className) {
-        var len = this.entityPending.length;
+    yespix.fn.isEntityAncestorsPending = function(className) {
+        var len = this.entityAncestorsPending.length;
         for (var t = 0; t < len; t++) {
-            if (this.entityPending[t] == className) return true;
+            if (this.entityAncestorsPending[t] == className) return true;
         }
-        console.log('isEntityPending :: entity "' + className + '" not pending');
+        //console.log('isEntityAncestorsPending :: entity "' + className + '" not pending');
 
         return false;
     };
@@ -732,7 +756,7 @@
         var entity = {};
 
         // check if the entity was waiting other classes to load
-        if (this.isEntityPending(name)) {
+        if (this.isEntityAncestorsPending(name)) {
             console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
             this.entityFetchAncestors(name, 'force');
         } else console.log('spawn :: entity "' + name + '" is NOT pending');
@@ -2746,7 +2770,7 @@
 
     function initEntities(yespix) {
 
-        yespix.define('actor', 'anim move collision', {
+        yespix.define('actor', 'anim, move, collision', {
 
             isAttacking: false,
             isFalling: false,
@@ -2769,14 +2793,38 @@
             }
         });
 
-        yespix.define('player2w', 'actor2w', {
+        yespix.define('actor2w', 'actor', {
+            actorMove: {
+                'idle': true,
 
-            actorKeys: {
-                left: 'left',
-                right: 'right',
-                attack: 'x',
-                jump: ' ',
+                'right': true,
+                'left': true,
+
+                'lookup': true,
+                'lookdown': true,
+
+                'walk': true,
+                'run': true,
+
+                'jump': true,
+                'longjump': true,
+                'doublejump': true,
+
+                'crouch': true,
+                'guard': true,
+
+                'damage': true,
+                'dead': true,
+
+                'throw': true,
+                'attack': true,
+                'use': true,
+                'default': 'idle',
             },
+
+            actorSpeedJump: 1.1,
+            actorGravity: true,
+            actorDirection: 'right',
 
             actorAnims: {
                 'idleright': 'idleright',
@@ -2788,98 +2836,55 @@
                 'lookup': 'lookup',
                 'lookdown': 'lookdown',
 
+                'lookup': 'lookup',
+                'lookdown': 'lookdown',
+
+                'attackleft': 'attackleft',
+                'attackright': 'attackright',
+
                 'jumpleft': 'jumpleft',
                 'jumpright': 'jumpright',
-
                 'airleft': 'airleft',
                 'airright': 'airright',
+                'landleft': 'landleft',
+                'landright': 'landright',
 
-                'attackleft': 'punch1left',
-                'attackright': 'punch1right',
+                'left': 'left',
+                'right': 'right',
             },
 
-            playerAirFriction: 0.02,
-            playerGroundFriction: 0.13,
+            actorInit: function(options) {},
 
-            actorOptions: {
-                alwaysRun: false,
+            init: function() {},
+
+            move: function() {
+                this.speedX += this.accelX;
+                this.speedY += this.accelY;
+
+                this.applyFriction();
+                this.applyGravity();
+
+                if (yespix.level) yespix.level.collision(this);
+                this.x += this.speedX;
+                this.y += this.speedY;
             },
 
-            init: function() {
-                yespix.on('enterFrame', function() {
-                    var move = '';
-
-                    if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
-                    else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
-                    else this.accelX = 0;
-
-                    //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
-                    //console.log('isOnGround = '+this.isOnGround+'');
-
-                    if (this.actorMove.attack && yespix.key(this.actorKeys.attack) && !this.isAttacking) {
-                        this.isAttacking = true;
-                        move = 'attack' + this.actorDirection;
-                        this.animWait = false;
-                        this.animPlay(this.actorAnims[move]);
-                        this.animWait = true;
-                        //yespix.dump(this);
-                    }
-
-                    if (this.actorMove.jump && this.isOnGround && yespix.key(this.actorKeys.jump)) {
-                        move = 'jump' + this.actorDirection;
-                        this.animWait = false;
-                        this.animPlay(this.actorAnims[move]);
-                        this.animWait = true;
-                        this.accelY = -this.actorSpeedJump;
-                        this.animNext = 'air' + this.actorDirection;
-                        this.isJumping = true;
-                        this.jumpTime = (new Date).getTime();
-                        console.log('this.jumpTime = ' + this.jumpTime);
-                    } else if (this.isJumping) {
-                        console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
-                        if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
-                            this.accelY = -(this.actorSpeedJump / 6);
-                            //this.accelY = 0;
-                        } else this.accelY = 0;
-                    } else this.accelY = 0;
-
-                    if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
-                        this.actorDirection = 'right';
-                        if (this.isOnGround) move = 'walk';
-                    } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
-                        this.actorDirection = 'left';
-                        if (this.isOnGround) move = 'walk';
-                    }
-                    if (!this.isOnGround) {
-                        if (this.speedY > 0) {
-                            this.isJumping = false;
-                            this.isFalling = true;
-                        }
-                        move = 'air';
-                    }
-
-                    if (move == '') move = this.actorMove['default'] + this.actorDirection;
-                    else move = move + this.actorDirection;
-                    this.animNext = this.actorAnims[move];
-
-
-                    if (this.animWait || this.isAttacking) return;
-
-
-                    this.animPlay(this.actorAnims[move]);
-                    //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
-
-                }, this, yespix);
+            applyGravity: function() {
+                if (!yespix.gravity) return false;
+                if (!this.isOnGround && yespix.gravity) {
+                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
+                    if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
+                    if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
+                }
             },
 
             applyFriction: function() {
-                this.speedX *= (1 - this.playerGroundFriction);
-                this.speedY *= (1 - this.playerAirFriction);
+                this.speedX *= (1 - this.moveFriction);
+                this.speedY *= (1 - this.moveFriction);
                 if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
                 if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
                 return true;
             },
-
 
         });
 
@@ -3014,6 +3019,373 @@
                 if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
                 if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
                 return true;
+            },
+
+        });
+
+
+        yespix.define('anim', 'image', {
+            animDefault: {
+                width: 32, // default tile width
+                height: 32, // default tile height
+                name: '', // default animation name to run
+                duration: 200,
+            },
+
+            animSelected: '',
+            animFrame: 0,
+            animSpeed: 1,
+            animReady: false,
+            animWait: false,
+            animNext: '',
+
+            init: function() {
+                this.animInit();
+                this.on('imageReady', function() {
+                    this.animFramesInit();
+                });
+            },
+
+
+            /**
+             * Array of anim informations:
+             * name: Name of the animation
+             * imageIndex: Image index of the sprite
+             * imageName: Image name of the sprite
+             * image: Image reference
+             * width: pixel width
+             * height: pixel height
+             * x: position X in the image
+             * y: position Y in the image
+             */
+            anims: {},
+
+            /**
+             * When all anim frames are ready, animSetup will initiated the frames
+             * @return {[type]} [description]
+             */
+            animFramesInit: function() {
+                //console.log('animFramesInit');
+
+                // check every animation
+                for (var name in this.anims) {
+                    var anim = this.anims[name];
+
+                    //console.log('animFramesInit :: name = ' + name);
+
+                    // only animation that is not ready
+                    if (!anim.isReady) {
+                        // init the ready variable
+                        var ready = true;
+                        if (anim.frames && anim.frames.length)
+                            for (var t = 0; t < anim.frames.length; t++) {
+                                var frame = anim.frames[t];
+                                // console.log('animFramesInit :: frame '+t+', isReady = '+frame.isReady+', image = '+frame.image);
+                                //if (frame.image) console.log('image.isReady = ' + frame.image.isReady);
+                                if (frame.isReady) continue;
+                                if (!frame.image || !frame.image.isReady) {
+                                    frame.isReady = false;
+                                    ready = false;
+                                    break;
+                                }
+                            }
+
+                        // If all the images are ready, we must complete the frame objects
+                        if (ready) {
+                            // animation is ready
+                            anim.isReady = true;
+
+                            var maxLine;
+
+                            // maximum frame in one line
+                            if (anim.frames && anim.frames.length)
+                                for (var t = 0; t < anim.frames.length; t++) {
+                                    var frame = anim.frames[t];
+
+                                    // frame initiated and ready
+                                    if (frame.isReady) continue;
+
+                                    if (yespix.isUndefined(frame.index)) frame.index = t;
+                                    if (yespix.isUndefined(frame.frameIndex)) frame.frameIndex = t;
+                                    anim.from = anim.from || 0;
+
+                                    // process maximum number of frames in one line for this frame and image. Each frame can have its own image
+                                    // so we need to update this variable on each frame
+                                    maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
+
+                                    console.log('maxLine = ' + maxLine);
+
+                                    if (maxLine > 0) {
+                                        frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
+                                        frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
+                                        frame.isReady = true;
+                                        console.log('frame :: t=' + t + ', frameIndex=' + frame.frameIndex + ', from=' + anim.from + ', maxLine=' + maxLine + ', x=' + frame.x + ', y=' + frame.y);
+                                    } //else console.log('frame :: t='+t+', frameIndex='+frame.frameIndex+', maxLine='+maxLine);
+                                }
+                            if (anim.extendsTo) {
+                                for (var t = 0; t < anim.extendsTo.length; t++) {
+                                    if (this.anims[anim.extendsTo[t]]) {
+                                        this.anims[anim.extendsTo[t]].isReady = true;
+                                        this.anims[anim.extendsTo[t]].length = anim.length;
+                                        if (this.anims[anim.extendsTo[t]].frames) this.anims[anim.extendsTo[t]].oldFrames = yespix.clone(this.anims[anim.extendsTo[t]].frames);
+
+                                        this.anims[anim.extendsTo[t]].frames = []; //anim.frames;
+                                        for (var u = 0; u < anim.frames.length; u++) {
+                                            this.anims[anim.extendsTo[t]].frames[u] = yespix.clone(anim.frames[u]);
+                                            if (this.anims[anim.extendsTo[t]].flipX) this.anims[anim.extendsTo[t]].frames[u].flipX = !this.anims[anim.extendsTo[t]].frames[u].flipX;
+                                            if (this.anims[anim.extendsTo[t]].flipY) this.anims[anim.extendsTo[t]].frames[u].flipY = !this.anims[anim.extendsTo[t]].frames[u].flipY;
+                                            if (this.anims[anim.extendsTo[t]].oldFrames && this.anims[anim.extendsTo[t]].oldFrames[u]) {
+                                                //                                              console.log('oldFrames '+u+' exists');
+                                                for (var n in this.anims[anim.extendsTo[t]].oldFrames[u]) {
+                                                    //                                                  console.log('copy property n='+n);
+                                                    this.anims[anim.extendsTo[t]].frames[u][n] = this.anims[anim.extendsTo[t]].oldFrames[u][n];
+                                                }
+                                            }
+                                        }
+                                        delete this.anims[anim.extendsTo[t]].oldFrames;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            animInit: function() {
+                //console.log('animInit :: this.anims = ' + this.anims);
+
+                for (var name in this.anims) {
+
+                    var anim = this.anims[name];
+                    //console.log('animInit :: anim name = ' + name);
+
+                    // check if all images are ready
+                    anim.name = name;
+                    anim.isReady = false;
+
+                    // init the default animation
+                    if (anim.isDefault) {
+                        this.animDefault['name'] = name;
+                        if (!this.animSelected) this.animSelected = name;
+                    }
+
+                    //console.log('animInit :: anim.extendsFrom = ' + anim.extendsFrom);
+                    if (anim.extendsFrom) {
+                        if (this.anims[anim.extendsFrom]) {
+                            if (!this.anims[anim.extendsFrom].extendsTo) this.anims[anim.extendsFrom].extendsTo = [name];
+                            else this.anims[anim.extendsFrom].extendsTo.push(name);
+                        } //else console.log('animInit :: anim.extendsFrom "' + anim.extendsFrom + '" does not exist');
+                    } //else 
+
+                    // "frames" is an array of frames
+                    else if (yespix.isArray(anim['frames'])) {
+                        // frames are already set
+                        if (!anim.length) anim.length = anim['frames'].length;
+
+                        for (var t = 0; t < anim.frames.length; t++) {
+                            if (yespix.isInt(anim.frames[t])) {
+                                var frame = {
+                                    index: t,
+                                    frameIndex: anim.frames[t],
+                                    anim: name,
+                                    duration: anim.duration || this.animDefault.duration,
+                                    flipX: anim.flipX || false,
+                                    flipY: anim.flipY || false,
+                                    isReady: false,
+                                    width: anim.width || this.animDefault.width,
+                                    height: anim.height || this.animDefault.height,
+                                };
+
+                                if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
+                                if (!frame.image && !yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
+                                if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
+
+                                anim.frames[t] = frame;
+                            } else {
+                                if (!yespix.isUndefined(anim.imageIndex)) anim.frames[t].image = this.image(anim.imageIndex);
+                                if (!anim.frames[t].image && !yespix.isUndefined(anim.imageName)) anim.frames[t].image = this.image(anim.imageName);
+                                if (yespix.isUndefined(anim.frames[t].image)) anim.frames[t].image = this.image(0);
+                            }
+                        }
+
+                    } else
+                    // "frames" is not set and must be initiated
+                    {
+                        if (!anim.length) anim.length = 1;
+                        if (!anim.from) anim.from = 0;
+                        anim['frames'] = [];
+
+                        for (var t = 0; t < anim.length; t++) {
+                            var frame = {
+                                index: t,
+                                frameIndex: t,
+                                anim: name,
+                                duration: anim.duration || this.animDefault.duration,
+                                flipX: anim.flipX || false,
+                                flipY: anim.flipY || false,
+                                isReady: false,
+                                width: anim.width || this.animDefault.width,
+                                height: anim.height || this.animDefault.height,
+                            };
+
+                            if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
+                            if (!yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
+                            if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
+
+                            anim['frames'].push(frame);
+                        }
+                    }
+                }
+                this.animFramesInit();
+            },
+
+            animPlay: function(name, speed, from) {
+                if (this.animWait) return;
+                if (!name) name = this.animDefault.name;
+                if (this.animSelected == name) return this;
+                if (!this.anims[name]) return null;
+
+                from = from || 0;
+                speed = speed || 1;
+                var frame = this.anims[name].frames[from];
+                if (!frame) return null;
+
+                console.log('playing anim "' + name + '"');
+
+                this.animSelected = name;
+                this.animFrame = from;
+                this.animSpeed = speed;
+                this.animTime = +new Date() + frame.duration * speed;
+
+                this.trigger('animStart', {
+                    name: this.animSelected,
+                    frame: this.animFrame
+                });
+                this.trigger('animFrame', {
+                    name: this.animSelected,
+                    frame: this.animFrame
+                });
+
+                return this;
+            },
+
+            animStop: function() {
+                //this.
+            },
+
+            animStep: function() {
+                if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
+
+                var animEnded = false;
+                var now = +new Date();
+
+                if (!this.animTime || isNaN(this.animTime)) this.animTime = now;
+
+                if (!this.animTime || this.animTime <= now) {
+                    this.animFrame++;
+
+                    //console.log('animFrame = '+this.animFrame+', frames.length = '+this.anims[this.animSelected].frames.length);
+                    if (this.animFrame >= this.anims[this.animSelected].frames.length) {
+                        this.animFrame = 0;
+                        animEnded = true;
+                    }
+
+                    this.trigger('animFrame', {
+                        name: this.animSelected,
+                        frame: this.animFrame
+                    });
+
+                    var frame = this.anims[this.animSelected].frames[this.animFrame];
+                    this.animTime = +new Date() + frame.duration * this.animSpeed;
+                    if (animEnded) {
+                        this.trigger('animEnd', {
+                            name: this.animSelected,
+                            frame: this.animFrame
+                        });
+                        this.animWait = false;
+                        if (this.animNext && this.animNext != '') {
+                            console.log('animNext = ' + this.animNext);
+                            this.animPlay(this.animNext);
+                        }
+                    }
+                }
+            },
+
+
+            draw: function(context) {
+
+                this.animStep();
+                if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+                if (!this.anims[this.animSelected]) return;
+
+                if (!this.isVisible) return;
+
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
+                var frame = this.anims[this.animSelected].frames[this.animFrame];
+                var img = frame.image;
+
+                var scaleX = frame.flipX ? -1 : 1;
+                var scaleY = frame.flipY ? -1 : 1;
+
+                if (this.snapToPixel) {
+                    var canvasX = parseInt(this.x * scaleX - frame.flipX * frame.width * this.pixelSize);
+                    var canvasY = parseInt(this.y * scaleY - frame.flipY * frame.height * this.pixelSize);
+                } else {
+                    var canvasX = this.x * scaleX - frame.flipX * frame.width * this.pixelSize;
+                    var canvasY = this.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+                }
+                var x = frame.x;
+                var y = frame.y;
+
+                if (context && img && img.element && img.isReady) {
+
+                    if (frame.flipX || frame.flipY) {
+                        context.save();
+                        context.scale(scaleX, scaleY);
+                    }
+                    context.globalAlpha = this.alpha;
+                    if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
+                    context.drawImage(img.element, //image element
+                        x, // x position on image
+                        y, // y position on image
+                        frame.width * this.pixelSize, // width on image
+                        frame.height * this.pixelSize, // height on image
+                        canvasX, // x position on canvas
+                        canvasY, // y position on canvas
+                        frame.width * this.pixelSize, // width on canvas
+                        frame.height * this.pixelSize // height on canvas
+                    );
+                    if (this.debug) {
+                        context.globalAlpha = 1;
+                        context.lineWidth = 0.5;
+                        context.strokeStyle = "#ff1111";
+                        context.strokeRect(canvasX - 0.5 * scaleX, canvasY - 0.5 * scaleY, frame.width * this.pixelSize + 1 * scaleX, frame.height * this.pixelSize + 1 * scaleY);
+                    }
+                    if (frame.flipX || frame.flipY) {
+                        context.restore();
+                    }
+                    if (this.debug) {
+                        context.globalAlpha = 1;
+                        context.fillStyle = '#999999';
+                        context.font = "10px sans-serif";
+                        context.fillText("Anim: " + this.animSelected + ' / ' + this.animFrame, parseInt(this.x), parseInt(this.y - 5));
+
+                        if (this.collisionBox) {
+                            var box = this.collisionBox();
+                            context.lineWidth = 0.5;
+                            context.strokeStyle = "#000099";
+                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                        }
+                    }
+                }
             },
 
         });
@@ -3402,8 +3774,22 @@
 
             inside: function(entity) {
                 return yespix.collisionInside(this, entity);
-            }
+            },
 
+            drawDebugCollision: function(context, drawBox) {
+                console.log('drawDebugCollision');
+                if (this.collisionBox) {
+                    var box = drawBox || this.collisionBox();
+                    context.globalAlpha = 1;
+                    context.lineWidth = 0.5;
+                    context.strokeStyle = "#000099";
+                    if (yespix.isUndefined()) {
+                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                    } else {
+                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+                    }
+                }
+            }
 
 
         });
@@ -3480,6 +3866,21 @@
                     if (!this._context && canvas) this._context = canvas.context;
                 }
                 return this._context;
+            },
+
+            drawDebug: function(context, box) {
+                if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
+                if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
+                if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
+                if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+            },
+
+            drawDebugPosition: function(context, drawBox) {
+                var box = drawBox || this.getDrawBox();
+                context.globalAlpha = 1;
+                context.lineWidth = 0.5;
+                context.strokeStyle = "#ff1111";
+                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
             },
 
         });
@@ -3676,23 +4077,19 @@
                         box.height // height on canvas
                     );
                     if (this.debug) {
-                        context.globalAlpha = 1;
-                        context.lineWidth = 0.5;
-                        context.strokeStyle = "#ff1111";
-                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                        context.fillStyle = '#999999';
-                        context.font = "10px sans-serif";
-                        context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
-
-                        if (this.collisionBox) {
-                            var box = this.collisionBox();
-                            context.lineWidth = 0.5;
-                            context.strokeStyle = "#000099";
-                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                        }
+                        this.drawDebug(context, box);
                     }
                 }
             },
+
+            drawDebugImage: function(context, drawBox) {
+                var box = drawBox || this.getDrawBox();
+                context.globalAlpha = 1;
+                context.fillStyle = '#999999';
+                context.font = "10px sans-serif";
+                context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
+            }
+
         });
 
         /**
@@ -4037,6 +4434,120 @@
             },
         });
 
+        yespix.define('player2w', 'actor2w', {
+
+            actorKeys: {
+                left: 'left',
+                right: 'right',
+                attack: 'x',
+                jump: ' ',
+            },
+
+            actorAnims: {
+                'idleright': 'idleright',
+                'idleleft': 'idleleft',
+
+                'walkright': 'walkright',
+                'walkleft': 'walkleft',
+
+                'lookup': 'lookup',
+                'lookdown': 'lookdown',
+
+                'jumpleft': 'jumpleft',
+                'jumpright': 'jumpright',
+
+                'airleft': 'airleft',
+                'airright': 'airright',
+
+                'attackleft': 'punch1left',
+                'attackright': 'punch1right',
+            },
+
+            playerAirFriction: 0.02,
+            playerGroundFriction: 0.13,
+
+            actorOptions: {
+                alwaysRun: false,
+            },
+
+            init: function() {
+                yespix.on('enterFrame', function() {
+                    var move = '';
+
+                    if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
+                    else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
+                    else this.accelX = 0;
+
+                    //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
+                    //console.log('isOnGround = '+this.isOnGround+'');
+
+                    if (this.actorMove.attack && yespix.key(this.actorKeys.attack) && !this.isAttacking) {
+                        this.isAttacking = true;
+                        move = 'attack' + this.actorDirection;
+                        this.animWait = false;
+                        this.animPlay(this.actorAnims[move]);
+                        this.animWait = true;
+                        //yespix.dump(this);
+                    }
+
+                    if (this.actorMove.jump && this.isOnGround && yespix.key(this.actorKeys.jump)) {
+                        move = 'jump' + this.actorDirection;
+                        this.animWait = false;
+                        this.animPlay(this.actorAnims[move]);
+                        this.animWait = true;
+                        this.accelY = -this.actorSpeedJump;
+                        this.animNext = 'air' + this.actorDirection;
+                        this.isJumping = true;
+                        this.jumpTime = (new Date).getTime();
+                        console.log('this.jumpTime = ' + this.jumpTime);
+                    } else if (this.isJumping) {
+                        console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
+                        if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
+                            this.accelY = -(this.actorSpeedJump / 6);
+                            //this.accelY = 0;
+                        } else this.accelY = 0;
+                    } else this.accelY = 0;
+
+                    if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
+                        this.actorDirection = 'right';
+                        if (this.isOnGround) move = 'walk';
+                    } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
+                        this.actorDirection = 'left';
+                        if (this.isOnGround) move = 'walk';
+                    }
+                    if (!this.isOnGround) {
+                        if (this.speedY > 0) {
+                            this.isJumping = false;
+                            this.isFalling = true;
+                        }
+                        move = 'air';
+                    }
+
+                    if (move == '') move = this.actorMove['default'] + this.actorDirection;
+                    else move = move + this.actorDirection;
+                    this.animNext = this.actorAnims[move];
+
+
+                    if (this.animWait || this.isAttacking) return;
+
+
+                    this.animPlay(this.actorAnims[move]);
+                    //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
+
+                }, this, yespix);
+            },
+
+            applyFriction: function() {
+                this.speedX *= (1 - this.playerGroundFriction);
+                this.speedY *= (1 - this.playerAirFriction);
+                if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
+                if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
+                return true;
+            },
+
+
+        });
+
         yespix.define('rect', 'gfx', {
 
             lineWidth: 0,
@@ -4076,18 +4587,7 @@
                         box.height // height on canvas
                     );
                     if (this.debug) {
-                        context.globalAlpha = 1;
-                        context.lineWidth = 0.5;
-                        context.strokeStyle = "#ff1111";
-                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                        context.fillStyle = '#999999';
-
-                        if (this.collisionBox) {
-                            var box = this.collisionBox();
-                            context.lineWidth = 0.5;
-                            context.strokeStyle = "#000099";
-                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                        }
+                        this.drawDebug(context, box);
                     }
                 }
             },
@@ -4413,17 +4913,7 @@
                     context.fillText(this.text, this.x, this.y);
 
                     if (this.debug) {
-                        context.globalAlpha = 1;
-                        context.lineWidth = 0.5;
-                        context.strokeStyle = "#ff1111";
-                        context.strokeRect(this.x - 0.5, this.x - 0.5, this.width, this.height);
-
-                        if (this.collisionBox) {
-                            var box = this.collisionBox();
-                            context.lineWidth = 0.5;
-                            context.strokeStyle = "#000099";
-                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                        }
+                        this.drawDebug(context, box);
                     }
                 }
             },
