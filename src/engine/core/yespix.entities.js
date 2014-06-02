@@ -185,7 +185,7 @@ yespix.fn.selectorInit = function(selector) {
         var items = selector.split(' ');
         for (var t in items)
             if (items != '') {
-                if (properties[this.selectorType(items[t])]) console.warn('entity.selectorInit: ambiguous selector item: "' + items[t] + '" defined twice in "' + selector + '"')
+                if (properties[this.selectorType(items[t])]) console.warn('entity.selectorInit: ambiguous selector item: "' + items[t] + '" defined twice in "' + selector + '"');
                 else properties[this.selectorType(items[t])] = this.selectorValue(items[t]);
             }
     } else // simple selector
@@ -259,7 +259,7 @@ yespix.fn.mixin = function(object, properties) {
             }(fn, this);
         }
     }
-},
+};
 
 
 yespix.fn.ancestors = function(name) {
@@ -281,7 +281,6 @@ yespix.fn.ancestors = function(name) {
 
 
 yespix.fn.define = function(name, list, properties) {
-    //console.log('define :: defining the entity "'+name+'"');
 
     // error if the entity class name already exists
     if (this.entityClasses[name]) {
@@ -317,33 +316,24 @@ yespix.fn.define = function(name, list, properties) {
     
     if (!this.isEntityAncestorsPending[name])
    	{
-    	console.log('define :: added entity "'+name+'"');
     	if (this.entityAncestorsPending.length>0)
 		{
     		var length = this.entityAncestorsPending.length;
     		var count = 0; // number of entity ancestors initiated
     		for (var t = 0; t<length; t++)
    			{
-    			console.log('define :: try to fetch ancestors of '+this.entityAncestorsPending[t]);
     			if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
-    			else console.log('define :: fail to fetch ancestors');
    			}
-    		console.log('define :: count = '+count);
     		if (count>0)
    			{
-    			console.log('define :: making new list');
     			var newList = [];
 	    		for (var t = 0; t<length; t++)
 	   			{
-	    			if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList[] = this.entityAncestorsPending[t];
-	    			else console.log('define :: deleting t = '+t+', "'+this.entityAncestorsPending[t]+'"');
+	    			if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
 	   			}
 	    		this.entityAncestorsPending = newList;
-	    		console.log('New list = ');
-	    		console.log(this.entityAncestorsPending);
    			}
 		}
-    	
    	}
     
     this.trigger('define', {
