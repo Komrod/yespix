@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+<script type="text/javascript">
+	
+	var yp = yespix({canvas: true, fps: 60});
+    
+	
+    yp.spawn('rect',
+            {
+                x: 50,
+                y: 50,
+                width: 30,
+                height: 30,
+                lineWidth: 5,
+                lineColor: '#F6FC2D',
+                rectColor: '',
+            });
+
+    yp.spawn('rect',
+            {
+                x: 100,
+                y: 50,
+                width: 30,
+                height: 30,
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('rect',
+            {
+                x: 150,
+                y: 50,
+                width: 30,
+                height: 30,
+                lineWidth: 5,
+                lineColor: '#F6FC2D',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 50,
+                y: 150,
+                width: 30,
+                height: 30,
+                lineWidth: 5,
+                rectRadius: 10,        
+                lineColor: '#F6FC2D',
+                rectColor: '',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 100,
+                y: 150,
+                width: 30,
+                height: 30,
+                rectRadius: 10,        
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                lineWidth: 5,
+                rectRadius: 10,        
+                lineColor: '#F6FC2D',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('image',
+            {
+                x: 200,
+                y: 50,
+                images: 'unit/image/zardoz.png'
+            });
+
+
+</script>
+
+</body>
+</html>

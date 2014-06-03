@@ -23,19 +23,23 @@ yespix.define('rect', 'gfx', {
 
         if (context) {
             context.globalAlpha = this.alpha;
-            if (this.lineWidth > 0) {
+
+            if (this.rectColor !== '')
+           	{
+	            context.fillStyle = this.rectColor;
+	            context.fillRect(
+	                box.x, // x position on canvas
+	                box.y, // y position on canvas
+	                box.width, // width on canvas
+	                box.height // height on canvas
+	            );
+           	}
+            if (this.lineWidth > 0 && this.lineColor != '') {
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
                 context.strokeRect(box.x, box.y, box.width, box.height);
             }
-
-            context.fillStyle = this.rectColor;
-            context.fillRect(
-                box.x, // x position on canvas
-                box.y, // y position on canvas
-                box.width, // width on canvas
-                box.height // height on canvas
-            );
+            
             if (this.debug) {
             	this.drawDebug(context, box);
             }
