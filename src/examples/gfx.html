@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+<script type="text/javascript">
+	
+	var yp = yespix({canvas: true, fps: 60});
+    
+	
+    yp.spawn('rect',
+            {
+                x: 50,
+                y: 50,
+                width: 30,
+                height: 30,
+                lineWidth: 3,
+                lineColor: '#F6FC2D',
+                rectColor: '',
+            });
+
+    yp.spawn('rect',
+            {
+                x: 100,
+                y: 50,
+                width: 30,
+                height: 30,
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('rect',
+            {
+                x: 150,
+                y: 50,
+                width: 30,
+                height: 30,
+                lineWidth: 3,
+                lineColor: '#F6FC2D',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 50,
+                y: 110,
+                width: 30,
+                height: 30,
+                lineWidth: 3,
+                rectRadius: 10,        
+                lineColor: '#F6FC2D',
+                rectColor: '',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 100,
+                y: 110,
+                width: 30,
+                height: 30,
+                rectRadius: 10,        
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('roundrect',
+            {
+                x: 150,
+                y: 110,
+                width: 30,
+                height: 30,
+                lineWidth: 3,
+                rectRadius: 10,        
+                lineColor: '#F6FC2D',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('circle',
+            {
+                x: 65,
+                y: 185,
+                circleRadius:15,
+                lineWidth: 3,
+                lineColor: '#F6FC2D',
+                rectColor: '',
+            });
+
+    yp.spawn('circle',
+            {
+                x: 115,
+                y: 185,
+                circleRadius:15,
+                lineColor: '',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('circle',
+            {
+                x: 165,
+                y: 185,
+                circleRadius:15,
+                lineWidth: 3,
+                lineColor: '#F6FC2D',
+                rectColor: '#19D1FF',
+            });
+
+    yp.spawn('image',
+            {
+                x: 200,
+                y: 50,
+                images: 'unit/image/zardoz.png'
+            });
+
+    yp.spawn('text',
+            {
+                x: 50,
+                y: 240,
+                text: "This is a text",
+                textColor: '#19D1FF',
+            });
+
+
+    yp.spawn('anim',
+            {
+                x: 350,
+                y: 50,
+                images: 'chuck/player.png',
+                animDefault:
+                {
+                    width: 32,
+                    height: 40,
+                    name: 'walk',
+                    duration: 150,
+                },
+                anims:
+                {
+                    walk:
+                    {
+                        from: 24,
+                        length: 8,
+                    },
+                }
+            });
+
+
+
+</script>
+
+</body>
+</html>

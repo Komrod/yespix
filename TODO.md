@@ -1,47 +1,56 @@
 TODO list:
+
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
 - Make an entity dump where you can see where properties come from
 - Make a basic Zombie Sim
-- VERSION 0.14
+- tag version 0.14
 - limit image draw to visible canvas when an image try to draw partialy outside the canvas
 - animate properties
 - tiled level import
 - draw text
 - draw polygon, line, circle, elipse, star
-- VERSION 0.15
+- tag version 0.15
 - draw SVG image
 - rotation
 - parent position and rotation affect children
 - Make an Arkanoid game
-- VERSION 0.16
+- tag version 0.16
 - font from image
 - typewritter: text showing letter by letter with sound
 - panel
 - button
+- Add fillAlpha and lineAlpha in rect entity
 - Make a Steel Sky game (raiden like)
-- VERSION 0.17
+- tag version 0.17
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
 - function keyCapture() stops the propagation of the pressed key
-- VERSION 0.18
+- tag version 0.18
 - Bunch must concat, splice, push with arrays
 - create temporary class with space, not only with "," like yespix.spawn('rect move')
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
-- VERSION 0.19
+- tag version 0.19
 - Create a function to add / remove modules
 - Create a DEV trunk and separate modules with entity definitions
 - Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - Make a
-- VERSION 0.20
+- tag version 0.20
 
 
 DONE:
+- unit test: instanciation
+- make examples work
+- unit test: general function
+- new unit test system
+- new initialisation for entities
+- Change the TODO list // 2014-05-12
+- rearranging folders
 - function visible() returns true if gfx entity is visible on canvas
 - switch speed to pixel-per-second and optionnaly pixel-per-frame
 - first(), first(50), last(), last(5), not(id), not(this), filter('even'), filter('odd') for Bunch
