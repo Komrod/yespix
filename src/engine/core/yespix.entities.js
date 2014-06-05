@@ -261,7 +261,9 @@ yespix.fn.mixin = function(object, properties) {
     }
 };
 
-
+/**
+ * Returns the list of ancestors of the entity
+ */
 yespix.fn.ancestors = function(name) {
     //				console.log('ancestors :: name = '+name);
     if (this.entityClasses[name]) {
@@ -311,10 +313,9 @@ yespix.fn.define = function(name, list, properties) {
     };
 
     // adding the ancestors
-    this.entityFetchAncestors(name);
-    this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
+    if (this.entityFetchAncestors(name)) this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
     
-    if (!this.isEntityAncestorsPending[name])
+    if (!this.isEntityAncestorsPending(name))
    	{
     	if (this.entityAncestorsPending.length>0)
 		{
@@ -351,6 +352,7 @@ yespix.fn.define = function(name, list, properties) {
  * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
  */
 yespix.fn.entityFetchAncestors = function(className, mode) {
+	console.log('entityFetchAncestors :: start, className = '+className+', mode = '+mode);
     if (!this.entityClasses[className]) {
         console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
         return false;
@@ -369,20 +371,40 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
                     this.entityAncestorsPending.push(className);
                     this.entityClasses[className].ancestors = [];
                     this.entityClasses[className].ancestorsReady = false;
+                    console.log('entityFetchAncestors :: ancestors NOK');
                     return false;
                     break;
                 } else {
                     if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                     this.entityClasses[className].ancestorsReady = false;
+                    console.log('entityFetchAncestors :: ancestors NOK');
                     return false;
                 }
             } else if (list[t] == className) {
             	if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
             } else {
+            	if (!this.entityClasses[list[t]].ancestorsReady)
+           		{
+                    if (mode == 'pending') {
+                        console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
+                        this.entityAncestorsPending.push(className);
+                        this.entityClasses[className].ancestors = [];
+                        this.entityClasses[className].ancestorsReady = false;
+                        console.log('entityFetchAncestors :: ancestors NOK');
+                        return false;
+                        break;
+                    } else {
+                        if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                        this.entityClasses[className].ancestorsReady = false;
+                        console.log('entityFetchAncestors :: ancestors NOK');
+                        return false;
+                    }
+           		}
                 this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
             }
         }
     }
+    console.log('entityFetchAncestors :: ancestors ready');
     this.entityClasses[className].ancestorsReady = true;
     return true;
 };
