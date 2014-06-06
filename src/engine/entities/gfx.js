@@ -18,6 +18,8 @@ yespix.define('gfx', {
     _flipX: false,
     _flipY: false,
 
+    debugAlpha: 1,
+
     ///////////////////////////////// Main functions ////////////////////////////////
 
     asset: function() {
@@ -72,21 +74,38 @@ yespix.define('gfx', {
         return this._context;
     },
 
-    drawDebug: function (context, box)
-    {
-    	if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
-    	if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
-    	if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
-    	if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+    draw: function() {
+        if (this.canDrawDebug()) this.drawDebug();
     },
 
-    drawDebugPosition: function(context, drawBox)
-    {
+    drawAlpha: function(context, type) {
+        if (!type)
+        {
+            context.globalAlpha = this.alpha;
+        } else
+        {
+            if (!this[type+'Alpha']) context.globalAlpha = 0;
+            else context.globalAlpha = this.alpha * this[type+'Alpha'];
+        }
+    },
+
+    canDrawDebug: function() {
+        return this.debug;
+    },
+
+    drawDebug: function(context, box) {
+        this.drawAlpha(context, 'debug');
+        if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
+        if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
+        if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
+        if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+    },
+
+    drawDebugPosition: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
-        context.globalAlpha = 1;
         context.lineWidth = 0.5;
         context.strokeStyle = "#ff1111";
         context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
     },
-    
+
 });

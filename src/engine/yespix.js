@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-03 */
+/*! yespix - v0.1.0 - 2014-06-06 */
 (function(undefined) {
 
     /**
@@ -604,7 +604,9 @@
         }
     };
 
-
+    /**
+     * Returns the list of ancestors of the entity
+     */
     yespix.fn.ancestors = function(name) {
         //				console.log('ancestors :: name = '+name);
         if (this.entityClasses[name]) {
@@ -654,10 +656,9 @@
         };
 
         // adding the ancestors
-        this.entityFetchAncestors(name);
-        this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
+        if (this.entityFetchAncestors(name)) this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
 
-        if (!this.isEntityAncestorsPending[name]) {
+        if (!this.isEntityAncestorsPending(name)) {
             if (this.entityAncestorsPending.length > 0) {
                 var length = this.entityAncestorsPending.length;
                 var count = 0; // number of entity ancestors initiated
@@ -689,6 +690,7 @@
      * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
      */
     yespix.fn.entityFetchAncestors = function(className, mode) {
+        console.log('entityFetchAncestors :: start, className = ' + className + ', mode = ' + mode);
         if (!this.entityClasses[className]) {
             console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
             return false;
@@ -707,20 +709,39 @@
                         this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
                         this.entityClasses[className].ancestorsReady = false;
+                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                         break;
                     } else {
                         if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                         this.entityClasses[className].ancestorsReady = false;
+                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                     }
                 } else if (list[t] == className) {
                     if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
                 } else {
+                    if (!this.entityClasses[list[t]].ancestorsReady) {
+                        if (mode == 'pending') {
+                            console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
+                            this.entityAncestorsPending.push(className);
+                            this.entityClasses[className].ancestors = [];
+                            this.entityClasses[className].ancestorsReady = false;
+                            console.log('entityFetchAncestors :: ancestors NOK');
+                            return false;
+                            break;
+                        } else {
+                            if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                            this.entityClasses[className].ancestorsReady = false;
+                            console.log('entityFetchAncestors :: ancestors NOK');
+                            return false;
+                        }
+                    }
                     this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
                 }
             }
         }
+        console.log('entityFetchAncestors :: ancestors ready');
         this.entityClasses[className].ancestorsReady = true;
         return true;
     };
@@ -3023,7 +3044,6 @@
 
         });
 
-
         yespix.define('anim', 'image', {
             animDefault: {
                 width: 32, // default tile width
@@ -3701,6 +3721,50 @@
 
         });
 
+        yespix.define('circle', 'gfx', {
+
+            circleRadius: 5,
+
+            init: function() {},
+
+            drawPath: function(context) {
+                context.beginPath();
+                context.arc(this.x, this.y, this.circleRadius, 0, 2 * Math.PI, false);
+            },
+
+            draw: function(context) {
+                if (!this.isVisible) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                var box = this.getDrawBox();
+
+                if (context) {
+                    context.globalAlpha = this.alpha;
+                    if (this.rectColor != '') {
+                        context.fillStyle = this.rectColor;
+                        this.drawPath(context);
+                        context.fill();
+                    }
+                    if (this.lineWidth > 0 && this.lineColor != '') {
+                        context.lineWidth = this.lineWidth;
+                        context.strokeStyle = this.lineColor;
+                        if (this.rectColor == '') this.drawPath(context);
+                        context.stroke();
+                    }
+                    if (this.debug) {
+                        this.drawDebug(context, box);
+                    }
+                }
+            },
+
+        });
+
         yespix.define('collision', {
 
             colOffsetX: 0,
@@ -3814,6 +3878,8 @@
             _flipX: false,
             _flipY: false,
 
+            debugAlpha: 1,
+
             ///////////////////////////////// Main functions ////////////////////////////////
 
             asset: function() {
@@ -3868,7 +3934,25 @@
                 return this._context;
             },
 
+            draw: function() {
+                if (this.canDrawDebug()) this.drawDebug();
+            },
+
+            drawAlpha: function(context, type) {
+                if (!type) {
+                    context.globalAlpha = this.alpha;
+                } else {
+                    if (!this[type + 'Alpha']) context.globalAlpha = 0;
+                    else context.globalAlpha = this.alpha * this[type + 'Alpha'];
+                }
+            },
+
+            canDrawDebug: function() {
+                return this.debug;
+            },
+
             drawDebug: function(context, box) {
+                this.drawAlpha(context, 'debug');
                 if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
                 if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
                 if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
@@ -3877,7 +3961,6 @@
 
             drawDebugPosition: function(context, drawBox) {
                 var box = drawBox || this.getDrawBox();
-                context.globalAlpha = 1;
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#ff1111";
                 context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
@@ -4434,6 +4517,83 @@
             },
         });
 
+        /**
+         * @class entity.path
+         */
+        yespix.define('path', {
+
+            init: function() {},
+
+            draw: function(context) {
+                if (!this.isVisible) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                var box = this.getDrawBox();
+                var scaleX = this.flipX ? -1 : 1;
+                var scaleY = this.flipY ? -1 : 1;
+
+                if (context) {
+                    context.globalAlpha = this.alpha;
+
+                    if (this.rectColor !== '') {
+                        context.fillStyle = this.rectColor;
+                        context.fillRect(
+                            box.x, // x position on canvas
+                            box.y, // y position on canvas
+                            box.width, // width on canvas
+                            box.height // height on canvas
+                        );
+                    }
+                    if (this.lineWidth > 0 && this.lineColor != '') {
+                        context.lineWidth = this.lineWidth;
+                        context.strokeStyle = this.lineColor;
+                        context.strokeRect(box.x, box.y, box.width, box.height);
+                    }
+
+                    if (this.debug) {
+                        this.drawDebug(context, box);
+                    }
+                }
+            },
+
+            canDrawPath: function() {
+
+            },
+
+            drawPath: function(context, box) {
+
+            },
+
+            drawAlpha: function(context, box) {
+
+            },
+
+            canDrawStroke: function(context, box) {
+
+            },
+
+            drawStroke: function(context, box) {
+
+            },
+
+            canDrawFill: function(context, box) {
+
+            },
+
+            drawFill: function(context, box) {
+
+            },
+
+
+
+        });
+
         yespix.define('player2w', 'actor2w', {
 
             actorKeys: {
@@ -4548,53 +4708,26 @@
 
         });
 
-        yespix.define('rect', 'gfx', {
-
-            lineWidth: 0,
-            lineColor: '#000000',
-            rectColor: '#999999',
-            isVisible: true,
+        yespix.define('rect', 'shape', {
 
             init: function() {},
 
-            draw: function(context) {
-                if (!this.isVisible) return;
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
-
-                var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
-
-                if (context) {
-                    context.globalAlpha = this.alpha;
-
-                    if (this.rectColor !== '') {
-                        context.fillStyle = this.rectColor;
-                        context.fillRect(
-                            box.x, // x position on canvas
-                            box.y, // y position on canvas
-                            box.width, // width on canvas
-                            box.height // height on canvas
-                        );
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        context.strokeRect(box.x, box.y, box.width, box.height);
-                    }
-
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
+            drawFill: function(context, box) {
+                context.fillStyle = this.fillColor;
+                context.fillRect(
+                    box.x, // x position on canvas
+                    box.y, // y position on canvas
+                    box.width, // width on canvas
+                    box.height // height on canvas
+                );
             },
 
+            drawLine: function(context, box) {
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                context.strokeRect(box.x, box.y, box.width, box.height);
+            }
         });
 
         yespix.define('roundrect', 'rect', {
@@ -4646,6 +4779,72 @@
                     if (this.debug) {
                         this.drawDebug(context, box);
                     }
+                }
+            },
+
+        });
+
+        yespix.define('shape', 'gfx', {
+
+            lineWidth: 0,
+            lineColor: '',
+            lineAlpha: 1.0,
+
+            fillColor: '',
+            fillAlpha: 1.0,
+
+            isVisible: true,
+
+            init: function() {},
+
+            canDraw: function() {
+                return this.isVisible && this.alpha > 0;
+            },
+
+            canDrawPath: function() {
+                return true;
+            },
+
+            drawPath: function(context, box) {
+
+            },
+
+            canDrawLine: function() {
+                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+            },
+
+            drawLine: function(context, box) {
+                this.drawAlpha(context, 'line');
+                context.stroke();
+            },
+
+            canDrawFill: function() {
+                return this.fillColor != '' && this.lineAlpha > 0;
+            },
+
+            drawFill: function(context, box) {
+                this.drawAlpha(context, 'fill');
+                context.fill();
+            },
+
+
+            draw: function(context) {
+                if (!this.canDraw()) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                var box = this.getDrawBox();
+
+                if (context) {
+                    if (this.canDrawPath()) this.drawPath(context, box);
+                    if (this.canDrawFill()) this.drawFill(context, box);
+                    if (this.canDrawLine()) this.drawLine(context, box);
+                    if (this.canDrawDebug()) this.drawDebug(context, box);
                 }
             },
 

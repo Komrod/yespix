@@ -190,18 +190,17 @@ yespix.define('image', 'gfx', {
                 box.height // height on canvas
             );
             if (this.debug) {
-            	this.drawDebug(context, box);
+                this.drawDebug(context, box);
             }
         }
     },
-    
-    drawDebugImage: function(context, drawBox)
-    {
+
+    drawDebugImage: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
         context.globalAlpha = 1;
         context.fillStyle = '#999999';
         context.font = "10px sans-serif";
         context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
     }
-    
+
 });

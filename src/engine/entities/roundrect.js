@@ -1,23 +1,22 @@
 yespix.define('roundrect', 'rect', {
 
-	rectRadius: 5,
-	
+    rectRadius: 5,
+
     init: function() {},
-    
-    drawPath: function(context)
-    {
+
+    drawPath: function(context) {
         context.beginPath();
         context.moveTo(this.x + this.rectRadius, this.y);
         context.lineTo(this.x + this.width - this.rectRadius, this.y);
         context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.rectRadius);
         context.lineTo(this.x + this.width, this.y + this.height - this.rectRadius);
-        context.quadraticCurveTo(this.x + this.width , this.y + this.height, this.x + this.width - this.rectRadius, this.y + this.height);
+        context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.rectRadius, this.y + this.height);
         context.lineTo(this.x + this.rectRadius, this.y + this.height);
         context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.rectRadius);
         context.lineTo(this.x, this.y + this.rectRadius);
         context.quadraticCurveTo(this.x, this.y, this.x + this.rectRadius, this.y);
     },
-    
+
     draw: function(context) {
         if (!this.isVisible) return;
 
@@ -35,8 +34,8 @@ yespix.define('roundrect', 'rect', {
         if (context) {
             context.globalAlpha = this.alpha;
             if (this.rectColor != '') {
-	            context.fillStyle = this.rectColor;
-            	this.drawPath(context);
+                context.fillStyle = this.rectColor;
+                this.drawPath(context);
                 context.fill();
             }
             if (this.lineWidth > 0 && this.lineColor != '') {
@@ -46,7 +45,7 @@ yespix.define('roundrect', 'rect', {
                 context.stroke();
             }
             if (this.debug) {
-            	this.drawDebug(context, box);
+                this.drawDebug(context, box);
             }
         }
     },

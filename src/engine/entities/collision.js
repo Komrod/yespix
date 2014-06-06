@@ -73,22 +73,19 @@ yespix.define('collision', {
         return yespix.collisionInside(this, entity);
     },
 
-    drawDebugCollision: function(context, drawBox)
-    {
-    	console.log('drawDebugCollision');
-	    if (this.collisionBox) {
-	        var box = drawBox || this.collisionBox();
-	        context.globalAlpha = 1;
-	        context.lineWidth = 0.5;
-	        context.strokeStyle = "#000099";
-	        if (yespix.isUndefined())
-	        {
-	        	context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-	        } else
-	        {
-	        	context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-	        }
-	    }
+    drawDebugCollision: function(context, drawBox) {
+        console.log('drawDebugCollision');
+        if (this.collisionBox) {
+            var box = drawBox || this.collisionBox();
+            context.globalAlpha = 1;
+            context.lineWidth = 0.5;
+            context.strokeStyle = "#000099";
+            if (yespix.isUndefined()) {
+                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+            } else {
+                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+            }
+        }
     }
 
 

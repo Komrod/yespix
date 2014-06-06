@@ -2,9 +2,9 @@
  * @class entity.path
  */
 yespix.define('path', {
-    
+
     init: function() {},
-    
+
     draw: function(context) {
         if (!this.isVisible) return;
 
@@ -22,8 +22,7 @@ yespix.define('path', {
         if (context) {
             context.globalAlpha = this.alpha;
 
-            if (this.rectColor !== '')
-            {
+            if (this.rectColor !== '') {
                 context.fillStyle = this.rectColor;
                 context.fillRect(
                     box.x, // x position on canvas
@@ -37,48 +36,41 @@ yespix.define('path', {
                 context.strokeStyle = this.lineColor;
                 context.strokeRect(box.x, box.y, box.width, box.height);
             }
-            
+
             if (this.debug) {
                 this.drawDebug(context, box);
             }
         }
     },
 
-    canDrawPath: function()
-    {
+    canDrawPath: function() {
 
     },
 
-    drawPath: function(context, box)    
-    {
+    drawPath: function(context, box) {
 
     },
 
-    drawAlpha: function(context, box)
-    {
+    drawAlpha: function(context, box) {
 
     },
 
-    canDrawStroke: function(context, box)
-    {
+    canDrawStroke: function(context, box) {
 
     },
 
-    drawStroke: function(context, box)
-    {
+    drawStroke: function(context, box) {
 
     },
 
-    canDrawFill: function(context, box)
-    {
+    canDrawFill: function(context, box) {
 
     },
 
-    drawFill: function(context, box)
-    {
+    drawFill: function(context, box) {
 
     },
 
-    
+
 
 });

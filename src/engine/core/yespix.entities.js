@@ -289,7 +289,7 @@ yespix.fn.define = function(name, list, properties) {
         console.warn('define :: entity class name "' + name + '" already exists');
         return;
     }
-    
+
     // init the parameters
     if (typeof list !== 'string') {
         properties = list;
@@ -314,29 +314,24 @@ yespix.fn.define = function(name, list, properties) {
 
     // adding the ancestors
     if (this.entityFetchAncestors(name)) this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
-    
-    if (!this.isEntityAncestorsPending(name))
-   	{
-    	if (this.entityAncestorsPending.length>0)
-		{
-    		var length = this.entityAncestorsPending.length;
-    		var count = 0; // number of entity ancestors initiated
-    		for (var t = 0; t<length; t++)
-   			{
-    			if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
-   			}
-    		if (count>0)
-   			{
-    			var newList = [];
-	    		for (var t = 0; t<length; t++)
-	   			{
-	    			if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
-	   			}
-	    		this.entityAncestorsPending = newList;
-   			}
-		}
-   	}
-    
+
+    if (!this.isEntityAncestorsPending(name)) {
+        if (this.entityAncestorsPending.length > 0) {
+            var length = this.entityAncestorsPending.length;
+            var count = 0; // number of entity ancestors initiated
+            for (var t = 0; t < length; t++) {
+                if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
+            }
+            if (count > 0) {
+                var newList = [];
+                for (var t = 0; t < length; t++) {
+                    if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
+                }
+                this.entityAncestorsPending = newList;
+            }
+        }
+    }
+
     this.trigger('define', {
         class: this.entityClasses[name]
     });
@@ -352,14 +347,14 @@ yespix.fn.define = function(name, list, properties) {
  * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
  */
 yespix.fn.entityFetchAncestors = function(className, mode) {
-	console.log('entityFetchAncestors :: start, className = '+className+', mode = '+mode);
+    console.log('entityFetchAncestors :: start, className = ' + className + ', mode = ' + mode);
     if (!this.entityClasses[className]) {
         console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
         return false;
     }
 
     if (this.entityClasses[className].ancestorsReady) return true;
-    
+
     mode = mode || 'pending';
     var list = this.entityClasses[className].list;
 
@@ -381,10 +376,9 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
                     return false;
                 }
             } else if (list[t] == className) {
-            	if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
             } else {
-            	if (!this.entityClasses[list[t]].ancestorsReady)
-           		{
+                if (!this.entityClasses[list[t]].ancestorsReady) {
                     if (mode == 'pending') {
                         console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                         this.entityAncestorsPending.push(className);
@@ -399,7 +393,7 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
                         console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                     }
-           		}
+                }
                 this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
             }
         }

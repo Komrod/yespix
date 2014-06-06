@@ -1,15 +1,14 @@
 yespix.define('circle', 'gfx', {
 
-	circleRadius: 5,
-	
+    circleRadius: 5,
+
     init: function() {},
-    
-    drawPath: function(context)
-    {
+
+    drawPath: function(context) {
         context.beginPath();
         context.arc(this.x, this.y, this.circleRadius, 0, 2 * Math.PI, false);
     },
-    
+
     draw: function(context) {
         if (!this.isVisible) return;
 
@@ -25,8 +24,8 @@ yespix.define('circle', 'gfx', {
         if (context) {
             context.globalAlpha = this.alpha;
             if (this.rectColor != '') {
-	            context.fillStyle = this.rectColor;
-            	this.drawPath(context);
+                context.fillStyle = this.rectColor;
+                this.drawPath(context);
                 context.fill();
             }
             if (this.lineWidth > 0 && this.lineColor != '') {
@@ -36,7 +35,7 @@ yespix.define('circle', 'gfx', {
                 context.stroke();
             }
             if (this.debug) {
-            	this.drawDebug(context, box);
+                this.drawDebug(context, box);
             }
         }
     },
