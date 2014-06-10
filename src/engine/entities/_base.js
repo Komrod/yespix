@@ -86,7 +86,12 @@
 		     */
 		    name: '',
 
-
+		    /**
+		     * Register instance in the engine when spawned
+		     */
+		    registerInstance: true,
+		    
+		    
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**

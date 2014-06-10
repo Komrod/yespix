@@ -138,7 +138,9 @@ yespix.define('image', 'gfx', {
                 //yespix.error();
             }
             //yespix.timerStop();
-
+            
+            console.log('image :: trigger imageReady');
+            console.log(entity);
             entity.trigger('imageReady', {
                 target: image,
             });

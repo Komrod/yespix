@@ -1,12 +1,6 @@
-/**
- ************************************************************************************************************
- ************************************************************************************************************
- * Level
- *
- */
 
 yespix.define('level', 'gfx', {
-    data: {},
+    data: null,
 
     isVisible: true,
 
@@ -16,8 +10,9 @@ yespix.define('level', 'gfx', {
 
     canvas: null,
     context: null,
-
-
+    tilesets: null,
+    levelDir: '',
+    
     block: function(x, y) {
         var index = y * this.data.width + x;
         var tileIndex = this.data.layers[0].data[index];
@@ -274,42 +269,66 @@ yespix.define('level', 'gfx', {
     load: function(src) {
         // destroy other loaded levels @todo
         //yespix.find('/level').not(this).destroy();
-
+    	this.levelDir = yespix.getDir(src);
+    	console.log('level :: load :: dir = '+this.levelDir);
         yespix.load(src, {
             'complete': function(e) {
-                yespix.dump(e);
-
-                var entity = e.entity;
-                entity.data = JSON.parse(e.content);
-
-
-                entity.canvas = document.createElement('canvas');
-                entity.context = entity.canvas.getContext('2d');
-
-                var index = 0;
-                var colors = ['', '', '#ff9900', '#FF0000', '#006600', '#000099'];
-
-                entity.canvas.width = entity.data.width * entity.data.tilewidth;
-                entity.canvas.height = entity.data.height * entity.data.tileheight;
-
-                for (var y = 0; y < entity.data.height; y++) {
-                    for (var x = 0; x < entity.data.width; x++) {
-                        var tileIndex = entity.data.layers[0].data[index];
-                        if (tileIndex > 1) {
-                            //console.log('x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
-                            entity.context.fillStyle = colors[tileIndex];
-                            entity.context.fillRect(x * entity.data.tilewidth, y * entity.data.tileheight, entity.data.tilewidth, entity.data.tileheight);
-                        }
-                        index++;
-                    }
+            	var entity = e.entity;
+            	entity.data = JSON.parse(e.content);
+                console.log(entity.data);
+                if (entity.data.layers)
+                {
+                	// load tilesets
+                	var images = [];
+                	var count = entity.data.tilesets.length; 
+            		console.log('level :: complete :: tilesets count '+count);
+                	for (var t = 0; t < count; t++)
+               		{
+                		console.log('level :: complete :: t = '+t);
+                		images.push(entity.levelDir+entity.data.tilesets[t].image);
+                		//tileset.on('');
+               		}
+                	console.log('images = ');
+                	console.log(images);
+                	this.tilesets = yespix.spawn(
+                			'image', 
+                			{
+                				registerInstance: false,
+                				images: images,
+                			});
+                	console.log('level :: complete :: adding imaeReady event');
+                	this.tilesets.on('imageReady', function()
+                	{
+                		console.log('imageReady :: ----------------------');
+                	});
+                	console.log('tilesets = ');
+                	console.log(this.tilesets);
+                	
                 }
-                entity.isReady = true;
-                yespix.level = entity;
             },
             'entity': this,
         });
     },
-
+    
+    tilsetsReady: function()
+    {
+    	/*
+    	// load layers
+    	var layer = null;
+    	var count = entity.data.layers.length; 
+		console.log('level :: complete :: layers count '+count);
+    	for (var t = 0; t < count; t++)
+   		{
+    		console.log('level :: complete :: t = '+t);
+    		layer = yespix.spawn('layer');
+    		layer.setLevel(entity);
+    		layer.load(entity.data.layers[t]);
+    		layer.make();
+    		entity.layers.push(layer);
+   		}*/
+    	this.isReady = true;
+    },
+    
     draw: function(context) {
         //console.log('level draw');
         if (!this.isVisible) return;
