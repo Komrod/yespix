@@ -77,6 +77,6 @@ yespix.define('layer', {
                 index++;
             }
         }
-        entity.isReady = true;
+        this.isReady = true;
     },
 });
