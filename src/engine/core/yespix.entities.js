@@ -453,8 +453,10 @@ yespix.fn.spawn = function(name, properties) {
     entity._ancestors = this.entityClasses[name]['ancestors'];
     entity._id = this.entityNextId++;
 
-    this.instanceAdd(entity);
-
+    console.log(entity);
+    if (entity['registerInstance']) this.instanceAdd(entity);
+    else console.log('entities :: entity instance not registered "'+name+'"');
+    
     // executing the init functions on ancestors
     this.call(entity, 'init', [properties]);
     if (this.isFunction(entity.init)) entity.init(properties);
