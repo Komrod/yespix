@@ -44,6 +44,7 @@ TODO list:
 
 
 DONE:
+- Add path entity for objects
 - unit test: instanciation
 - make examples work
 - unit test: general function
