@@ -218,7 +218,7 @@ yespix.define('level', 'gfx', {
             var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
             if (this.block(cellRight, cellBottom)) {
                 console.log('Double collision right down');
-                this.collisionDown(entity, box, cellRight, cellBottom);
+                //this.collisionDown(entity, box, cellRight, cellBottom);
                 this.collisionRight(entity, box, cellRight, cellBottom);
             }
         } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
@@ -226,7 +226,7 @@ yespix.define('level', 'gfx', {
             var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
             if (this.block(cellLeft, cellBottom)) {
                 console.log('Double collision left down');
-                this.collisionDown(entity, box, cellLeft, cellBottom);
+                //this.collisionDown(entity, box, cellLeft, cellBottom);
                 this.collisionLeft(entity, box, cellLeft, cellBottom);
             }
         } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {

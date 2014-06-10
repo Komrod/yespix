@@ -1,15 +1,14 @@
-yespix.define('rect', 'shape', {
+yespix.define('rect', 'path', {
 
     init: function() {},
-
 
     drawFill: function(context, box) {
         context.fillStyle = this.fillColor;
         context.fillRect(
-            box.x, // x position on canvas
-            box.y, // y position on canvas
-            box.width, // width on canvas
-            box.height // height on canvas
+            this.x, // x position on canvas
+            this.y, // y position on canvas
+            this.width, // width on canvas
+            this.height // height on canvas
         );
     },
 

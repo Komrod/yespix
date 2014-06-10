@@ -1,12 +1,52 @@
-/**
- * @class entity.path
- */
-yespix.define('path', {
+yespix.define('path', 'gfx', {
+
+    lineWidth: 0,
+    lineColor: '',
+    lineAlpha: 1.0,
+    
+    fillColor: '',
+    fillAlpha: 1.0,
+
+    isVisible: true,
 
     init: function() {},
 
+    canDraw: function() {
+        return this.isVisible && this.alpha > 0;
+    },
+
+    canDrawPath: function() {
+        return true;
+    },
+
+    drawPath: function(context, box) {
+
+    },
+
+    canDrawLine: function() {
+        return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+    },
+
+    drawLine: function(context, box) {
+        this.drawAlpha(context, 'line');
+        context.lineWidth = this.lineWidth;
+        context.strokeStyle = this.lineColor;
+        context.stroke();
+    },
+
+    canDrawFill: function() {
+        return this.fillColor != '' && this.fillAlpha > 0;
+    },
+
+    drawFill: function(context, box) {
+        this.drawAlpha(context, 'fill');
+        context.fillStyle = this.fillColor;
+        context.fill();
+    },
+
+
     draw: function(context) {
-        if (!this.isVisible) return;
+        if (!this.canDraw()) return;
 
         if (!context) {
             if (!this._context) {
@@ -16,61 +56,12 @@ yespix.define('path', {
         }
 
         var box = this.getDrawBox();
-        var scaleX = this.flipX ? -1 : 1;
-        var scaleY = this.flipY ? -1 : 1;
 
         if (context) {
-            context.globalAlpha = this.alpha;
-
-            if (this.rectColor !== '') {
-                context.fillStyle = this.rectColor;
-                context.fillRect(
-                    box.x, // x position on canvas
-                    box.y, // y position on canvas
-                    box.width, // width on canvas
-                    box.height // height on canvas
-                );
-            }
-            if (this.lineWidth > 0 && this.lineColor != '') {
-                context.lineWidth = this.lineWidth;
-                context.strokeStyle = this.lineColor;
-                context.strokeRect(box.x, box.y, box.width, box.height);
-            }
-
-            if (this.debug) {
-                this.drawDebug(context, box);
-            }
+            if (this.canDrawPath()) this.drawPath(context, box);
+            if (this.canDrawFill()) this.drawFill(context, box);
+            if (this.canDrawLine()) this.drawLine(context, box);
+            if (this.canDrawDebug()) this.drawDebug(context, box);
         }
     },
-
-    canDrawPath: function() {
-
-    },
-
-    drawPath: function(context, box) {
-
-    },
-
-    drawAlpha: function(context, box) {
-
-    },
-
-    canDrawStroke: function(context, box) {
-
-    },
-
-    drawStroke: function(context, box) {
-
-    },
-
-    canDrawFill: function(context, box) {
-
-    },
-
-    drawFill: function(context, box) {
-
-    },
-
-
-
 });

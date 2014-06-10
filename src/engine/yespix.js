@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-06 */
+/*! yespix - v0.1.0 - 2014-06-09 */
 (function(undefined) {
 
     /**
@@ -690,7 +690,6 @@
      * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
      */
     yespix.fn.entityFetchAncestors = function(className, mode) {
-        console.log('entityFetchAncestors :: start, className = ' + className + ', mode = ' + mode);
         if (!this.entityClasses[className]) {
             console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
             return false;
@@ -709,13 +708,11 @@
                         this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
                         this.entityClasses[className].ancestorsReady = false;
-                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                         break;
                     } else {
                         if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                         this.entityClasses[className].ancestorsReady = false;
-                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                     }
                 } else if (list[t] == className) {
@@ -727,13 +724,11 @@
                             this.entityAncestorsPending.push(className);
                             this.entityClasses[className].ancestors = [];
                             this.entityClasses[className].ancestorsReady = false;
-                            console.log('entityFetchAncestors :: ancestors NOK');
                             return false;
                             break;
                         } else {
                             if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                             this.entityClasses[className].ancestorsReady = false;
-                            console.log('entityFetchAncestors :: ancestors NOK');
                             return false;
                         }
                     }
@@ -741,7 +736,6 @@
                 }
             }
         }
-        console.log('entityFetchAncestors :: ancestors ready');
         this.entityClasses[className].ancestorsReady = true;
         return true;
     };
@@ -778,9 +772,8 @@
 
         // check if the entity was waiting other classes to load
         if (this.isEntityAncestorsPending(name)) {
-            console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
             this.entityFetchAncestors(name, 'force');
-        } else console.log('spawn :: entity "' + name + '" is NOT pending');
+        }
 
         // mixin with the ancestors
         for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -860,7 +853,6 @@
                     this.entityInstances['/' + entity._ancestors[t]] = [entity];
                     entity._instances[entity._ancestors[t]] = 0;
                 } else {
-                    console.log('add instance to /' + entity._ancestors[t]);
                     this.entityInstances['/' + entity._ancestors[t]].push(entity);
                     entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
                 }
@@ -2791,6 +2783,199 @@
 
     function initEntities(yespix) {
 
+        /**
+         ************************************************************************************************************
+         * @class entity.base
+         */
+
+        yespix.define('base', {
+
+            /**
+             * Reference to the YESPIX engine (in case you lost it)
+             * @property _yespix
+             * @type {object}
+             */
+            _yespix: yespix,
+
+
+            /**
+             * Entity class name initiated on the spawn of the entity
+             * @property _class
+             * @type string
+             */
+            _class: '',
+
+            /**
+             * Array of ancestor names initiated on the spawn of the entity
+             * @property _ancestors
+             * @type array
+             */
+            _ancestors: [],
+
+            /**
+             * Reference to the scene of the entity initiated by the scene entity
+             * @property _scene
+             * @type object
+             */
+            _scene: null,
+
+            /**
+             * Unique integer of the entity instance
+             * @property _id
+             * @type integer
+             */
+            _id: 1,
+
+            /**
+             * Array of children reference
+             * @property _children
+             * @type array
+             */
+            _children: null,
+
+            /**
+             * Reference to the parent
+             * @property _parent
+             * @type object
+             */
+            _parent: null,
+
+            /**
+             * Set True if the entity is active
+             * @property isActive
+             * @type boolean
+             * @default true
+             */
+            isActive: true,
+
+            /**
+             * Set True if the entity is visible
+             * @property isVisible
+             * @type boolean
+             * @default false
+             */
+            isVisible: false,
+
+            /**
+             * Set True if the entity is global
+             * @property isGlobal
+             * @type boolean
+             * @default false
+             */
+            isGlobal: false,
+
+            /**
+             * Name of the entity, not unique
+             * @property name
+             * @type string
+             */
+            name: '',
+
+
+            ///////////////////////////////// Main functions ////////////////////////////////
+
+            /**
+             * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
+             */
+            assets: function() {
+                return [];
+            },
+
+            /**
+             * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
+             */
+            init: function(properties) {
+                return true;
+            },
+
+            ancestor: function(name) {
+                return yespix.inArray(this._ancestors, name);
+            },
+
+            typeof: function(name) {
+                if (yespix.isArray(name)) {
+                    for (var t = 0; t < name.length; t++)
+                        if (this.typeOf(name[t])) return true;
+                    return false;
+                }
+                return (this.ancestor(name) || this._class == name);
+            },
+
+            prop: function(name, value) {
+                if (yespix.isObject(name)) {
+                    for (var n in name) {
+                        this[n] = name[n];
+                    }
+                    return this;
+                }
+                this[name] = value;
+                return this;
+            },
+
+            /**
+             * Clone an entity
+             */
+            clone: function(properties) {
+                var entity = yespix.clone(this);
+                entity._id = yespix.entityNextId++;
+                if (properties) entity.prop(properties);
+                entity._instances = null;
+                yespix.dump(yespix.entityInstances);
+                yespix.instanceAdd(entity);
+                yespix.dump(yespix.entityInstances);
+                return entity;
+            },
+
+            attach: function(entity) {
+                yespix.attach(this, entity);
+                return this;
+            },
+
+            detach: function(entity) {
+                yespix.detach(this, entity);
+                return this;
+            },
+
+            trigger: function(name, e) {
+                yespix.trigger(name, e, this);
+                return this;
+            },
+
+            on: function(name, callback) {
+                yespix.on(name, callback, this);
+                return this;
+            },
+
+            off: function(name, callback) {
+                yespix.off(name, callback, this);
+                return this;
+            },
+
+            listen: function(pname, callback) {
+                return yespix.listen(this, pname, callback);
+                return this;
+            },
+
+            destroy: function() {
+                this._deleting = true;
+                this.isActive = false;
+                this.isVisible = false;
+
+                if (this._children) {
+                    for (var t = 0; t < this._children.length; t++) {
+                        if (this._children[t] && !this._children[t].deleting) {
+                            this._children[t].destroy();
+                        }
+                    }
+                }
+
+                yespix.instanceRemove(this);
+                return this;
+            }
+
+        });
+        yespix.entityRootClassname = 'base';
+
         yespix.define('actor', 'anim, move, collision', {
 
             isAttacking: false,
@@ -3410,199 +3595,6 @@
 
         });
 
-        /**
-         ************************************************************************************************************
-         * @class entity.base
-         */
-
-        yespix.define('base', {
-
-            /**
-             * Reference to the YESPIX engine (in case you lost it)
-             * @property _yespix
-             * @type {object}
-             */
-            _yespix: yespix,
-
-
-            /**
-             * Entity class name initiated on the spawn of the entity
-             * @property _class
-             * @type string
-             */
-            _class: '',
-
-            /**
-             * Array of ancestor names initiated on the spawn of the entity
-             * @property _ancestors
-             * @type array
-             */
-            _ancestors: [],
-
-            /**
-             * Reference to the scene of the entity initiated by the scene entity
-             * @property _scene
-             * @type object
-             */
-            _scene: null,
-
-            /**
-             * Unique integer of the entity instance
-             * @property _id
-             * @type integer
-             */
-            _id: 1,
-
-            /**
-             * Array of children reference
-             * @property _children
-             * @type array
-             */
-            _children: null,
-
-            /**
-             * Reference to the parent
-             * @property _parent
-             * @type object
-             */
-            _parent: null,
-
-            /**
-             * Set True if the entity is active
-             * @property isActive
-             * @type boolean
-             * @default true
-             */
-            isActive: true,
-
-            /**
-             * Set True if the entity is visible
-             * @property isVisible
-             * @type boolean
-             * @default false
-             */
-            isVisible: false,
-
-            /**
-             * Set True if the entity is global
-             * @property isGlobal
-             * @type boolean
-             * @default false
-             */
-            isGlobal: false,
-
-            /**
-             * Name of the entity, not unique
-             * @property name
-             * @type string
-             */
-            name: '',
-
-
-            ///////////////////////////////// Main functions ////////////////////////////////
-
-            /**
-             * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
-             */
-            assets: function() {
-                return [];
-            },
-
-            /**
-             * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
-             */
-            init: function(properties) {
-                return true;
-            },
-
-            ancestor: function(name) {
-                return yespix.inArray(this._ancestors, name);
-            },
-
-            typeof: function(name) {
-                if (yespix.isArray(name)) {
-                    for (var t = 0; t < name.length; t++)
-                        if (this.typeOf(name[t])) return true;
-                    return false;
-                }
-                return (this.ancestor(name) || this._class == name);
-            },
-
-            prop: function(name, value) {
-                if (yespix.isObject(name)) {
-                    for (var n in name) {
-                        this[n] = name[n];
-                    }
-                    return this;
-                }
-                this[name] = value;
-                return this;
-            },
-
-            /**
-             * Clone an entity
-             */
-            clone: function(properties) {
-                var entity = yespix.clone(this);
-                entity._id = yespix.entityNextId++;
-                if (properties) entity.prop(properties);
-                entity._instances = null;
-                yespix.dump(yespix.entityInstances);
-                yespix.instanceAdd(entity);
-                yespix.dump(yespix.entityInstances);
-                return entity;
-            },
-
-            attach: function(entity) {
-                yespix.attach(this, entity);
-                return this;
-            },
-
-            detach: function(entity) {
-                yespix.detach(this, entity);
-                return this;
-            },
-
-            trigger: function(name, e) {
-                yespix.trigger(name, e, this);
-                return this;
-            },
-
-            on: function(name, callback) {
-                yespix.on(name, callback, this);
-                return this;
-            },
-
-            off: function(name, callback) {
-                yespix.off(name, callback, this);
-                return this;
-            },
-
-            listen: function(pname, callback) {
-                return yespix.listen(this, pname, callback);
-                return this;
-            },
-
-            destroy: function() {
-                this._deleting = true;
-                this.isActive = false;
-                this.isVisible = false;
-
-                if (this._children) {
-                    for (var t = 0; t < this._children.length; t++) {
-                        if (this._children[t] && !this._children[t].deleting) {
-                            this._children[t].destroy();
-                        }
-                    }
-                }
-
-                yespix.instanceRemove(this);
-                return this;
-            }
-
-        });
-        yespix.entityRootClassname = 'base';
-
         yespix.define('canvas', {
             canvasOptions: null,
             element: null,
@@ -3663,65 +3655,11 @@
         });
 
 
-        yespix.define('scene', {
-            sceneOptions: null,
-            document: null,
-
-            init: function(options) {
-                this.create(options);
-            },
-
-            create: function(options) {
-                options = options || {};
-                options.document = options.document || yespix.document;
-
-                this.sceneOptions = options;
-            },
-
-        });
 
 
 
-        yespix.define('move', {
-            speedX: 0,
-            speedY: 0,
-            accelX: 0,
-            accelY: 0,
-            moveFriction: 0.05,
 
-            moveStop: function() {
-                this.speedX = this.speedY = this.accelX = this.accelY = 0;
-            },
-
-
-            init: function() {
-                yespix.on('enterFrame', this.move, this, yespix);
-            },
-
-            move: function() {
-                if (this.applyGravity && yespix.gravity) this.applyGravity();
-                this.speedX += this.accelX;
-                this.speedY += this.accelY;
-                this.speedX *= 1 - this.moveFriction;
-                this.speedY *= 1 - this.moveFriction;
-                if (yespix.level) yespix.level.collision(this);
-                this.x += this.speedX;
-                this.y += this.speedY;
-            },
-
-            applyGravity: function() {
-                /*
-				if (!this.isOnGround && yespix.gravity) {
-					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
-					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
-					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
-				}
-				*/
-            },
-
-        });
-
-        yespix.define('circle', 'gfx', {
+        yespix.define('circle', 'path', {
 
             circleRadius: 5,
 
@@ -3729,38 +3667,7 @@
 
             drawPath: function(context) {
                 context.beginPath();
-                context.arc(this.x, this.y, this.circleRadius, 0, 2 * Math.PI, false);
-            },
-
-            draw: function(context) {
-                if (!this.isVisible) return;
-
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
-
-                var box = this.getDrawBox();
-
-                if (context) {
-                    context.globalAlpha = this.alpha;
-                    if (this.rectColor != '') {
-                        context.fillStyle = this.rectColor;
-                        this.drawPath(context);
-                        context.fill();
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        if (this.rectColor == '') this.drawPath(context);
-                        context.stroke();
-                    }
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
+                context.arc(this.x + this.circleRadius, this.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
             },
 
         });
@@ -4395,7 +4302,7 @@
                     var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
                     if (this.block(cellRight, cellBottom)) {
                         console.log('Double collision right down');
-                        this.collisionDown(entity, box, cellRight, cellBottom);
+                        //this.collisionDown(entity, box, cellRight, cellBottom);
                         this.collisionRight(entity, box, cellRight, cellBottom);
                     }
                 } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
@@ -4403,7 +4310,7 @@
                     var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
                     if (this.block(cellLeft, cellBottom)) {
                         console.log('Double collision left down');
-                        this.collisionDown(entity, box, cellLeft, cellBottom);
+                        //this.collisionDown(entity, box, cellLeft, cellBottom);
                         this.collisionLeft(entity, box, cellLeft, cellBottom);
                     }
                 } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {
@@ -4517,15 +4424,95 @@
             },
         });
 
-        /**
-         * @class entity.path
-         */
-        yespix.define('path', {
+
+        yespix.define('move', {
+            speedX: 0,
+            speedY: 0,
+            accelX: 0,
+            accelY: 0,
+            moveFriction: 0.05,
+
+            moveStop: function() {
+                this.speedX = this.speedY = this.accelX = this.accelY = 0;
+            },
+
+
+            init: function() {
+                yespix.on('enterFrame', this.move, this, yespix);
+            },
+
+            move: function() {
+                if (this.applyGravity && yespix.gravity) this.applyGravity();
+                this.speedX += this.accelX;
+                this.speedY += this.accelY;
+                this.speedX *= 1 - this.moveFriction;
+                this.speedY *= 1 - this.moveFriction;
+                if (yespix.level) yespix.level.collision(this);
+                this.x += this.speedX;
+                this.y += this.speedY;
+            },
+
+            applyGravity: function() {
+                /*
+				if (!this.isOnGround && yespix.gravity) {
+					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
+					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
+					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
+				}
+				*/
+            },
+
+        });
+
+        yespix.define('path', 'gfx', {
+
+            lineWidth: 0,
+            lineColor: '',
+            lineAlpha: 1.0,
+
+            fillColor: '',
+            fillAlpha: 1.0,
+
+            isVisible: true,
 
             init: function() {},
 
+            canDraw: function() {
+                return this.isVisible && this.alpha > 0;
+            },
+
+            canDrawPath: function() {
+                return true;
+            },
+
+            drawPath: function(context, box) {
+
+            },
+
+            canDrawLine: function() {
+                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+            },
+
+            drawLine: function(context, box) {
+                this.drawAlpha(context, 'line');
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                context.stroke();
+            },
+
+            canDrawFill: function() {
+                return this.fillColor != '' && this.fillAlpha > 0;
+            },
+
+            drawFill: function(context, box) {
+                this.drawAlpha(context, 'fill');
+                context.fillStyle = this.fillColor;
+                context.fill();
+            },
+
+
             draw: function(context) {
-                if (!this.isVisible) return;
+                if (!this.canDraw()) return;
 
                 if (!context) {
                     if (!this._context) {
@@ -4535,63 +4522,14 @@
                 }
 
                 var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
 
                 if (context) {
-                    context.globalAlpha = this.alpha;
-
-                    if (this.rectColor !== '') {
-                        context.fillStyle = this.rectColor;
-                        context.fillRect(
-                            box.x, // x position on canvas
-                            box.y, // y position on canvas
-                            box.width, // width on canvas
-                            box.height // height on canvas
-                        );
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        context.strokeRect(box.x, box.y, box.width, box.height);
-                    }
-
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
+                    if (this.canDrawPath()) this.drawPath(context, box);
+                    if (this.canDrawFill()) this.drawFill(context, box);
+                    if (this.canDrawLine()) this.drawLine(context, box);
+                    if (this.canDrawDebug()) this.drawDebug(context, box);
                 }
             },
-
-            canDrawPath: function() {
-
-            },
-
-            drawPath: function(context, box) {
-
-            },
-
-            drawAlpha: function(context, box) {
-
-            },
-
-            canDrawStroke: function(context, box) {
-
-            },
-
-            drawStroke: function(context, box) {
-
-            },
-
-            canDrawFill: function(context, box) {
-
-            },
-
-            drawFill: function(context, box) {
-
-            },
-
-
-
         });
 
         yespix.define('player2w', 'actor2w', {
@@ -4708,18 +4646,17 @@
 
         });
 
-        yespix.define('rect', 'shape', {
+        yespix.define('rect', 'path', {
 
             init: function() {},
-
 
             drawFill: function(context, box) {
                 context.fillStyle = this.fillColor;
                 context.fillRect(
-                    box.x, // x position on canvas
-                    box.y, // y position on canvas
-                    box.width, // width on canvas
-                    box.height // height on canvas
+                    this.x, // x position on canvas
+                    this.y, // y position on canvas
+                    this.width, // width on canvas
+                    this.height // height on canvas
                 );
             },
 
@@ -4732,85 +4669,28 @@
 
         yespix.define('roundrect', 'rect', {
 
-            rectRadius: 5,
+            borderRadius: 5,
 
             init: function() {},
+
+            getBorderRadius: function() {
+                if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
+                if (this.height < this.width) return this.height / 2;
+                return this.width / 2;
+            },
 
             drawPath: function(context) {
+                var radius = this.getBorderRadius();
                 context.beginPath();
-                context.moveTo(this.x + this.rectRadius, this.y);
-                context.lineTo(this.x + this.width - this.rectRadius, this.y);
-                context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.rectRadius);
-                context.lineTo(this.x + this.width, this.y + this.height - this.rectRadius);
-                context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.rectRadius, this.y + this.height);
-                context.lineTo(this.x + this.rectRadius, this.y + this.height);
-                context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.rectRadius);
-                context.lineTo(this.x, this.y + this.rectRadius);
-                context.quadraticCurveTo(this.x, this.y, this.x + this.rectRadius, this.y);
-            },
-
-            draw: function(context) {
-                if (!this.isVisible) return;
-
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
-
-                var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
-
-                if (context) {
-                    context.globalAlpha = this.alpha;
-                    if (this.rectColor != '') {
-                        context.fillStyle = this.rectColor;
-                        this.drawPath(context);
-                        context.fill();
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        if (this.rectColor == '') this.drawPath(context);
-                        context.stroke();
-                    }
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
-            },
-
-        });
-
-        yespix.define('shape', 'gfx', {
-
-            lineWidth: 0,
-            lineColor: '',
-            lineAlpha: 1.0,
-
-            fillColor: '',
-            fillAlpha: 1.0,
-
-            isVisible: true,
-
-            init: function() {},
-
-            canDraw: function() {
-                return this.isVisible && this.alpha > 0;
-            },
-
-            canDrawPath: function() {
-                return true;
-            },
-
-            drawPath: function(context, box) {
-
-            },
-
-            canDrawLine: function() {
-                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+                context.moveTo(this.x + radius, this.y);
+                context.lineTo(this.x + this.width - radius, this.y);
+                context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + radius);
+                context.lineTo(this.x + this.width, this.y + this.height - radius);
+                context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height);
+                context.lineTo(this.x + radius, this.y + this.height);
+                context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - radius);
+                context.lineTo(this.x, this.y + radius);
+                context.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
             },
 
             drawLine: function(context, box) {
@@ -4818,38 +4698,28 @@
                 context.stroke();
             },
 
-            canDrawFill: function() {
-                return this.fillColor != '' && this.lineAlpha > 0;
-            },
-
             drawFill: function(context, box) {
                 this.drawAlpha(context, 'fill');
                 context.fill();
             },
 
+        });
+        yespix.define('scene', {
+            sceneOptions: null,
+            document: null,
 
-            draw: function(context) {
-                if (!this.canDraw()) return;
+            init: function(options) {
+                this.create(options);
+            },
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+            create: function(options) {
+                options = options || {};
+                options.document = options.document || yespix.document;
 
-                var box = this.getDrawBox();
-
-                if (context) {
-                    if (this.canDrawPath()) this.drawPath(context, box);
-                    if (this.canDrawFill()) this.drawFill(context, box);
-                    if (this.canDrawLine()) this.drawLine(context, box);
-                    if (this.canDrawDebug()) this.drawDebug(context, box);
-                }
+                this.sceneOptions = options;
             },
 
         });
-
         /**
          *
          */

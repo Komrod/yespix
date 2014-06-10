@@ -1,53 +1,38 @@
 yespix.define('roundrect', 'rect', {
 
-    rectRadius: 5,
+    borderRadius: 5,
 
     init: function() {},
 
-    drawPath: function(context) {
-        context.beginPath();
-        context.moveTo(this.x + this.rectRadius, this.y);
-        context.lineTo(this.x + this.width - this.rectRadius, this.y);
-        context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.rectRadius);
-        context.lineTo(this.x + this.width, this.y + this.height - this.rectRadius);
-        context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.rectRadius, this.y + this.height);
-        context.lineTo(this.x + this.rectRadius, this.y + this.height);
-        context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.rectRadius);
-        context.lineTo(this.x, this.y + this.rectRadius);
-        context.quadraticCurveTo(this.x, this.y, this.x + this.rectRadius, this.y);
+    getBorderRadius: function()
+    {
+        if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
+        if (this.height < this.width) return this.height / 2;
+        return this.width / 2;
     },
 
-    draw: function(context) {
-        if (!this.isVisible) return;
+    drawPath: function(context) {
+        var radius = this.getBorderRadius();
+        context.beginPath();
+        context.moveTo(this.x + radius, this.y);
+        context.lineTo(this.x + this.width - radius, this.y);
+        context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + radius);
+        context.lineTo(this.x + this.width, this.y + this.height - radius);
+        context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height);
+        context.lineTo(this.x + radius, this.y + this.height);
+        context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - radius);
+        context.lineTo(this.x, this.y + radius);
+        context.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
+    },
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+    drawLine: function(context, box) {
+        this.drawAlpha(context, 'line');
+        context.stroke();
+    },
 
-        var box = this.getDrawBox();
-        var scaleX = this.flipX ? -1 : 1;
-        var scaleY = this.flipY ? -1 : 1;
-
-        if (context) {
-            context.globalAlpha = this.alpha;
-            if (this.rectColor != '') {
-                context.fillStyle = this.rectColor;
-                this.drawPath(context);
-                context.fill();
-            }
-            if (this.lineWidth > 0 && this.lineColor != '') {
-                context.lineWidth = this.lineWidth;
-                context.strokeStyle = this.lineColor;
-                if (this.rectColor == '') this.drawPath(context);
-                context.stroke();
-            }
-            if (this.debug) {
-                this.drawDebug(context, box);
-            }
-        }
+    drawFill: function(context, box) {
+        this.drawAlpha(context, 'fill');
+        context.fill();
     },
 
 });
