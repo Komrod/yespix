@@ -1,5 +1,5 @@
 
-yespix.define('layer', {
+yespix.define('layer', 'gfx', {
     data: {},
 
     isVisible: true,
@@ -7,10 +7,9 @@ yespix.define('layer', {
     isReady: false,
 
     canvas: null,
+    drawContext: null,
     data: null,
     level: null,
-    
-    registerInstance: false,
     
     create: function()
     {
@@ -33,15 +32,36 @@ yespix.define('layer', {
     	if (!this.data) return false;
     	
         this.canvas = document.createElement('canvas');
-        this._context = this.canvas.getContext('2d');
+        this.drawContext = this.canvas.getContext('2d');
         
-        this.canvas.width = this.data.width * this.data.tilewidth;
-        this.canvas.height = this.data.height * this.data.tileheight;
+        this.width = this.data.width * this.data.tilewidth;
+        this.height = this.data.height * this.data.tileheight;
+        console.log('layer :: update :: width = '+this.width+', height = '+this.height);
+        console.log(this);
+        console.log(this.data);
     },
     
-    drawTile: function(tileIndex, cellX, cellY, width, height)
+    getPosition: function(cellX, cellY)
     {
-    	console.log('drawTile :: tileIndex = '+tileIndex+', cellX = '+cellX+', cellY = '+cellY+', width = '+width+', height = '+height);
+    	return {
+//    		x: cellX * this.
+    		};
+    },
+    
+    drawTile: function(spriteIndex, cellX, cellY)
+    {
+    	console.log('drawTile :: spriteIndex = '+spriteIndex+', cellX = '+cellX+', cellY = '+cellY);
+        /*context.drawImage(img.element, //image element
+                x, // x position on image
+                y, // y position on image
+                frame.width * this.pixelSize, // width on image
+                frame.height * this.pixelSize, // height on image
+                canvasX, // x position on canvas
+                canvasY, // y position on canvas
+                frame.width * this.pixelSize, // width on canvas
+                frame.height * this.pixelSize // height on canvas
+            );*/
+    	
     },
     
     clear: function()
@@ -52,12 +72,8 @@ yespix.define('layer', {
     
     make: function() {
         console.log('layer :: make');
-        console.log('this = ');
-        console.log(this);
         
         this.clear();
-        if (!this.isVisible) return;
-        if (!this._context) return;
         if (!this.data || !this.level) return;
         
         console.log('layer :: make :: start');
@@ -68,11 +84,11 @@ yespix.define('layer', {
         
         for (var y = 0; y < this.level.data.height; y++) {
             for (var x = 0; x < this.data.width; x++) {
-                var tileIndex = this.data.data[index];
-                if (tileIndex > 1) {
+                var spriteIndex = this.data.data[index];
+                if (spriteIndex > 1) {
                     //entity.context.fillStyle = colors[tileIndex];
-                    console.log('layer :: make :: x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
-                    this.drawTile(tileIndex, x, y, this.level.data.width, this.level.data.height);
+                    console.log('layer :: make :: x=' + x + ', y=' + y + ', spriteIndex=' + spriteIndex);
+                    this.drawTile(spriteIndex, x, y);
                 }
                 index++;
             }

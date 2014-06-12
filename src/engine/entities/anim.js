@@ -326,7 +326,7 @@ yespix.define('anim', 'image', {
                 context.scale(scaleX, scaleY);
             }
             context.globalAlpha = this.alpha;
-            if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
+            //if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
             context.drawImage(img.element, //image element
                 x, // x position on image
                 y, // y position on image

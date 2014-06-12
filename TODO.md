@@ -39,7 +39,6 @@ TODO list:
 - Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
-- Make a
 - tag version 0.20
 
 
@@ -100,7 +99,7 @@ PENDING:
 - do real js classes with prototype for entity classes
 - do a partial draw for each gfx entities
 - prerender canvas for the partial draw
-- function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
+- function xload which try to execute an action depending the extension of the loaded file (execute a .js script, add .css file to document ...)
 
 
 

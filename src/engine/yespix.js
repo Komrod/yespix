@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-09 */
+/*! yespix - v0.1.0 - 2014-06-12 */
 (function(undefined) {
 
     /**
@@ -796,7 +796,9 @@
         entity._ancestors = this.entityClasses[name]['ancestors'];
         entity._id = this.entityNextId++;
 
-        this.instanceAdd(entity);
+        console.log(entity);
+        if (entity['registerInstance']) this.instanceAdd(entity);
+        else console.log('entities :: entity instance not registered "' + name + '"');
 
         // executing the init functions on ancestors
         this.call(entity, 'init', [properties]);
@@ -2871,6 +2873,11 @@
              */
             name: '',
 
+            /**
+             * Register instance in the engine when spawned
+             */
+            registerInstance: true,
+
 
             ///////////////////////////////// Main functions ////////////////////////////////
 
@@ -3557,7 +3564,7 @@
                         context.scale(scaleX, scaleY);
                     }
                     context.globalAlpha = this.alpha;
-                    if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
+                    //if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
                     context.drawImage(img.element, //image element
                         x, // x position on image
                         y, // y position on image
@@ -4016,6 +4023,8 @@
                     }
                     //yespix.timerStop();
 
+                    console.log('image :: trigger imageReady');
+                    console.log(entity);
                     entity.trigger('imageReady', {
                         target: image,
                     });
@@ -4082,15 +4091,101 @@
 
         });
 
-        /**
-         ************************************************************************************************************
-         ************************************************************************************************************
-         * Level
-         *
-         */
+
+        yespix.define('layer', 'gfx', {
+            data: {},
+
+            isVisible: true,
+
+            isReady: false,
+
+            canvas: null,
+            drawContext: null,
+            data: null,
+            level: null,
+
+            create: function() {
+
+            },
+
+            setLevel: function(level) {
+                this.level = level;
+            },
+
+            load: function(data) {
+                this.data = data;
+                this.update();
+            },
+
+            update: function() {
+                if (!this.data) return false;
+
+                this.canvas = document.createElement('canvas');
+                this.drawContext = this.canvas.getContext('2d');
+
+                this.width = this.data.width * this.data.tilewidth;
+                this.height = this.data.height * this.data.tileheight;
+                console.log('layer :: update :: width = ' + this.width + ', height = ' + this.height);
+                console.log(this);
+                console.log(this.data);
+            },
+
+            getPosition: function(cellX, cellY) {
+                return {
+                    //    		x: cellX * this.
+                };
+            },
+
+            drawTile: function(spriteIndex, cellX, cellY) {
+                console.log('drawTile :: spriteIndex = ' + spriteIndex + ', cellX = ' + cellX + ', cellY = ' + cellY);
+                /*context.drawImage(img.element, //image element
+                x, // x position on image
+                y, // y position on image
+                frame.width * this.pixelSize, // width on image
+                frame.height * this.pixelSize, // height on image
+                canvasX, // x position on canvas
+                canvasY, // y position on canvas
+                frame.width * this.pixelSize, // width on canvas
+                frame.height * this.pixelSize // height on canvas
+            );*/
+
+            },
+
+            clear: function() {
+                if (this.canvas) this.canvas.width = this.canvas.width;
+            },
+
+
+            make: function() {
+                console.log('layer :: make');
+
+                this.clear();
+                if (!this.data || !this.level) return;
+
+                console.log('layer :: make :: start');
+                console.log('data = ');
+                console.log(this.data);
+
+                var index = 0;
+
+                for (var y = 0; y < this.level.data.height; y++) {
+                    for (var x = 0; x < this.data.width; x++) {
+                        var spriteIndex = this.data.data[index];
+                        if (spriteIndex > 1) {
+                            //entity.context.fillStyle = colors[tileIndex];
+                            console.log('layer :: make :: x=' + x + ', y=' + y + ', spriteIndex=' + spriteIndex);
+                            this.drawTile(spriteIndex, x, y);
+                        }
+                        index++;
+                    }
+                }
+                this.isReady = true;
+            },
+        });
+
 
         yespix.define('level', 'gfx', {
-            data: {},
+            data: null,
 
             isVisible: true,
 
@@ -4100,7 +4195,10 @@
 
             canvas: null,
             context: null,
+            tilesets: null,
+            levelDir: '',
 
+            registerInstance: false,
 
             block: function(x, y) {
                 var index = y * this.data.width + x;
@@ -4358,70 +4456,69 @@
             load: function(src) {
                 // destroy other loaded levels @todo
                 //yespix.find('/level').not(this).destroy();
+                this.levelDir = yespix.getDir(src);
+                console.log('level :: load :: dir = ' + this.levelDir);
+
+                this.canvas = document.createElement('canvas');
+                this.context = this.canvas.getContext('2d');
 
                 yespix.load(src, {
                     'complete': function(e) {
-                        yespix.dump(e);
-
                         var entity = e.entity;
                         entity.data = JSON.parse(e.content);
-
-
-                        entity.canvas = document.createElement('canvas');
-                        entity.context = entity.canvas.getContext('2d');
-
-                        var index = 0;
-                        var colors = ['', '', '#ff9900', '#FF0000', '#006600', '#000099'];
 
                         entity.canvas.width = entity.data.width * entity.data.tilewidth;
                         entity.canvas.height = entity.data.height * entity.data.tileheight;
 
-                        for (var y = 0; y < entity.data.height; y++) {
-                            for (var x = 0; x < entity.data.width; x++) {
-                                var tileIndex = entity.data.layers[0].data[index];
-                                if (tileIndex > 1) {
-                                    //console.log('x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
-                                    entity.context.fillStyle = colors[tileIndex];
-                                    entity.context.fillRect(x * entity.data.tilewidth, y * entity.data.tileheight, entity.data.tilewidth, entity.data.tileheight);
-                                }
-                                index++;
+                        console.log(entity.data);
+                        if (entity.data.layers) {
+                            // load tilesets
+                            var images = [];
+                            var count = entity.data.tilesets.length;
+                            console.log('level :: load / complete :: tilesets count ' + count);
+                            for (var t = 0; t < count; t++) {
+                                console.log('level :: complete :: t = ' + t);
+                                images.push(entity.levelDir + entity.data.tilesets[t].image);
+                                //tileset.on('');
                             }
+                            console.log('images = ');
+                            console.log(images);
+                            entity.tilesets = yespix.spawn(
+                                'image', {
+                                    registerInstance: false,
+                                    images: images,
+                                });
+                            entity.tilesets.on('imageReady', function() {
+                                entity.tilesetsReady();
+                            }, entity);
+
                         }
-                        entity.isReady = true;
-                        yespix.level = entity;
                     },
                     'entity': this,
                 });
             },
 
-            draw: function(context) {
-                //console.log('level draw');
-                if (!this.isVisible) return;
+            tilesetsReady: function() {
+                // load layers
+                var layer = null;
+                var count = this.data.layers.length;
 
-                //console.log('level draw #2');
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+                console.log('level :: tilesetsReady :: layers count ' + count);
+                for (var t = 0; t < count; t++) {
+                    console.log('level :: tilesetsReady :: making layer t = ' + t);
+                    layer = yespix.spawn('layer');
+                    layer.setLevel(this);
 
-                //console.log('level draw #3 context = '+context+', isReady = '+this.isReady);
-                if (context && this.isReady) {
-                    context.globalAlpha = this.alpha;
-                    //console.log('level draw #4');
-                    context.drawImage(this.canvas, //image element
-                        0, // x position on image
-                        0, // y position on image
-                        this.canvas.width, // width on image
-                        this.canvas.height, // height on image
-                        0, // x position on canvas
-                        0, // y position on canvas
-                        this.canvas.width, // width on canvas
-                        this.canvas.height // height on canvas
-                    );
+                    this.data.layers[t].tileWidth = this.data.tileWidth;
+                    layer.load(this.data.layers[t]);
+                    layer.make();
+                    this.layers.push(layer);
+
+                    break;
                 }
+                this.isReady = true;
             },
+
         });
 
 
