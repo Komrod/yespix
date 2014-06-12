@@ -116,7 +116,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: ['../engine/**/*.js'],
+                files: ['../engine/core/*.js', '../engine/entities/*.js'],
                 tasks: ['default'],
                 options: {
                     spawn: false,
