@@ -51,7 +51,8 @@ module.exports = function(grunt) {
             },
             out: {
                 src: [
-                    '../engine/core/*.js'
+                      '../engine/core/*.js',
+                      '../engine/entities/*.js'
                 ]
             }
         },

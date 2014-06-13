@@ -7,7 +7,7 @@
 <script type="text/javascript">
 
 	var yp = yespix({canvas: true, fps: 50});
-	/*
+	
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
@@ -150,12 +150,12 @@
 	
 
 
-    */
-	yp.gravity = { y: 30 };
+    
+	//yp.gravity = { y: 30 };
 
 	yp.spawn('level').prop({z: 100, alpha: 0.5}).load('chuck/test.json');
 
-	//yp.spawn('chuck',{ x: 300, y: 450, z: 1000});
+	yp.spawn('chuck',{ x: 300, y: 450, z: 1000});
 
 
 </script>
