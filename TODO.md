@@ -1,9 +1,7 @@
 TODO list:
 
-- multiple layer level
-- layer alpha and type (decor)
-- fix level collision on level position
 - attach entities to level to have an owner hierarchy
+- fix level collision on level position
 - create a sprite entity from anim enity
 - change the draw mechanism to use events and owner hierarchy
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
@@ -49,6 +47,8 @@ TODO list:
 
 
 DONE:
+- multiple layer level
+- layer alpha and type (decor)
 - Add path entity for objects
 - unit test: instanciation
 - make examples work
