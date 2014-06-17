@@ -1,5 +1,5 @@
 
-yespix.define('level', {
+yespix.define('level', 'gfx', {
     levelData: null,
     levelCollision: [],
     
@@ -20,26 +20,26 @@ yespix.define('level', {
     		var layer = this.levelData.layers[t];
     		if (layer.properties['type'] && layer.properties['type'] == 'decor')
     		{
-    			console.log('buildLevelCollision :: skipping decor layer')
+    			//console.log('buildLevelCollision :: skipping decor layer')
     			continue;
     		}
-    		console.log('buildLevelCollision :: data = ');
-    		console.log(this.levelData.layers[t]);
+    		//console.log('buildLevelCollision :: data = ');
+    		//console.log(this.levelData.layers[t]);
     		for (var u=0; u<layer.data.length; u++)
    			{
     			if (!this.levelCollision[u]) this.levelCollision[u] = 0;
     			this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
    			}
     	}
-    	console.log('buildLevelCollision :: levelCollision = ');
-    	console.log(this.levelCollision);
+    	//console.log('buildLevelCollision :: levelCollision = ');
+    	//console.log(this.levelCollision);
     },
     
     block: function(x, y) {
         var index = y * this.levelData.width + x;
         var tileIndex = this.levelCollision[index];
-        console.log('block :: index = ' + index + ', tileIndex = ' + tileIndex);
-        if (tileIndex > 1) return true;
+        console.log('block :: ('+x+', '+y+') :: index = ' + index + ', tileIndex = ' + tileIndex);
+        if (tileIndex > 0) return true;
         return false;
     },
 
@@ -78,15 +78,16 @@ yespix.define('level', {
 
     collision: function(entity) {
         if (entity.speedX == 0 && entity.speedY == 0) return;
+        if (!entity.collisionBox) return;
 
         var left = false,
             right = false,
             up = false,
             down = false;
 
-        console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
-
-        var box = entity.collisionBox();
+        //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
+        
+        var box = entity.collisionBox(this);
 
 
         if (entity.speedX > 0) {
@@ -312,15 +313,15 @@ yespix.define('level', {
                 	// load tilesets
                 	var images = [];
                 	var count = entity.levelData.tilesets.length; 
-            		console.log('level :: load / complete :: tilesets count '+count);
+            		//console.log('level :: load / complete :: tilesets count '+count);
                 	for (var t = 0; t < count; t++)
                		{
-                		console.log('level :: complete :: t = '+t);
+                		//console.log('level :: complete :: t = '+t);
                 		images.push(entity.levelDir+entity.levelData.tilesets[t].image);
                 		//tileset.on('');
                		}
-                	console.log('images = ');
-                	console.log(images);
+                	//console.log('images = ');
+                	//console.log(images);
                 	entity.tilesets = yespix.spawn(
                 			'image', 
                 			{
@@ -345,15 +346,15 @@ yespix.define('level', {
     	var layer = null;
     	var count = this.levelData.layers.length; 
 		
-    	console.log('level :: tilesetsReady :: layers count '+count);
+    	//console.log('level :: tilesetsReady :: layers count '+count);
     	for (var t = 0; t < count; t++)
    		{
-    		console.log('level :: tilesetsReady :: making layer t = '+t);
+    		//console.log('level :: tilesetsReady :: making layer t = '+t);
     		layer = yespix.spawn('layer');
     		layer.setLevel(this);
     		
-    		console.log('level :: tilesetsReady :: this.levelData = ');
-    		console.log(this.levelData);
+    		//console.log('level :: tilesetsReady :: this.levelData = ');
+    		//console.log(this.levelData);
     		
     		this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
     		layer.load(this.levelData.layers[t]);

@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-12 */
+/*! yespix - v0.1.0 - 2014-06-16 */
 (function(undefined) {
 
     /**
@@ -3698,11 +3698,19 @@
                 return false;
             },
 
-            collisionBox: function() {
+            collisionBox: function(obj) {
+
+                obj = obj || {
+                    x: 0,
+                    y: 0
+                };
+                if (!obj.x) obj.x = 0;
+                if (!obj.y) obj.y = 0;
+
                 if (yespix.isUndefined(this.pixelSize)) {
                     return {
-                        x: this.x + this.colOffsetX,
-                        y: this.y + this.colOffsetY,
+                        x: this.x + this.colOffsetX + obj.x,
+                        y: this.y + this.colOffsetY + obj.y,
                         width: this.colWidth,
                         height: this.colHeight,
                         offsetX: this.colOffsetX,
@@ -3710,8 +3718,8 @@
                     };
                 } else {
                     return {
-                        x: this.x + this.colOffsetX * this.pixelSize,
-                        y: this.y + this.colOffsetY * this.pixelSize,
+                        x: this.x + this.colOffsetX * this.pixelSize + obj.x,
+                        y: this.y + this.colOffsetY * this.pixelSize + obj.y,
                         width: this.colWidth * this.pixelSize,
                         height: this.colHeight * this.pixelSize,
                         offsetX: this.colOffsetX * this.pixelSize,
@@ -4093,7 +4101,6 @@
 
 
         yespix.define('layer', 'gfx', {
-            data: {},
 
             isVisible: true,
 
@@ -4101,8 +4108,12 @@
 
             canvas: null,
             drawContext: null,
-            data: null,
+
+            layerData: null,
+
             level: null,
+
+            layerParallax: {},
 
             create: function() {
 
@@ -4112,43 +4123,64 @@
                 this.level = level;
             },
 
-            load: function(data) {
-                this.data = data;
+            load: function(layerData) {
+                this.layerData = layerData;
                 this.update();
             },
 
             update: function() {
-                if (!this.data) return false;
+                if (!this.layerData) return false;
 
                 this.canvas = document.createElement('canvas');
                 this.drawContext = this.canvas.getContext('2d');
 
-                this.width = this.data.width * this.data.tilewidth;
-                this.height = this.data.height * this.data.tileheight;
+                this.width = this.layerData.width * this.layerData.tilewidth;
+                this.height = this.layerData.height * this.layerData.tilewidth;
+                if (this.layerData.properties.z) this.z = this.layerData.properties.z;
+                this.layerParallax = {
+                    x: 1,
+                    y: 1
+                };
+                if (this.layerData.properties.parallaxX) this.layerParallax.x = this.layerData.properties.parallaxX;
+                if (this.layerData.properties.parallaxY) this.layerParallax.y = this.layerData.properties.parallaxY;
+
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+
                 console.log('layer :: update :: width = ' + this.width + ', height = ' + this.height);
                 console.log(this);
-                console.log(this.data);
-            },
-
-            getPosition: function(cellX, cellY) {
-                return {
-                    //    		x: cellX * this.
-                };
+                console.log(this.layerData);
             },
 
             drawTile: function(spriteIndex, cellX, cellY) {
-                console.log('drawTile :: spriteIndex = ' + spriteIndex + ', cellX = ' + cellX + ', cellY = ' + cellY);
-                /*context.drawImage(img.element, //image element
-                x, // x position on image
-                y, // y position on image
-                frame.width * this.pixelSize, // width on image
-                frame.height * this.pixelSize, // height on image
-                canvasX, // x position on canvas
-                canvasY, // y position on canvas
-                frame.width * this.pixelSize, // width on canvas
-                frame.height * this.pixelSize // height on canvas
-            );*/
+                //console.log('drawTile :: spriteIndex = '+spriteIndex+', cellX = '+cellX+', cellY = '+cellY);
+                var img = this.level.tilesets.image(0);
+                if (!img.isReady) {
+                    console.error('layer::drawTile :: image [0] of the tile set is not ready');
+                    return false;
+                }
+                var infos = this.level.levelData.tilesets[0];
+                var max = Math.floor(img.element.width / infos.tilewidth);
+                var line = Math.floor(spriteIndex / max);
+                var col = spriteIndex - (line * max);
+                /*console.log('max = '+max);
+    	console.log('img.element.width = '+img.element.width+', infos.tilewidth = '+infos.tilewidth+', line = '+line),
+    	console.log('col = '+col);
+    	console.log('drawTile :: infos = ');
+    	console.log(infos);*/
 
+                console.log('drawTile: line = ' + line + ', col = ' + col + ', max = ' + max + ', tilewidth = ' + this.layerData.tilewidth + ', pox = ' + (line * this.layerData.tilewidth));
+
+                this.drawContext.drawImage(img.element, //image element
+                    col * this.layerData.tilewidth, // x position on image
+                    line * this.layerData.tilewidth, // y position on image
+                    this.layerData.tilewidth, // width on image
+                    this.layerData.tilewidth, // height on image
+                    cellX * this.layerData.tilewidth, // x position on canvas
+                    cellY * this.layerData.tilewidth, // y position on canvas
+                    this.layerData.tilewidth, // width on canvas
+                    this.layerData.tilewidth // height on canvas
+                );
             },
 
             clear: function() {
@@ -4160,20 +4192,18 @@
                 console.log('layer :: make');
 
                 this.clear();
-                if (!this.data || !this.level) return;
+                if (!this.layerData || !this.level) return;
 
                 console.log('layer :: make :: start');
-                console.log('data = ');
-                console.log(this.data);
+                console.log('layerData = ');
+                console.log(this.layerData);
 
                 var index = 0;
 
-                for (var y = 0; y < this.level.data.height; y++) {
-                    for (var x = 0; x < this.data.width; x++) {
-                        var spriteIndex = this.data.data[index];
-                        if (spriteIndex > 1) {
-                            //entity.context.fillStyle = colors[tileIndex];
-                            console.log('layer :: make :: x=' + x + ', y=' + y + ', spriteIndex=' + spriteIndex);
+                for (var y = 0; y < this.layerData.height; y++) {
+                    for (var x = 0; x < this.layerData.width; x++) {
+                        var spriteIndex = this.layerData.data[index] - 1;
+                        if (spriteIndex >= 0) {
                             this.drawTile(spriteIndex, x, y);
                         }
                         index++;
@@ -4181,14 +4211,35 @@
                 }
                 this.isReady = true;
             },
+
+            draw: function(context) {
+                if (!this.isVisible) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+
+                if (context && this.drawContext) {
+                    context.globalAlpha = this.alpha * this.level.alpha;
+                    context.drawImage(this.canvas, //image element
+                        this.level.x, // x position on image
+                        this.level.y, // y position on image
+                        this.canvas.width, // width on image
+                        this.canvas.height // height on image
+                    );
+                }
+            },
         });
 
 
         yespix.define('level', 'gfx', {
-            data: null,
+            levelData: null,
+            levelCollision: [],
 
             isVisible: true,
-
             isReady: false,
 
             layers: [],
@@ -4198,13 +4249,29 @@
             tilesets: null,
             levelDir: '',
 
-            registerInstance: false,
+            buildLevelCollision: function() {
+                for (var t = 0; t < this.levelData.layers.length; t++) {
+                    var layer = this.levelData.layers[t];
+                    if (layer.properties['type'] && layer.properties['type'] == 'decor') {
+                        //console.log('buildLevelCollision :: skipping decor layer')
+                        continue;
+                    }
+                    //console.log('buildLevelCollision :: data = ');
+                    //console.log(this.levelData.layers[t]);
+                    for (var u = 0; u < layer.data.length; u++) {
+                        if (!this.levelCollision[u]) this.levelCollision[u] = 0;
+                        this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
+                    }
+                }
+                //console.log('buildLevelCollision :: levelCollision = ');
+                //console.log(this.levelCollision);
+            },
 
             block: function(x, y) {
-                var index = y * this.data.width + x;
-                var tileIndex = this.data.layers[0].data[index];
-                //console.log('block :: index = ' + index + ', tileIndex = ' + tileIndex);
-                if (tileIndex > 1) return true;
+                var index = y * this.levelData.width + x;
+                var tileIndex = this.levelCollision[index];
+                console.log('block :: (' + x + ', ' + y + ') :: index = ' + index + ', tileIndex = ' + tileIndex);
+                if (tileIndex > 0) return true;
                 return false;
             },
 
@@ -4214,26 +4281,26 @@
 
             collisionRight: function(entity, box, cellX, cellY) {
                 this.hit(cellX, cellY, 'right', entity.speedX);
-                entity.x = this.x + cellX * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                entity.x = this.x + cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
                 entity.speedX = 0;
             },
 
             collisionLeft: function(entity, box, cellX, cellY) {
                 this.hit(cellX, cellY, 'left', entity.speedX);
-                entity.x = this.x + (cellX + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
+                entity.x = this.x + (cellX + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
                 entity.speedX = 0;
             },
 
             collisionUp: function(entity, box, cellX, cellY) {
                 this.hit(cellX, cellY, 'up', entity.speedY);
-                var posY = this.y + (cellY + 1) * this.data.tileheight + 1 - box.offsetY;
+                var posY = this.y + (cellY + 1) * this.levelData.tileheight + 1 - box.offsetY;
                 entity.y = posY;
                 entity.speedY = 0;
             },
 
             collisionDown: function(entity, box, cellX, cellY) {
                 this.hit(cellX, cellY, 'down', entity.speedY);
-                entity.y = this.y + (cellY) * this.data.tileheight - box.offsetY - box.height - 1;
+                entity.y = this.y + (cellY) * this.levelData.tileheight - box.offsetY - box.height - 1;
                 entity.speedY = 0;
                 entity.isOnGround = true;
                 entity.isJumping = false;
@@ -4243,6 +4310,7 @@
 
             collision: function(entity) {
                 if (entity.speedX == 0 && entity.speedY == 0) return;
+                if (!entity.collisionBox) return;
 
                 var left = false,
                     right = false,
@@ -4251,28 +4319,28 @@
 
                 //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
 
-                var box = entity.collisionBox();
+                var box = entity.collisionBox(this);
 
 
                 if (entity.speedX > 0) {
                     // check every collision on the right
-                    var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                    var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
+                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
 
                     if (cellNext > cellRight) {
 
                         right = true;
 
-                        var cellTop = Math.floor(box.y / this.data.tileheight);
-                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var cellTop = Math.floor(box.y / this.levelData.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                         var stopped = false;
                         for (var x = cellRight; x <= cellNext; x++) {
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
                                     this.collisionRight(entity, box, x, y);
-                                    //var posX = this.x + (x) * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                                    //var posX = this.x + (x) * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
                                     //entity.x = posX;
                                     //entity.speedX = 0;
                                     stopped = true;
@@ -4284,10 +4352,10 @@
                     }
                 } else if (entity.speedX < 0) {
                     // check every collision on the left
-                    var cellLeft = Math.floor(box.x / this.data.tilewidth);
+                    var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the left of the entity
-                    var cellNext = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
+                    var cellNext = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
 
                     //console.log('cellLeft = '+cellLeft+', cellNext = '+cellNext);
 
@@ -4295,14 +4363,14 @@
 
                         left = true;
 
-                        var cellTop = Math.floor(box.y / this.data.tileheight);
-                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var cellTop = Math.floor(box.y / this.levelData.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                         var stopped = false;
                         for (var x = cellLeft; x >= cellNext; x--) {
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
                                     this.collisionLeft(entity, box, x, y);
-                                    /*var posX = this.x + (x + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
+                                    /*var posX = this.x + (x + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
 									entity.x = posX;
 									entity.speedX = 0;*/
                                     stopped = true;
@@ -4316,10 +4384,10 @@
 
                 if (entity.speedY > 0) {
                     // check every collision on the bottom
-                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                    var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
 
                     // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
 
                     //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
 
@@ -4327,15 +4395,15 @@
 
                         down = true;
 
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellBottom; y <= cellNext; y++) {
                             for (var x = cellLeft; x <= cellRight; x++) {
                                 if (this.block(x, y)) {
                                     this.collisionDown(entity, box, x, y);
                                     /*
-									var posY = this.y + (y) * this.data.tileheight - box.offsetY - box.height - 1;
+									var posY = this.y + (y) * this.levelData.tileheight - box.offsetY - box.height - 1;
 									//console.log('block :: x = '+x+', y = '+y+', poxY = '+posY);
 									console.log('entity posY from ' + entity.y + ' to ' + posY);
 									entity.y = posY;
@@ -4353,10 +4421,10 @@
                     }
                 } else if (entity.speedY < 0) {
                     // check every collision on the bottom
-                    var cellTop = Math.floor(box.y / this.data.tileheight);
+                    var cellTop = Math.floor(box.y / this.levelData.tileheight);
 
                     // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    var cellNext = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
 
                     //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
 
@@ -4364,8 +4432,8 @@
 
                         up = true;
 
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellTop; y >= cellNext; y--) {
                             for (var x = cellLeft; x <= cellRight; x++) {
@@ -4373,7 +4441,7 @@
                                 if (this.block(x, y)) {
                                     this.collisionUp(entity, box, x, y);
                                     /*
-									var posY = this.y + (y + 1) * this.data.tileheight + 1 - box.offsetY;
+									var posY = this.y + (y + 1) * this.levelData.tileheight + 1 - box.offsetY;
 									console.log('entity posY from ' + entity.y + ' to ' + posY);
 									entity.y = posY;
 									entity.speedY = 0;
@@ -4388,32 +4456,32 @@
                 }
 
                 if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
-                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellTop)) {
                         console.log('Double collision right top');
                         this.collisionUp(entity, box, cellRight, cellTop);
                         this.collisionRight(entity, box, cellRight, cellTop);
                     }
                 } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
-                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellBottom)) {
                         console.log('Double collision right down');
                         //this.collisionDown(entity, box, cellRight, cellBottom);
                         this.collisionRight(entity, box, cellRight, cellBottom);
                     }
                 } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
-                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellBottom)) {
                         console.log('Double collision left down');
                         //this.collisionDown(entity, box, cellLeft, cellBottom);
                         this.collisionLeft(entity, box, cellLeft, cellBottom);
                     }
                 } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {
-                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellTop)) {
                         console.log('Double collision left up');
                         this.collisionUp(entity, box, cellLeft, cellTop);
@@ -4423,15 +4491,15 @@
 
                 if (entity.speedY == 0) {
                     // check if the entity is on ground
-                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
-                    var cellNext = Math.floor((box.y + box.height + 1) / this.data.tileheight);
+                    var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
+                    var cellNext = Math.floor((box.y + box.height + 1) / this.levelData.tileheight);
                     if (cellNext == cellBottom) {
                         entity.isOnGround = false;
                         //console.log('entity NOT on ground');
                     } else {
                         entity.isOnGround = false;
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellBottom; y <= cellNext; y++) {
                             for (var x = cellLeft; x <= cellRight; x++) {
@@ -4465,24 +4533,25 @@
                 yespix.load(src, {
                     'complete': function(e) {
                         var entity = e.entity;
-                        entity.data = JSON.parse(e.content);
+                        entity.levelData = JSON.parse(e.content);
 
-                        entity.canvas.width = entity.data.width * entity.data.tilewidth;
-                        entity.canvas.height = entity.data.height * entity.data.tileheight;
+                        entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
+                        entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
+                        entity.buildLevelCollision();
 
-                        console.log(entity.data);
-                        if (entity.data.layers) {
+                        console.log(entity.levelData);
+                        if (entity.levelData.layers) {
                             // load tilesets
                             var images = [];
-                            var count = entity.data.tilesets.length;
-                            console.log('level :: load / complete :: tilesets count ' + count);
+                            var count = entity.levelData.tilesets.length;
+                            //console.log('level :: load / complete :: tilesets count '+count);
                             for (var t = 0; t < count; t++) {
-                                console.log('level :: complete :: t = ' + t);
-                                images.push(entity.levelDir + entity.data.tilesets[t].image);
+                                //console.log('level :: complete :: t = '+t);
+                                images.push(entity.levelDir + entity.levelData.tilesets[t].image);
                                 //tileset.on('');
                             }
-                            console.log('images = ');
-                            console.log(images);
+                            //console.log('images = ');
+                            //console.log(images);
                             entity.tilesets = yespix.spawn(
                                 'image', {
                                     registerInstance: false,
@@ -4490,6 +4559,7 @@
                                 });
                             entity.tilesets.on('imageReady', function() {
                                 entity.tilesetsReady();
+                                yespix.level = entity;
                             }, entity);
 
                         }
@@ -4501,20 +4571,21 @@
             tilesetsReady: function() {
                 // load layers
                 var layer = null;
-                var count = this.data.layers.length;
+                var count = this.levelData.layers.length;
 
-                console.log('level :: tilesetsReady :: layers count ' + count);
+                //console.log('level :: tilesetsReady :: layers count '+count);
                 for (var t = 0; t < count; t++) {
-                    console.log('level :: tilesetsReady :: making layer t = ' + t);
+                    //console.log('level :: tilesetsReady :: making layer t = '+t);
                     layer = yespix.spawn('layer');
                     layer.setLevel(this);
 
-                    this.data.layers[t].tileWidth = this.data.tileWidth;
-                    layer.load(this.data.layers[t]);
+                    //console.log('level :: tilesetsReady :: this.levelData = ');
+                    //console.log(this.levelData);
+
+                    this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
+                    layer.load(this.levelData.layers[t]);
                     layer.make();
                     this.layers.push(layer);
-
-                    break;
                 }
                 this.isReady = true;
             },
@@ -4528,6 +4599,8 @@
             accelX: 0,
             accelY: 0,
             moveFriction: 0.05,
+
+            applyGravity: false,
 
             moveStop: function() {
                 this.speedX = this.speedY = this.accelX = this.accelY = 0;

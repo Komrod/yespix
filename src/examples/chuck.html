@@ -151,11 +151,11 @@
 
 
     
-	//yp.gravity = { y: 30 };
+	yp.gravity = { y: 10 };
 
-	yp.spawn('level').prop({z: 100, alpha: 0.5}).load('chuck/test.json');
+	yp.spawn('level').prop({x: 50, y: 0, alpha: 1.0, moveFriction: 0}).load('chuck/test.json');
 
-	yp.spawn('chuck',{ x: 300, y: 450, z: 1000});
+	yp.spawn('chuck',{ x: 350, y: 430, z: 1000});
 
 
 </script>

@@ -7,7 +7,8 @@
          "opacity":1,
          "properties":
             {
-             "type":"decor"
+             "type":"decor",
+             "z": 100
             },
          "type":"tilelayer",
          "visible":true,
@@ -22,7 +23,8 @@
          "opacity":1,
          "properties":
             {
-             "yespixType":"odor"
+             "yespixType":"odor",
+             "z": 900
             },
          "type":"tilelayer",
          "visible":true,
@@ -37,7 +39,8 @@
          "opacity":1,
          "properties":
             {
-             "type":"decor"
+             "type":"decor",
+             "z": 2000
             },
          "type":"tilelayer",
          "visible":true,

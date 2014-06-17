@@ -17,11 +17,16 @@ yespix.define('collision', {
         return false;
     },
 
-    collisionBox: function() {
+    collisionBox: function(obj) {
+    	
+    	obj = obj || {x:0, y:0};
+    	if (!obj.x) obj.x = 0;
+    	if (!obj.y) obj.y = 0;
+    	
         if (yespix.isUndefined(this.pixelSize)) {
             return {
-                x: this.x + this.colOffsetX,
-                y: this.y + this.colOffsetY,
+                x: this.x + this.colOffsetX + obj.x,
+                y: this.y + this.colOffsetY + obj.y,
                 width: this.colWidth,
                 height: this.colHeight,
                 offsetX: this.colOffsetX,
@@ -29,8 +34,8 @@ yespix.define('collision', {
             };
         } else {
             return {
-                x: this.x + this.colOffsetX * this.pixelSize,
-                y: this.y + this.colOffsetY * this.pixelSize,
+                x: this.x + this.colOffsetX * this.pixelSize + obj.x,
+                y: this.y + this.colOffsetY * this.pixelSize + obj.y,
                 width: this.colWidth * this.pixelSize,
                 height: this.colHeight * this.pixelSize,
                 offsetX: this.colOffsetX * this.pixelSize,

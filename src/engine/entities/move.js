@@ -5,7 +5,9 @@ yespix.define('move', {
     accelX: 0,
     accelY: 0,
     moveFriction: 0.05,
-
+    
+    applyGravity: false,
+    
     moveStop: function() {
         this.speedX = this.speedY = this.accelX = this.accelY = 0;
     },
