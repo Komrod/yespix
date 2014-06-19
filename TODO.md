@@ -1,6 +1,6 @@
 TODO list:
 
-- attach entities to level to have an owner hierarchy
+- property entityUnique to be sure that only one instance of the entity is spawned
 - fix level collision on level position
 - create a sprite entity from anim enity
 - change the draw mechanism to use events and owner hierarchy
