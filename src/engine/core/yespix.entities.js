@@ -444,7 +444,6 @@ yespix.fn.spawn = function(name, properties) {
     // mixin with the class name
     this.mixin(entity, this.entityClasses[name].properties);
 
-
     // copy the spawn properties
     for (var fn in properties) {
         entity[fn] = properties[fn];
@@ -453,13 +452,11 @@ yespix.fn.spawn = function(name, properties) {
     entity._ancestors = this.entityClasses[name]['ancestors'];
     entity._id = this.entityNextId++;
 
-    console.log(entity);
-    if (entity['registerInstance']) this.instanceAdd(entity);
-    else console.log('entities :: entity instance not registered "'+name+'"');
-    
     // executing the init functions on ancestors
     this.call(entity, 'init', [properties]);
     if (this.isFunction(entity.init)) entity.init(properties);
+
+    if (entity['registerInstance']) this.instanceAdd(entity);
 
     if (entity._ancestors.length > 0)
         for (t = 0; t < entity._ancestors.length; t++) this.trigger('spawn:' + entity._ancestors[t], {
@@ -483,6 +480,35 @@ yespix.fn.instanceAdd = function(entity) {
     if (entity._instances) this.instanceRemove(entity);
     entity._instances = {};
 
+    // entity must be unique
+    if (entity.isUnique == true)
+    {
+        console.log('instanceAdd :: isUnique');
+        if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0)
+        {
+            var list = this.entityInstances['.' + entity._class];
+            var count = list.length;
+            console.log('instanceAdd :: isUnique :: length='+list.length+', count='+count);
+            for (var t=0; t<count; t++)
+            {
+                console.log('instanceAdd :: isUnique :: t='+t+', length='+list.length+', count='+count);
+                if (list[0]) console.log('list[0] exists'); else console.log('list[0] !exists');
+                if (list[t]) console.log('list[t] exists'); else console.log('list[t] !exists');
+                this.instanceRemove(list[0]);
+                this.instanceRemove(list[t]);
+            }
+        }
+        else console.log('instanceAdd :: isUnique :: no instance for class "'+entity._class+'"');
+        console.log('instanceAdd :: isUnique :: list =');
+        console.log(list);
+        console.log('instanceAdd :: isUnique :: list.length ='+list.length);
+        this.instanceRemove(list[0]);
+        if (list[0]) console.log('list[0] exists'); else console.log('list[0] !exists');
+        if (list[1]) console.log('list[1] exists'); else console.log('list[1] !exists');
+        console.log('instanceAdd :: isUnique :: entityInstances = ')
+        console.log(this.entityInstances['.' + entity._class]);
+        console.log('instanceAdd :: isUnique :: entityInstances.length = '+this.entityInstances['.' + entity._class].length);
+    }
 
     // insert reference in the global instances list
     if (this.isUndefined(this.entityInstances['']) || this.entityInstances[''].length == 0) {
@@ -527,6 +553,12 @@ yespix.fn.instanceAdd = function(entity) {
 };
 
 yespix.fn.instanceRemove = function(entity) {
+    if (!entity)
+    {
+        console.warn('instanceRemove :: parameter entity is undefined');
+        return false;
+    }
+
     // remove reference from the global instances list
     if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
 
@@ -575,7 +607,7 @@ yespix.fn.hasAncestors = function(classname, ancestors) {
 };
 
 /**
- * Call some entity class functions on the context of an entity object. e.g.
+ * Call some entity class functions of ancestors in the context of an entity object. e.g.
  * @trigger call
  * @param {object} entity Entity instance
  * @param {string|function} fn Function name in a string or function reference to call // @todo

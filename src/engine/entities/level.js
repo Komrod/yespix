@@ -12,6 +12,8 @@ yespix.define('level', 'gfx', {
     context: null,
     tilesets: null,
     levelDir: '',
+
+    isUnique: true,
     
     buildLevelCollision: function()
     {

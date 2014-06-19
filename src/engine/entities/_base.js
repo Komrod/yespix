@@ -91,7 +91,14 @@
 		     */
 		    registerInstance: true,
 		    
-		    
+		    /**
+		     * Set to True if the entity must be unique (only one instance)
+		     * @property isUnique
+		     * @type boolean
+		     * @default false
+		     */
+		    isUnique: false,
+
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**
