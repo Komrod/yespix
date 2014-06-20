@@ -124,6 +124,12 @@ yespix.fn.load = function(fileList, complete, options) {
         // file will now refer to the current file URL object
         var file = this.data.file[fileList[index]];
 
+        //console.log('load :: start for url '+fileList[index]);
+        //if (!this.data.file[fileList[index]]) console.log('load :: file undefined');
+        //if (!this.data.file[fileList[index]].state) console.log('load :: file with no state');
+        //if (this.data.file[fileList[index]].state) console.log('load :: file state '+this.data.file[fileList[index]].state);
+        //if (urlOptions.entity && urlOptions.entity.name) console.log('load :: urlOptions.entity.name '+urlOptions.entity.name);
+
         // starting a XMLHttpRequest client only if the file is not currently downloading.
         if (!this.data.file[fileList[index]] // file URL not previously loaded
             || !this.data.file[fileList[index]].state // file URL has no state 
@@ -216,9 +222,8 @@ yespix.fn.load = function(fileList, complete, options) {
                     state: file.state,
                     url: file.url,
                     file: file,
-                    entity: options['entity'],
+//                    entity: options['entity'],
                 };
-                console.log('file.options.entity: ' + file.options.entity);
 
                 // loop inside file.options
                 if (file.options)
@@ -296,6 +301,7 @@ yespix.fn.load = function(fileList, complete, options) {
                         // executes error and complete functions
                         for (var t = 0; t < this.file.options.length; t++) {
                             newEvent.stat = this.file.options[t].stat;
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             newEvent.type = 'error';
                             this.file.options[t]['error'](newEvent);
                             newEvent.type = 'complete';
@@ -308,6 +314,10 @@ yespix.fn.load = function(fileList, complete, options) {
                     // executes success and complete functions
                     newEvent.state = file.state = 'loaded';
                     for (var t = 0; t < this.file.options.length; t++) {
+                        //console.log('load :: complete :: t='+t+'');
+                        if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
+                        //if (newEvent.entity) console.log('load :: complete :: newEvent entity.name='+newEvent.entity.name+'');
+                        //else console.log('load :: complete :: newEvent NO entity');
                         newEvent.stat = this.file.options[t].stat;
                         newEvent.type = 'success';
                         this.file.options[t]['success'](newEvent);
@@ -326,6 +336,7 @@ yespix.fn.load = function(fileList, complete, options) {
                     newEvent.type = 'progress';
                     for (var t = 0; t < this.file.options.length; t++) {
                         newEvent.stat = this.file.options[t].stat;
+                        if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                         this.file.options[t]['progress'](newEvent);
                     }
                 }
