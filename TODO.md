@@ -1,9 +1,7 @@
 TODO list:
 
-- property entityUnique to be sure that only one instance of the entity is spawned
 - fix level collision on level position
 - create a sprite entity from anim enity
-- change the draw mechanism to use events and owner hierarchy
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - fix bug collision between entities
@@ -47,6 +45,7 @@ TODO list:
 
 
 DONE:
+- property entityUnique to be sure that only one instance of the entity is spawned
 - multiple layer level
 - layer alpha and type (decor)
 - Add path entity for objects
