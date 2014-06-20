@@ -153,9 +153,12 @@
     
 	yp.gravity = { y: 10 };
 
-	yp.spawn('level', {x: 50, y: 0, alpha: 1.0, moveFriction: 0}).load('chuck/test.json');
-
-	yp.spawn('chuck',{ x: 350, y: 430, z: 1000});
+	yp.spawn('level', {name: 'test1', x: 50, y: 0, alpha: 1.0, moveFriction: 0, isUnique: false}).load('chuck/test.json');
+	yp.spawn('level', {name: 'test2', x: 50, y: 0, alpha: 1.0, moveFriction: 0, isUnique: false}).load('chuck/test.json');
+	yp.spawn('level', {name: 'test3', x: 50, y: 0, alpha: 1.0, moveFriction: 0}).load('chuck/test.json');
+	console.log('count level = '+yp.find('.level').length);
+	console.log('count layer = '+yp.find('.layer').length);
+	//yp.spawn('chuck',{ x: 350, y: 430, z: 1000});
 
 
 </script>

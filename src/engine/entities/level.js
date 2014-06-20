@@ -295,27 +295,28 @@ yespix.define('level', 'gfx', {
         // destroy other loaded levels @todo
         //yespix.find('/level').not(this).destroy();
     	this.levelDir = yespix.getDir(src);
-    	console.log('level :: load :: dir = '+this.levelDir);
+    	//console.log('level :: load :: dir = '+this.levelDir);
 
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         
+        //console.log('level :: load :: loading level data for '+this.name);
         yespix.load(src, {
             'complete': function(e) {
             	var entity = e.entity;
+                //console.log('complete for '+entity.name);
             	entity.levelData = JSON.parse(e.content);
 
                 entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                 entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
                 entity.buildLevelCollision();
                 
-                console.log(entity.levelData);
+                //console.log(entity.levelData);
                 if (entity.levelData.layers)
                 {
                 	// load tilesets
                 	var images = [];
                 	var count = entity.levelData.tilesets.length; 
-            		//console.log('level :: load / complete :: tilesets count '+count);
                 	for (var t = 0; t < count; t++)
                		{
                 		//console.log('level :: complete :: t = '+t);
@@ -324,6 +325,7 @@ yespix.define('level', 'gfx', {
                		}
                 	//console.log('images = ');
                 	//console.log(images);
+                    //console.log('level :: load / complete for '+entity.name+' :: tileset images count '+count);
                 	entity.tilesets = yespix.spawn(
                 			'image', 
                 			{
@@ -332,6 +334,7 @@ yespix.define('level', 'gfx', {
                 			});
                     entity.tilesets.on('imageReady', function()
                 	{
+                        console.log('level :: imageReady for '+entity.name);
                 		entity.tilesetsReady();
                 		yespix.level = entity;
                 	}, entity);
@@ -344,15 +347,21 @@ yespix.define('level', 'gfx', {
     
     tilesetsReady: function()
     {
+        if (this._deleting)
+        {
+            console.log('Level currently deleting '+this.name+' ... '+this._deleting);
+            return;
+        }
     	// load layers
     	var layer = null;
     	var count = this.levelData.layers.length; 
 		
-    	//console.log('level :: tilesetsReady :: layers count '+count);
+    	console.log('level :: tilesetsReady :: layers count '+count);
     	for (var t = 0; t < count; t++)
    		{
     		//console.log('level :: tilesetsReady :: making layer t = '+t);
     		layer = yespix.spawn('layer');
+            this.attach(layer);
     		layer.setLevel(this);
     		
     		//console.log('level :: tilesetsReady :: this.levelData = ');

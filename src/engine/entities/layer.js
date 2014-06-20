@@ -47,9 +47,9 @@ yespix.define('layer', 'gfx', {
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         
-        console.log('layer :: update :: width = '+this.width+', height = '+this.height);
-        console.log(this);
-        console.log(this.layerData);
+        //onsole.log('layer :: update :: width = '+this.width+', height = '+this.height);
+        //console.log(this);
+        //console.log(this.layerData);
     },
     
     drawTile: function(spriteIndex, cellX, cellY)
@@ -125,8 +125,9 @@ yespix.define('layer', 'gfx', {
                 if (this._context) context = this._context;
             } else context = this._context;
         }
-
-        if (context && this.drawContext) {
+        console.log('layer :: draw :: context='+context+', this.canvas='+this.canvas);
+        if (context && this.canvas) {
+            console.log('layer :: draw :: context.globalAlpha='+context.globalAlpha+', this.level.x='+this.level.x+', this.level.y='+this.level.y+', width='+this.canvas.width+', height='+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
             	this.level.x, // x position on image
