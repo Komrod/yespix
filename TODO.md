@@ -8,6 +8,7 @@ TODO list:
 - Make an entity dump where you can see where properties come from
 - Make a basic Zombie Sim
 - tag version 0.14
+- remove entity._instances array = obsolete
 - limit image draw to visible canvas when an image try to draw partialy outside the canvas
 - animate properties
 - tiled level import
