@@ -270,7 +270,7 @@ yespix.fn.init = function(options) {
             }
 
             // change the drawEntities because some entity instances have been added or removed
-            if (yespix.drawEntitiesChange) {
+            if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                 yespix.drawEntities = yespix.entityInstances['/gfx'];
                 if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
                 yespix.drawEntitiesChange = false;

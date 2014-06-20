@@ -21,8 +21,13 @@ yespix.fn.attach = function(parent, child) {
     if (child._parent == parent) return null;
 
     // attach
+    if (parent._children) console.log('attach :: parent._children = '+parent._children.length);
+    else console.log('attach :: parent._children = 00');
+
     if (!parent._children) parent._children = [child];
     else parent._children.push(child);
+
+    console.log('attach :: parent._children = '+parent._children.length);
 
     if (child._parent) this.detach(child._parent, child);
     child._parent = parent;

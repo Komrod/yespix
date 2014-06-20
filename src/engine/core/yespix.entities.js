@@ -477,46 +477,33 @@ yespix.fn.spawn = function(name, properties) {
  */
 yespix.fn.instanceAdd = function(entity) {
     // the entity must not be in any instances list because we are overriding his _instances object
-    if (entity._instances) this.instanceRemove(entity);
+    if (entity._instanceExists) this.instanceRemove(entity);
     entity._instances = {};
 
     // entity must be unique
     if (entity.isUnique == true)
     {
-        console.log('instanceAdd :: isUnique');
+        console.log('instanceAdd :: isUnique :: deleting other entities');
+        this.find('.'+entity._class+', /'+entity._class).destroy();
         if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0)
         {
             var list = this.entityInstances['.' + entity._class];
             var count = list.length;
-            console.log('instanceAdd :: isUnique :: length='+list.length+', count='+count);
             for (var t=0; t<count; t++)
             {
-                console.log('instanceAdd :: isUnique :: t='+t+', length='+list.length+', count='+count);
-                if (list[0]) console.log('list[0] exists'); else console.log('list[0] !exists');
-                if (list[t]) console.log('list[t] exists'); else console.log('list[t] !exists');
                 this.instanceRemove(list[0]);
-                this.instanceRemove(list[t]);
             }
         }
-        else console.log('instanceAdd :: isUnique :: no instance for class "'+entity._class+'"');
-        console.log('instanceAdd :: isUnique :: list =');
-        console.log(list);
-        console.log('instanceAdd :: isUnique :: list.length ='+list.length);
-        this.instanceRemove(list[0]);
-        if (list[0]) console.log('list[0] exists'); else console.log('list[0] !exists');
-        if (list[1]) console.log('list[1] exists'); else console.log('list[1] !exists');
-        console.log('instanceAdd :: isUnique :: entityInstances = ')
-        console.log(this.entityInstances['.' + entity._class]);
-        console.log('instanceAdd :: isUnique :: entityInstances.length = '+this.entityInstances['.' + entity._class].length);
     }
+
 
     // insert reference in the global instances list
     if (this.isUndefined(this.entityInstances['']) || this.entityInstances[''].length == 0) {
         this.entityInstances[''] = [entity];
-        entity._instances[''] = 0;
+        //entity._instances[''] = 0;
     } else {
         this.entityInstances[''].push(entity);
-        entity._instances[''] = this.entityInstances[''].length - 1;
+        //entity._instances[''] = this.entityInstances[''].length - 1;
     }
 
     // insert reference with the entity Id
@@ -525,10 +512,10 @@ yespix.fn.instanceAdd = function(entity) {
     // insert reference in the class instances list for its own class name
     if (this.isUndefined(this.entityInstances['.' + entity._class]) || this.entityInstances['.' + entity._class].length == 0) {
         this.entityInstances['.' + entity._class] = [entity];
-        entity._instances[entity._class] = 0;
+        //entity._instances[entity._class] = 0;
     } else {
         this.entityInstances['.' + entity._class].push(entity);
-        entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
+        //entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
     }
 
     // insert a reference in the ancestor instances list for all its ancestors
@@ -536,12 +523,14 @@ yespix.fn.instanceAdd = function(entity) {
         for (var t = 0; t < entity._ancestors.length; t++) {
             if (this.isUndefined(this.entityInstances['/' + entity._ancestors[t]]) || this.entityInstances['/' + entity._ancestors[t]].length == 0) {
                 this.entityInstances['/' + entity._ancestors[t]] = [entity];
-                entity._instances[entity._ancestors[t]] = 0;
+                //entity._instances[entity._ancestors[t]] = 0;
             } else {
                 this.entityInstances['/' + entity._ancestors[t]].push(entity);
-                entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
+                //entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
             }
         }
+    
+    entity._instanceExists = true;
 
     // Trigger some events to dispatch the spawn of an entity
     this.trigger('spawn', {
@@ -553,25 +542,63 @@ yespix.fn.instanceAdd = function(entity) {
 };
 
 yespix.fn.instanceRemove = function(entity) {
+    var t,u;
     if (!entity)
     {
         console.warn('instanceRemove :: parameter entity is undefined');
         return false;
     }
-
+    console.log('instanceRemove :: remove entity '+entity.name);
     // remove reference from the global instances list
-    if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
+    if (this.entityInstances[''])
+    {
+        //this.entityInstances[''].splice(entity._instances[''], 1); // remove instance by index // obsolete
+        for (t=0; t<this.entityInstances[''].length; t++)
+        {
+            if (this.entityInstances[''][t] == entity)
+            {
+                this.entityInstances[''].splice(t, 1);
+                break;
+            }
+        }
+    }
 
     // remove reference with the entity Id
     delete this.entityInstances[+entity._id];
 
     // remove reference from the class instances list for its own class name
-    if (this.entityInstances['.' + entity._class]) this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1);
+    if (this.entityInstances['.' + entity._class])
+    {
+        //this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1); // remove instance by index // obsolee
+        for (t=0; t<this.entityInstances['.' + entity._class].length; t++)
+        {
+            if (this.entityInstances['.' + entity._class][t] == entity)
+            {
+                this.entityInstances['.' + entity._class].splice(t, 1);
+                break;
+            }
+        }
+    }
 
     // insert a reference in the class instances list for all its ancestors
     if (entity._ancestors.length > 0)
-        for (var t = 0; t < entity._ancestors.length; t++)
-            if (this.entityInstances['/' + entity._ancestors[t]]) this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
+        for (t = 0; t < entity._ancestors.length; t++)
+        {
+            if (this.entityInstances['/' + entity._ancestors[t]])
+            {
+                //this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1); // obsolete
+                for (u=0; u<this.entityInstances["/" + entity._ancestors[t]].length; u++)
+                {
+                    if (this.entityInstances["/" + entity._ancestors[t]][u] == entity)
+                    {
+                        this.entityInstances["/" + entity._ancestors[t]].splice(u, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    
+    entity._instanceExists = false;
 
     this.trigger('remove', {
         entity: entity

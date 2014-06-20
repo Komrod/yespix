@@ -56,6 +56,21 @@
 		    _parent: null,
 
 		    /**
+		     * Set True when the entity is currently deleting itself
+		     * @property _deleting
+		     * @type boolean
+			 */
+		    _deleting: false,
+
+		    /**
+		     * Set True if the entity instance was added to the global YESPIX entity list
+		     * @property _instanceExists
+		     * @type boolean
+		     * @default true
+		     */
+		    _instanceExists: false,
+
+		    /**
 		     * Set True if the entity is active
 		     * @property isActive
 		     * @type boolean
@@ -146,7 +161,7 @@
 		        var entity = yespix.clone(this);
 		        entity._id = yespix.entityNextId++;
 		        if (properties) entity.prop(properties);
-		        entity._instances = null;
+		        entity._instances = false;
 		        yespix.dump(yespix.entityInstances);
 		        yespix.instanceAdd(entity);
 		        yespix.dump(yespix.entityInstances);
@@ -184,19 +199,25 @@
 		    },
 
 		    destroy: function() {
+	        	console.log('base :: destroy :: entity name ='+this.name);
 		        this._deleting = true;
 		        this.isActive = false;
 		        this.isVisible = false;
 
 		        if (this._children) {
+		        	console.log('base :: destroy :: children length='+this._children.length);
 		            for (var t = 0; t < this._children.length; t++) {
-		                if (this._children[t] && !this._children[t].deleting) {
+		                if (this._children[t] && !this._children[t]._deleting) {
+				        	console.log('base :: destroy :: destroying child t='+t);
 		                    this._children[t].destroy();
 		                }
+			        	else console.log('base :: destroy :: child already deleted');
 		            }
-		        }
+		        } else console.log('base :: destroy :: NO children');
+		        this._children = null;
 
 		        yespix.instanceRemove(this);
+		        console.log('base :: destroy :: finish for name='+this.name);
 		        return this;
 		    }
 
