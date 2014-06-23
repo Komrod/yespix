@@ -205,19 +205,19 @@
 		        this.isVisible = false;
 
 		        if (this._children) {
-		        	console.log('base :: destroy :: children length='+this._children.length);
+		        	//console.log('base :: destroy :: children length='+this._children.length);
 		            for (var t = 0; t < this._children.length; t++) {
 		                if (this._children[t] && !this._children[t]._deleting) {
-				        	console.log('base :: destroy :: destroying child t='+t);
+				        	//console.log('base :: destroy :: destroying child t='+t);
 		                    this._children[t].destroy();
 		                }
-			        	else console.log('base :: destroy :: child already deleted');
+			        	//else console.log('base :: destroy :: child already deleted');
 		            }
-		        } else console.log('base :: destroy :: NO children');
+		        } //else console.log('base :: destroy :: NO children');
 		        this._children = null;
 
 		        yespix.instanceRemove(this);
-		        console.log('base :: destroy :: finish for name='+this.name);
+		        //console.log('base :: destroy :: finish for name='+this.name);
 		        return this;
 		    }
 

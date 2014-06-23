@@ -67,10 +67,8 @@ yespix.define('gfx', {
 
     getContext: function() {
         if (this._context) return this._context;
-        if (this._parent == null) {
-            var canvas = yespix.find('.canvas')[0];
-            if (!this._context && canvas) this._context = canvas.context;
-        }
+        var canvas = yespix.find('.canvas')[0];
+        if (canvas) this._context = canvas.context;
         return this._context;
     },
 

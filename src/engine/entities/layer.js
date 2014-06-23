@@ -125,9 +125,9 @@ yespix.define('layer', 'gfx', {
                 if (this._context) context = this._context;
             } else context = this._context;
         }
-        console.log('layer :: draw :: context='+context+', this.canvas='+this.canvas);
+        //console.log('layer :: draw :: context='+context+', this.canvas='+this.canvas);
         if (context && this.canvas) {
-            console.log('layer :: draw :: context.globalAlpha='+context.globalAlpha+', this.level.x='+this.level.x+', this.level.y='+this.level.y+', width='+this.canvas.width+', height='+this.canvas.height);
+            //console.log('layer :: draw :: context.globalAlpha='+context.globalAlpha+', this.level.x='+this.level.x+', this.level.y='+this.level.y+', width='+this.canvas.width+', height='+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
             	this.level.x, // x position on image
