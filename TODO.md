@@ -1,8 +1,9 @@
 TODO list:
 
 - player get throught floor on high gravity
-- move level view, make attached entities 
-- make mayer a general empty drawable canvas, put the level build on 
+- move level view, make attached entities move on parent move
+- parallax
+- make layer a general empty drawable canvas (view), put the level build on 
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities

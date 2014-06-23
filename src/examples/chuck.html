@@ -153,8 +153,11 @@
     
 	yp.gravity = { y: 20 };
 
-	yp.spawn('level', {name: 'level test', x: 50, y: 50, alpha: 0.1}).load('chuck/test.json');
-	yp.spawn('chuck',{ x: 350, y: 430, z: 1000});
+	var mylevel = yp.spawn('level', {name: 'level test', x: 50, y: 50, alpha: 0.1, moveFriction: 0, speedX: 0.1});
+	mylevel.load('chuck/test.json');
+	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 350, y: 430, z: 1000});
+	console.log('mychuck = '+mychuck+', mylevel = '+mylevel);
+	mylevel.attach(mychuck);
 
 
 </script>

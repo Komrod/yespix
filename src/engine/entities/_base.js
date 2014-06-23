@@ -173,6 +173,11 @@
 		        return this;
 		    },
 
+		    setParent: function(entity) {
+		        yespix.attach(entity, this);
+		        return this;
+		    },
+
 		    detach: function(entity) {
 		        yespix.detach(this, entity);
 		        return this;

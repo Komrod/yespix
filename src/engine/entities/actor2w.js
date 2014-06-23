@@ -80,7 +80,6 @@
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }
-                console.log('applyGravity :: speed.x = '+this.speedX+', speedY = '+this.speedY);
             },
 
             applyFriction: function() {

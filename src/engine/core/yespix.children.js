@@ -4,13 +4,26 @@
  */
 
 /**
- * @todo  moving rotating the parent will affect the children
+ * @todo  rotating the parent will affect the children
  * @param {entity} parent The parent
  * @param {entity|array} child An entity to attached or an array of entities
  * @example attach(entity1, entity2) attaches entity2 to entity1
  * @example attach(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
  */
 yespix.fn.attach = function(parent, child) {
+
+    if (!parent)
+    {
+        console.warn('attach :: parent undefined');
+        return this;
+    }
+    if (!child)
+    {
+        console.warn('attach :: child undefined');
+        return this;
+    }
+
+    console.log('yespix.attach :: parent='+parent+', child='+child);
     // multiple children
     if (this.isArray(child)) {
         for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
@@ -18,11 +31,12 @@ yespix.fn.attach = function(parent, child) {
     }
 
     // try to attach an entity already attached to the parent
-    if (child._parent == parent) return null;
+    if (child && !child._parent == parent) return null;
 
     // attach
+    console.log('attach :: entity name = '+child.name+' to parent '+parent.name);
     if (parent._children) console.log('attach :: parent._children = '+parent._children.length);
-    else console.log('attach :: parent._children = 00');
+    else console.log('attach :: parent._children = 0 ');
 
     if (!parent._children) parent._children = [child];
     else parent._children.push(child);
