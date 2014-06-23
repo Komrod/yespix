@@ -77,10 +77,10 @@
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }
+                console.log('applyGravity :: speed.x = '+this.speedX+', speedY = '+this.speedY);
             },
 
             applyFriction: function() {

@@ -14,8 +14,8 @@ yespix.define('level', 'gfx,move', {
     levelDir: '',
 
     isUnique: true,
-    applyGravity: false,
-    
+    canApplyGravity: false,
+
     buildLevelCollision: function()
     {
     	for (var t=0; t<this.levelData.layers.length; t++)

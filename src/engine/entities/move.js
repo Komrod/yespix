@@ -6,7 +6,7 @@ yespix.define('move', {
     accelY: 0,
     moveFriction: 0.05,
     
-    applyGravity: false,
+    canApplyGravity: true,
     
     moveStop: function() {
         this.speedX = this.speedY = this.accelX = this.accelY = 0;
@@ -18,7 +18,7 @@ yespix.define('move', {
     },
 
     move: function() {
-        if (this.applyGravity && yespix.gravity) this.applyGravity();
+        if (this.canApplyGravity && yespix.gravity) this.applyGravity();
         this.speedX += this.accelX;
         this.speedY += this.accelY;
         this.speedX *= 1 - this.moveFriction;
@@ -29,13 +29,11 @@ yespix.define('move', {
     },
 
     applyGravity: function() {
-        /*
-				if (!this.isOnGround && yespix.gravity) {
-					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
-					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
-					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
-				}
-				*/
+        if (!yespix.gravity) return false;
+        if (!this.isOnGround && yespix.gravity) {
+            if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
+            if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
+        }
     },
 
 });
