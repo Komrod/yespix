@@ -1,6 +1,8 @@
 TODO list:
 
-- fix level collision on level position
+- player get throught floor on high gravity
+- move level view, make attached entities 
+- make mayer a general empty drawable canvas, put the level build on 
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
@@ -46,6 +48,7 @@ TODO list:
 
 
 DONE:
+- fix level collision on level position // 2014-06-23
 - property entityUnique to be sure that only one instance of the entity is spawned
 - multiple layer level
 - layer alpha and type (decor)
