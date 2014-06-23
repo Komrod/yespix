@@ -1,12 +1,12 @@
 TODO list:
 
 - player get throught floor on high gravity
-- move level view, make attached entities move on parent move
-- parallax
-- make layer a general empty drawable canvas (view), put the level build on 
+- parallax layer
+- make layer a general empty drawable canvas (view), put the level build on the level entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
+- on actor entity, make walk animation speed progressive
 - fix bug collision between entities
 - Make an entity dump where you can see where properties come from
 - Make a basic Zombie Sim
@@ -46,9 +46,11 @@ TODO list:
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - tag version 0.20
+- Make the Chuck game
 
 
 DONE:
+- move level view, make attached entities move on parent move
 - fix level collision on level position // 2014-06-23
 - property entityUnique to be sure that only one instance of the entity is spawned
 - multiple layer level
