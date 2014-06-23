@@ -69,7 +69,6 @@ yespix.fn.find = function(selector, fn) {
 
     if (this.isUndefined(selector)) {
         var result = this.bunch(this.entityInstances['']);
-        //console.log('undefined, length = '+result.length);
         if (fn) this.each(result, fn);
         return result;
     }
@@ -81,7 +80,6 @@ yespix.fn.find = function(selector, fn) {
         // return all entities if the selector is an empty string
         if (selector === '') {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('empty "", length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -91,8 +89,6 @@ yespix.fn.find = function(selector, fn) {
     } else
     // if selector is the entity._id (integer)
     if (this.isInt(selector)) {
-        //console.log('selector is an int, entity = '+this.entityInstances[+selector]);
-        // return the entity
         if (this.entityInstances[+selector]) return this.bunch([this.entityInstances[+selector]]);
         return this.bunch();
     } else
@@ -101,7 +97,6 @@ yespix.fn.find = function(selector, fn) {
         // empty properties return all the entities
         if (this.pLength(selector) == 0) {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('empty {}, length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -139,29 +134,21 @@ yespix.fn.find = function(selector, fn) {
         }
         // no class, return empty bunch
         else {
-            //console.log('return empty bunch');
             return this.bunch();
         }
     }
     // if not, parse the whole list (slow)
     else instances = this.entityInstances[''];
 
-    // console.log('instances length = '+instances.length);
     for (var t = 0; t < instances.length; t++) {
         var count = 0;
-        // console.log('find: checking entity ['+t+'] with name "'+instances[t]._name+'"');
         for (var n in properties) {
-            // if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
-            // else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
             if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
-            //console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
             if (count >= propMatch) {
-                //console.log('find: adding entity to result');
                 result.push(instances[t]);
             }
         }
     }
-    // console.log('find: result length = '+result.length);
 
     if (fn) this.each(result, fn);
 
@@ -198,12 +185,10 @@ yespix.fn.selectorInit = function(selector) {
 yespix.fn.selectorCompare = function(entityValue, value) {
     if (this.isString(value)) {
         if (this.isArray(entityValue)) return this.inArray(entityValue, value);
-        //if (this.isString(entityValue)) return entityValue === value; 
         return entityValue === value;
     }
     if (this.isArray(value)) {
         if (this.isString(entityValue)) return this.inArray(value, entityValue);
-        //if (this.isString(entityValue)) return entityValue === value; 
         return entityValue === value;
     }
     if (this.isRegexp(value)) {
@@ -265,7 +250,6 @@ yespix.fn.mixin = function(object, properties) {
  * Returns the list of ancestors of the entity
  */
 yespix.fn.ancestors = function(name) {
-    //				console.log('ancestors :: name = '+name);
     if (this.entityClasses[name]) {
         var list = [];
         for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -273,10 +257,8 @@ yespix.fn.ancestors = function(name) {
             list = list.concat(this.ancestors(a));
         }
         list.push(name);
-        //					console.log('ancestors :: return list length '+list.length);
         return list;
     } else {
-        //					console.log('ancestors :: return empty list');
         return [];
     }
 };
@@ -337,9 +319,6 @@ yespix.fn.define = function(name, list, properties) {
     });
 
     return this;
-    //console.log('entity.define :: entity class name "'+name+'" added');
-    //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
-    //console.log('----');
 };
 
 /**
@@ -402,7 +381,6 @@ yespix.fn.isEntityAncestorsPending = function(className) {
     for (var t = 0; t < len; t++) {
         if (this.entityAncestorsPending[t] == className) return true;
     }
-    //console.log('isEntityAncestorsPending :: entity "' + className + '" not pending');
 
     return false;
 };
@@ -483,7 +461,6 @@ yespix.fn.instanceAdd = function(entity) {
     // entity must be unique
     if (entity.isUnique == true)
     {
-        console.log('instanceAdd :: isUnique :: deleting other entities');
         this.find('.'+entity._class+', /'+entity._class).destroy();
         if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0)
         {
@@ -548,7 +525,6 @@ yespix.fn.instanceRemove = function(entity) {
         console.warn('instanceRemove :: parameter entity is undefined');
         return false;
     }
-    console.log('instanceRemove :: remove entity '+entity.name);
     // remove reference from the global instances list
     if (this.entityInstances[''])
     {
@@ -647,7 +623,6 @@ yespix.fn.hasAncestors = function(classname, ancestors) {
  * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
  */
 yespix.fn.call = function(entity, fn, ancestors, params) {
-    //console.log('call : entity._class='+entity._class+', fn='+fn+', ancestors='+ancestors);
 
     if (!this.isDefined(entity._class)) return null;
     if (this.isString(ancestors)) ancestors = ancestors.split(',');
@@ -660,8 +635,6 @@ yespix.fn.call = function(entity, fn, ancestors, params) {
 
     if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
     else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
-
-    //console.log('ancestors = '+ancestors.join(', '));
 
     var result = [];
     for (var t = 0; t < ancestors.length; t++) {

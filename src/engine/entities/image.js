@@ -77,7 +77,6 @@ yespix.define('image', 'gfx', {
     },
 
     image: function(properties) {
-        //console.log('image :: properties = '+properties);
 
         if (properties == undefined)
             if (this.images[0]) return this.imageInit(this.images[0]);
@@ -92,10 +91,8 @@ yespix.define('image', 'gfx', {
         var max = Object.keys(properties).length;
         var count = 0;
         for (var t = 0; t < this.images.length; t++) {
-            //console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
             for (var n in properties) {
                 if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
-                //console.log('property "'+n+'", max = '+max+', count = '+count);
                 if (count >= max) return this.imageInit(this.images[t]);
             }
         }
@@ -120,10 +117,8 @@ yespix.define('image', 'gfx', {
         image.isInitiated = true;
         image.entity = entity;
         image.element = document.createElement('img');
-        //console.log('createElement :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
 
         if (image.element) image.element.onload = image.element.onLoad = function() {
-            //console.log('image.onlad :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
             image.realWidth = this.width;
             image.realHeight = this.height;
             image.isReady = true;
@@ -132,15 +127,8 @@ yespix.define('image', 'gfx', {
                 image.element = entity.resize(image.element, entity.pixelSize);
                 image.realWidth = this.width * entity.pixelSize;
                 image.realHeight = this.height * entity.pixelSize;
-
-                //console.log('image resized');
-                //yespix.call(entity, 'draw', 'gfx');
-                //yespix.error();
             }
-            //yespix.timerStop();
             
-            console.log('image :: trigger imageReady');
-            console.log(entity);
             entity.trigger('imageReady', {
                 target: image,
             });
@@ -173,7 +161,6 @@ yespix.define('image', 'gfx', {
             } else context = this._context;
         }
 
-        //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
         var img = this.image(this.imageSelected);
         var box = this.getDrawBox();
         var scaleX = this.flipX ? -1 : 1;

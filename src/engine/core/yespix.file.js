@@ -124,12 +124,6 @@ yespix.fn.load = function(fileList, complete, options) {
         // file will now refer to the current file URL object
         var file = this.data.file[fileList[index]];
 
-        //console.log('load :: start for url '+fileList[index]);
-        //if (!this.data.file[fileList[index]]) console.log('load :: file undefined');
-        //if (!this.data.file[fileList[index]].state) console.log('load :: file with no state');
-        //if (this.data.file[fileList[index]].state) console.log('load :: file state '+this.data.file[fileList[index]].state);
-        //if (urlOptions.entity && urlOptions.entity.name) console.log('load :: urlOptions.entity.name '+urlOptions.entity.name);
-
         // starting a XMLHttpRequest client only if the file is not currently downloading.
         if (!this.data.file[fileList[index]] // file URL not previously loaded
             || !this.data.file[fileList[index]].state // file URL has no state 
@@ -314,10 +308,7 @@ yespix.fn.load = function(fileList, complete, options) {
                     // executes success and complete functions
                     newEvent.state = file.state = 'loaded';
                     for (var t = 0; t < this.file.options.length; t++) {
-                        //console.log('load :: complete :: t='+t+'');
                         if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
-                        //if (newEvent.entity) console.log('load :: complete :: newEvent entity.name='+newEvent.entity.name+'');
-                        //else console.log('load :: complete :: newEvent NO entity');
                         newEvent.stat = this.file.options[t].stat;
                         newEvent.type = 'success';
                         this.file.options[t]['success'](newEvent);
@@ -472,11 +463,9 @@ yespix.fn.css = function(fileList, complete, options) {
 
             var interval_id = setInterval(function() { // start checking whether the style sheet has successfully loaded
                     try {
-                        //console.log('len = '+s[sheet][cssRules].length);
                         if (s[sheet] && s[sheet][cssRules].length) { // SUCCESS! our style sheet has loaded
                             clearInterval(interval_id); // clear the counters
                             clearTimeout(timeout_id);
-                            //console.log('addcss :: load link success');
                             complete(e);
                         }
                     } catch (e) {} finally {}
@@ -492,9 +481,7 @@ yespix.fn.css = function(fileList, complete, options) {
     } else {
         var token = 0;
         options['complete'] = function(e) {
-            //						console.log('complete::: token ='+token+', url = '+fileList[token]);
             if (fileList[token] == e.url) {
-                //console.log('complete css '+e.file);
                 var s = document.createElement('link');
                 s.type = 'text/css';
                 s.rel = 'stylesheet';

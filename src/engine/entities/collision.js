@@ -79,7 +79,6 @@ yespix.define('collision', {
     },
 
     drawDebugCollision: function(context, drawBox) {
-        console.log('drawDebugCollision');
         if (this.collisionBox) {
             var box = drawBox || this.collisionBox();
             context.globalAlpha = 1;

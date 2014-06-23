@@ -53,13 +53,10 @@ yespix.fn.collisionOccupy = function(entity) {
     var cellY = minCellY = Math.floor(box.y / this.collisionSize);
     var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
     var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
-    //if (this.key(' ')) this.dump(box, 'collisionOccupy :: box for entity "' + entity.name + '"');
-    //if (this.key(' ')) console.log('collisionOccupy :: minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
 
     while (cellX <= maxCellX) {
         cellY = minCellY;
         while (cellY <= maxCellY) {
-            //if (this.key(' ')) console.log('collisionOccupy :: cellX = ' + cellX + ', cellY = ' + cellY);
             this.collisionAdd(entity, cellX, cellY);
             cellY++;
         }
@@ -143,12 +140,10 @@ yespix.fn.collisionInside = function(entity1, entity2) {
  * @chainable
  */
 yespix.fn.collision = function(entity) {
-    //if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
     var entities = []; // store checked entities to check for collision only once
 
     var box = entity.collisionBox();
     if (box.width <= 0 || box.height <= 0) {
-        //if (this.key(' ')) console.log('no collision box');
         return;
     }
     var cellX = minCellX = Math.floor(box.x / this.collisionSize);
@@ -156,19 +151,13 @@ yespix.fn.collision = function(entity) {
     var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
     var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
 
-    //if (this.key(' ')) console.log('minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
     while (cellX <= maxCellX) {
-        //if (this.key(' ')) console.log('cellX = ' + cellX);
         cellY = minCellY;
         while (cellY <= maxCellY) {
-            //if (this.key(' ')) console.log('cellY = ' + cellY);
             var cell = this.collisionCell(cellX, cellY);
-            //if (this.key(' ')) console.log(cell.length + ' entities in cell ' + cellX + ', ' + cellY);
             for (var t = 0; t < cell.length; t++) {
                 if (cell[t] !== entity && !this.inArray(entities, cell[t])) {
-                    //if (this.key(' ')) console.log('collision t=' + t + ', cw = ' + entity.collisionWith(cell[t]) + ', cc = ' + this.collisionCheck(entity, cell[t]));
                     if (entity.collisionWith(cell[t]) && this.collisionCheck(entity, cell[t])) {
-                        //console.log('trigger collide on entity "' + entity.name + '"');
                         entity.trigger('collide', {
                             entity: cell[t]
                         });

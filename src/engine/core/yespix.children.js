@@ -14,16 +14,15 @@ yespix.fn.attach = function(parent, child) {
 
     if (!parent)
     {
-        console.warn('attach :: parent undefined');
+        console.warn('attach :: cannot attach, parent undefined');
         return this;
     }
     if (!child)
     {
-        console.warn('attach :: child undefined');
+        console.warn('attach :: cannot attach, child undefined');
         return this;
     }
 
-    console.log('yespix.attach :: parent='+parent+', child='+child);
     // multiple children
     if (this.isArray(child)) {
         for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
@@ -34,14 +33,8 @@ yespix.fn.attach = function(parent, child) {
     if (child && !child._parent == parent) return null;
 
     // attach
-    console.log('attach :: entity name = '+child.name+' to parent '+parent.name);
-    if (parent._children) console.log('attach :: parent._children = '+parent._children.length);
-    else console.log('attach :: parent._children = 0 ');
-
     if (!parent._children) parent._children = [child];
     else parent._children.push(child);
-
-    console.log('attach :: parent._children = '+parent._children.length);
 
     if (child._parent) this.detach(child._parent, child);
     child._parent = parent;
@@ -49,6 +42,12 @@ yespix.fn.attach = function(parent, child) {
 };
 
 yespix.fn.detach = function(parent, child) {
+    if (!parent)
+    {
+        console.warn('detach :: cannot detach, parent undefined');
+        return this;
+    }
+
     var t;
 
     // detach everything 

@@ -36,7 +36,6 @@ yespix.define('level', 'gfx,move', {
     block: function(cellX, cellY) {
         var index = cellY * this.levelData.width + cellX;
         var tileIndex = this.levelCollision[index];
-        console.log('block :: ('+cellX+', '+cellY+') :: index = ' + index + ', tileIndex = ' + tileIndex);
         if (tileIndex > 0) return true;
         return false;
     },
@@ -149,8 +148,6 @@ yespix.define('level', 'gfx,move', {
             // cellNext is the final cell on the right of the entity
             var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
 
-            //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
-
             if (cellNext > cellBottom) {
 
                 down = true;
@@ -186,8 +183,6 @@ yespix.define('level', 'gfx,move', {
             // cellNext is the final cell on the right of the entity
             var cellNext = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
 
-            //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
-
             if (cellNext < cellTop) {
 
                 up = true;
@@ -197,15 +192,8 @@ yespix.define('level', 'gfx,move', {
                 var stopped = false;
                 for (var y = cellTop; y >= cellNext; y--) {
                     for (var x = cellLeft; x <= cellRight; x++) {
-                        //console.log('level.collision :: x=' + x + ', y=' + y + ', block=' + this.block(x, y));
                         if (this.block(x, y)) {
                             this.collisionUp(entity, box, x, y);
-                            /*
-									var posY = this.y + (y + 1) * this.levelData.tileheight + 1 - box.offsetY;
-									console.log('entity posY from ' + entity.y + ' to ' + posY);
-									entity.y = posY;
-									entity.speedY = 0;
-									*/
                             stopped = true;
                             break;
                         }
@@ -219,7 +207,6 @@ yespix.define('level', 'gfx,move', {
             var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
             var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
             if (this.block(cellRight, cellTop)) {
-                console.log('Double collision right top');
                 this.collisionUp(entity, box, cellRight, cellTop);
                 this.collisionRight(entity, box, cellRight, cellTop);
             }
@@ -227,7 +214,6 @@ yespix.define('level', 'gfx,move', {
             var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
             var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
             if (this.block(cellRight, cellBottom)) {
-                console.log('Double collision right down');
                 //this.collisionDown(entity, box, cellRight, cellBottom);
                 this.collisionRight(entity, box, cellRight, cellBottom);
             }
@@ -235,7 +221,6 @@ yespix.define('level', 'gfx,move', {
             var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
             var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
             if (this.block(cellLeft, cellBottom)) {
-                console.log('Double collision left down');
                 //this.collisionDown(entity, box, cellLeft, cellBottom);
                 this.collisionLeft(entity, box, cellLeft, cellBottom);
             }
@@ -243,7 +228,6 @@ yespix.define('level', 'gfx,move', {
             var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
             var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
             if (this.block(cellLeft, cellTop)) {
-                console.log('Double collision left up');
                 this.collisionUp(entity, box, cellLeft, cellTop);
                 this.collisionLeft(entity, box, cellLeft, cellTop);
             }
@@ -255,7 +239,6 @@ yespix.define('level', 'gfx,move', {
             var cellNext = Math.floor((box.y + box.height + 1) / this.levelData.tileheight);
             if (cellNext == cellBottom) {
                 entity.isOnGround = false;
-                //console.log('entity NOT on ground');
             } else {
                 entity.isOnGround = false;
                 var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
@@ -282,26 +265,20 @@ yespix.define('level', 'gfx,move', {
 
 
     load: function(src) {
-        // destroy other loaded levels @todo
-        //yespix.find('/level').not(this).destroy();
     	this.levelDir = yespix.getDir(src);
-    	//console.log('level :: load :: dir = '+this.levelDir);
 
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         
-        //console.log('level :: load :: loading level data for '+this.name);
         yespix.load(src, {
             'complete': function(e) {
             	var entity = e.entity;
-                //console.log('complete for '+entity.name);
             	entity.levelData = JSON.parse(e.content);
 
                 entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                 entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
                 entity.buildLevelCollision();
                 
-                //console.log(entity.levelData);
                 if (entity.levelData.layers)
                 {
                 	// load tilesets
@@ -309,13 +286,8 @@ yespix.define('level', 'gfx,move', {
                 	var count = entity.levelData.tilesets.length; 
                 	for (var t = 0; t < count; t++)
                		{
-                		//console.log('level :: complete :: t = '+t);
                 		images.push(entity.levelDir+entity.levelData.tilesets[t].image);
-                		//tileset.on('');
                		}
-                	//console.log('images = ');
-                	//console.log(images);
-                    //console.log('level :: load / complete for '+entity.name+' :: tileset images count '+count);
                 	entity.tilesets = yespix.spawn(
                 			'image', 
                 			{
@@ -350,13 +322,9 @@ yespix.define('level', 'gfx,move', {
     	console.log('level :: tilesetsReady :: layers count '+count);
     	for (var t = 0; t < count; t++)
    		{
-    		//console.log('level :: tilesetsReady :: making layer t = '+t);
     		layer = yespix.spawn('layer');
             this.attach(layer);
     		layer.setLevel(this);
-    		
-    		//console.log('level :: tilesetsReady :: this.levelData = ');
-    		//console.log(this.levelData);
     		
     		this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
     		layer.load(this.levelData.layers[t]);

@@ -16,7 +16,6 @@
  *
  */
 yespix.fn.support = function(type) {
-    //console.log('yespix.support :: type='+type);
     if (!type) return null;
     var types = type.split('/');
 
@@ -41,14 +40,11 @@ yespix.fn.support = function(type) {
 
     // create element if needed
     if (this.data.support.elements[types[0]] === undefined) {
-        //console.log('type='+type+', types[0]='+types[0]+', types[1]='+types[1]);
         this.data.support.elements[types[0]] = document.createElement(types[0]);
-        //		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
         if (this.data.support.elements[types[0]] === false) this.data.support.elements[types[0]] = false;
     }
 
     var e = this.data.support.elements[types[0]];
-    //	if (!e || !! e.canPlayType == false) return false;
     if (!e || e.canPlayType === false) return false;
 
     var str = e.canPlayType(type);

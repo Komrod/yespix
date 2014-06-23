@@ -342,7 +342,6 @@ yespix.fn.init = function(options) {
 
         // triggers on YESPIX engine
         yespix.trigger(e.type, e);
-        console.log('trigger ' + e.type);
         //return false;
     };
 
@@ -398,7 +397,6 @@ yespix.fn.init = function(options) {
      * blur
      */
     document.onblur = function(e) {
-        //console.log('blur');
         yespix.data.key.pressed = {};
         yespix.data.key.hold = {};
         yespix.data.key.down = {};

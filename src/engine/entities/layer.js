@@ -46,15 +46,10 @@ yespix.define('layer', 'gfx', {
         
         this.canvas.width = this.width;
         this.canvas.height = this.height;
-        
-        //onsole.log('layer :: update :: width = '+this.width+', height = '+this.height);
-        //console.log(this);
-        //console.log(this.layerData);
     },
     
     drawTile: function(spriteIndex, cellX, cellY)
     {
-    	//console.log('drawTile :: spriteIndex = '+spriteIndex+', cellX = '+cellX+', cellY = '+cellY);
     	var img = this.level.tilesets.image(0);
     	if (!img.isReady)
   		{
@@ -65,13 +60,6 @@ yespix.define('layer', 'gfx', {
     	var max = Math.floor(img.element.width / infos.tilewidth);
     	var line = Math.floor(spriteIndex / max);
     	var col = spriteIndex - (line * max);
-    	/*console.log('max = '+max);
-    	console.log('img.element.width = '+img.element.width+', infos.tilewidth = '+infos.tilewidth+', line = '+line),
-    	console.log('col = '+col);
-    	console.log('drawTile :: infos = ');
-    	console.log(infos);*/
-    	
-    	console.log('drawTile: line = '+line+', col = '+col+', max = '+max+', tilewidth = '+this.layerData.tilewidth+', pox = '+(line * this.layerData.tilewidth));
     	
         this.drawContext.drawImage(img.element, //image element
                 col * this.layerData.tilewidth, // x position on image
@@ -92,14 +80,8 @@ yespix.define('layer', 'gfx', {
     
     
     make: function() {
-        console.log('layer :: make');
-        
         this.clear();
         if (!this.layerData || !this.level) return;
-        
-        console.log('layer :: make :: start');
-        console.log('layerData = ');
-        console.log(this.layerData);
         
         var index = 0;
         
@@ -125,9 +107,7 @@ yespix.define('layer', 'gfx', {
                 if (this._context) context = this._context;
             } else context = this._context;
         }
-        //console.log('layer :: draw :: context='+context+', this.canvas='+this.canvas);
         if (context && this.canvas) {
-            //console.log('layer :: draw :: context.globalAlpha='+context.globalAlpha+', this.level.x='+this.level.x+', this.level.y='+this.level.y+', width='+this.canvas.width+', height='+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
             	this.level.x, // x position on image

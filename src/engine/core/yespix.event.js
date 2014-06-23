@@ -151,21 +151,18 @@ yespix.fn.listen = function(obj, pname, callback) {
     // listen to multiple properties
     if (this.isArray(pname)) {
         for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
-        return true;
+        return this;
     }
 
     // listen to multiple objects
     if (this.isArray(obj)) {
         for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
-        return true;
+        return this;
     }
 
-    //console.log('listen :: obj[pname] = ' + obj[pname]);
     var initValue = obj[pname];
     callback = callback || this.listenTrigger;
     if (Object.defineProperty) {
-        //				var value = obj[pname];
-        //				console.log('value = '+value);
         obj['__var_callback_' + pname] = callback;
 
         Object.defineProperty(obj, pname, {
@@ -202,9 +199,7 @@ yespix.fn.listen = function(obj, pname, callback) {
         obj['__var_old_' + pname] = initValue;
         obj['__var_new_' + pname] = initValue;
         obj['__var_callback_' + pname] = callback;
-        //console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
         this.on('enterFrame', function() {
-            //console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
             if (this[pname] != this['__var_new_' + pname]) {
                 this['__var_old_' + pname] = this['__var_new_' + pname];
                 this['__var_new_' + pname] = this[pname];
@@ -218,9 +213,8 @@ yespix.fn.listen = function(obj, pname, callback) {
         }, obj, this);
 
     }
-    //console.log('listen :: before set obj[pname] = ' + obj[pname]);
     obj[pname] = initValue;
-    //console.log('listen :: after set obj[pname] = ' + obj[pname]);
+    return this;
 };
 
 yespix.fn.listenTrigger = function(obj, e) {

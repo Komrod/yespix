@@ -39,13 +39,10 @@ yespix.define('anim', 'image', {
      * @return {[type]} [description]
      */
     animFramesInit: function() {
-        //console.log('animFramesInit');
 
         // check every animation
         for (var name in this.anims) {
             var anim = this.anims[name];
-
-            //console.log('animFramesInit :: name = ' + name);
 
             // only animation that is not ready
             if (!anim.isReady) {
@@ -54,8 +51,6 @@ yespix.define('anim', 'image', {
                 if (anim.frames && anim.frames.length)
                     for (var t = 0; t < anim.frames.length; t++) {
                         var frame = anim.frames[t];
-                        // console.log('animFramesInit :: frame '+t+', isReady = '+frame.isReady+', image = '+frame.image);
-                        //if (frame.image) console.log('image.isReady = ' + frame.image.isReady);
                         if (frame.isReady) continue;
                         if (!frame.image || !frame.image.isReady) {
                             frame.isReady = false;
@@ -87,14 +82,11 @@ yespix.define('anim', 'image', {
                             // so we need to update this variable on each frame
                             maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
 
-                            console.log('maxLine = ' + maxLine);
-
                             if (maxLine > 0) {
                                 frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
                                 frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
                                 frame.isReady = true;
-                                console.log('frame :: t=' + t + ', frameIndex=' + frame.frameIndex + ', from=' + anim.from + ', maxLine=' + maxLine + ', x=' + frame.x + ', y=' + frame.y);
-                            } //else console.log('frame :: t='+t+', frameIndex='+frame.frameIndex+', maxLine='+maxLine);
+                            }
                         }
                     if (anim.extendsTo) {
                         for (var t = 0; t < anim.extendsTo.length; t++) {
@@ -109,9 +101,7 @@ yespix.define('anim', 'image', {
                                     if (this.anims[anim.extendsTo[t]].flipX) this.anims[anim.extendsTo[t]].frames[u].flipX = !this.anims[anim.extendsTo[t]].frames[u].flipX;
                                     if (this.anims[anim.extendsTo[t]].flipY) this.anims[anim.extendsTo[t]].frames[u].flipY = !this.anims[anim.extendsTo[t]].frames[u].flipY;
                                     if (this.anims[anim.extendsTo[t]].oldFrames && this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                        //                                              console.log('oldFrames '+u+' exists');
                                         for (var n in this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                            //                                                  console.log('copy property n='+n);
                                             this.anims[anim.extendsTo[t]].frames[u][n] = this.anims[anim.extendsTo[t]].oldFrames[u][n];
                                         }
                                     }
@@ -126,12 +116,9 @@ yespix.define('anim', 'image', {
     },
 
     animInit: function() {
-        //console.log('animInit :: this.anims = ' + this.anims);
-
         for (var name in this.anims) {
 
             var anim = this.anims[name];
-            //console.log('animInit :: anim name = ' + name);
 
             // check if all images are ready
             anim.name = name;
@@ -143,13 +130,12 @@ yespix.define('anim', 'image', {
                 if (!this.animSelected) this.animSelected = name;
             }
 
-            //console.log('animInit :: anim.extendsFrom = ' + anim.extendsFrom);
             if (anim.extendsFrom) {
                 if (this.anims[anim.extendsFrom]) {
                     if (!this.anims[anim.extendsFrom].extendsTo) this.anims[anim.extendsFrom].extendsTo = [name];
                     else this.anims[anim.extendsFrom].extendsTo.push(name);
-                } //else console.log('animInit :: anim.extendsFrom "' + anim.extendsFrom + '" does not exist');
-            } //else 
+                } 
+            }
 
             // "frames" is an array of frames
             else if (yespix.isArray(anim['frames'])) {
@@ -258,7 +244,6 @@ yespix.define('anim', 'image', {
         if (!this.animTime || this.animTime <= now) {
             this.animFrame++;
 
-            //console.log('animFrame = '+this.animFrame+', frames.length = '+this.anims[this.animSelected].frames.length);
             if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                 this.animFrame = 0;
                 animEnded = true;
@@ -302,7 +287,6 @@ yespix.define('anim', 'image', {
             } else context = this._context;
         }
 
-        //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
         var frame = this.anims[this.animSelected].frames[this.animFrame];
         var img = frame.image;
 
@@ -326,7 +310,6 @@ yespix.define('anim', 'image', {
                 context.scale(scaleX, scaleY);
             }
             context.globalAlpha = this.alpha;
-            //if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
             context.drawImage(img.element, //image element
                 x, // x position on image
                 y, // y position on image
