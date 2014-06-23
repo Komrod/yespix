@@ -5,9 +5,11 @@
 
 /**
  * clear the collision map
+ * @chainable
  */
 yespix.fn.collisionClear = function() {
     this.data.collisionMap = [];
+    return this;
 };
 
 /**
@@ -18,6 +20,7 @@ yespix.fn.collisionCellSize = function(size) {
     if (size < 1) size = 32;
     this.collisionSize = size;
     this.collisionClear();
+    return this;
 };
 
 /**
@@ -38,6 +41,7 @@ yespix.fn.collisionCell = function(x, y, type) {
 
 /**
  * Add the entity in the collision map according to the collision box
+ * @chainable
  * @todo shouldnt always be a box (cirle, elipse ...)
  * @todo multiple box for an entity
  */
@@ -61,6 +65,7 @@ yespix.fn.collisionOccupy = function(entity) {
         }
         cellX++;
     }
+    return this;
 };
 
 yespix.fn.collisionAdd = function(entity, x, y, type) {
@@ -73,19 +78,14 @@ yespix.fn.collisionAdd = function(entity, x, y, type) {
     if (!line) {
         line = this.data.collisionMap[x] = [];
         line[y] = [entity];
-        //if (this.key(' ')) console.log('collisionAdd :: new line');
-        //if (this.key(' ')) console.log('collisionAdd :: final entity count 1');
-        return true;
+        return this;
     }
     if (!line[y]) {
         line[y] = [];
-        if (this.key(' ')) console.log('collisionAdd :: new column, final entity count 1');
     }
     line[y].push(entity);
-    if (this.key(' ')) console.log('collisionAdd :: before unique count ' + line[y].length);
     this.unique(line[y]);
-    if (this.key(' ')) console.log('collisionAdd :: final entity count ' + line[y].length);
-    return true;
+    return this;
 };
 
 yespix.fn.collisionCheck = function(entity1, entity2) {
@@ -139,6 +139,9 @@ yespix.fn.collisionInside = function(entity1, entity2) {
     return false;
 };
 
+/**
+ * @chainable
+ */
 yespix.fn.collision = function(entity) {
     //if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
     var entities = []; // store checked entities to check for collision only once
@@ -177,5 +180,5 @@ yespix.fn.collision = function(entity) {
         }
         cellX++;
     }
-
+    return this;
 };

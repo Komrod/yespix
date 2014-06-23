@@ -333,6 +333,7 @@ yespix.define('level', 'gfx,move', {
             },
             'entity': this,
         });
+        return this;
     },
     
     tilesetsReady: function()

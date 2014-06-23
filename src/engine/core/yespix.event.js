@@ -228,4 +228,5 @@ yespix.fn.listenTrigger = function(obj, e) {
     if (!obj._changedList) obj._changedList = {};
     obj._changedList[e.name] = true;
     obj.trigger('change:' + e.name, e);
+    return this;
 };
