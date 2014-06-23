@@ -25,8 +25,8 @@ yespix.define('collision', {
     	
         if (yespix.isUndefined(this.pixelSize)) {
             return {
-                x: this.x + this.colOffsetX + obj.x,
-                y: this.y + this.colOffsetY + obj.y,
+                x: this.x + this.colOffsetX - obj.x,
+                y: this.y + this.colOffsetY - obj.y,
                 width: this.colWidth,
                 height: this.colHeight,
                 offsetX: this.colOffsetX,
@@ -34,8 +34,8 @@ yespix.define('collision', {
             };
         } else {
             return {
-                x: this.x + this.colOffsetX * this.pixelSize + obj.x,
-                y: this.y + this.colOffsetY * this.pixelSize + obj.y,
+                x: this.x + this.colOffsetX * this.pixelSize - obj.x,
+                y: this.y + this.colOffsetY * this.pixelSize - obj.y,
                 width: this.colWidth * this.pixelSize,
                 height: this.colHeight * this.pixelSize,
                 offsetX: this.colOffsetX * this.pixelSize,
