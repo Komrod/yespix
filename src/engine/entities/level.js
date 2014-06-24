@@ -12,9 +12,34 @@ yespix.define('level', 'gfx,move', {
     context: null,
     tilesets: null,
     levelDir: '',
+    followOptions: null,
 
     isUnique: true,
     canApplyGravity: false,
+
+    getDrawBox: function() {
+        if (this.snapToPixel) {
+            var x = parseInt(this.x);
+            var y = parseInt(this.y);
+        } else {
+            var x = this.x;
+            var y = this.y;
+        }
+        var width = this.width;
+        var height = this.height;
+
+        if (this.canvas) {
+            width = this.canvas.width;
+            height = this.canvas.height;
+        }
+
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height
+        };
+    },
 
     buildLevelCollision: function()
     {
@@ -329,9 +354,67 @@ yespix.define('level', 'gfx,move', {
     		this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
     		layer.load(this.levelData.layers[t]);
     		layer.make();
+            layer.prop({x: this.x, y: this.y});
     		this.layers.push(layer);
    		}
     	this.isReady = true;
     },
     
+    follow: function(entity, options)
+    {
+        if (!entity)
+        {
+            console.error('follow :: invalid entity to follow')
+            return false;
+        }
+        
+        this.attach(entity);
+
+        options = options || {};
+        if (!options.positionX) options.positionX = 0.5;
+        if (!options.positionY) options.positionY = 0.5;
+        if (!options.speedX) options.speedX = 1;
+        if (!options.speedY) options.speedY = 1;
+
+        this.followOptions = options;
+        entity.on('moveEnd', this.followEntity);
+    },
+
+    /**
+     * @this followed entity
+     */
+    followEntity: function(e)
+    {
+        // @todo add function to do this in level entity
+        if (this._parent)
+        {
+            //this.isActive = false;
+
+            boxEntity = this.getDrawBox();
+            boxParent = this._parent.getDrawBox();
+            /*if (yespix.key('a')) console.log('this = '); 
+            if (yespix.key('a')) console.log(this);
+            if (yespix.key('a')) console.log('boxEntity = '); 
+            if (yespix.key('a')) console.log(boxEntity);
+            if (yespix.key('a')) console.log('boxParent = '); 
+            if (yespix.key('a')) console.log(boxParent);*/
+            var centerX = boxParent.x + boxParent.width * this._parent.followOptions.positionX - boxEntity.width / 2;
+            var centerY = boxParent.y + boxParent.height * this._parent.followOptions.positionY - boxEntity.height / 2;
+            var deltaX = centerX - this.x;
+            var deltaY = centerY - this.y;
+
+            if (yespix.key('a')) console.log('followEntity :: centerX='+centerX+', centerY='+centerY+', this.x='+this.x+', this.y='+this.y+', deltaX='+deltaX+', deltaY='+deltaY);
+            this._parent.moveTo(this._parent.x + deltaX / 200, this._parent.y + deltaY / 200);
+            //console.log('followEntity :: moveTo x='+(this._parent.x - deltaX / 200)+', y='+(this._parent.y - deltaY / 200));
+            //this.isActive = true;
+        }
+    },
+
+    unfollow: function()
+    {
+        this.followOptions = null;
+        this.moveStop();
+    },
+
+
 });

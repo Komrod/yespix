@@ -210,8 +210,6 @@ yespix.define('anim', 'image', {
         var frame = this.anims[name].frames[from];
         if (!frame) return null;
 
-        console.log('playing anim "' + name + '"');
-
         this.animSelected = name;
         this.animFrame = from;
         this.animSpeed = speed;
@@ -263,13 +261,47 @@ yespix.define('anim', 'image', {
                 });
                 this.animWait = false;
                 if (this.animNext && this.animNext != '') {
-                    console.log('animNext = ' + this.animNext);
                     this.animPlay(this.animNext);
                 }
             }
         }
     },
 
+    getFrame: function(animIndex, frameIndex)
+    {
+        animIndex = animIndex || this.animSelected;
+        if (!this.anims[animIndex]) return false;
+        frameIndex = frameIndex || this.animFrame;
+        if (!this.anims[animIndex].frames[frameIndex]) return false;
+        return this.anims[animIndex].frames[frameIndex];
+    },
+
+    getDrawBox: function() {
+        if (this.snapToPixel) {
+            var x = parseInt(this.x);
+            var y = parseInt(this.y);
+        } else {
+            var x = this.x;
+            var y = this.y;
+        }
+        var width = this.width;
+        var height = this.height;
+        
+        var frame = this.getFrame();
+        //if (yespix.key('a') && !frame) console.log('frame = ');
+        //if (yespix.key('a')) console.log(frame);
+        var type = 'anim';
+        width = frame.width;
+        height = frame.height;
+
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            type: type
+        };
+    },
 
     draw: function(context) {
 

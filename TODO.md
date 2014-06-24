@@ -1,14 +1,16 @@
 TODO list:
 
 - player get throught floor on high gravity
+- getDrawBox sometimes get x and y as NaN on actor2w
 - parallax layer
+- auto attach every entity to the current level
 - make layer a general empty drawable canvas (view), put the level build on the level entity
+- level follow an entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - on actor entity, make walk animation speed progressive
 - fix bug collision between entities
-- Make an entity dump where you can see where properties come from
 - Make a basic Zombie Sim
 - tag version 0.14
 - remove entity._instances array = obsolete

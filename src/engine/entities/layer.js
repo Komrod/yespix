@@ -110,8 +110,8 @@ yespix.define('layer', 'gfx', {
         if (context && this.canvas) {
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
-            	this.level.x, // x position on image
-            	this.level.y, // y position on image
+            	this.x, // x position on image
+            	this.y, // y position on image
                 this.canvas.width, // width on image
                 this.canvas.height // height on image
             );

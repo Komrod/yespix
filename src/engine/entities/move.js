@@ -19,9 +19,12 @@ yespix.define('move', {
 
     moveTo: function(x, y)
     {
+        if (isNaN(x) || isNaN(y)) return false;
+
         // move children
-        var deltaX = this.x - x,
-            deltaY = this.y - y;
+        var deltaX = x - this.x,
+            deltaY = y - this.y;
+
         this.moveChildren(deltaX, deltaY);
 
         // move entity
@@ -30,6 +33,8 @@ yespix.define('move', {
     },
 
     move: function() {
+        this.trigger('moveStart', {entity: this});
+
         // apply gravity
         if (this.canApplyGravity && yespix.gravity) this.applyGravity();
 
@@ -50,12 +55,13 @@ yespix.define('move', {
 
         // move children
         this.moveChildren(this.speedX, this.speedY);
+
+        this.trigger('moveEnd', {entity: this});
     },
 
     moveChildren: function(deltaX, deltaY)
     {
         var count =0; if (this._children) count = this._children.length;
-        console.log('moveChildren :: start :: deltaX='+deltaX+', deltaY='+deltaY+', child count='+count);
         if (!this._children || this._children.length == 0) return false;
         
         var t = 0,
@@ -63,8 +69,12 @@ yespix.define('move', {
 
         for (; t<length; t++)
         {
-            this._children[t].x += deltaX;
-            this._children[t].y += deltaY;
+            if (this._children[t].isActive)
+            {
+                if (yespix.key('a')) console.log('moveChildren :: move children t='+t+', name='+this._children[t].name);
+                this._children[t].x += deltaX;
+                this._children[t].y += deltaY;
+            }
         }
     },
 

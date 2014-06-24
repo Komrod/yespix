@@ -46,13 +46,16 @@ yespix.define('gfx', {
         }
         var width = this.width;
         var height = this.height;
-
-        if (this.typeof('image')) {
+        
+        if (this.typeof('anim')) 
+        {
             var img = this.image(this.imageSelected);
+            var type = 'anim';
             width = this.width || img.width || img.realWidth;
             height = this.height || img.height || img.realHeight;
-        } else if (this.typeof('anim')) {
+        } else if (this.typeof('image')) {
             var img = this.image(this.imageSelected);
+            var type = 'image';
             width = this.width || img.width || img.realWidth;
             height = this.height || img.height || img.realHeight;
         }
@@ -61,7 +64,8 @@ yespix.define('gfx', {
             x: x,
             y: y,
             width: width,
-            height: height
+            height: height,
+            type: type
         };
     },
 

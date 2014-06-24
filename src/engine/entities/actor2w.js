@@ -63,6 +63,8 @@
             init: function() {},
 
             move: function() {
+                this.trigger('moveStart', {entity: this});
+
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
 
@@ -72,6 +74,8 @@
                 if (yespix.level) yespix.level.collision(this);
                 this.x += this.speedX;
                 this.y += this.speedY;
+
+                this.trigger('moveEnd', {entity: this});
             },
 
             applyGravity: function() {

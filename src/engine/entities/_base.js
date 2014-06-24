@@ -204,7 +204,6 @@
 		    },
 
 		    destroy: function() {
-	        	console.log('base :: destroy :: entity name ='+this.name);
 		        this._deleting = true;
 		        this.isActive = false;
 		        this.isVisible = false;
