@@ -1,7 +1,6 @@
 TODO list:
 
 - player get throught floor on high gravity
-- getDrawBox sometimes get x and y as NaN on actor2w
 - parallax layer
 - auto attach every entity to the current level
 - make layer a general empty drawable canvas (view), put the level build on the level entity
@@ -12,46 +11,47 @@ TODO list:
 - on actor entity, make walk animation speed progressive
 - fix bug collision between entities
 - Make a basic Zombie Sim
-- tag version 0.14
+- tag version 0.1.4
 - remove entity._instances array = obsolete
 - limit image draw to visible canvas when an image try to draw partialy outside the canvas
 - animate properties
 - tiled level import
 - draw text
 - draw polygon, line, circle, elipse, star
-- tag version 0.15
+- tag version 0.1.5
 - draw SVG image
 - rotation
 - parent position and rotation affect children
 - Make an Arkanoid game
-- tag version 0.16
+- tag version 0.1.6
 - font from image
 - typewritter: text showing letter by letter with sound
 - panel
 - button
 - Add fillAlpha and lineAlpha in rect entity
 - Make a Steel Sky game (raiden like)
-- tag version 0.17
+- tag version 0.1.7
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
 - function keyCapture() stops the propagation of the pressed key
-- tag version 0.18
+- tag version 0.1.8
 - Bunch must concat, splice, push with arrays
 - create temporary class with space, not only with "," like yespix.spawn('rect move')
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
-- tag version 0.19
+- tag version 0.1.9
 - Create a function to add / remove modules
 - Create a DEV trunk and separate modules with entity definitions
 - Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
-- tag version 0.20
+- tag version 0.2
 - Make the Chuck game
 
 
 DONE:
+- getDrawBox sometimes get x and y as NaN on actor2w
 - move level view, make attached entities move on parent move
 - fix level collision on level position // 2014-06-23
 - property entityUnique to be sure that only one instance of the entity is spawned
