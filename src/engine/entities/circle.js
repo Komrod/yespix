@@ -1,8 +1,8 @@
 yespix.define('circle', 'path', {
 
     circleRadius: 5,
-    
-    init: function() { },
+
+    init: function() {},
 
     drawPath: function(context) {
         context.beginPath();

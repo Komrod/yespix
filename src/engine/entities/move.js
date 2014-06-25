@@ -1,13 +1,12 @@
-
 yespix.define('move', {
     speedX: 0,
     speedY: 0,
     accelX: 0,
     accelY: 0,
     moveFriction: 0.05,
-    
+
     canApplyGravity: true,
-    
+
     moveStop: function() {
         this.speedX = this.speedY = this.accelX = this.accelY = 0;
     },
@@ -17,8 +16,7 @@ yespix.define('move', {
         yespix.on('enterFrame', this.move, this, yespix);
     },
 
-    moveTo: function(x, y)
-    {
+    moveTo: function(x, y) {
         if (isNaN(x) || isNaN(y)) return false;
 
         // move children
@@ -33,7 +31,9 @@ yespix.define('move', {
     },
 
     move: function() {
-        this.trigger('moveStart', {entity: this});
+        this.trigger('moveStart', {
+            entity: this
+        });
 
         // apply gravity
         if (this.canApplyGravity && yespix.gravity) this.applyGravity();
@@ -56,22 +56,22 @@ yespix.define('move', {
         // move children
         this.moveChildren(this.speedX, this.speedY);
 
-        this.trigger('moveEnd', {entity: this});
+        this.trigger('moveEnd', {
+            entity: this
+        });
     },
 
-    moveChildren: function(deltaX, deltaY)
-    {
-        var count =0; if (this._children) count = this._children.length;
+    moveChildren: function(deltaX, deltaY) {
+        var count = 0;
+        if (this._children) count = this._children.length;
         if (!this._children || this._children.length == 0) return false;
-        
+
         var t = 0,
             length = this._children.length;
 
-        for (; t<length; t++)
-        {
-            if (this._children[t].isActive)
-            {
-                if (yespix.key('a')) console.log('moveChildren :: move children t='+t+', name='+this._children[t].name);
+        for (; t < length; t++) {
+            if (this._children[t].isActive) {
+                if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
                 this._children[t].x += deltaX;
                 this._children[t].y += deltaY;
             }

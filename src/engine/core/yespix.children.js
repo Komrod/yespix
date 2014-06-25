@@ -12,13 +12,11 @@
  */
 yespix.fn.attach = function(parent, child) {
 
-    if (!parent)
-    {
+    if (!parent) {
         console.warn('attach :: cannot attach, parent undefined');
         return this;
     }
-    if (!child)
-    {
+    if (!child) {
         console.warn('attach :: cannot attach, child undefined');
         return this;
     }
@@ -42,8 +40,7 @@ yespix.fn.attach = function(parent, child) {
 };
 
 yespix.fn.detach = function(parent, child) {
-    if (!parent)
-    {
+    if (!parent) {
         console.warn('detach :: cannot detach, parent undefined');
         return this;
     }

@@ -3,7 +3,7 @@ yespix.define('path', 'gfx', {
     lineWidth: 0,
     lineColor: '',
     lineAlpha: 1.0,
-    
+
     fillColor: '',
     fillAlpha: 1.0,
 

@@ -46,9 +46,8 @@ yespix.define('gfx', {
         }
         var width = this.width;
         var height = this.height;
-        
-        if (this.typeof('anim')) 
-        {
+
+        if (this.typeof('anim')) {
             var img = this.image(this.imageSelected);
             var type = 'anim';
             width = this.width || img.width || img.realWidth;
@@ -81,13 +80,11 @@ yespix.define('gfx', {
     },
 
     drawAlpha: function(context, type) {
-        if (!type)
-        {
+        if (!type) {
             context.globalAlpha = this.alpha;
-        } else
-        {
-            if (!this[type+'Alpha']) context.globalAlpha = 0;
-            else context.globalAlpha = this.alpha * this[type+'Alpha'];
+        } else {
+            if (!this[type + 'Alpha']) context.globalAlpha = 0;
+            else context.globalAlpha = this.alpha * this[type + 'Alpha'];
         }
     },
 

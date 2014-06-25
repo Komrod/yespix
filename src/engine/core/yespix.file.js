@@ -216,7 +216,7 @@ yespix.fn.load = function(fileList, complete, options) {
                     state: file.state,
                     url: file.url,
                     file: file,
-//                    entity: options['entity'],
+                    //                    entity: options['entity'],
                 };
 
                 // loop inside file.options

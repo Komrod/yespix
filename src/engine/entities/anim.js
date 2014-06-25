@@ -134,7 +134,7 @@ yespix.define('anim', 'image', {
                 if (this.anims[anim.extendsFrom]) {
                     if (!this.anims[anim.extendsFrom].extendsTo) this.anims[anim.extendsFrom].extendsTo = [name];
                     else this.anims[anim.extendsFrom].extendsTo.push(name);
-                } 
+                }
             }
 
             // "frames" is an array of frames
@@ -267,8 +267,7 @@ yespix.define('anim', 'image', {
         }
     },
 
-    getFrame: function(animIndex, frameIndex)
-    {
+    getFrame: function(animIndex, frameIndex) {
         animIndex = animIndex || this.animSelected;
         if (!this.anims[animIndex]) return false;
         frameIndex = frameIndex || this.animFrame;
@@ -286,7 +285,7 @@ yespix.define('anim', 'image', {
         }
         var width = this.width;
         var height = this.height;
-        
+
         var frame = this.getFrame();
         //if (yespix.key('a') && !frame) console.log('frame = ');
         //if (yespix.key('a')) console.log(frame);

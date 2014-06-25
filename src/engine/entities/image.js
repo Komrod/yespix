@@ -128,7 +128,7 @@ yespix.define('image', 'gfx', {
                 image.realWidth = this.width * entity.pixelSize;
                 image.realHeight = this.height * entity.pixelSize;
             }
-            
+
             entity.trigger('imageReady', {
                 target: image,
             });

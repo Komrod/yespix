@@ -4,8 +4,7 @@ yespix.define('roundrect', 'rect', {
 
     init: function() {},
 
-    getBorderRadius: function()
-    {
+    getBorderRadius: function() {
         if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
         if (this.height < this.width) return this.height / 2;
         return this.width / 2;

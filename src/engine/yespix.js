@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-16 */
+/*! yespix - v0.1.0 - 2014-06-25 */
 (function(undefined) {
 
     /**
@@ -39,9 +39,6 @@
 
     // bunch init
     Bunch = function(list) {
-        // if (list) console.log('Bunch :: list = '+list+', length = '+list.length+', instanceOf Bunch = '+(this instanceof Bunch));
-        //else console.log('Bunch :: list = '+list+', length = -');
-        //console.log('Bunch :: instanceOf Bunch = '+(this instanceof Bunch));
         if (!(this instanceof Bunch)) return new Bunch(list);
         this.__bunch_init.apply(this, arguments);
     };
@@ -52,7 +49,6 @@
         for (var t = 0; t < this.length; t++) {
             for (var u = t + 1; u < this.length; u++) {
                 if (this[t] === this[u]) {
-                    //console.log('Bunch.unique :: splice an element');
                     this.splice(u--, 1);
                 }
             }
@@ -67,9 +63,6 @@
 	*/
 
     Bunch.prototype.__bunch_init = function(list) {
-        // if (list) console.log('Bunch.init :: list = '+list+', length = '+list.length);
-        // else console.log('Bunch.init :: list = '+list+', length = -');
-
         if (list && list.length > 0) {
             for (var t = 0; t < list.length; t++) this.push(list[t]);
             this.unique();
@@ -103,13 +96,23 @@
      */
 
     /**
-     * @todo  moving rotating the parent will affect the children
+     * @todo  rotating the parent will affect the children
      * @param {entity} parent The parent
      * @param {entity|array} child An entity to attached or an array of entities
      * @example attach(entity1, entity2) attaches entity2 to entity1
      * @example attach(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
      */
     yespix.fn.attach = function(parent, child) {
+
+        if (!parent) {
+            console.warn('attach :: cannot attach, parent undefined');
+            return this;
+        }
+        if (!child) {
+            console.warn('attach :: cannot attach, child undefined');
+            return this;
+        }
+
         // multiple children
         if (this.isArray(child)) {
             for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
@@ -117,7 +120,7 @@
         }
 
         // try to attach an entity already attached to the parent
-        if (child._parent == parent) return null;
+        if (child && !child._parent == parent) return null;
 
         // attach
         if (!parent._children) parent._children = [child];
@@ -129,6 +132,11 @@
     };
 
     yespix.fn.detach = function(parent, child) {
+        if (!parent) {
+            console.warn('detach :: cannot detach, parent undefined');
+            return this;
+        }
+
         var t;
 
         // detach everything 
@@ -166,9 +174,11 @@
 
     /**
      * clear the collision map
+     * @chainable
      */
     yespix.fn.collisionClear = function() {
         this.data.collisionMap = [];
+        return this;
     };
 
     /**
@@ -179,6 +189,7 @@
         if (size < 1) size = 32;
         this.collisionSize = size;
         this.collisionClear();
+        return this;
     };
 
     /**
@@ -199,6 +210,7 @@
 
     /**
      * Add the entity in the collision map according to the collision box
+     * @chainable
      * @todo shouldnt always be a box (cirle, elipse ...)
      * @todo multiple box for an entity
      */
@@ -210,18 +222,16 @@
         var cellY = minCellY = Math.floor(box.y / this.collisionSize);
         var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
         var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
-        //if (this.key(' ')) this.dump(box, 'collisionOccupy :: box for entity "' + entity.name + '"');
-        //if (this.key(' ')) console.log('collisionOccupy :: minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
 
         while (cellX <= maxCellX) {
             cellY = minCellY;
             while (cellY <= maxCellY) {
-                //if (this.key(' ')) console.log('collisionOccupy :: cellX = ' + cellX + ', cellY = ' + cellY);
                 this.collisionAdd(entity, cellX, cellY);
                 cellY++;
             }
             cellX++;
         }
+        return this;
     };
 
     yespix.fn.collisionAdd = function(entity, x, y, type) {
@@ -234,19 +244,14 @@
         if (!line) {
             line = this.data.collisionMap[x] = [];
             line[y] = [entity];
-            //if (this.key(' ')) console.log('collisionAdd :: new line');
-            //if (this.key(' ')) console.log('collisionAdd :: final entity count 1');
-            return true;
+            return this;
         }
         if (!line[y]) {
             line[y] = [];
-            if (this.key(' ')) console.log('collisionAdd :: new column, final entity count 1');
         }
         line[y].push(entity);
-        if (this.key(' ')) console.log('collisionAdd :: before unique count ' + line[y].length);
         this.unique(line[y]);
-        if (this.key(' ')) console.log('collisionAdd :: final entity count ' + line[y].length);
-        return true;
+        return this;
     };
 
     yespix.fn.collisionCheck = function(entity1, entity2) {
@@ -300,13 +305,14 @@
         return false;
     };
 
+    /**
+     * @chainable
+     */
     yespix.fn.collision = function(entity) {
-        //if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
         var entities = []; // store checked entities to check for collision only once
 
         var box = entity.collisionBox();
         if (box.width <= 0 || box.height <= 0) {
-            //if (this.key(' ')) console.log('no collision box');
             return;
         }
         var cellX = minCellX = Math.floor(box.x / this.collisionSize);
@@ -314,19 +320,13 @@
         var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
         var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
 
-        //if (this.key(' ')) console.log('minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
         while (cellX <= maxCellX) {
-            //if (this.key(' ')) console.log('cellX = ' + cellX);
             cellY = minCellY;
             while (cellY <= maxCellY) {
-                //if (this.key(' ')) console.log('cellY = ' + cellY);
                 var cell = this.collisionCell(cellX, cellY);
-                //if (this.key(' ')) console.log(cell.length + ' entities in cell ' + cellX + ', ' + cellY);
                 for (var t = 0; t < cell.length; t++) {
                     if (cell[t] !== entity && !this.inArray(entities, cell[t])) {
-                        //if (this.key(' ')) console.log('collision t=' + t + ', cw = ' + entity.collisionWith(cell[t]) + ', cc = ' + this.collisionCheck(entity, cell[t]));
                         if (entity.collisionWith(cell[t]) && this.collisionCheck(entity, cell[t])) {
-                            //console.log('trigger collide on entity "' + entity.name + '"');
                             entity.trigger('collide', {
                                 entity: cell[t]
                             });
@@ -338,7 +338,7 @@
             }
             cellX++;
         }
-
+        return this;
     };
 
     /**
@@ -412,7 +412,6 @@
 
         if (this.isUndefined(selector)) {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('undefined, length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -424,7 +423,6 @@
             // return all entities if the selector is an empty string
             if (selector === '') {
                 var result = this.bunch(this.entityInstances['']);
-                //console.log('empty "", length = '+result.length);
                 if (fn) this.each(result, fn);
                 return result;
             }
@@ -434,8 +432,6 @@
         } else
         // if selector is the entity._id (integer)
         if (this.isInt(selector)) {
-            //console.log('selector is an int, entity = '+this.entityInstances[+selector]);
-            // return the entity
             if (this.entityInstances[+selector]) return this.bunch([this.entityInstances[+selector]]);
             return this.bunch();
         } else
@@ -444,7 +440,6 @@
             // empty properties return all the entities
             if (this.pLength(selector) == 0) {
                 var result = this.bunch(this.entityInstances['']);
-                //console.log('empty {}, length = '+result.length);
                 if (fn) this.each(result, fn);
                 return result;
             }
@@ -482,29 +477,21 @@
             }
             // no class, return empty bunch
             else {
-                //console.log('return empty bunch');
                 return this.bunch();
             }
         }
         // if not, parse the whole list (slow)
         else instances = this.entityInstances[''];
 
-        // console.log('instances length = '+instances.length);
         for (var t = 0; t < instances.length; t++) {
             var count = 0;
-            // console.log('find: checking entity ['+t+'] with name "'+instances[t]._name+'"');
             for (var n in properties) {
-                // if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
-                // else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
                 if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
-                //console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
                 if (count >= propMatch) {
-                    //console.log('find: adding entity to result');
                     result.push(instances[t]);
                 }
             }
         }
-        // console.log('find: result length = '+result.length);
 
         if (fn) this.each(result, fn);
 
@@ -541,12 +528,10 @@
     yespix.fn.selectorCompare = function(entityValue, value) {
         if (this.isString(value)) {
             if (this.isArray(entityValue)) return this.inArray(entityValue, value);
-            //if (this.isString(entityValue)) return entityValue === value; 
             return entityValue === value;
         }
         if (this.isArray(value)) {
             if (this.isString(entityValue)) return this.inArray(value, entityValue);
-            //if (this.isString(entityValue)) return entityValue === value; 
             return entityValue === value;
         }
         if (this.isRegexp(value)) {
@@ -608,7 +593,6 @@
      * Returns the list of ancestors of the entity
      */
     yespix.fn.ancestors = function(name) {
-        //				console.log('ancestors :: name = '+name);
         if (this.entityClasses[name]) {
             var list = [];
             for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -616,10 +600,8 @@
                 list = list.concat(this.ancestors(a));
             }
             list.push(name);
-            //					console.log('ancestors :: return list length '+list.length);
             return list;
         } else {
-            //					console.log('ancestors :: return empty list');
             return [];
         }
     };
@@ -680,9 +662,6 @@
         });
 
         return this;
-        //console.log('entity.define :: entity class name "'+name+'" added');
-        //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
-        //console.log('----');
     };
 
     /**
@@ -745,7 +724,6 @@
         for (var t = 0; t < len; t++) {
             if (this.entityAncestorsPending[t] == className) return true;
         }
-        //console.log('isEntityAncestorsPending :: entity "' + className + '" not pending');
 
         return false;
     };
@@ -787,7 +765,6 @@
         // mixin with the class name
         this.mixin(entity, this.entityClasses[name].properties);
 
-
         // copy the spawn properties
         for (var fn in properties) {
             entity[fn] = properties[fn];
@@ -796,13 +773,11 @@
         entity._ancestors = this.entityClasses[name]['ancestors'];
         entity._id = this.entityNextId++;
 
-        console.log(entity);
-        if (entity['registerInstance']) this.instanceAdd(entity);
-        else console.log('entities :: entity instance not registered "' + name + '"');
-
         // executing the init functions on ancestors
         this.call(entity, 'init', [properties]);
         if (this.isFunction(entity.init)) entity.init(properties);
+
+        if (entity['registerInstance']) this.instanceAdd(entity);
 
         if (entity._ancestors.length > 0)
             for (t = 0; t < entity._ancestors.length; t++) this.trigger('spawn:' + entity._ancestors[t], {
@@ -823,17 +798,29 @@
      */
     yespix.fn.instanceAdd = function(entity) {
         // the entity must not be in any instances list because we are overriding his _instances object
-        if (entity._instances) this.instanceRemove(entity);
+        if (entity._instanceExists) this.instanceRemove(entity);
         entity._instances = {};
+
+        // entity must be unique
+        if (entity.isUnique == true) {
+            this.find('.' + entity._class + ', /' + entity._class).destroy();
+            if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0) {
+                var list = this.entityInstances['.' + entity._class];
+                var count = list.length;
+                for (var t = 0; t < count; t++) {
+                    this.instanceRemove(list[0]);
+                }
+            }
+        }
 
 
         // insert reference in the global instances list
         if (this.isUndefined(this.entityInstances['']) || this.entityInstances[''].length == 0) {
             this.entityInstances[''] = [entity];
-            entity._instances[''] = 0;
+            //entity._instances[''] = 0;
         } else {
             this.entityInstances[''].push(entity);
-            entity._instances[''] = this.entityInstances[''].length - 1;
+            //entity._instances[''] = this.entityInstances[''].length - 1;
         }
 
         // insert reference with the entity Id
@@ -842,10 +829,10 @@
         // insert reference in the class instances list for its own class name
         if (this.isUndefined(this.entityInstances['.' + entity._class]) || this.entityInstances['.' + entity._class].length == 0) {
             this.entityInstances['.' + entity._class] = [entity];
-            entity._instances[entity._class] = 0;
+            //entity._instances[entity._class] = 0;
         } else {
             this.entityInstances['.' + entity._class].push(entity);
-            entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
+            //entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
         }
 
         // insert a reference in the ancestor instances list for all its ancestors
@@ -853,12 +840,14 @@
             for (var t = 0; t < entity._ancestors.length; t++) {
                 if (this.isUndefined(this.entityInstances['/' + entity._ancestors[t]]) || this.entityInstances['/' + entity._ancestors[t]].length == 0) {
                     this.entityInstances['/' + entity._ancestors[t]] = [entity];
-                    entity._instances[entity._ancestors[t]] = 0;
+                    //entity._instances[entity._ancestors[t]] = 0;
                 } else {
                     this.entityInstances['/' + entity._ancestors[t]].push(entity);
-                    entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
+                    //entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
                 }
             }
+
+        entity._instanceExists = true;
 
         // Trigger some events to dispatch the spawn of an entity
         this.trigger('spawn', {
@@ -870,19 +859,51 @@
     };
 
     yespix.fn.instanceRemove = function(entity) {
+        var t, u;
+        if (!entity) {
+            console.warn('instanceRemove :: parameter entity is undefined');
+            return false;
+        }
         // remove reference from the global instances list
-        if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
+        if (this.entityInstances['']) {
+            //this.entityInstances[''].splice(entity._instances[''], 1); // remove instance by index // obsolete
+            for (t = 0; t < this.entityInstances[''].length; t++) {
+                if (this.entityInstances[''][t] == entity) {
+                    this.entityInstances[''].splice(t, 1);
+                    break;
+                }
+            }
+        }
 
         // remove reference with the entity Id
         delete this.entityInstances[+entity._id];
 
         // remove reference from the class instances list for its own class name
-        if (this.entityInstances['.' + entity._class]) this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1);
+        if (this.entityInstances['.' + entity._class]) {
+            //this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1); // remove instance by index // obsolee
+            for (t = 0; t < this.entityInstances['.' + entity._class].length; t++) {
+                if (this.entityInstances['.' + entity._class][t] == entity) {
+                    this.entityInstances['.' + entity._class].splice(t, 1);
+                    break;
+                }
+            }
+        }
 
         // insert a reference in the class instances list for all its ancestors
         if (entity._ancestors.length > 0)
-            for (var t = 0; t < entity._ancestors.length; t++)
-                if (this.entityInstances['/' + entity._ancestors[t]]) this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
+            for (t = 0; t < entity._ancestors.length; t++) {
+                if (this.entityInstances['/' + entity._ancestors[t]]) {
+                    //this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1); // obsolete
+                    for (u = 0; u < this.entityInstances["/" + entity._ancestors[t]].length; u++) {
+                        if (this.entityInstances["/" + entity._ancestors[t]][u] == entity) {
+                            this.entityInstances["/" + entity._ancestors[t]].splice(u, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+        entity._instanceExists = false;
 
         this.trigger('remove', {
             entity: entity
@@ -918,7 +939,7 @@
     };
 
     /**
-     * Call some entity class functions on the context of an entity object. e.g.
+     * Call some entity class functions of ancestors in the context of an entity object. e.g.
      * @trigger call
      * @param {object} entity Entity instance
      * @param {string|function} fn Function name in a string or function reference to call // @todo
@@ -931,7 +952,6 @@
      * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
      */
     yespix.fn.call = function(entity, fn, ancestors, params) {
-        //console.log('call : entity._class='+entity._class+', fn='+fn+', ancestors='+ancestors);
 
         if (!this.isDefined(entity._class)) return null;
         if (this.isString(ancestors)) ancestors = ancestors.split(',');
@@ -944,8 +964,6 @@
 
         if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
         else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
-
-        //console.log('ancestors = '+ancestors.join(', '));
 
         var result = [];
         for (var t = 0; t < ancestors.length; t++) {
@@ -1135,21 +1153,18 @@
         // listen to multiple properties
         if (this.isArray(pname)) {
             for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
-            return true;
+            return this;
         }
 
         // listen to multiple objects
         if (this.isArray(obj)) {
             for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
-            return true;
+            return this;
         }
 
-        //console.log('listen :: obj[pname] = ' + obj[pname]);
         var initValue = obj[pname];
         callback = callback || this.listenTrigger;
         if (Object.defineProperty) {
-            //				var value = obj[pname];
-            //				console.log('value = '+value);
             obj['__var_callback_' + pname] = callback;
 
             Object.defineProperty(obj, pname, {
@@ -1186,9 +1201,7 @@
             obj['__var_old_' + pname] = initValue;
             obj['__var_new_' + pname] = initValue;
             obj['__var_callback_' + pname] = callback;
-            //console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
             this.on('enterFrame', function() {
-                //console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
                 if (this[pname] != this['__var_new_' + pname]) {
                     this['__var_old_' + pname] = this['__var_new_' + pname];
                     this['__var_new_' + pname] = this[pname];
@@ -1202,9 +1215,8 @@
             }, obj, this);
 
         }
-        //console.log('listen :: before set obj[pname] = ' + obj[pname]);
         obj[pname] = initValue;
-        //console.log('listen :: after set obj[pname] = ' + obj[pname]);
+        return this;
     };
 
     yespix.fn.listenTrigger = function(obj, e) {
@@ -1212,6 +1224,7 @@
         if (!obj._changedList) obj._changedList = {};
         obj._changedList[e.name] = true;
         obj.trigger('change:' + e.name, e);
+        return this;
     };
 
     /**
@@ -1432,9 +1445,8 @@
                         state: file.state,
                         url: file.url,
                         file: file,
-                        entity: options['entity'],
+                        //                    entity: options['entity'],
                     };
-                    console.log('file.options.entity: ' + file.options.entity);
 
                     // loop inside file.options
                     if (file.options)
@@ -1512,6 +1524,7 @@
                             // executes error and complete functions
                             for (var t = 0; t < this.file.options.length; t++) {
                                 newEvent.stat = this.file.options[t].stat;
+                                if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                                 newEvent.type = 'error';
                                 this.file.options[t]['error'](newEvent);
                                 newEvent.type = 'complete';
@@ -1524,6 +1537,7 @@
                         // executes success and complete functions
                         newEvent.state = file.state = 'loaded';
                         for (var t = 0; t < this.file.options.length; t++) {
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             newEvent.stat = this.file.options[t].stat;
                             newEvent.type = 'success';
                             this.file.options[t]['success'](newEvent);
@@ -1542,6 +1556,7 @@
                         newEvent.type = 'progress';
                         for (var t = 0; t < this.file.options.length; t++) {
                             newEvent.stat = this.file.options[t].stat;
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             this.file.options[t]['progress'](newEvent);
                         }
                     }
@@ -1677,11 +1692,9 @@
 
                 var interval_id = setInterval(function() { // start checking whether the style sheet has successfully loaded
                         try {
-                            //console.log('len = '+s[sheet][cssRules].length);
                             if (s[sheet] && s[sheet][cssRules].length) { // SUCCESS! our style sheet has loaded
                                 clearInterval(interval_id); // clear the counters
                                 clearTimeout(timeout_id);
-                                //console.log('addcss :: load link success');
                                 complete(e);
                             }
                         } catch (e) {} finally {}
@@ -1697,9 +1710,7 @@
         } else {
             var token = 0;
             options['complete'] = function(e) {
-                //						console.log('complete::: token ='+token+', url = '+fileList[token]);
                 if (fileList[token] == e.url) {
-                    //console.log('complete css '+e.file);
                     var s = document.createElement('link');
                     s.type = 'text/css';
                     s.rel = 'stylesheet';
@@ -2334,7 +2345,7 @@
                 }
 
                 // change the drawEntities because some entity instances have been added or removed
-                if (yespix.drawEntitiesChange) {
+                if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                     yespix.drawEntities = yespix.entityInstances['/gfx'];
                     if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
                     yespix.drawEntitiesChange = false;
@@ -2406,7 +2417,6 @@
 
             // triggers on YESPIX engine
             yespix.trigger(e.type, e);
-            console.log('trigger ' + e.type);
             //return false;
         };
 
@@ -2462,7 +2472,6 @@
          * blur
          */
         document.onblur = function(e) {
-            //console.log('blur');
             yespix.data.key.pressed = {};
             yespix.data.key.hold = {};
             yespix.data.key.down = {};
@@ -2510,7 +2519,6 @@
         var t;
 
         type = type || 'hold';
-        //console.log('type = '+type);
         if (this.isString(s)) {
             if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
                 var arr = s.split('|', 2);
@@ -2566,7 +2574,6 @@
      *
      */
     yespix.fn.support = function(type) {
-        //console.log('yespix.support :: type='+type);
         if (!type) return null;
         var types = type.split('/');
 
@@ -2591,14 +2598,11 @@
 
         // create element if needed
         if (this.data.support.elements[types[0]] === undefined) {
-            //console.log('type='+type+', types[0]='+types[0]+', types[1]='+types[1]);
             this.data.support.elements[types[0]] = document.createElement(types[0]);
-            //		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
             if (this.data.support.elements[types[0]] === false) this.data.support.elements[types[0]] = false;
         }
 
         var e = this.data.support.elements[types[0]];
-        //	if (!e || !! e.canPlayType == false) return false;
         if (!e || e.canPlayType === false) return false;
 
         var str = e.canPlayType(type);
@@ -2707,8 +2711,6 @@
                 };
         })();
 
-        //console.log('timer.start, onFrame = '+this.onFrame);
-
         this.frameMs = 1000 / this.fps;
         var yespix = this;
         this.frameTick = function() {
@@ -2752,8 +2754,6 @@
             });
 
             this.collisionClear();
-            //console.log('collision length = '+this.find('/collision').length);
-            //				this.dump(this.find('/collision'), 'find(/collision)');
             var list = this.find('/collision');
             if (list.length > 0) list.collisionOccupy().collision();
 
@@ -2843,6 +2843,21 @@
             _parent: null,
 
             /**
+             * Set True when the entity is currently deleting itself
+             * @property _deleting
+             * @type boolean
+             */
+            _deleting: false,
+
+            /**
+             * Set True if the entity instance was added to the global YESPIX entity list
+             * @property _instanceExists
+             * @type boolean
+             * @default true
+             */
+            _instanceExists: false,
+
+            /**
              * Set True if the entity is active
              * @property isActive
              * @type boolean
@@ -2878,6 +2893,13 @@
              */
             registerInstance: true,
 
+            /**
+             * Set to True if the entity must be unique (only one instance)
+             * @property isUnique
+             * @type boolean
+             * @default false
+             */
+            isUnique: false,
 
             ///////////////////////////////// Main functions ////////////////////////////////
 
@@ -2926,7 +2948,7 @@
                 var entity = yespix.clone(this);
                 entity._id = yespix.entityNextId++;
                 if (properties) entity.prop(properties);
-                entity._instances = null;
+                entity._instances = false;
                 yespix.dump(yespix.entityInstances);
                 yespix.instanceAdd(entity);
                 yespix.dump(yespix.entityInstances);
@@ -2935,6 +2957,11 @@
 
             attach: function(entity) {
                 yespix.attach(this, entity);
+                return this;
+            },
+
+            setParent: function(entity) {
+                yespix.attach(entity, this);
                 return this;
             },
 
@@ -2970,11 +2997,13 @@
 
                 if (this._children) {
                     for (var t = 0; t < this._children.length; t++) {
-                        if (this._children[t] && !this._children[t].deleting) {
+                        if (this._children[t] && !this._children[t]._deleting) {
+                            //console.log('base :: destroy :: destroying child t='+t);
                             this._children[t].destroy();
                         }
                     }
                 }
+                this._children = null;
 
                 yespix.instanceRemove(this);
                 return this;
@@ -3071,6 +3100,10 @@
             init: function() {},
 
             move: function() {
+                this.trigger('moveStart', {
+                    entity: this
+                });
+
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
 
@@ -3080,12 +3113,15 @@
                 if (yespix.level) yespix.level.collision(this);
                 this.x += this.speedX;
                 this.y += this.speedY;
+
+                this.trigger('moveEnd', {
+                    entity: this
+                });
             },
 
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }
@@ -3220,7 +3256,6 @@
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }
@@ -3277,13 +3312,10 @@
              * @return {[type]} [description]
              */
             animFramesInit: function() {
-                //console.log('animFramesInit');
 
                 // check every animation
                 for (var name in this.anims) {
                     var anim = this.anims[name];
-
-                    //console.log('animFramesInit :: name = ' + name);
 
                     // only animation that is not ready
                     if (!anim.isReady) {
@@ -3292,8 +3324,6 @@
                         if (anim.frames && anim.frames.length)
                             for (var t = 0; t < anim.frames.length; t++) {
                                 var frame = anim.frames[t];
-                                // console.log('animFramesInit :: frame '+t+', isReady = '+frame.isReady+', image = '+frame.image);
-                                //if (frame.image) console.log('image.isReady = ' + frame.image.isReady);
                                 if (frame.isReady) continue;
                                 if (!frame.image || !frame.image.isReady) {
                                     frame.isReady = false;
@@ -3325,14 +3355,11 @@
                                     // so we need to update this variable on each frame
                                     maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
 
-                                    console.log('maxLine = ' + maxLine);
-
                                     if (maxLine > 0) {
                                         frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
                                         frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
                                         frame.isReady = true;
-                                        console.log('frame :: t=' + t + ', frameIndex=' + frame.frameIndex + ', from=' + anim.from + ', maxLine=' + maxLine + ', x=' + frame.x + ', y=' + frame.y);
-                                    } //else console.log('frame :: t='+t+', frameIndex='+frame.frameIndex+', maxLine='+maxLine);
+                                    }
                                 }
                             if (anim.extendsTo) {
                                 for (var t = 0; t < anim.extendsTo.length; t++) {
@@ -3347,9 +3374,7 @@
                                             if (this.anims[anim.extendsTo[t]].flipX) this.anims[anim.extendsTo[t]].frames[u].flipX = !this.anims[anim.extendsTo[t]].frames[u].flipX;
                                             if (this.anims[anim.extendsTo[t]].flipY) this.anims[anim.extendsTo[t]].frames[u].flipY = !this.anims[anim.extendsTo[t]].frames[u].flipY;
                                             if (this.anims[anim.extendsTo[t]].oldFrames && this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                                //                                              console.log('oldFrames '+u+' exists');
                                                 for (var n in this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                                    //                                                  console.log('copy property n='+n);
                                                     this.anims[anim.extendsTo[t]].frames[u][n] = this.anims[anim.extendsTo[t]].oldFrames[u][n];
                                                 }
                                             }
@@ -3364,12 +3389,9 @@
             },
 
             animInit: function() {
-                //console.log('animInit :: this.anims = ' + this.anims);
-
                 for (var name in this.anims) {
 
                     var anim = this.anims[name];
-                    //console.log('animInit :: anim name = ' + name);
 
                     // check if all images are ready
                     anim.name = name;
@@ -3381,13 +3403,12 @@
                         if (!this.animSelected) this.animSelected = name;
                     }
 
-                    //console.log('animInit :: anim.extendsFrom = ' + anim.extendsFrom);
                     if (anim.extendsFrom) {
                         if (this.anims[anim.extendsFrom]) {
                             if (!this.anims[anim.extendsFrom].extendsTo) this.anims[anim.extendsFrom].extendsTo = [name];
                             else this.anims[anim.extendsFrom].extendsTo.push(name);
-                        } //else console.log('animInit :: anim.extendsFrom "' + anim.extendsFrom + '" does not exist');
-                    } //else 
+                        }
+                    }
 
                     // "frames" is an array of frames
                     else if (yespix.isArray(anim['frames'])) {
@@ -3462,8 +3483,6 @@
                 var frame = this.anims[name].frames[from];
                 if (!frame) return null;
 
-                console.log('playing anim "' + name + '"');
-
                 this.animSelected = name;
                 this.animFrame = from;
                 this.animSpeed = speed;
@@ -3496,7 +3515,6 @@
                 if (!this.animTime || this.animTime <= now) {
                     this.animFrame++;
 
-                    //console.log('animFrame = '+this.animFrame+', frames.length = '+this.anims[this.animSelected].frames.length);
                     if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                         this.animFrame = 0;
                         animEnded = true;
@@ -3516,13 +3534,46 @@
                         });
                         this.animWait = false;
                         if (this.animNext && this.animNext != '') {
-                            console.log('animNext = ' + this.animNext);
                             this.animPlay(this.animNext);
                         }
                     }
                 }
             },
 
+            getFrame: function(animIndex, frameIndex) {
+                animIndex = animIndex || this.animSelected;
+                if (!this.anims[animIndex]) return false;
+                frameIndex = frameIndex || this.animFrame;
+                if (!this.anims[animIndex].frames[frameIndex]) return false;
+                return this.anims[animIndex].frames[frameIndex];
+            },
+
+            getDrawBox: function() {
+                if (this.snapToPixel) {
+                    var x = parseInt(this.x);
+                    var y = parseInt(this.y);
+                } else {
+                    var x = this.x;
+                    var y = this.y;
+                }
+                var width = this.width;
+                var height = this.height;
+
+                var frame = this.getFrame();
+                //if (yespix.key('a') && !frame) console.log('frame = ');
+                //if (yespix.key('a')) console.log(frame);
+                var type = 'anim';
+                width = frame.width;
+                height = frame.height;
+
+                return {
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height,
+                    type: type
+                };
+            },
 
             draw: function(context) {
 
@@ -3540,7 +3591,6 @@
                     } else context = this._context;
                 }
 
-                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
                 var frame = this.anims[this.animSelected].frames[this.animFrame];
                 var img = frame.image;
 
@@ -3564,7 +3614,6 @@
                         context.scale(scaleX, scaleY);
                     }
                     context.globalAlpha = this.alpha;
-                    //if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
                     context.drawImage(img.element, //image element
                         x, // x position on image
                         y, // y position on image
@@ -3661,11 +3710,6 @@
             },
         });
 
-
-
-
-
-
         yespix.define('circle', 'path', {
 
             circleRadius: 5,
@@ -3709,8 +3753,8 @@
 
                 if (yespix.isUndefined(this.pixelSize)) {
                     return {
-                        x: this.x + this.colOffsetX + obj.x,
-                        y: this.y + this.colOffsetY + obj.y,
+                        x: this.x + this.colOffsetX - obj.x,
+                        y: this.y + this.colOffsetY - obj.y,
                         width: this.colWidth,
                         height: this.colHeight,
                         offsetX: this.colOffsetX,
@@ -3718,8 +3762,8 @@
                     };
                 } else {
                     return {
-                        x: this.x + this.colOffsetX * this.pixelSize + obj.x,
-                        y: this.y + this.colOffsetY * this.pixelSize + obj.y,
+                        x: this.x + this.colOffsetX * this.pixelSize - obj.x,
+                        y: this.y + this.colOffsetY * this.pixelSize - obj.y,
                         width: this.colWidth * this.pixelSize,
                         height: this.colHeight * this.pixelSize,
                         offsetX: this.colOffsetX * this.pixelSize,
@@ -3763,7 +3807,6 @@
             },
 
             drawDebugCollision: function(context, drawBox) {
-                console.log('drawDebugCollision');
                 if (this.collisionBox) {
                     var box = drawBox || this.collisionBox();
                     context.globalAlpha = 1;
@@ -3829,12 +3872,14 @@
                 var width = this.width;
                 var height = this.height;
 
-                if (this.typeof('image')) {
+                if (this.typeof('anim')) {
                     var img = this.image(this.imageSelected);
+                    var type = 'anim';
                     width = this.width || img.width || img.realWidth;
                     height = this.height || img.height || img.realHeight;
-                } else if (this.typeof('anim')) {
+                } else if (this.typeof('image')) {
                     var img = this.image(this.imageSelected);
+                    var type = 'image';
                     width = this.width || img.width || img.realWidth;
                     height = this.height || img.height || img.realHeight;
                 }
@@ -3843,16 +3888,15 @@
                     x: x,
                     y: y,
                     width: width,
-                    height: height
+                    height: height,
+                    type: type
                 };
             },
 
             getContext: function() {
                 if (this._context) return this._context;
-                if (this._parent == null) {
-                    var canvas = yespix.find('.canvas')[0];
-                    if (!this._context && canvas) this._context = canvas.context;
-                }
+                var canvas = yespix.find('.canvas')[0];
+                if (canvas) this._context = canvas.context;
                 return this._context;
             },
 
@@ -3969,7 +4013,6 @@
             },
 
             image: function(properties) {
-                //console.log('image :: properties = '+properties);
 
                 if (properties == undefined)
                     if (this.images[0]) return this.imageInit(this.images[0]);
@@ -3984,10 +4027,8 @@
                 var max = Object.keys(properties).length;
                 var count = 0;
                 for (var t = 0; t < this.images.length; t++) {
-                    //console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
                     for (var n in properties) {
                         if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
-                        //console.log('property "'+n+'", max = '+max+', count = '+count);
                         if (count >= max) return this.imageInit(this.images[t]);
                     }
                 }
@@ -4012,10 +4053,8 @@
                 image.isInitiated = true;
                 image.entity = entity;
                 image.element = document.createElement('img');
-                //console.log('createElement :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
 
                 if (image.element) image.element.onload = image.element.onLoad = function() {
-                    //console.log('image.onlad :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
                     image.realWidth = this.width;
                     image.realHeight = this.height;
                     image.isReady = true;
@@ -4024,15 +4063,8 @@
                         image.element = entity.resize(image.element, entity.pixelSize);
                         image.realWidth = this.width * entity.pixelSize;
                         image.realHeight = this.height * entity.pixelSize;
-
-                        //console.log('image resized');
-                        //yespix.call(entity, 'draw', 'gfx');
-                        //yespix.error();
                     }
-                    //yespix.timerStop();
 
-                    console.log('image :: trigger imageReady');
-                    console.log(entity);
                     entity.trigger('imageReady', {
                         target: image,
                     });
@@ -4065,7 +4097,6 @@
                     } else context = this._context;
                 }
 
-                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
                 var img = this.image(this.imageSelected);
                 var box = this.getDrawBox();
                 var scaleX = this.flipX ? -1 : 1;
@@ -4099,7 +4130,6 @@
 
         });
 
-
         yespix.define('layer', 'gfx', {
 
             isVisible: true,
@@ -4112,8 +4142,6 @@
             layerData: null,
 
             level: null,
-
-            layerParallax: {},
 
             create: function() {
 
@@ -4137,23 +4165,12 @@
                 this.width = this.layerData.width * this.layerData.tilewidth;
                 this.height = this.layerData.height * this.layerData.tilewidth;
                 if (this.layerData.properties.z) this.z = this.layerData.properties.z;
-                this.layerParallax = {
-                    x: 1,
-                    y: 1
-                };
-                if (this.layerData.properties.parallaxX) this.layerParallax.x = this.layerData.properties.parallaxX;
-                if (this.layerData.properties.parallaxY) this.layerParallax.y = this.layerData.properties.parallaxY;
 
                 this.canvas.width = this.width;
                 this.canvas.height = this.height;
-
-                console.log('layer :: update :: width = ' + this.width + ', height = ' + this.height);
-                console.log(this);
-                console.log(this.layerData);
             },
 
             drawTile: function(spriteIndex, cellX, cellY) {
-                //console.log('drawTile :: spriteIndex = '+spriteIndex+', cellX = '+cellX+', cellY = '+cellY);
                 var img = this.level.tilesets.image(0);
                 if (!img.isReady) {
                     console.error('layer::drawTile :: image [0] of the tile set is not ready');
@@ -4163,13 +4180,6 @@
                 var max = Math.floor(img.element.width / infos.tilewidth);
                 var line = Math.floor(spriteIndex / max);
                 var col = spriteIndex - (line * max);
-                /*console.log('max = '+max);
-    	console.log('img.element.width = '+img.element.width+', infos.tilewidth = '+infos.tilewidth+', line = '+line),
-    	console.log('col = '+col);
-    	console.log('drawTile :: infos = ');
-    	console.log(infos);*/
-
-                console.log('drawTile: line = ' + line + ', col = ' + col + ', max = ' + max + ', tilewidth = ' + this.layerData.tilewidth + ', pox = ' + (line * this.layerData.tilewidth));
 
                 this.drawContext.drawImage(img.element, //image element
                     col * this.layerData.tilewidth, // x position on image
@@ -4189,14 +4199,8 @@
 
 
             make: function() {
-                console.log('layer :: make');
-
                 this.clear();
                 if (!this.layerData || !this.level) return;
-
-                console.log('layer :: make :: start');
-                console.log('layerData = ');
-                console.log(this.layerData);
 
                 var index = 0;
 
@@ -4221,12 +4225,11 @@
                         if (this._context) context = this._context;
                     } else context = this._context;
                 }
-
-                if (context && this.drawContext) {
+                if (context && this.canvas) {
                     context.globalAlpha = this.alpha * this.level.alpha;
                     context.drawImage(this.canvas, //image element
-                        this.level.x, // x position on image
-                        this.level.y, // y position on image
+                        this.x, // x position on image
+                        this.y, // y position on image
                         this.canvas.width, // width on image
                         this.canvas.height // height on image
                     );
@@ -4234,8 +4237,7 @@
             },
         });
 
-
-        yespix.define('level', 'gfx', {
+        yespix.define('level', 'gfx,move', {
             levelData: null,
             levelCollision: [],
 
@@ -4248,29 +4250,51 @@
             context: null,
             tilesets: null,
             levelDir: '',
+            followOptions: null,
+
+            isUnique: true,
+            canApplyGravity: false,
+
+            getDrawBox: function() {
+                if (this.snapToPixel) {
+                    var x = parseInt(this.x);
+                    var y = parseInt(this.y);
+                } else {
+                    var x = this.x;
+                    var y = this.y;
+                }
+                var width = this.width;
+                var height = this.height;
+
+                if (this.canvas) {
+                    width = this.canvas.width;
+                    height = this.canvas.height;
+                }
+
+                return {
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height
+                };
+            },
 
             buildLevelCollision: function() {
                 for (var t = 0; t < this.levelData.layers.length; t++) {
                     var layer = this.levelData.layers[t];
-                    if (layer.properties['type'] && layer.properties['type'] == 'decor') {
-                        //console.log('buildLevelCollision :: skipping decor layer')
+                    if (layer.properties['type'] && (layer.properties['type'] == 'decor' || layer.properties['type'] == 'parallax')) {
                         continue;
                     }
-                    //console.log('buildLevelCollision :: data = ');
-                    //console.log(this.levelData.layers[t]);
                     for (var u = 0; u < layer.data.length; u++) {
                         if (!this.levelCollision[u]) this.levelCollision[u] = 0;
                         this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
                     }
                 }
-                //console.log('buildLevelCollision :: levelCollision = ');
-                //console.log(this.levelCollision);
             },
 
-            block: function(x, y) {
-                var index = y * this.levelData.width + x;
+            block: function(cellX, cellY) {
+                var index = cellY * this.levelData.width + cellX;
                 var tileIndex = this.levelCollision[index];
-                console.log('block :: (' + x + ', ' + y + ') :: index = ' + index + ', tileIndex = ' + tileIndex);
                 if (tileIndex > 0) return true;
                 return false;
             },
@@ -4317,10 +4341,7 @@
                     up = false,
                     down = false;
 
-                //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
-
                 var box = entity.collisionBox(this);
-
 
                 if (entity.speedX > 0) {
                     // check every collision on the right
@@ -4352,12 +4373,12 @@
                     }
                 } else if (entity.speedX < 0) {
                     // check every collision on the left
-                    var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                    var cellLeft = Math.floor((box.x) / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the left of the entity
                     var cellNext = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
 
-                    //console.log('cellLeft = '+cellLeft+', cellNext = '+cellNext);
+                    //console.log('level.x = '+this.x+', level.y = '+this.y+', entity.x = '+entity.x+', entity.y = '+entity.y+', box.x = '+box.x+', box.y = '+box.y+', cellLeft = '+cellLeft+', cellNext = '+cellNext);
 
                     if (cellNext < cellLeft) {
 
@@ -4370,9 +4391,6 @@
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
                                     this.collisionLeft(entity, box, x, y);
-                                    /*var posX = this.x + (x + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
-									entity.x = posX;
-									entity.speedX = 0;*/
                                     stopped = true;
                                     break;
                                 }
@@ -4388,8 +4406,6 @@
 
                     // cellNext is the final cell on the right of the entity
                     var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
-
-                    //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
 
                     if (cellNext > cellBottom) {
 
@@ -4426,8 +4442,6 @@
                     // cellNext is the final cell on the right of the entity
                     var cellNext = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
 
-                    //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
-
                     if (cellNext < cellTop) {
 
                         up = true;
@@ -4437,15 +4451,8 @@
                         var stopped = false;
                         for (var y = cellTop; y >= cellNext; y--) {
                             for (var x = cellLeft; x <= cellRight; x++) {
-                                //console.log('level.collision :: x=' + x + ', y=' + y + ', block=' + this.block(x, y));
                                 if (this.block(x, y)) {
                                     this.collisionUp(entity, box, x, y);
-                                    /*
-									var posY = this.y + (y + 1) * this.levelData.tileheight + 1 - box.offsetY;
-									console.log('entity posY from ' + entity.y + ' to ' + posY);
-									entity.y = posY;
-									entity.speedY = 0;
-									*/
                                     stopped = true;
                                     break;
                                 }
@@ -4459,7 +4466,6 @@
                     var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
                     var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellTop)) {
-                        console.log('Double collision right top');
                         this.collisionUp(entity, box, cellRight, cellTop);
                         this.collisionRight(entity, box, cellRight, cellTop);
                     }
@@ -4467,7 +4473,6 @@
                     var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
                     var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellBottom)) {
-                        console.log('Double collision right down');
                         //this.collisionDown(entity, box, cellRight, cellBottom);
                         this.collisionRight(entity, box, cellRight, cellBottom);
                     }
@@ -4475,7 +4480,6 @@
                     var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
                     var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellBottom)) {
-                        console.log('Double collision left down');
                         //this.collisionDown(entity, box, cellLeft, cellBottom);
                         this.collisionLeft(entity, box, cellLeft, cellBottom);
                     }
@@ -4483,7 +4487,6 @@
                     var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
                     var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellTop)) {
-                        console.log('Double collision left up');
                         this.collisionUp(entity, box, cellLeft, cellTop);
                         this.collisionLeft(entity, box, cellLeft, cellTop);
                     }
@@ -4495,7 +4498,6 @@
                     var cellNext = Math.floor((box.y + box.height + 1) / this.levelData.tileheight);
                     if (cellNext == cellBottom) {
                         entity.isOnGround = false;
-                        //console.log('entity NOT on ground');
                     } else {
                         entity.isOnGround = false;
                         var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
@@ -4522,10 +4524,7 @@
 
 
             load: function(src) {
-                // destroy other loaded levels @todo
-                //yespix.find('/level').not(this).destroy();
                 this.levelDir = yespix.getDir(src);
-                console.log('level :: load :: dir = ' + this.levelDir);
 
                 this.canvas = document.createElement('canvas');
                 this.context = this.canvas.getContext('2d');
@@ -4537,27 +4536,26 @@
 
                         entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                         entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
+
+                        entity.width = entity.canvas.width;
+                        entity.height = entity.canvas.height;
+
                         entity.buildLevelCollision();
 
-                        console.log(entity.levelData);
                         if (entity.levelData.layers) {
                             // load tilesets
                             var images = [];
                             var count = entity.levelData.tilesets.length;
-                            //console.log('level :: load / complete :: tilesets count '+count);
                             for (var t = 0; t < count; t++) {
-                                //console.log('level :: complete :: t = '+t);
                                 images.push(entity.levelDir + entity.levelData.tilesets[t].image);
-                                //tileset.on('');
                             }
-                            //console.log('images = ');
-                            //console.log(images);
                             entity.tilesets = yespix.spawn(
                                 'image', {
                                     registerInstance: false,
                                     images: images,
                                 });
                             entity.tilesets.on('imageReady', function() {
+                                console.log('level :: imageReady for ' + entity.name);
                                 entity.tilesetsReady();
                                 yespix.level = entity;
                             }, entity);
@@ -4566,32 +4564,116 @@
                     },
                     'entity': this,
                 });
+                return this;
             },
 
             tilesetsReady: function() {
+                if (this._deleting) {
+                    console.log('Level currently deleting ' + this.name + ' ... ' + this._deleting);
+                    return;
+                }
                 // load layers
                 var layer = null;
                 var count = this.levelData.layers.length;
 
-                //console.log('level :: tilesetsReady :: layers count '+count);
+                console.log('level :: tilesetsReady :: layers count ' + count);
                 for (var t = 0; t < count; t++) {
-                    //console.log('level :: tilesetsReady :: making layer t = '+t);
                     layer = yespix.spawn('layer');
+                    this.attach(layer);
                     layer.setLevel(this);
-
-                    //console.log('level :: tilesetsReady :: this.levelData = ');
-                    //console.log(this.levelData);
 
                     this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
                     layer.load(this.levelData.layers[t]);
                     layer.make();
+                    layer.prop({
+                        x: this.x,
+                        y: this.y
+                    });
                     this.layers.push(layer);
                 }
                 this.isReady = true;
             },
 
-        });
 
+            moveChildren: function(deltaX, deltaY) {
+                var count = 0;
+                if (this._children) count = this._children.length;
+                if (!this._children || this._children.length == 0) return false;
+
+                var t = 0,
+                    length = this._children.length;
+
+                for (; t < length; t++) {
+                    if (this._children[t].isActive) {
+                        var speedX = 1,
+                            speedY = 1;
+
+                        if (this._children[t].layerData && this._children[t].layerData.properties && this._children[t].layerData.properties.type == 'parallax') {
+                            if (yespix.key('a')) console.log(this._children[t].layerData);
+                            if (!yespix.isUndefined(this._children[t].layerData.properties.speedX)) {
+                                speedX = this._children[t].layerData.properties.speedX;
+                                if (yespix.key('a')) console.log('speedX is defined');
+                            }
+                            if (yespix.key('a')) console.log('speedX = ' + speedX);
+                        }
+                        this._children[t].x += deltaX * speedX;
+                        this._children[t].y += deltaY * speedY;
+                    }
+                }
+            },
+
+            follow: function(entity, options) {
+                if (!entity) {
+                    console.error('follow :: invalid entity to follow')
+                    return false;
+                }
+
+                this.attach(entity);
+
+                options = options || {};
+                if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;
+                if (yespix.isUndefined(options.positionY)) options.positionY = 0.5;
+                if (yespix.isUndefined(options.speedX)) options.speedX = 10;
+                if (yespix.isUndefined(options.speedY)) options.speedY = 0.2;
+
+                this.followOptions = options;
+                entity.on('moveEnd', this.followEntity);
+            },
+
+            /**
+             * @this followed entity
+             */
+            followEntity: function(e) {
+                // @todo add function to do this in level entity
+                if (this._parent) {
+                    //this.isActive = false;
+
+                    boxEntity = this.getDrawBox();
+                    boxParent = this._parent.getDrawBox();
+                    /*if (yespix.key('a')) console.log('this = '); 
+            if (yespix.key('a')) console.log(this);
+            if (yespix.key('a')) console.log('boxEntity = '); 
+            if (yespix.key('a')) console.log(boxEntity);
+            if (yespix.key('a')) console.log('boxParent = '); 
+            if (yespix.key('a')) console.log(boxParent);*/
+                    var centerX = boxParent.width * this._parent.followOptions.positionX - boxEntity.width / 2;
+                    var centerY = boxParent.height * this._parent.followOptions.positionY - boxEntity.height / 2;
+                    var deltaX = centerX - this.x;
+                    var deltaY = centerY - this.y;
+
+                    //if (yespix.key('a')) console.log('followEntity :: centerX='+centerX+', centerY='+centerY+', this.x='+this.x+', this.y='+this.y+', deltaX='+deltaX+', deltaY='+deltaY);
+                    this._parent.moveTo(this._parent.x + deltaX / 10 * this._parent.followOptions.speedX, this._parent.y + deltaY / 10 * this._parent.followOptions.speedY);
+                    //console.log('followEntity :: moveTo x='+(this._parent.x - deltaX / 200)+', y='+(this._parent.y - deltaY / 200));
+                    //this.isActive = true;
+                }
+            },
+            unfollow: function() {
+                this.followOptions = null;
+                this.moveStop();
+            },
+
+
+        });
 
         yespix.define('move', {
             speedX: 0,
@@ -4600,7 +4682,7 @@
             accelY: 0,
             moveFriction: 0.05,
 
-            applyGravity: false,
+            canApplyGravity: true,
 
             moveStop: function() {
                 this.speedX = this.speedY = this.accelX = this.accelY = 0;
@@ -4611,25 +4693,74 @@
                 yespix.on('enterFrame', this.move, this, yespix);
             },
 
+            moveTo: function(x, y) {
+                if (isNaN(x) || isNaN(y)) return false;
+
+                // move children
+                var deltaX = x - this.x,
+                    deltaY = y - this.y;
+
+                this.moveChildren(deltaX, deltaY);
+
+                // move entity
+                this.x = x;
+                this.y = y;
+            },
+
             move: function() {
-                if (this.applyGravity && yespix.gravity) this.applyGravity();
+                this.trigger('moveStart', {
+                    entity: this
+                });
+
+                // apply gravity
+                if (this.canApplyGravity && yespix.gravity) this.applyGravity();
+
+                // apply acceleration
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
+
+                // apply friction
                 this.speedX *= 1 - this.moveFriction;
                 this.speedY *= 1 - this.moveFriction;
+
+                // apply level collision
                 if (yespix.level) yespix.level.collision(this);
+
+                // apply speed
                 this.x += this.speedX;
                 this.y += this.speedY;
+
+                // move children
+                this.moveChildren(this.speedX, this.speedY);
+
+                this.trigger('moveEnd', {
+                    entity: this
+                });
+            },
+
+            moveChildren: function(deltaX, deltaY) {
+                var count = 0;
+                if (this._children) count = this._children.length;
+                if (!this._children || this._children.length == 0) return false;
+
+                var t = 0,
+                    length = this._children.length;
+
+                for (; t < length; t++) {
+                    if (this._children[t].isActive) {
+                        if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
+                        this._children[t].x += deltaX;
+                        this._children[t].y += deltaY;
+                    }
+                }
             },
 
             applyGravity: function() {
-                /*
-				if (!this.isOnGround && yespix.gravity) {
-					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
-					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
-					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
-				}
-				*/
+                if (!yespix.gravity) return false;
+                if (!this.isOnGround && yespix.gravity) {
+                    if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
+                    if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
+                }
             },
 
         });
@@ -4874,6 +5005,7 @@
             },
 
         });
+
         yespix.define('scene', {
             sceneOptions: null,
             document: null,
@@ -4890,6 +5022,7 @@
             },
 
         });
+
         /**
          *
          */

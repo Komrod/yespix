@@ -56,8 +56,3 @@ yespix.define('canvas', {
         if (this.element) this.element.width = this.element.width;
     },
 });
-
-
-
-
-

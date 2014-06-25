@@ -18,11 +18,14 @@ yespix.define('collision', {
     },
 
     collisionBox: function(obj) {
-    	
-    	obj = obj || {x:0, y:0};
-    	if (!obj.x) obj.x = 0;
-    	if (!obj.y) obj.y = 0;
-    	
+
+        obj = obj || {
+            x: 0,
+            y: 0
+        };
+        if (!obj.x) obj.x = 0;
+        if (!obj.y) obj.y = 0;
+
         if (yespix.isUndefined(this.pixelSize)) {
             return {
                 x: this.x + this.colOffsetX - obj.x,

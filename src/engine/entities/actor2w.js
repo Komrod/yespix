@@ -63,7 +63,9 @@
             init: function() {},
 
             move: function() {
-                this.trigger('moveStart', {entity: this});
+                this.trigger('moveStart', {
+                    entity: this
+                });
 
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
@@ -75,7 +77,9 @@
                 this.x += this.speedX;
                 this.y += this.speedY;
 
-                this.trigger('moveEnd', {entity: this});
+                this.trigger('moveEnd', {
+                    entity: this
+                });
             },
 
             applyGravity: function() {

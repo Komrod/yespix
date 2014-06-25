@@ -459,15 +459,12 @@ yespix.fn.instanceAdd = function(entity) {
     entity._instances = {};
 
     // entity must be unique
-    if (entity.isUnique == true)
-    {
-        this.find('.'+entity._class+', /'+entity._class).destroy();
-        if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0)
-        {
+    if (entity.isUnique == true) {
+        this.find('.' + entity._class + ', /' + entity._class).destroy();
+        if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0) {
             var list = this.entityInstances['.' + entity._class];
             var count = list.length;
-            for (var t=0; t<count; t++)
-            {
+            for (var t = 0; t < count; t++) {
                 this.instanceRemove(list[0]);
             }
         }
@@ -506,7 +503,7 @@ yespix.fn.instanceAdd = function(entity) {
                 //entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
             }
         }
-    
+
     entity._instanceExists = true;
 
     // Trigger some events to dispatch the spawn of an entity
@@ -519,20 +516,16 @@ yespix.fn.instanceAdd = function(entity) {
 };
 
 yespix.fn.instanceRemove = function(entity) {
-    var t,u;
-    if (!entity)
-    {
+    var t, u;
+    if (!entity) {
         console.warn('instanceRemove :: parameter entity is undefined');
         return false;
     }
     // remove reference from the global instances list
-    if (this.entityInstances[''])
-    {
+    if (this.entityInstances['']) {
         //this.entityInstances[''].splice(entity._instances[''], 1); // remove instance by index // obsolete
-        for (t=0; t<this.entityInstances[''].length; t++)
-        {
-            if (this.entityInstances[''][t] == entity)
-            {
+        for (t = 0; t < this.entityInstances[''].length; t++) {
+            if (this.entityInstances[''][t] == entity) {
                 this.entityInstances[''].splice(t, 1);
                 break;
             }
@@ -543,13 +536,10 @@ yespix.fn.instanceRemove = function(entity) {
     delete this.entityInstances[+entity._id];
 
     // remove reference from the class instances list for its own class name
-    if (this.entityInstances['.' + entity._class])
-    {
+    if (this.entityInstances['.' + entity._class]) {
         //this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1); // remove instance by index // obsolee
-        for (t=0; t<this.entityInstances['.' + entity._class].length; t++)
-        {
-            if (this.entityInstances['.' + entity._class][t] == entity)
-            {
+        for (t = 0; t < this.entityInstances['.' + entity._class].length; t++) {
+            if (this.entityInstances['.' + entity._class][t] == entity) {
                 this.entityInstances['.' + entity._class].splice(t, 1);
                 break;
             }
@@ -558,22 +548,18 @@ yespix.fn.instanceRemove = function(entity) {
 
     // insert a reference in the class instances list for all its ancestors
     if (entity._ancestors.length > 0)
-        for (t = 0; t < entity._ancestors.length; t++)
-        {
-            if (this.entityInstances['/' + entity._ancestors[t]])
-            {
+        for (t = 0; t < entity._ancestors.length; t++) {
+            if (this.entityInstances['/' + entity._ancestors[t]]) {
                 //this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1); // obsolete
-                for (u=0; u<this.entityInstances["/" + entity._ancestors[t]].length; u++)
-                {
-                    if (this.entityInstances["/" + entity._ancestors[t]][u] == entity)
-                    {
+                for (u = 0; u < this.entityInstances["/" + entity._ancestors[t]].length; u++) {
+                    if (this.entityInstances["/" + entity._ancestors[t]][u] == entity) {
                         this.entityInstances["/" + entity._ancestors[t]].splice(u, 1);
                         break;
                     }
                 }
             }
         }
-    
+
     entity._instanceExists = false;
 
     this.trigger('remove', {

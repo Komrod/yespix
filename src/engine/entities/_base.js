@@ -59,7 +59,7 @@
 		     * Set True when the entity is currently deleting itself
 		     * @property _deleting
 		     * @type boolean
-			 */
+		     */
 		    _deleting: false,
 
 		    /**
@@ -105,7 +105,7 @@
 		     * Register instance in the engine when spawned
 		     */
 		    registerInstance: true,
-		    
+
 		    /**
 		     * Set to True if the entity must be unique (only one instance)
 		     * @property isUnique
@@ -211,7 +211,7 @@
 		        if (this._children) {
 		            for (var t = 0; t < this._children.length; t++) {
 		                if (this._children[t] && !this._children[t]._deleting) {
-				        	//console.log('base :: destroy :: destroying child t='+t);
+		                    //console.log('base :: destroy :: destroying child t='+t);
 		                    this._children[t].destroy();
 		                }
 		            }
