@@ -12,8 +12,6 @@ yespix.define('layer', 'gfx', {
     
     level: null,
     
-    layerParallax: {},
-    
     create: function()
     {
     	
@@ -40,9 +38,6 @@ yespix.define('layer', 'gfx', {
         this.width = this.layerData.width * this.layerData.tilewidth;
         this.height = this.layerData.height * this.layerData.tilewidth;
         if (this.layerData.properties.z) this.z = this.layerData.properties.z;
-        this.layerParallax = {x:1,y:1};
-        if (this.layerData.properties.parallaxX) this.layerParallax.x = this.layerData.properties.parallaxX;
-        if (this.layerData.properties.parallaxY) this.layerParallax.y = this.layerData.properties.parallaxY;
         
         this.canvas.width = this.width;
         this.canvas.height = this.height;

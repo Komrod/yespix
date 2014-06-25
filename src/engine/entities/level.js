@@ -46,7 +46,7 @@ yespix.define('level', 'gfx,move', {
     	for (var t=0; t<this.levelData.layers.length; t++)
     	{
     		var layer = this.levelData.layers[t];
-    		if (layer.properties['type'] && layer.properties['type'] == 'decor')
+    		if (layer.properties['type'] && (layer.properties['type'] == 'decor' || layer.properties['type'] == 'parallax'))
     		{
     			continue;
     		}
@@ -362,6 +362,38 @@ yespix.define('level', 'gfx,move', {
     		this.layers.push(layer);
    		}
     	this.isReady = true;
+    },
+
+    
+    moveChildren: function(deltaX, deltaY)
+    {
+        var count =0; if (this._children) count = this._children.length;
+        if (!this._children || this._children.length == 0) return false;
+        
+        var t = 0,
+            length = this._children.length;
+
+        for (; t<length; t++)
+        {
+            if (this._children[t].isActive)
+            {
+                var speedX = 1,
+                    speedY = 1;
+                
+                if (this._children[t].layerData && this._children[t].layerData.properties && this._children[t].layerData.properties.type == 'parallax')
+                {
+                    if (yespix.key('a')) console.log(this._children[t].layerData);
+                    if (!yespix.isUndefined(this._children[t].layerData.properties.speedX))
+                    {
+                        speedX = this._children[t].layerData.properties.speedX;
+                        if (yespix.key('a')) console.log('speedX is defined');
+                    }
+                    if (yespix.key('a')) console.log('speedX = '+speedX);
+                }
+                this._children[t].x += deltaX * speedX;
+                this._children[t].y += deltaY * speedY;
+            }
+        }
     },
     
     follow: function(entity, options)
