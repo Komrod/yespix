@@ -156,7 +156,7 @@
 	var mylevel = yp.spawn('level', {name: 'level test', x: 50, y: 50, alpha: 0.1}).load('chuck/test.json');
 	console.log('mylevel = '+mylevel);
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 350, y: 430, z: 1000});
-	mylevel.follow(mychuck);
+	mylevel.follow(mychuck, {reset: true});
 
 	console.log('mychuck = '+mychuck+', mylevel = '+mylevel);
 

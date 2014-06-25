@@ -368,14 +368,11 @@ yespix.define('level', 'gfx,move', {
             if (this._children[t].isActive) {
                 var speedX = 1,
                     speedY = 1;
-
+                // parallax layers move differently
                 if (this._children[t].layerData && this._children[t].layerData.properties && this._children[t].layerData.properties.type == 'parallax') {
-                    if (yespix.key('a')) console.log(this._children[t].layerData);
                     if (!yespix.isUndefined(this._children[t].layerData.properties.speedX)) {
                         speedX = this._children[t].layerData.properties.speedX;
-                        if (yespix.key('a')) console.log('speedX is defined');
                     }
-                    if (yespix.key('a')) console.log('speedX = ' + speedX);
                 }
                 this._children[t].x += deltaX * speedX;
                 this._children[t].y += deltaY * speedY;
@@ -394,40 +391,49 @@ yespix.define('level', 'gfx,move', {
         options = options || {};
         if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;
         if (yespix.isUndefined(options.positionY)) options.positionY = 0.5;
-        if (yespix.isUndefined(options.speedX)) options.speedX = 10;
-        if (yespix.isUndefined(options.speedY)) options.speedY = 0.2;
+        if (yespix.isUndefined(options.speedX)) options.speedX = 1;
+        if (yespix.isUndefined(options.speedY)) options.speedY = 0.02;
 
         this.followOptions = options;
-        entity.on('moveEnd', this.followEntity);
+
+        if (options.reset) this.followTeleport(entity);
+
+        entity.on('moveEnd', function(e)
+            {
+                if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);
+            });
     },
 
-    /**
-     * @this followed entity
-     */
-    followEntity: function(e) {
-        // @todo add function to do this in level entity
-        if (this._parent) {
-            //this.isActive = false;
-
-            boxEntity = this.getDrawBox();
-            boxParent = this._parent.getDrawBox();
-            /*if (yespix.key('a')) console.log('this = '); 
-            if (yespix.key('a')) console.log(this);
-            if (yespix.key('a')) console.log('boxEntity = '); 
-            if (yespix.key('a')) console.log(boxEntity);
-            if (yespix.key('a')) console.log('boxParent = '); 
-            if (yespix.key('a')) console.log(boxParent);*/
-            var centerX = boxParent.width * this._parent.followOptions.positionX - boxEntity.width / 2;
-            var centerY = boxParent.height * this._parent.followOptions.positionY - boxEntity.height / 2;
-            var deltaX = centerX - this.x;
-            var deltaY = centerY - this.y;
-
-            //if (yespix.key('a')) console.log('followEntity :: centerX='+centerX+', centerY='+centerY+', this.x='+this.x+', this.y='+this.y+', deltaX='+deltaX+', deltaY='+deltaY);
-            this._parent.moveTo(this._parent.x + deltaX / 10 * this._parent.followOptions.speedX, this._parent.y + deltaY / 10 * this._parent.followOptions.speedY);
-            //console.log('followEntity :: moveTo x='+(this._parent.x - deltaX / 200)+', y='+(this._parent.y - deltaY / 200));
-            //this.isActive = true;
-        }
+    followTeleport: function(entity) {
+        var delta = this.followEntityDelta(entity);
+        var boxEntity = entity.getDrawBox();
+        var boxParent = this.getDrawBox();
+        console.log('followTeleport :: delta = ');
+        console.log(delta);
+        console.log('followTeleport :: boxEntity = ');
+        console.log(boxEntity);
+        console.log('followTeleport :: boxParent = ');
+        console.log(boxParent);
+        this.moveTo(this.x + delta.x, this.y + delta.y);
     },
+
+    followEntityDelta: function(entity)    
+    {
+        var boxEntity = entity.getDrawBox();
+        var boxParent = this.getDrawBox();
+        var centerX = boxParent.width * this.followOptions.positionX - boxEntity.width / 2;
+        var centerY = boxParent.height * this.followOptions.positionY - boxEntity.height / 2;
+        var deltaX = centerX - entity.x;
+        var deltaY = centerY - entity.y;
+
+        return {x: deltaX, y: deltaY};
+    },
+
+    followEntity: function(entity) {
+        var delta = this.followEntityDelta(entity);
+        this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+    },
+    
     unfollow: function() {
         this.followOptions = null;
         this.moveStop();

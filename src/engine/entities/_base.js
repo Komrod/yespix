@@ -56,7 +56,7 @@
 		    _parent: null,
 
 		    /**
-		     * Set True when the entity is currently deleting itself
+		     * Set True when the entity deletion is in progress
 		     * @property _deleting
 		     * @type boolean
 		     */
