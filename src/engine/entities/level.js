@@ -302,6 +302,10 @@ yespix.define('level', 'gfx,move', {
 
                 entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                 entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
+
+                entity.width = entity.canvas.width;
+                entity.height = entity.canvas.height;
+
                 entity.buildLevelCollision();
                 
                 if (entity.levelData.layers)
@@ -371,10 +375,10 @@ yespix.define('level', 'gfx,move', {
         this.attach(entity);
 
         options = options || {};
-        if (!options.positionX) options.positionX = 0.5;
-        if (!options.positionY) options.positionY = 0.5;
-        if (!options.speedX) options.speedX = 1;
-        if (!options.speedY) options.speedY = 1;
+        if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;
+        if (yespix.isUndefined(options.positionY)) options.positionY = 0.5;
+        if (yespix.isUndefined(options.speedX)) options.speedX = 10;
+        if (yespix.isUndefined(options.speedY)) options.speedY = 0.2;
 
         this.followOptions = options;
         entity.on('moveEnd', this.followEntity);
@@ -398,18 +402,17 @@ yespix.define('level', 'gfx,move', {
             if (yespix.key('a')) console.log(boxEntity);
             if (yespix.key('a')) console.log('boxParent = '); 
             if (yespix.key('a')) console.log(boxParent);*/
-            var centerX = boxParent.x + boxParent.width * this._parent.followOptions.positionX - boxEntity.width / 2;
-            var centerY = boxParent.y + boxParent.height * this._parent.followOptions.positionY - boxEntity.height / 2;
+            var centerX = boxParent.width * this._parent.followOptions.positionX - boxEntity.width / 2;
+            var centerY = boxParent.height * this._parent.followOptions.positionY - boxEntity.height / 2;
             var deltaX = centerX - this.x;
             var deltaY = centerY - this.y;
 
-            if (yespix.key('a')) console.log('followEntity :: centerX='+centerX+', centerY='+centerY+', this.x='+this.x+', this.y='+this.y+', deltaX='+deltaX+', deltaY='+deltaY);
-            this._parent.moveTo(this._parent.x + deltaX / 200, this._parent.y + deltaY / 200);
+            //if (yespix.key('a')) console.log('followEntity :: centerX='+centerX+', centerY='+centerY+', this.x='+this.x+', this.y='+this.y+', deltaX='+deltaX+', deltaY='+deltaY);
+            this._parent.moveTo(this._parent.x + deltaX / 10 * this._parent.followOptions.speedX, this._parent.y + deltaY / 10 * this._parent.followOptions.speedY);
             //console.log('followEntity :: moveTo x='+(this._parent.x - deltaX / 200)+', y='+(this._parent.y - deltaY / 200));
             //this.isActive = true;
         }
     },
-
     unfollow: function()
     {
         this.followOptions = null;
