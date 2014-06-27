@@ -1,6 +1,8 @@
 TODO list:
 
 - entity.isReady set True when all entity files loaded and entityReady event launch
+- handle multiple tileset on level
+- handle tileset with multiple lines
 - level follow stops at level border
 - level follow change position relative to entity speed
 - player get throught floor on high gravity
