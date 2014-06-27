@@ -40,6 +40,16 @@ yespix.define('image', 'gfx', {
         this.imageInit();
     },
 
+    checkReadyState: function()
+    {
+        console.log('checkReadyState :: image');
+        for (var t = 0; t < this.images.length; t++) {
+            console.log('checkReadyState :: image['+t+'] = ');
+            console.log(this.images[t]);
+        }
+        this.ready();
+    },
+
     resize: function(img, scale) {
         // Takes an image and a scaling factor and returns the scaled image
         // The original image is drawn into an offscreen canvas of the same size

@@ -9,13 +9,16 @@ yespix.define('anim', 'image', {
     animSelected: '',
     animFrame: 0,
     animSpeed: 1,
-    animReady: false,
     animWait: false,
     animNext: '',
 
     init: function() {
         this.animInit();
         this.on('imageReady', function() {
+            console.log('anim.imageReady :: this.isReady = '+this.isReady);
+            this.isReady = true;
+            console.log('anim.imageReady :: this.isReady = '+this.isReady);
+            console.log(this);
             this.animFramesInit();
         });
     },
