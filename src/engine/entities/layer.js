@@ -20,6 +20,7 @@ yespix.define('layer', 'gfx', {
     },
 
     load: function(layerData) {
+        console.log('layer.load :: start');
         this.layerData = layerData;
         this.update();
     },
@@ -39,6 +40,7 @@ yespix.define('layer', 'gfx', {
     },
 
     drawTile: function(spriteIndex, cellX, cellY) {
+        // todo handle multiple tileset
         var img = this.level.tilesets.image(0);
         if (!img.isReady) {
             console.error('layer::drawTile :: image [0] of the tile set is not ready');
@@ -48,7 +50,7 @@ yespix.define('layer', 'gfx', {
         var max = Math.floor(img.element.width / infos.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
-
+        console.log('layer::drawTile :: cellX = '+cellX+', cellY = '+cellY+', max = '+max+', line = '+line+', col = '+col+', img = '+img);
         this.drawContext.drawImage(img.element, //image element
             col * this.layerData.tilewidth, // x position on image
             line * this.layerData.tilewidth, // y position on image
@@ -67,6 +69,7 @@ yespix.define('layer', 'gfx', {
 
 
     make: function() {
+        console.log('layer.make :: start');
         this.clear();
         if (!this.layerData || !this.level) return;
 
@@ -82,9 +85,11 @@ yespix.define('layer', 'gfx', {
             }
         }
         this.isReady = true;
+        //console.log('layer.make :: ready!');
     },
 
     draw: function(context) {
+        //console.log('layer.draw :: start');
         if (!this.isVisible) return;
 
         if (!context) {
@@ -93,7 +98,9 @@ yespix.define('layer', 'gfx', {
                 if (this._context) context = this._context;
             } else context = this._context;
         }
+        //console.log('layer.draw :: context = '+context);
         if (context && this.canvas) {
+            if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
                 this.x, // x position on image

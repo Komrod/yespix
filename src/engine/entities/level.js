@@ -396,7 +396,7 @@ yespix.define('level', 'gfx,move', {
 
         this.followOptions = options;
 
-        if (options.reset) this.followTeleport(entity);
+        if (options.reset) this.followReset(entity);
 
         entity.on('moveEnd', function(e)
             {
@@ -404,34 +404,58 @@ yespix.define('level', 'gfx,move', {
             });
     },
 
-    followTeleport: function(entity) {
+    followReset: function(entity) {
+        if (!entity.isReady)
+        {
+            console.log('followReset :: entity is not ready');
+            entity.on('entityReady', function() {
+                
+            });
+            return false;
+        }
+
         var delta = this.followEntityDelta(entity);
-        var boxEntity = entity.getDrawBox();
-        var boxParent = this.getDrawBox();
-        console.log('followTeleport :: delta = ');
-        console.log(delta);
-        console.log('followTeleport :: boxEntity = ');
-        console.log(boxEntity);
-        console.log('followTeleport :: boxParent = ');
-        console.log(boxParent);
-        this.moveTo(this.x + delta.x, this.y + delta.y);
+        if (delta)
+        {
+            this.moveTo(this.x + delta.x, this.y + delta.y);
+            return true;
+        }
+        return false;
     },
 
-    followEntityDelta: function(entity)    
+    followEntityDelta: function(entity, context)    
     {
+        if (yespix.key('a')) console.log('followEntity :: context = '+context);
+        if (!context) return;
         var boxEntity = entity.getDrawBox();
-        var boxParent = this.getDrawBox();
-        var centerX = boxParent.width * this.followOptions.positionX - boxEntity.width / 2;
-        var centerY = boxParent.height * this.followOptions.positionY - boxEntity.height / 2;
-        var deltaX = centerX - entity.x;
-        var deltaY = centerY - entity.y;
-
+        var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
+        var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;
+        var deltaX = centerX - boxEntity.x;
+        var deltaY = centerY - boxEntity.y;
+        if (yespix.key('a')) console.log('followEntity :: centerX = '+centerX+', centerY = '+centerY
+            +', deltaX = '+deltaX+', deltaY = '+deltaY
+            +', boxEntity.x = '+boxEntity.x+', boxEntity.y = '+boxEntity.y
+            +', boxEntity.width = '+boxEntity.width+', boxEntity.height = '+boxEntity.height
+            +', canvas.width = '+context.canvas.width+', canvas.height = '+context.canvas.height);
+        if (isNaN(deltaX) && isNaN(deltaY)) return false;
         return {x: deltaX, y: deltaY};
     },
 
-    followEntity: function(entity) {
-        var delta = this.followEntityDelta(entity);
-        this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+    followEntity: function(entity, context) {
+        if (!context) {
+            if (!this._context) {
+                this.getContext();
+                if (this._context) context = this._context;
+            } else context = this._context;
+        }
+        if (yespix.key('a')) console.log('followEntity :: context = ')
+        if (yespix.key('a')) console.log(context);
+        if (yespix.key('a')) console.log('followEntity :: context.canvas = ')
+        if (yespix.key('a')) console.log(context.canvas);
+        var delta = this.followEntityDelta(entity, context);
+        if (yespix.key('a')) console.log('followEntity :: delta = ')
+        if (yespix.key('a')) console.log(delta);
+        if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
     },
     
     unfollow: function() {

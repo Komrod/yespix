@@ -153,14 +153,9 @@
     
 	yp.gravity = { y: 10 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 50, y: 50, alpha: 0.1}).load('chuck/test.json');
-	console.log('mylevel = '+mylevel);
+	var mylevel = yp.spawn('level', {name: 'level test', alpha: 0.1}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 350, y: 430, z: 1000});
-	mylevel.follow(mychuck, {reset: true});
-
-	console.log('mychuck = '+mychuck+', mylevel = '+mylevel);
-
-	console.log(mychuck);
+	mylevel.follow(mychuck); //, {reset: true});
 </script>
 
 </body>

@@ -117,17 +117,31 @@
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**
-		     * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
+		     * Return the array of assets used for the entity. The original code of the function is called for 
+		     * the class name of the entity and each ancestor classes
 		     */
 		    assets: function() {
 		        return [];
 		    },
 
 		    /**
-		     * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
+		     * Initilize the entity object. The original code of the function is called for the class name of 
+		     * the entity and each ancestor classes
 		     */
 		    init: function(properties) {
 		        return true;
+		    },
+
+		    checkReadyState: function()
+		    {
+		        console.log('checkReadyState :: image');
+		    	this.ready();
+		    },
+
+		    ready: function()
+		    {
+		    	this.ready = true;
+		    	this.trigger('entityReady');
 		    },
 
 		    ancestor: function(name) {

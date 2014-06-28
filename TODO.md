@@ -1,10 +1,13 @@
 TODO list:
 
+- entity.isReady set True when all entity files loaded and entityReady event launch
+- handle multiple tileset on level
+- handle tileset with multiple lines
+- level follow stops at level border
+- level follow change position relative to entity speed
 - player get throught floor on high gravity
-- parallax layer
 - auto attach every entity to the current level
 - make layer a general empty drawable canvas (view), put the level build on the level entity
-- level follow an entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
@@ -51,10 +54,13 @@ TODO list:
 
 
 DONE:
+- fix follow big level
+- level follow an entity
+- parallax layer // 2014-06-25
 - getDrawBox sometimes get x and y as NaN on actor2w
 - move level view, make attached entities move on parent move
 - fix level collision on level position // 2014-06-23
-- property entityUnique to be sure that only one instance of the entity is spawned
+- property entityUnique True to be sure that only one instance of the entity is spawned
 - multiple layer level
 - layer alpha and type (decor)
 - Add path entity for objects
