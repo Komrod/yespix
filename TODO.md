@@ -1,9 +1,13 @@
+
 TODO list:
 
-- entity.isReady set True when all entity files loaded and entityReady event launch
 - handle multiple tileset on level
 - handle tileset with multiple lines
-- level follow stops at level border
+- level collision loop when outside level
+- fix level collision with floor after jump
+- fix layer opacity
+- option stopAtBorders that makes the level follow stops at level border
+- actor2w disociate speed and direction
 - level follow change position relative to entity speed
 - player get throught floor on high gravity
 - auto attach every entity to the current level
@@ -54,6 +58,7 @@ TODO list:
 
 
 DONE:
+- entity.isReady set True when all entity files loaded and entityReady event launch
 - fix follow big level
 - level follow an entity
 - parallax layer // 2014-06-25
