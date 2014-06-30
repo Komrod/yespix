@@ -38,16 +38,28 @@ yespix.define('image', 'gfx', {
         }
 
         this.imageInit();
+
+        this.readyFunctions.push(this.checkReadyStateImage);
+        this.on('imageReady', this.checkReadyState);
     },
 
-    checkReadyState: function()
+    checkReadyStateImage: function()
     {
-        console.log('checkReadyState :: image');
+
+        console.log('checkReadyStateImage :: image');
+        console.log('checkReadyStateImage :: this = ');
+        console.log(this);
         for (var t = 0; t < this.images.length; t++) {
-            console.log('checkReadyState :: image['+t+'] = ');
+            console.log('checkReadyStateImage :: image['+t+'] = ');
             console.log(this.images[t]);
+            if (!this.images[t].isReady)
+            {
+                console.log('checkReadyStateImage :: image['+t+'] NOT READY ');
+                return false;
+            }
         }
-        this.ready();
+        console.log('checkReadyStateImage :: images all ready ');
+        return true;
     },
 
     resize: function(img, scale) {

@@ -114,6 +114,13 @@
 		     */
 		    isUnique: false,
 
+		    /**
+		     * 
+		     */
+		    
+		    
+		    readyFunctions: [],
+
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**
@@ -129,18 +136,26 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(properties) {
+		        this.on('spawn', this.checkReadyState);
 		        return true;
 		    },
 
 		    checkReadyState: function()
 		    {
-		        console.log('checkReadyState :: image');
-		    	this.ready();
+		        console.log('checkReadyState :: class '+this._class+', readyFunctions count = '+this.readyFunctions.length);
+	    		console.log('checkReadyState :: this = ');
+	    		console.log(this);
+		        for (var t=0; t<this.readyFunctions.length; t++)
+		        {
+		        	if (!this.readyFunctions[t].apply(this)) return false;
+		        }
+		        this.ready();
+		    	return true;
 		    },
 
 		    ready: function()
 		    {
-		    	this.ready = true;
+		    	this.isReady = true;
 		    	this.trigger('entityReady');
 		    },
 
@@ -182,18 +197,18 @@
 		        return entity;
 		    },
 
-		    attach: function(entity) {
-		        yespix.attach(this, entity);
+		    childAdd: function(entity) {
+		        yespix.childAdd(this, entity);
 		        return this;
 		    },
 
 		    setParent: function(entity) {
-		        yespix.attach(entity, this);
+		        yespix.childAdd(entity, this);
 		        return this;
 		    },
 
-		    detach: function(entity) {
-		        yespix.detach(this, entity);
+		    childRemove: function(entity) {
+		        yespix.childRemove(this, entity);
 		        return this;
 		    },
 

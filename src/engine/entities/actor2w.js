@@ -63,6 +63,8 @@
             init: function() {},
 
             move: function() {
+                if (this._parent && !this._parent.isReady) return false;
+                
                 this.trigger('moveStart', {
                     entity: this
                 });

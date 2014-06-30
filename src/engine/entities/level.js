@@ -16,6 +16,17 @@ yespix.define('level', 'gfx,move', {
     isUnique: true,
     canApplyGravity: false,
 
+
+    init: function()
+    {
+        this.readyFunctions.push(this.checkReadyStateLevel);
+    },
+
+    checkReadyStateLevel: function()
+    {
+        return false;
+    },
+
     getDrawBox: function() {
         if (this.snapToPixel) {
             var x = parseInt(this.x);
@@ -43,10 +54,10 @@ yespix.define('level', 'gfx,move', {
     buildLevelCollision: function() {
         for (var t = 0; t < this.levelData.layers.length; t++) {
             var layer = this.levelData.layers[t];
-            if (layer.properties['type'] && (layer.properties['type'] == 'decor' || layer.properties['type'] == 'parallax')) {
+            if (layer.properties && layer.properties['type'] && (layer.properties['type'] == 'decor' || layer.properties['type'] == 'parallax')) {
                 continue;
             }
-            for (var u = 0; u < layer.data.length; u++) {
+            if (layer.data) for (var u = 0; u < layer.data.length; u++) {
                 if (!this.levelCollision[u]) this.levelCollision[u] = 0;
                 this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
             }
@@ -340,7 +351,7 @@ yespix.define('level', 'gfx,move', {
         console.log('level :: tilesetsReady :: layers count ' + count);
         for (var t = 0; t < count; t++) {
             layer = yespix.spawn('layer');
-            this.attach(layer);
+            this.childAdd(layer);
             layer.setLevel(this);
 
             this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
@@ -386,7 +397,7 @@ yespix.define('level', 'gfx,move', {
             return false;
         }
 
-        this.attach(entity);
+        this.childAdd(entity);
 
         options = options || {};
         if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;

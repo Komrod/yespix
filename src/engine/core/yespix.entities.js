@@ -436,10 +436,22 @@ yespix.fn.spawn = function(name, properties) {
 
     if (entity['registerInstance']) this.instanceAdd(entity);
 
+    // Trigger some events to dispatch the spawn of an entity
+    var event = {
+        entity: entity,
+        type: 'spawn'
+    }
+    entity.trigger('spawn', event);
+    this.trigger('spawn', event);
+
     if (entity._ancestors.length > 0)
-        for (t = 0; t < entity._ancestors.length; t++) this.trigger('spawn:' + entity._ancestors[t], {
-            entity: entity
-        });
+        for (t = 0; t < entity._ancestors.length; t++)
+        {
+            entity.trigger('spawn:' + entity._ancestors[t], event);
+            this.trigger('spawn:' + entity._ancestors[t], event);
+        }
+    entity.trigger('spawn:' + entity._class, event);
+    this.trigger('spawn:' + entity._class, event);
 
     return entity;
 };
@@ -505,14 +517,6 @@ yespix.fn.instanceAdd = function(entity) {
         }
 
     entity._instanceExists = true;
-
-    // Trigger some events to dispatch the spawn of an entity
-    this.trigger('spawn', {
-        entity: entity
-    });
-    this.trigger('spawn:' + entity._class, {
-        entity: entity
-    });
 };
 
 yespix.fn.instanceRemove = function(entity) {
