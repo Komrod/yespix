@@ -69,6 +69,10 @@
          "height":19,
          "name":"squares",
          "opacity":1,
+         "properties":
+            {
+             "type":"decor"
+            },
          "type":"tilelayer",
          "visible":true,
          "width":100,
@@ -93,6 +97,10 @@
                  "y":134
                 }],
          "opacity":1,
+         "properties":
+            {
+             "type":"trigger"
+            },
          "type":"objectgroup",
          "visible":true,
          "width":100,
