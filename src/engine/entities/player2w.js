@@ -63,9 +63,9 @@ yespix.define('player2w', 'actor2w', {
                 this.animNext = 'air' + this.actorDirection;
                 this.isJumping = true;
                 this.jumpTime = (new Date).getTime();
-                console.log('this.jumpTime = ' + this.jumpTime);
+//                console.log('this.jumpTime = ' + this.jumpTime);
             } else if (this.isJumping) {
-                console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
+//                console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
                 if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
                     this.accelY = -(this.actorSpeedJump / 6);
                     //this.accelY = 0;

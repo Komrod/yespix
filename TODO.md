@@ -1,15 +1,14 @@
 
 TODO list:
 
-- handle multiple tileset on level
+- handle gid and multiple tileset on level
 - handle tileset with multiple lines
 - level collision loop when outside level
-- fix level collision with floor after jump
-- fix layer opacity
+- fix level collision with floor after jump, make children position relative to parent
+- fix parallax y of level layers
 - option stopAtBorders that makes the level follow stops at level border
 - actor2w disociate speed and direction
 - level follow change position relative to entity speed
-- player get throught floor on high gravity
 - auto attach every entity to the current level
 - make layer a general empty drawable canvas (view), put the level build on the level entity
 - create a sprite entity from anim enity
@@ -58,6 +57,8 @@ TODO list:
 
 
 DONE:
+- fix layer opacity // 2014-06-30
+- fix player get throught floor on high gravity
 - entity.isReady set True when all entity files loaded and entityReady event launch
 - fix follow big level
 - level follow an entity

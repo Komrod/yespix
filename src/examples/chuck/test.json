@@ -8,6 +8,7 @@
          "properties":
             {
              "speedX":"0.2",
+             "speedY":"0.05",
              "type":"parallax"
             },
          "type":"tilelayer",
@@ -24,6 +25,7 @@
          "properties":
             {
              "speedX":"0.5",
+             "speedY":"0.1",
              "type":"parallax"
             },
          "type":"tilelayer",
@@ -55,6 +57,7 @@
          "properties":
             {
              "speedX":"3",
+             "speedY":"1.2",
              "type":"parallax",
              "z":"2000"
             },

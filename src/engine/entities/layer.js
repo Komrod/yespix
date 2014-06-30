@@ -34,7 +34,8 @@ yespix.define('layer', 'gfx', {
         this.width = this.layerData.width * this.layerData.tilewidth;
         this.height = this.layerData.height * this.layerData.tilewidth;
         if (this.layerData.properties.z) this.z = this.layerData.properties.z;
-
+        if (this.layerData.opacity) this.alpha = this.layerData.opacity;
+        console.log('layer.update :: this.layerData.opacity = '+this.layerData.opacity);
         this.canvas.width = this.width;
         this.canvas.height = this.height;
     },
@@ -50,7 +51,7 @@ yespix.define('layer', 'gfx', {
         var max = Math.floor(img.element.width / infos.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
-        console.log('layer::drawTile :: cellX = '+cellX+', cellY = '+cellY+', max = '+max+', line = '+line+', col = '+col+', img = '+img);
+        //console.log('layer::drawTile :: cellX = '+cellX+', cellY = '+cellY+', max = '+max+', line = '+line+', col = '+col+', img = '+img);
         this.drawContext.drawImage(img.element, //image element
             col * this.layerData.tilewidth, // x position on image
             line * this.layerData.tilewidth, // y position on image
@@ -77,14 +78,17 @@ yespix.define('layer', 'gfx', {
 
         for (var y = 0; y < this.layerData.height; y++) {
             for (var x = 0; x < this.layerData.width; x++) {
-                var spriteIndex = this.layerData.data[index] - 1;
-                if (spriteIndex >= 0) {
-                    this.drawTile(spriteIndex, x, y);
+                if (this.layerData && this.layerData.data)
+                {
+                    var spriteIndex = this.layerData.data[index] - 1;
+                    if (spriteIndex >= 0) {
+                        this.drawTile(spriteIndex, x, y);
+                    }
                 }
                 index++;
             }
         }
-        this.isReady = true;
+        this.ready();
         //console.log('layer.make :: ready!');
     },
 
@@ -100,7 +104,7 @@ yespix.define('layer', 'gfx', {
         }
         //console.log('layer.draw :: context = '+context);
         if (context && this.canvas) {
-            if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
+            //if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             context.drawImage(this.canvas, //image element
                 this.x, // x position on image

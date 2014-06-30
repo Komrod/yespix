@@ -76,18 +76,21 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionRight: function(entity, box, cellX, cellY) {
+        console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'right', entity.speedX);
         entity.x = this.x + cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
         entity.speedX = 0;
     },
 
     collisionLeft: function(entity, box, cellX, cellY) {
+        console.log('collisionLeft :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'left', entity.speedX);
         entity.x = this.x + (cellX + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
         entity.speedX = 0;
     },
 
     collisionUp: function(entity, box, cellX, cellY) {
+        console.log('collisionUp :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'up', entity.speedY);
         var posY = this.y + (cellY + 1) * this.levelData.tileheight + 1 - box.offsetY;
         entity.y = posY;
@@ -95,6 +98,7 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionDown: function(entity, box, cellX, cellY) {
+        console.log('collisionDown :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'down', entity.speedY);
         entity.y = this.y + (cellY) * this.levelData.tileheight - box.offsetY - box.height - 1;
         entity.speedY = 0;
@@ -150,7 +154,7 @@ yespix.define('level', 'gfx,move', {
             // cellNext is the final cell on the left of the entity
             var cellNext = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
 
-            //console.log('level.x = '+this.x+', level.y = '+this.y+', entity.x = '+entity.x+', entity.y = '+entity.y+', box.x = '+box.x+', box.y = '+box.y+', cellLeft = '+cellLeft+', cellNext = '+cellNext);
+            if (yespix.key('left')) console.log('level.x = '+this.x+', level.y = '+this.y+', entity.x = '+entity.x+', entity.y = '+entity.y+', box.x = '+box.x+', box.y = '+box.y+', cellLeft = '+cellLeft+', cellNext = '+cellNext);
 
             if (cellNext < cellLeft) {
 
@@ -173,10 +177,10 @@ yespix.define('level', 'gfx,move', {
         }
 
         if (entity.speedY > 0) {
-            // check every collision on the bottom
+            // check every collision on the floor
             var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
 
-            // cellNext is the final cell on the right of the entity
+            // cellNext is the final cell under the entity
             var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
 
             if (cellNext > cellBottom) {
@@ -208,10 +212,10 @@ yespix.define('level', 'gfx,move', {
                 }
             }
         } else if (entity.speedY < 0) {
-            // check every collision on the bottom
+            // check every collision on the ceiling
             var cellTop = Math.floor(box.y / this.levelData.tileheight);
 
-            // cellNext is the final cell on the right of the entity
+            // cellNext is the final cell on the top of the entity
             var cellNext = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
 
             if (cellNext < cellTop) {
