@@ -27,30 +27,6 @@ yespix.define('level', 'gfx,move', {
         return false;
     },
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
-        } else {
-            var x = this.x;
-            var y = this.y;
-        }
-        var width = this.width;
-        var height = this.height;
-
-        if (this.canvas) {
-            width = this.canvas.width;
-            height = this.canvas.height;
-        }
-
-        return {
-            x: x,
-            y: y,
-            width: width,
-            height: height
-        };
-    },
-
     buildLevelCollision: function() {
         for (var t = 0; t < this.levelData.layers.length; t++) {
             var layer = this.levelData.layers[t];
@@ -117,7 +93,10 @@ yespix.define('level', 'gfx,move', {
             up = false,
             down = false;
 
-        var box = entity.collisionBox(this);
+        var box = entity.collisionBox(false);
+        console.log('collision :: box = ');
+        console.log(box);
+        //box.nope();
 
         if (entity.speedX > 0) {
             // check every collision on the right

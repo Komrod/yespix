@@ -26,7 +26,7 @@ yespix.define('gfx', {
         return [];
     },
 
-    // initilize object
+    // initilize entity
     init: function() {
 
         yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
@@ -36,35 +36,28 @@ yespix.define('gfx', {
         return true;
     },
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
-        } else {
-            var x = this.x;
-            var y = this.y;
+    getPosition: function(relative)
+    {
+        if (relative || !this._parent)
+        {
+            return {x: this.x, y: this.y};
+        } else
+        {
+            var position = this._parent.getPosition();
+            if (position) return {x: this.x + position.x, y: this.y + position.y};
         }
-        var width = this.width;
-        var height = this.height;
+        return {x: this.x, y: this.y};
+    },
 
-        if (this.typeof('anim')) {
-            var img = this.image(this.imageSelected);
-            var type = 'anim';
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        } else if (this.typeof('image')) {
-            var img = this.image(this.imageSelected);
-            var type = 'image';
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        }
+    getDrawBox: function(relative) {
+        var position = this.getPosition(relative);
 
         return {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            type: type
+            x: position.x,
+            y: position.y,
+            width: this.width,
+            height: this.height,
+            type: this._class
         };
     },
 

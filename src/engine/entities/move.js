@@ -23,7 +23,7 @@ yespix.define('move', {
         var deltaX = x - this.x,
             deltaY = y - this.y;
 
-        this.moveChildren(deltaX, deltaY);
+        //this.moveChildren(deltaX, deltaY);
 
         // move entity
         this.x = x;
@@ -54,13 +54,13 @@ yespix.define('move', {
         this.y += this.speedY;
 
         // move children
-        this.moveChildren(this.speedX, this.speedY);
+        //this.moveChildren(this.speedX, this.speedY);
 
         this.trigger('moveEnd', {
             entity: this
         });
     },
-
+    /*
     moveChildren: function(deltaX, deltaY) {
         var count = 0;
         if (this._children) count = this._children.length;
@@ -77,7 +77,7 @@ yespix.define('move', {
             }
         }
     },
-
+    */
     applyGravity: function() {
         if (!yespix.gravity) return false;
         if (!this.isOnGround && yespix.gravity) {

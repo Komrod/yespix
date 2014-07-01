@@ -17,19 +17,14 @@ yespix.define('collision', {
         return false;
     },
 
-    collisionBox: function(obj) {
+    collisionBox: function(relative) {
 
-        obj = obj || {
-            x: 0,
-            y: 0
-        };
-        if (!obj.x) obj.x = 0;
-        if (!obj.y) obj.y = 0;
+        var pos = this.getPosition(relative);
 
         if (yespix.isUndefined(this.pixelSize)) {
             return {
-                x: this.x + this.colOffsetX - obj.x,
-                y: this.y + this.colOffsetY - obj.y,
+                x: pos.x + this.colOffsetX,
+                y: pos.y + this.colOffsetY,
                 width: this.colWidth,
                 height: this.colHeight,
                 offsetX: this.colOffsetX,
@@ -37,8 +32,8 @@ yespix.define('collision', {
             };
         } else {
             return {
-                x: this.x + this.colOffsetX * this.pixelSize - obj.x,
-                y: this.y + this.colOffsetY * this.pixelSize - obj.y,
+                x: pos.x + this.colOffsetX * this.pixelSize,
+                y: pos.y + this.colOffsetY * this.pixelSize,
                 width: this.colWidth * this.pixelSize,
                 height: this.colHeight * this.pixelSize,
                 offsetX: this.colOffsetX * this.pixelSize,
