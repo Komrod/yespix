@@ -44,6 +44,7 @@ yespix.define('gfx', {
         } else
         {
             var position = this._parent.getPosition();
+            if (yespix.frame<100) console.log('getPosition :: absolute position x='+(this.x + position.x)+', y='+(this.y + position.y));
             if (position) return {x: this.x + position.x, y: this.y + position.y};
         }
         return {x: this.x, y: this.y};

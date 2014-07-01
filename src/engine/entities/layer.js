@@ -106,9 +106,10 @@ yespix.define('layer', 'gfx', {
         if (context && this.canvas) {
             //if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
+            var box = this.getDrawBox();
             context.drawImage(this.canvas, //image element
-                this.x, // x position on image
-                this.y, // y position on image
+                box.x, // x position on image
+                box.y, // y position on image
                 this.canvas.width, // width on image
                 this.canvas.height // height on image
             );

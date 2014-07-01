@@ -326,13 +326,14 @@ yespix.define('anim', 'image', {
 
         var scaleX = frame.flipX ? -1 : 1;
         var scaleY = frame.flipY ? -1 : 1;
-
+        var position = this.getPosition();
+        
         if (this.snapToPixel) {
-            var canvasX = parseInt(this.x * scaleX - frame.flipX * frame.width * this.pixelSize);
-            var canvasY = parseInt(this.y * scaleY - frame.flipY * frame.height * this.pixelSize);
+            var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
+            var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
         } else {
-            var canvasX = this.x * scaleX - frame.flipX * frame.width * this.pixelSize;
-            var canvasY = this.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+            var canvasX = position.x * scaleX - frame.flipX * frame.width * this.pixelSize;
+            var canvasY = position.y * scaleY - frame.flipY * frame.height * this.pixelSize;
         }
         var x = frame.x;
         var y = frame.y;
