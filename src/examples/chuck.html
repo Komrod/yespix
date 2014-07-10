@@ -6,7 +6,7 @@
 <body>
 <script type="text/javascript">
 
-	var yp = yespix({canvas: true, fps: 50});
+	var yp = yespix({canvas: {width: 1200, height: 1200}, fps: 50});
 	
 	yp.define('chuck', 'player2w',
 	{
@@ -153,10 +153,10 @@
     
 	yp.gravity = { y: 20 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 20, y: 20}).load('chuck/test.json');
+	var mylevel = yp.spawn('level', {name: 'level test', x: 100, y: 100}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 350, y: 50, z: 1000});
 	//mylevel.childAdd(mychuck);
-	mylevel.follow(mychuck); //, {reset: true});
+	mylevel.follow(mychuck, {reset: true});
 	yp.find().prop({alpha: 0.1});
 
 </script>

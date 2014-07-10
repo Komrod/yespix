@@ -7,6 +7,7 @@ TODO list:
 - fix level collision with floor after jump, make children position relative to parent
 - fix parallax y of level layers
 - option stopAtBorders that makes the level follow stops at level border
+- set a pixelSize for the level
 - actor2w disociate speed and direction
 - level follow change position relative to entity speed
 - auto attach every entity to the current level
@@ -57,6 +58,7 @@ TODO list:
 
 
 DONE:
+- fix level collision when level is not at (0,0)
 - fix layer opacity // 2014-06-30
 - fix player get throught floor on high gravity
 - entity.isReady set True when all entity files loaded and entityReady event launch

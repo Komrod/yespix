@@ -79,10 +79,12 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionDown: function(entity, box, cellX, cellY) {
-        if (yespix.frameIndex<100) console.log('collisionDown :: cellX: '+cellX+', cellY: '+cellY+', entity.y: '+entity.y);
+        if (yespix.frameIndex<100) console.log('collisionDown :: tileheight: '+this.levelData.tileheight+', cellY: '+cellY+', entity.y: '+entity.y+', box.y: '+box.y+', box.offsetY: '+box.offsetY+', box.height: '+box.height);
         this.hit(cellX, cellY, 'down', entity.speedY);
-        entity.y = (cellY) * this.levelData.tileheight - box.offsetY - box.height - 1;
-        if (yespix.frameIndex<100) console.log('collisionDown :: entity.y: '+entity.y);
+        var delta = box.y - entity.y;
+        entity.y = cellY * this.levelData.tileheight - box.offsetY - box.height - 1;
+        if (yespix.frameIndex<100) console.log('collisionDown :: new entity.y: '+entity.y+', delta: '+delta);
+        if (yespix.frameIndex<100) console.log('------------------------------------------------------------------------------------------------------------------------');
         entity.speedY = 0;
         entity.isOnGround = true;
         entity.isJumping = false;
@@ -99,7 +101,7 @@ yespix.define('level', 'gfx,move', {
             up = false,
             down = false;
 
-        var box = entity.collisionBox(false);
+        var box = entity.collisionBox(true);
         if (yespix.frameIndex<100)
         {
             console.log('collision :: box = ');
@@ -407,9 +409,9 @@ yespix.define('level', 'gfx,move', {
     followReset: function(entity) {
         if (!entity.isReady)
         {
-            console.log('followReset :: entity is not ready');
+            console.log('followReset :: entity not ready --------------------------------------------');
             entity.on('entityReady', function() {
-                
+                console.log('entityReady : -------------------------------------------- ENTITY READY');
             });
             return false;
         }
@@ -425,18 +427,13 @@ yespix.define('level', 'gfx,move', {
 
     followEntityDelta: function(entity, context)    
     {
-        if (yespix.key('a')) console.log('followEntity :: context = '+context);
+        if (yespix.key('a')) console.log('followEntityDelta :: context = '+context);
         if (!context) return;
-        var boxEntity = entity.getDrawBox();
+        var boxEntity = entity.getDrawBox(true);
         var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
         var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;
-        var deltaX = centerX - boxEntity.x;
-        var deltaY = centerY - boxEntity.y;
-        if (yespix.key('a')) console.log('followEntity :: centerX = '+centerX+', centerY = '+centerY
-            +', deltaX = '+deltaX+', deltaY = '+deltaY
-            +', boxEntity.x = '+boxEntity.x+', boxEntity.y = '+boxEntity.y
-            +', boxEntity.width = '+boxEntity.width+', boxEntity.height = '+boxEntity.height
-            +', canvas.width = '+context.canvas.width+', canvas.height = '+context.canvas.height);
+        var deltaX = centerX - boxEntity.x - this.x;
+        var deltaY = centerY - boxEntity.y - this.y;
         if (isNaN(deltaX) && isNaN(deltaY)) return false;
         return {x: deltaX, y: deltaY};
     },
@@ -448,14 +445,8 @@ yespix.define('level', 'gfx,move', {
                 if (this._context) context = this._context;
             } else context = this._context;
         }
-        if (yespix.key('a')) console.log('followEntity :: context = ')
-        if (yespix.key('a')) console.log(context);
-        if (yespix.key('a')) console.log('followEntity :: context.canvas = ')
-        if (yespix.key('a')) console.log(context.canvas);
         var delta = this.followEntityDelta(entity, context);
-        if (yespix.key('a')) console.log('followEntity :: delta = ')
-        if (yespix.key('a')) console.log(delta);
-        //if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+        if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
     },
     
     unfollow: function() {
