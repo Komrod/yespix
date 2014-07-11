@@ -24,6 +24,7 @@ yespix.define('level', 'gfx,move', {
 
     checkReadyStateLevel: function()
     {
+        // @todo
         return false;
     },
 
@@ -37,17 +38,12 @@ yespix.define('level', 'gfx,move', {
                 if (!this.levelCollision[u]) this.levelCollision[u] = 0;
                 this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
             }
-            if (layer.data) console.log('layer data length = '+layer.data.length);
         }
     },
 
     block: function(cellX, cellY) {
         var index = cellY * this.levelData.width + cellX;
         var tileIndex = this.levelCollision[index];
-        if (yespix.frameIndex<100)
-        {
-            console.log('block :: index = '+index+', tileIndex = '+tileIndex+', max = '+this.levelCollision.length);
-        }
         if (tileIndex && tileIndex > 0) return true;
         return false;
     },
@@ -57,21 +53,21 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionRight: function(entity, box, cellX, cellY) {
-        console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
+        //console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'right', entity.speedX);
         entity.x = cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
         entity.speedX = 0;
     },
 
     collisionLeft: function(entity, box, cellX, cellY) {
-        console.log('collisionLeft :: cellX: '+cellX+', cellY: '+cellY);
+        //console.log('collisionLeft :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'left', entity.speedX);
         entity.x = (cellX + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
         entity.speedX = 0;
     },
 
     collisionUp: function(entity, box, cellX, cellY) {
-        console.log('collisionUp :: cellX: '+cellX+', cellY: '+cellY);
+        //console.log('collisionUp :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'up', entity.speedY);
         var posY = (cellY + 1) * this.levelData.tileheight + 1 - box.offsetY;
         entity.y = posY;
@@ -79,12 +75,10 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionDown: function(entity, box, cellX, cellY) {
-        if (yespix.frameIndex<100) console.log('collisionDown :: tileheight: '+this.levelData.tileheight+', cellY: '+cellY+', entity.y: '+entity.y+', box.y: '+box.y+', box.offsetY: '+box.offsetY+', box.height: '+box.height);
+        //if (yespix.frameIndex<100) console.log('collisionDown :: tileheight: '+this.levelData.tileheight+', cellY: '+cellY+', entity.y: '+entity.y+', box.y: '+box.y+', box.offsetY: '+box.offsetY+', box.height: '+box.height);
         this.hit(cellX, cellY, 'down', entity.speedY);
         var delta = box.y - entity.y;
         entity.y = cellY * this.levelData.tileheight - box.offsetY - box.height - 1;
-        if (yespix.frameIndex<100) console.log('collisionDown :: new entity.y: '+entity.y+', delta: '+delta);
-        if (yespix.frameIndex<100) console.log('------------------------------------------------------------------------------------------------------------------------');
         entity.speedY = 0;
         entity.isOnGround = true;
         entity.isJumping = false;
@@ -102,11 +96,6 @@ yespix.define('level', 'gfx,move', {
             down = false;
 
         var box = entity.collisionBox(true);
-        if (yespix.frameIndex<100)
-        {
-            console.log('collision :: box = ');
-            console.log(box);
-        }
 
         if (entity.speedX > 0) {
             // check every collision on the right
@@ -170,10 +159,6 @@ yespix.define('level', 'gfx,move', {
             // cellNext is the final cell under the entity
             var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
 
-            if (yespix.frameIndex<100)
-            {
-                console.log('level.x = '+this.x+', level.y = '+this.y+', entity.x = '+entity.x+', entity.y = '+entity.y+', box.x = '+box.x+', box.y = '+box.y+', cellBottom = '+cellBottom+', cellNext = '+cellNext);
-            }
             if (cellNext > cellBottom) {
 
                 down = true;
@@ -336,14 +321,12 @@ yespix.define('level', 'gfx,move', {
 
     tilesetsReady: function() {
         if (this._deleting) {
-            console.log('Level currently deleting ' + this.name + ' ... ' + this._deleting);
             return;
         }
         // load layers
         var layer = null;
         var count = this.levelData.layers.length;
 
-        console.log('level :: tilesetsReady :: layers count ' + count);
         for (var t = 0; t < count; t++) {
             layer = yespix.spawn('layer');
             this.childAdd(layer);
@@ -354,34 +337,8 @@ yespix.define('level', 'gfx,move', {
             layer.make();
             this.layers.push(layer);
         }
-        this.isReady = true;
+        this.ready();
     },
-
-    /*
-    moveChildren: function(deltaX, deltaY) {
-        var count = 0;
-        if (this._children) count = this._children.length;
-        if (!this._children || this._children.length == 0) return false;
-
-        var t = 0,
-            length = this._children.length;
-
-        for (; t < length; t++) {
-            if (this._children[t].isActive) {
-                var speedX = 1,
-                    speedY = 1;
-                // parallax layers move differently
-                if (this._children[t].layerData && this._children[t].layerData.properties && this._children[t].layerData.properties.type == 'parallax') {
-                    if (!yespix.isUndefined(this._children[t].layerData.properties.speedX)) {
-                        speedX = this._children[t].layerData.properties.speedX;
-                    }
-                }
-                this._children[t].x += deltaX * speedX;
-                this._children[t].y += deltaY * speedY;
-            }
-        }
-    },
-    */
 
     follow: function(entity, options) {
         if (!entity) {
@@ -409,9 +366,8 @@ yespix.define('level', 'gfx,move', {
     followReset: function(entity) {
         if (!entity.isReady)
         {
-            console.log('followReset :: entity not ready --------------------------------------------');
             entity.on('entityReady', function() {
-                console.log('entityReady : -------------------------------------------- ENTITY READY');
+                this._parent.followReset(this);
             });
             return false;
         }
@@ -419,7 +375,7 @@ yespix.define('level', 'gfx,move', {
         var delta = this.followEntityDelta(entity);
         if (delta)
         {
-            //this.moveTo(this.x + delta.x, this.y + delta.y);
+            this.moveTo(this.x + delta.x, this.y + delta.y);
             return true;
         }
         return false;
@@ -427,8 +383,12 @@ yespix.define('level', 'gfx,move', {
 
     followEntityDelta: function(entity, context)    
     {
-        if (yespix.key('a')) console.log('followEntityDelta :: context = '+context);
-        if (!context) return;
+        if (!context) {
+            if (!this._context) {
+                this.getContext();
+                if (this._context) context = this._context;
+            } else context = this._context;
+        }
         var boxEntity = entity.getDrawBox(true);
         var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
         var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;

@@ -136,18 +136,19 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(properties) {
+		    	this.readyFunctions = [];
 		        this.on('spawn', this.checkReadyState);
 		        return true;
 		    },
 
 		    checkReadyState: function()
 		    {
-		        console.log('checkReadyState :: class '+this._class+', readyFunctions count = '+this.readyFunctions.length);
-	    		console.log('checkReadyState :: this = ');
-	    		console.log(this);
 		        for (var t=0; t<this.readyFunctions.length; t++)
 		        {
-		        	if (!this.readyFunctions[t].apply(this)) return false;
+		        	if (!this.readyFunctions[t].apply(this))
+		       		{
+		       			return false;
+		       		}
 		        }
 		        this.ready();
 		    	return true;
@@ -218,12 +219,12 @@
 		    },
 
 		    on: function(name, callback) {
-		        yespix.on(name, callback, this);
+		        yespix.on(name, callback, this, this);
 		        return this;
 		    },
 
 		    off: function(name, callback) {
-		        yespix.off(name, callback, this);
+		        yespix.off(name, callback, this, this);
 		        return this;
 		    },
 

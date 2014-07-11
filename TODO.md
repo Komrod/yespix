@@ -58,6 +58,7 @@ TODO list:
 
 
 DONE:
+- follow reset when entity is ready
 - fix level collision when level is not at (0,0)
 - fix layer opacity // 2014-06-30
 - fix player get throught floor on high gravity
