@@ -41,12 +41,34 @@ yespix.define('layer', 'gfx', {
     },
 
     drawTile: function(spriteIndex, cellX, cellY) {
-        // todo handle multiple tileset
-        var img = this.level.tilesets.image(0);
-        if (!img.isReady) {
-            console.error('layer::drawTile :: image [0] of the tile set is not ready');
+
+        var img;
+        var index = spriteIndex;
+
+        for (var t=0; t<this.level.tilesets.images.length; t++)
+        {
+            if (!this.level.tilesets.images[t].isReady)
+            {
+                console.error('layer::drawTile :: image ['+t+'] of the tileset is not ready');
+                return false;
+            }
+
+
+            img = this.level.tilesets.image(t);
+            break;
+
+        }
+
+        if (!img) {
+            console.error('layer::drawTile :: no image found for spriteIndex '+spriteIndex);
             return false;
         }
+
+        if (!img.isReady) {
+            console.error('layer::drawTile :: image of the tileset is not ready');
+            return false;
+        }
+
         var infos = this.level.levelData.tilesets[0];
         var max = Math.floor(img.element.width / infos.tilewidth);
         var line = Math.floor(spriteIndex / max);

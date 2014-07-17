@@ -307,7 +307,7 @@ yespix.define('level', 'gfx,move', {
                             images: images,
                         });
                     entity.tilesets.on('imageReady', function() {
-                        console.log('level :: imageReady for ' + entity.name);
+                        console.log('level :: imageReady for entity "' + entity.name + '"');
                         entity.tilesetsReady();
                         yespix.level = entity;
                     }, entity);
@@ -321,8 +321,15 @@ yespix.define('level', 'gfx,move', {
 
     tilesetsReady: function() {
         if (this._deleting) {
-            return;
+            return false;
         }
+        
+        // check if all tilesets images are ready
+        if (!this.tilesets.isReady)
+        {
+            return false;
+        }
+
         // load layers
         var layer = null;
         var count = this.levelData.layers.length;
