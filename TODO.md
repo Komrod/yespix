@@ -3,20 +3,19 @@ TODO list:
 
 - handle gid and multiple tileset on level
 - handle tileset with multiple lines
-- level collision loop when outside level
-- fix level collision with floor after jump, make children position relative to parent
-- fix parallax y of level layers
+- fix level collision loop when outside level
+- fix parallax layers
 - option stopAtBorders that makes the level follow stops at level border
 - set a pixelSize for the level
 - actor2w disociate speed and direction
 - level follow change position relative to entity speed
 - auto attach every entity to the current level
-- make layer a general empty drawable canvas (view), put the level build on the level entity
+- make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - on actor entity, make walk animation speed progressive
-- fix bug collision between entities
+- fix collision between entities
 - Make a basic Zombie Sim
 - tag version 0.1.4
 - remove entity._instances array = obsolete
@@ -59,6 +58,7 @@ TODO list:
 
 DONE:
 - follow reset when entity is ready
+- fix level collision with floor after jump, make children position relative to parent
 - fix level collision when level is not at (0,0)
 - fix layer opacity // 2014-06-30
 - fix player get throught floor on high gravity
