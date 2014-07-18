@@ -3,6 +3,7 @@ TODO list:
 
 - fix level collision loop when outside level
 - fix parallax layers
+- option collisionAtBorders that avoid entities to get out of the level
 - option stopAtBorders that makes the level follow stops at level border
 - set a pixelSize for the level
 - actor2w disociate speed and direction
