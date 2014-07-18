@@ -20,7 +20,6 @@ yespix.define('layer', 'gfx', {
     },
 
     load: function(layerData) {
-        console.log('layer.load :: start');
         this.layerData = layerData;
         this.update();
     },
@@ -35,15 +34,12 @@ yespix.define('layer', 'gfx', {
         this.height = this.layerData.height * this.layerData.tilewidth;
         if (this.layerData.properties.z) this.z = this.layerData.properties.z;
         if (this.layerData.opacity) this.alpha = this.layerData.opacity;
-        console.log('layer.update :: this.layerData.opacity = '+this.layerData.opacity);
         this.canvas.width = this.width;
         this.canvas.height = this.height;
     },
 
     drawTile: function(spriteIndex, cellX, cellY) {
-
-        var img;
-        var index = spriteIndex;
+        var image, imageIndex;
 
         for (var t=0; t<this.level.tilesets.images.length; t++)
         {
@@ -52,29 +48,27 @@ yespix.define('layer', 'gfx', {
                 console.error('layer::drawTile :: image ['+t+'] of the tileset is not ready');
                 return false;
             }
-
-
-            img = this.level.tilesets.image(t);
-            break;
-
         }
 
-        if (!img) {
+        image = this.level.tilesets.getSpriteImage(spriteIndex);
+
+        if (!image) {
             console.error('layer::drawTile :: no image found for spriteIndex '+spriteIndex);
             return false;
         }
 
-        if (!img.isReady) {
+        if (!image.isReady) {
             console.error('layer::drawTile :: image of the tileset is not ready');
             return false;
         }
 
+        spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
+
         var infos = this.level.levelData.tilesets[0];
-        var max = Math.floor(img.element.width / infos.tilewidth);
+        var max = Math.floor(image.element.width / infos.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
-        //console.log('layer::drawTile :: cellX = '+cellX+', cellY = '+cellY+', max = '+max+', line = '+line+', col = '+col+', img = '+img);
-        this.drawContext.drawImage(img.element, //image element
+        this.drawContext.drawImage(image.element, //image element
             col * this.layerData.tilewidth, // x position on image
             line * this.layerData.tilewidth, // y position on image
             this.layerData.tilewidth, // width on image
@@ -92,7 +86,6 @@ yespix.define('layer', 'gfx', {
 
 
     make: function() {
-        console.log('layer.make :: start');
         this.clear();
         if (!this.layerData || !this.level) return;
 
@@ -111,11 +104,9 @@ yespix.define('layer', 'gfx', {
             }
         }
         this.ready();
-        //console.log('layer.make :: ready!');
     },
 
     draw: function(context) {
-        //console.log('layer.draw :: start');
         if (!this.isVisible) return;
 
         if (!context) {

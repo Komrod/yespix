@@ -45,20 +45,12 @@ yespix.define('image', 'gfx', {
 
     checkReadyStateImage: function()
     {
-
-        console.log('checkReadyStateImage :: image');
-        console.log('checkReadyStateImage :: this = ');
-        console.log(this);
         for (var t = 0; t < this.images.length; t++) {
-            console.log('checkReadyStateImage :: image['+t+'] = ');
-            console.log(this.images[t]);
             if (!this.images[t].isReady)
             {
-                console.log('checkReadyStateImage :: image['+t+'] NOT READY ');
                 return false;
             }
         }
-        console.log('checkReadyStateImage :: images all ready ');
         return true;
     },
 

@@ -1,4 +1,4 @@
-yespix.define('anim', 'image', {
+yespix.define('anim', 'sprite', {
     animDefault: {
         width: 32, // default tile width
         height: 32, // default tile height
@@ -15,10 +15,6 @@ yespix.define('anim', 'image', {
     init: function() {
         this.animInit();
         this.on('imageReady', function() {
-            console.log('anim.imageReady :: this.isReady = '+this.isReady);
-            this.isReady = true;
-            console.log('anim.imageReady :: this.isReady = '+this.isReady);
-            console.log(this);
             this.animFramesInit();
         });
     },

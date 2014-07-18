@@ -302,12 +302,14 @@ yespix.define('level', 'gfx,move', {
                         images.push(entity.levelDir + entity.levelData.tilesets[t].image);
                     }
                     entity.tilesets = yespix.spawn(
-                        'image', {
+                        'sprite', {
                             registerInstance: false,
                             images: images,
+                            spriteWidth: entity.levelData.tilewidth,
+                            spriteHeight: entity.levelData.tileheight
                         });
                     entity.tilesets.on('imageReady', function() {
-                        console.log('level :: imageReady for entity "' + entity.name + '"');
+                        //console.log('level :: imageReady for entity "' + entity.name + '"');
                         entity.tilesetsReady();
                         yespix.level = entity;
                     }, entity);
@@ -323,7 +325,7 @@ yespix.define('level', 'gfx,move', {
         if (this._deleting) {
             return false;
         }
-        
+
         // check if all tilesets images are ready
         if (!this.tilesets.isReady)
         {
