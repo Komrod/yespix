@@ -1,8 +1,6 @@
 
 TODO list:
 
-- handle gid and multiple tileset on level
-- handle tileset with multiple lines
 - fix level collision loop when outside level
 - fix parallax layers
 - option stopAtBorders that makes the level follow stops at level border
@@ -57,6 +55,8 @@ TODO list:
 
 
 DONE:
+- handle gid and multiple tileset on level // 2014-07-18
+- handle tileset with multiple lines
 - follow reset when entity is ready
 - fix level collision with floor after jump, make children position relative to parent
 - fix level collision when level is not at (0,0)
