@@ -42,6 +42,9 @@ yespix.define('level', 'gfx,move', {
     },
 
     block: function(cellX, cellY) {
+        if (cellX<0 || cellY<0) return false;
+        if (cellX>=this.levelData.width || cellY>=this.levelData.height) return false;
+        
         var index = cellY * this.levelData.width + cellX;
         var tileIndex = this.levelCollision[index];
         if (tileIndex && tileIndex > 0) return true;
