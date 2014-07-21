@@ -120,6 +120,11 @@ yespix.define('layer', 'gfx', {
             //if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             var box = this.getDrawBox();
+            if (this.layerData.properties.type == 'parallax')
+            {
+                if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
+                if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
+            }
             context.drawImage(this.canvas, //image element
                 box.x, // x position on image
                 box.y, // y position on image
