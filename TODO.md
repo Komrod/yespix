@@ -1,10 +1,6 @@
 
 TODO list:
 
-- fix level collision loop when outside level
-- fix parallax layers
-- option collisionAtBorders that avoid entities to get out of the level
-- option stopAtBorders that makes the level follow stops at level border
 - set a pixelSize for the level
 - actor2w disociate speed and direction
 - level follow change position relative to entity speed
@@ -55,7 +51,14 @@ TODO list:
 - Make the Chuck game
 
 
+LATER:
+- option collisionAtBorders that avoid entities to get out of the level
+- option stopAtBorders that makes the level follow stops at level border
+
+
 DONE:
+- fix level collision loop when outside level
+- fix parallax layers
 - handle gid and multiple tileset on level // 2014-07-18
 - handle tileset with multiple lines
 - follow reset when entity is ready
