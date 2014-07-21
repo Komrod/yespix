@@ -340,7 +340,6 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
         if (list[t] != '') {
             if (!this.entityClasses[list[t]]) {
                 if (mode == 'pending') {
-                    console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                     this.entityAncestorsPending.push(className);
                     this.entityClasses[className].ancestors = [];
                     this.entityClasses[className].ancestorsReady = false;
@@ -352,11 +351,10 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
                     return false;
                 }
             } else if (list[t] == className) {
-                if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                if (mode != 'slient') console.error('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
             } else {
                 if (!this.entityClasses[list[t]].ancestorsReady) {
                     if (mode == 'pending') {
-                        console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                         this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
                         this.entityClasses[className].ancestorsReady = false;
