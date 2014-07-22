@@ -36,18 +36,24 @@ yespix.define('gfx', {
         return true;
     },
 
-    getPosition: function(relative)
-    {
-        if (relative || !this._parent)
-        {
-            return {x: this.x, y: this.y};
-        } else
-        {
+    getPosition: function(relative) {
+        if (relative || !this._parent) {
+            return {
+                x: this.x,
+                y: this.y
+            };
+        } else {
             var position = this._parent.getPosition();
-            if (yespix.frame<100) console.log('getPosition :: absolute position x='+(this.x + position.x)+', y='+(this.y + position.y));
-            if (position) return {x: this.x + position.x, y: this.y + position.y};
+            if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
+            if (position) return {
+                x: this.x + position.x,
+                y: this.y + position.y
+            };
         }
-        return {x: this.x, y: this.y};
+        return {
+            x: this.x,
+            y: this.y
+        };
     },
 
     getDrawBox: function(relative) {

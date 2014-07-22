@@ -60,7 +60,7 @@ yespix.define('move', {
             entity: this
         });
     },
-    
+
     /*
     moveChildren: function(deltaX, deltaY) {
         var count = 0;

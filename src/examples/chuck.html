@@ -153,7 +153,7 @@
     
 	yp.gravity = { y: 20 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 100, y: 100}).load('chuck/test.json');
+	var mylevel = yp.spawn('level', {name: 'level test', x: 100, y: 100, pixelSize: 2}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 0, y: -250, z: 1000});
 	//mylevel.childAdd(mychuck);
 	mylevel.follow(mychuck, {reset: true});

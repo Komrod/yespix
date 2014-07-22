@@ -37,4 +37,3 @@ yespix.define('actor4w', 'actor', {
     actorInit: function(options) {},
     init: function() {},
 });
-

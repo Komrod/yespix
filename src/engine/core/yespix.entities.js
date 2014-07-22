@@ -443,8 +443,7 @@ yespix.fn.spawn = function(name, properties) {
     this.trigger('spawn', event);
 
     if (entity._ancestors.length > 0)
-        for (t = 0; t < entity._ancestors.length; t++)
-        {
+        for (t = 0; t < entity._ancestors.length; t++) {
             entity.trigger('spawn:' + entity._ancestors[t], event);
             this.trigger('spawn:' + entity._ancestors[t], event);
         }

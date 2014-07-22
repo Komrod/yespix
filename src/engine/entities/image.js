@@ -43,11 +43,9 @@ yespix.define('image', 'gfx', {
         this.on('imageReady', this.checkReadyState);
     },
 
-    checkReadyStateImage: function()
-    {
+    checkReadyStateImage: function() {
         for (var t = 0; t < this.images.length; t++) {
-            if (!this.images[t].isReady)
-            {
+            if (!this.images[t].isReady) {
                 return false;
             }
         }

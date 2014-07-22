@@ -41,11 +41,9 @@ yespix.define('layer', 'gfx', {
     drawTile: function(spriteIndex, cellX, cellY) {
         var image, imageIndex;
 
-        for (var t=0; t<this.level.tilesets.images.length; t++)
-        {
-            if (!this.level.tilesets.images[t].isReady)
-            {
-                console.error('layer::drawTile :: image ['+t+'] of the tileset is not ready');
+        for (var t = 0; t < this.level.tilesets.images.length; t++) {
+            if (!this.level.tilesets.images[t].isReady) {
+                console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
                 return false;
             }
         }
@@ -53,7 +51,7 @@ yespix.define('layer', 'gfx', {
         image = this.level.tilesets.getSpriteImage(spriteIndex);
 
         if (!image) {
-            console.error('layer::drawTile :: no image found for spriteIndex '+spriteIndex);
+            console.error('layer::drawTile :: no image found for spriteIndex ' + spriteIndex);
             return false;
         }
 
@@ -91,8 +89,7 @@ yespix.define('layer', 'gfx', {
 
         for (var y = 0; y < this.layerData.height; y++) {
             for (var x = 0; x < this.layerData.width; x++) {
-                if (this.layerData && this.layerData.data)
-                {
+                if (this.layerData && this.layerData.data) {
                     var spriteIndex = this.layerData.data[index] - 1;
                     if (spriteIndex >= 0) {
                         this.drawTile(spriteIndex, x, y);
@@ -118,8 +115,7 @@ yespix.define('layer', 'gfx', {
             //if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
             context.globalAlpha = this.alpha * this.level.alpha;
             var box = this.getDrawBox();
-            if (this.layerData.properties.type == 'parallax')
-            {
+            if (this.layerData.properties.type == 'parallax') {
                 if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
                 if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
             }

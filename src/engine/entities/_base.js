@@ -115,16 +115,16 @@
 		    isUnique: false,
 
 		    /**
-		     * 
+		     *
 		     */
-		    
-		    
+
+
 		    readyFunctions: [],
 
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**
-		     * Return the array of assets used for the entity. The original code of the function is called for 
+		     * Return the array of assets used for the entity. The original code of the function is called for
 		     * the class name of the entity and each ancestor classes
 		     */
 		    assets: function() {
@@ -132,32 +132,28 @@
 		    },
 
 		    /**
-		     * Initilize the entity object. The original code of the function is called for the class name of 
+		     * Initilize the entity object. The original code of the function is called for the class name of
 		     * the entity and each ancestor classes
 		     */
 		    init: function(properties) {
-		    	this.readyFunctions = [];
+		        this.readyFunctions = [];
 		        this.on('spawn', this.checkReadyState);
 		        return true;
 		    },
 
-		    checkReadyState: function()
-		    {
-		        for (var t=0; t<this.readyFunctions.length; t++)
-		        {
-		        	if (!this.readyFunctions[t].apply(this))
-		       		{
-		       			return false;
-		       		}
+		    checkReadyState: function() {
+		        for (var t = 0; t < this.readyFunctions.length; t++) {
+		            if (!this.readyFunctions[t].apply(this)) {
+		                return false;
+		            }
 		        }
 		        this.ready();
-		    	return true;
+		        return true;
 		    },
 
-		    ready: function()
-		    {
-		    	this.isReady = true;
-		    	this.trigger('entityReady');
+		    ready: function() {
+		        this.isReady = true;
+		        this.trigger('entityReady');
 		    },
 
 		    ancestor: function(name) {

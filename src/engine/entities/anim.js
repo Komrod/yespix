@@ -323,7 +323,7 @@ yespix.define('anim', 'sprite', {
         var scaleX = frame.flipX ? -1 : 1;
         var scaleY = frame.flipY ? -1 : 1;
         var position = this.getPosition();
-        
+
         if (this.snapToPixel) {
             var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
             var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
