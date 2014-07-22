@@ -1,7 +1,6 @@
 
 TODO list:
 
-- set a pixelSize for the level
 - actor2w disociate speed and direction
 - level follow change position relative to entity speed
 - auto attach every entity to the current level
@@ -14,7 +13,7 @@ TODO list:
 - Make a basic Zombie Sim
 - tag version 0.1.4
 - remove entity._instances array = obsolete
-- limit image draw to visible canvas when an image try to draw partialy outside the canvas
+- limit image draw to visible canvas when an image try to draw partially outside the canvas
 - animate properties
 - tiled level import
 - draw text
@@ -57,6 +56,7 @@ LATER:
 
 
 DONE:
+- set a pixelSize for the level
 - fix level collision loop when outside level
 - fix parallax layers
 - handle gid and multiple tileset on level // 2014-07-18
