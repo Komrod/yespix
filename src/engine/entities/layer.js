@@ -63,9 +63,7 @@ yespix.define('layer', 'gfx', {
         }
 
         spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
-
-        var infos = this.level.levelData.tilesets[0];
-        var max = Math.floor(image.element.width / infos.tilewidth);
+        var max = Math.floor(image.realWidth / this.level.levelData.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
         this.drawContext.drawImage(image.element, //image element

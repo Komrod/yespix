@@ -44,7 +44,7 @@ yespix.define('level', 'gfx,move', {
     block: function(cellX, cellY) {
         if (cellX<0 || cellY<0) return false;
         if (cellX>=this.levelData.width || cellY>=this.levelData.height) return false;
-        
+
         var index = cellY * this.levelData.width + cellX;
         var tileIndex = this.levelCollision[index];
         if (tileIndex && tileIndex > 0) return true;
@@ -261,7 +261,6 @@ yespix.define('level', 'gfx,move', {
                 for (var y = cellBottom; y <= cellNext; y++) {
                     for (var x = cellLeft; x <= cellRight; x++) {
                         if (this.block(x, y)) {
-                            //console.log('entity on ground');
                             entity.isOnGround = true;
                             entity.isJumping = false;
                             entity.isFalling = false;
@@ -287,7 +286,13 @@ yespix.define('level', 'gfx,move', {
         yespix.load(src, {
             'complete': function(e) {
                 var entity = e.entity;
+                var pixelSize = 1;
+                if (entity.pixelSize && entity.pixelSize>0) pixelSize = entity.pixelSize;
+
                 entity.levelData = JSON.parse(e.content);
+
+                entity.levelData.tilewidth = entity.levelData.tilewidth * entity.pixelSize;
+                entity.levelData.tileheight = entity.levelData.tileheight * entity.pixelSize;
 
                 entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                 entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
@@ -308,11 +313,11 @@ yespix.define('level', 'gfx,move', {
                         'sprite', {
                             registerInstance: false,
                             images: images,
+                            pixelSize: pixelSize,
                             spriteWidth: entity.levelData.tilewidth,
                             spriteHeight: entity.levelData.tileheight
                         });
                     entity.tilesets.on('imageReady', function() {
-                        //console.log('level :: imageReady for entity "' + entity.name + '"');
                         entity.tilesetsReady();
                         yespix.level = entity;
                     }, entity);
