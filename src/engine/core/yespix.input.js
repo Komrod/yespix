@@ -29,7 +29,6 @@ yespix.fn.key = function(s, type) {
     var t;
 
     type = type || 'hold';
-    //console.log('type = '+type);
     if (this.isString(s)) {
         if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
             var arr = s.split('|', 2);

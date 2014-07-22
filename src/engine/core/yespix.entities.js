@@ -69,7 +69,6 @@ yespix.fn.find = function(selector, fn) {
 
     if (this.isUndefined(selector)) {
         var result = this.bunch(this.entityInstances['']);
-        //console.log('undefined, length = '+result.length);
         if (fn) this.each(result, fn);
         return result;
     }
@@ -81,7 +80,6 @@ yespix.fn.find = function(selector, fn) {
         // return all entities if the selector is an empty string
         if (selector === '') {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('empty "", length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -91,8 +89,6 @@ yespix.fn.find = function(selector, fn) {
     } else
     // if selector is the entity._id (integer)
     if (this.isInt(selector)) {
-        //console.log('selector is an int, entity = '+this.entityInstances[+selector]);
-        // return the entity
         if (this.entityInstances[+selector]) return this.bunch([this.entityInstances[+selector]]);
         return this.bunch();
     } else
@@ -101,7 +97,6 @@ yespix.fn.find = function(selector, fn) {
         // empty properties return all the entities
         if (this.pLength(selector) == 0) {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('empty {}, length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -139,29 +134,21 @@ yespix.fn.find = function(selector, fn) {
         }
         // no class, return empty bunch
         else {
-            //console.log('return empty bunch');
             return this.bunch();
         }
     }
     // if not, parse the whole list (slow)
     else instances = this.entityInstances[''];
 
-    // console.log('instances length = '+instances.length);
     for (var t = 0; t < instances.length; t++) {
         var count = 0;
-        // console.log('find: checking entity ['+t+'] with name "'+instances[t]._name+'"');
         for (var n in properties) {
-            // if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
-            // else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
             if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
-            //console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
             if (count >= propMatch) {
-                //console.log('find: adding entity to result');
                 result.push(instances[t]);
             }
         }
     }
-    // console.log('find: result length = '+result.length);
 
     if (fn) this.each(result, fn);
 
@@ -198,12 +185,10 @@ yespix.fn.selectorInit = function(selector) {
 yespix.fn.selectorCompare = function(entityValue, value) {
     if (this.isString(value)) {
         if (this.isArray(entityValue)) return this.inArray(entityValue, value);
-        //if (this.isString(entityValue)) return entityValue === value; 
         return entityValue === value;
     }
     if (this.isArray(value)) {
         if (this.isString(entityValue)) return this.inArray(value, entityValue);
-        //if (this.isString(entityValue)) return entityValue === value; 
         return entityValue === value;
     }
     if (this.isRegexp(value)) {
@@ -265,7 +250,6 @@ yespix.fn.mixin = function(object, properties) {
  * Returns the list of ancestors of the entity
  */
 yespix.fn.ancestors = function(name) {
-    //				console.log('ancestors :: name = '+name);
     if (this.entityClasses[name]) {
         var list = [];
         for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -273,10 +257,8 @@ yespix.fn.ancestors = function(name) {
             list = list.concat(this.ancestors(a));
         }
         list.push(name);
-        //					console.log('ancestors :: return list length '+list.length);
         return list;
     } else {
-        //					console.log('ancestors :: return empty list');
         return [];
     }
 };
@@ -289,7 +271,7 @@ yespix.fn.define = function(name, list, properties) {
         console.warn('define :: entity class name "' + name + '" already exists');
         return;
     }
-    
+
     // init the parameters
     if (typeof list !== 'string') {
         properties = list;
@@ -314,37 +296,29 @@ yespix.fn.define = function(name, list, properties) {
 
     // adding the ancestors
     if (this.entityFetchAncestors(name)) this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
-    
-    if (!this.isEntityAncestorsPending(name))
-   	{
-    	if (this.entityAncestorsPending.length>0)
-		{
-    		var length = this.entityAncestorsPending.length;
-    		var count = 0; // number of entity ancestors initiated
-    		for (var t = 0; t<length; t++)
-   			{
-    			if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
-   			}
-    		if (count>0)
-   			{
-    			var newList = [];
-	    		for (var t = 0; t<length; t++)
-	   			{
-	    			if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
-	   			}
-	    		this.entityAncestorsPending = newList;
-   			}
-		}
-   	}
-    
+
+    if (!this.isEntityAncestorsPending(name)) {
+        if (this.entityAncestorsPending.length > 0) {
+            var length = this.entityAncestorsPending.length;
+            var count = 0; // number of entity ancestors initiated
+            for (var t = 0; t < length; t++) {
+                if (this.entityFetchAncestors(this.entityAncestorsPending[t], 'silent')) count++;
+            }
+            if (count > 0) {
+                var newList = [];
+                for (var t = 0; t < length; t++) {
+                    if (!this.entityClasses[this.entityAncestorsPending[t]].ancestorsReady) newList.push(this.entityAncestorsPending[t]);
+                }
+                this.entityAncestorsPending = newList;
+            }
+        }
+    }
+
     this.trigger('define', {
         class: this.entityClasses[name]
     });
 
     return this;
-    //console.log('entity.define :: entity class name "'+name+'" added');
-    //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
-    //console.log('----');
 };
 
 /**
@@ -352,14 +326,13 @@ yespix.fn.define = function(name, list, properties) {
  * @param {string} mode Mode: optional, with "pending" mode, entity class with missing ancestor will be placed in the pending list
  */
 yespix.fn.entityFetchAncestors = function(className, mode) {
-	console.log('entityFetchAncestors :: start, className = '+className+', mode = '+mode);
     if (!this.entityClasses[className]) {
         console.warn('entityFetchAncestors :: entity class name "' + className + '" does not exist');
         return false;
     }
 
     if (this.entityClasses[className].ancestorsReady) return true;
-    
+
     mode = mode || 'pending';
     var list = this.entityClasses[className].list;
 
@@ -367,44 +340,36 @@ yespix.fn.entityFetchAncestors = function(className, mode) {
         if (list[t] != '') {
             if (!this.entityClasses[list[t]]) {
                 if (mode == 'pending') {
-                    console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                     this.entityAncestorsPending.push(className);
                     this.entityClasses[className].ancestors = [];
                     this.entityClasses[className].ancestorsReady = false;
-                    console.log('entityFetchAncestors :: ancestors NOK');
                     return false;
                     break;
                 } else {
                     if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                     this.entityClasses[className].ancestorsReady = false;
-                    console.log('entityFetchAncestors :: ancestors NOK');
                     return false;
                 }
             } else if (list[t] == className) {
-            	if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                if (mode != 'slient') console.error('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
             } else {
-            	if (!this.entityClasses[list[t]].ancestorsReady)
-           		{
+                if (!this.entityClasses[list[t]].ancestorsReady) {
                     if (mode == 'pending') {
-                        console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                         this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
                         this.entityClasses[className].ancestorsReady = false;
-                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                         break;
                     } else {
                         if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
                         this.entityClasses[className].ancestorsReady = false;
-                        console.log('entityFetchAncestors :: ancestors NOK');
                         return false;
                     }
-           		}
+                }
                 this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
             }
         }
     }
-    console.log('entityFetchAncestors :: ancestors ready');
     this.entityClasses[className].ancestorsReady = true;
     return true;
 };
@@ -414,7 +379,6 @@ yespix.fn.isEntityAncestorsPending = function(className) {
     for (var t = 0; t < len; t++) {
         if (this.entityAncestorsPending[t] == className) return true;
     }
-    //console.log('isEntityAncestorsPending :: entity "' + className + '" not pending');
 
     return false;
 };
@@ -441,9 +405,8 @@ yespix.fn.spawn = function(name, properties) {
 
     // check if the entity was waiting other classes to load
     if (this.isEntityAncestorsPending(name)) {
-        console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
         this.entityFetchAncestors(name, 'force');
-    } else console.log('spawn :: entity "' + name + '" is NOT pending');
+    }
 
     // mixin with the ancestors
     for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -457,7 +420,6 @@ yespix.fn.spawn = function(name, properties) {
     // mixin with the class name
     this.mixin(entity, this.entityClasses[name].properties);
 
-
     // copy the spawn properties
     for (var fn in properties) {
         entity[fn] = properties[fn];
@@ -466,16 +428,27 @@ yespix.fn.spawn = function(name, properties) {
     entity._ancestors = this.entityClasses[name]['ancestors'];
     entity._id = this.entityNextId++;
 
-    this.instanceAdd(entity);
-
     // executing the init functions on ancestors
     this.call(entity, 'init', [properties]);
     if (this.isFunction(entity.init)) entity.init(properties);
 
+    if (entity['registerInstance']) this.instanceAdd(entity);
+
+    // Trigger some events to dispatch the spawn of an entity
+    var event = {
+        entity: entity,
+        type: 'spawn'
+    }
+    entity.trigger('spawn', event);
+    this.trigger('spawn', event);
+
     if (entity._ancestors.length > 0)
-        for (t = 0; t < entity._ancestors.length; t++) this.trigger('spawn:' + entity._ancestors[t], {
-            entity: entity
-        });
+        for (t = 0; t < entity._ancestors.length; t++) {
+            entity.trigger('spawn:' + entity._ancestors[t], event);
+            this.trigger('spawn:' + entity._ancestors[t], event);
+        }
+    entity.trigger('spawn:' + entity._class, event);
+    this.trigger('spawn:' + entity._class, event);
 
     return entity;
 };
@@ -491,17 +464,29 @@ yespix.fn.spawn = function(name, properties) {
  */
 yespix.fn.instanceAdd = function(entity) {
     // the entity must not be in any instances list because we are overriding his _instances object
-    if (entity._instances) this.instanceRemove(entity);
+    if (entity._instanceExists) this.instanceRemove(entity);
     entity._instances = {};
+
+    // entity must be unique
+    if (entity.isUnique == true) {
+        this.find('.' + entity._class + ', /' + entity._class).destroy();
+        if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0) {
+            var list = this.entityInstances['.' + entity._class];
+            var count = list.length;
+            for (var t = 0; t < count; t++) {
+                this.instanceRemove(list[0]);
+            }
+        }
+    }
 
 
     // insert reference in the global instances list
     if (this.isUndefined(this.entityInstances['']) || this.entityInstances[''].length == 0) {
         this.entityInstances[''] = [entity];
-        entity._instances[''] = 0;
+        //entity._instances[''] = 0;
     } else {
         this.entityInstances[''].push(entity);
-        entity._instances[''] = this.entityInstances[''].length - 1;
+        //entity._instances[''] = this.entityInstances[''].length - 1;
     }
 
     // insert reference with the entity Id
@@ -510,10 +495,10 @@ yespix.fn.instanceAdd = function(entity) {
     // insert reference in the class instances list for its own class name
     if (this.isUndefined(this.entityInstances['.' + entity._class]) || this.entityInstances['.' + entity._class].length == 0) {
         this.entityInstances['.' + entity._class] = [entity];
-        entity._instances[entity._class] = 0;
+        //entity._instances[entity._class] = 0;
     } else {
         this.entityInstances['.' + entity._class].push(entity);
-        entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
+        //entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
     }
 
     // insert a reference in the ancestor instances list for all its ancestors
@@ -521,37 +506,62 @@ yespix.fn.instanceAdd = function(entity) {
         for (var t = 0; t < entity._ancestors.length; t++) {
             if (this.isUndefined(this.entityInstances['/' + entity._ancestors[t]]) || this.entityInstances['/' + entity._ancestors[t]].length == 0) {
                 this.entityInstances['/' + entity._ancestors[t]] = [entity];
-                entity._instances[entity._ancestors[t]] = 0;
+                //entity._instances[entity._ancestors[t]] = 0;
             } else {
-                console.log('add instance to /' + entity._ancestors[t]);
                 this.entityInstances['/' + entity._ancestors[t]].push(entity);
-                entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
+                //entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
             }
         }
 
-    // Trigger some events to dispatch the spawn of an entity
-    this.trigger('spawn', {
-        entity: entity
-    });
-    this.trigger('spawn:' + entity._class, {
-        entity: entity
-    });
+    entity._instanceExists = true;
 };
 
 yespix.fn.instanceRemove = function(entity) {
+    var t, u;
+    if (!entity) {
+        console.warn('instanceRemove :: parameter entity is undefined');
+        return false;
+    }
     // remove reference from the global instances list
-    if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
+    if (this.entityInstances['']) {
+        //this.entityInstances[''].splice(entity._instances[''], 1); // remove instance by index // obsolete
+        for (t = 0; t < this.entityInstances[''].length; t++) {
+            if (this.entityInstances[''][t] == entity) {
+                this.entityInstances[''].splice(t, 1);
+                break;
+            }
+        }
+    }
 
     // remove reference with the entity Id
     delete this.entityInstances[+entity._id];
 
     // remove reference from the class instances list for its own class name
-    if (this.entityInstances['.' + entity._class]) this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1);
+    if (this.entityInstances['.' + entity._class]) {
+        //this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1); // remove instance by index // obsolee
+        for (t = 0; t < this.entityInstances['.' + entity._class].length; t++) {
+            if (this.entityInstances['.' + entity._class][t] == entity) {
+                this.entityInstances['.' + entity._class].splice(t, 1);
+                break;
+            }
+        }
+    }
 
     // insert a reference in the class instances list for all its ancestors
     if (entity._ancestors.length > 0)
-        for (var t = 0; t < entity._ancestors.length; t++)
-            if (this.entityInstances['/' + entity._ancestors[t]]) this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
+        for (t = 0; t < entity._ancestors.length; t++) {
+            if (this.entityInstances['/' + entity._ancestors[t]]) {
+                //this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1); // obsolete
+                for (u = 0; u < this.entityInstances["/" + entity._ancestors[t]].length; u++) {
+                    if (this.entityInstances["/" + entity._ancestors[t]][u] == entity) {
+                        this.entityInstances["/" + entity._ancestors[t]].splice(u, 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+    entity._instanceExists = false;
 
     this.trigger('remove', {
         entity: entity
@@ -587,7 +597,7 @@ yespix.fn.hasAncestors = function(classname, ancestors) {
 };
 
 /**
- * Call some entity class functions on the context of an entity object. e.g.
+ * Call some entity class functions of ancestors in the context of an entity object. e.g.
  * @trigger call
  * @param {object} entity Entity instance
  * @param {string|function} fn Function name in a string or function reference to call // @todo
@@ -600,7 +610,6 @@ yespix.fn.hasAncestors = function(classname, ancestors) {
  * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
  */
 yespix.fn.call = function(entity, fn, ancestors, params) {
-    //console.log('call : entity._class='+entity._class+', fn='+fn+', ancestors='+ancestors);
 
     if (!this.isDefined(entity._class)) return null;
     if (this.isString(ancestors)) ancestors = ancestors.split(',');
@@ -613,8 +622,6 @@ yespix.fn.call = function(entity, fn, ancestors, params) {
 
     if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
     else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
-
-    //console.log('ancestors = '+ancestors.join(', '));
 
     var result = [];
     for (var t = 0; t < ancestors.length; t++) {

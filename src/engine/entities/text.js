@@ -22,7 +22,7 @@ yespix.define('text', 'gfx', {
             context.fillText(this.text, this.x, this.y);
 
             if (this.debug) {
-            	this.drawDebug(context, box);
+                this.drawDebug(context, box);
             }
         }
     },

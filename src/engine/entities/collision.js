@@ -17,11 +17,14 @@ yespix.define('collision', {
         return false;
     },
 
-    collisionBox: function() {
+    collisionBox: function(relative) {
+
+        var pos = this.getPosition(relative);
+
         if (yespix.isUndefined(this.pixelSize)) {
             return {
-                x: this.x + this.colOffsetX,
-                y: this.y + this.colOffsetY,
+                x: pos.x + this.colOffsetX,
+                y: pos.y + this.colOffsetY,
                 width: this.colWidth,
                 height: this.colHeight,
                 offsetX: this.colOffsetX,
@@ -29,8 +32,8 @@ yespix.define('collision', {
             };
         } else {
             return {
-                x: this.x + this.colOffsetX * this.pixelSize,
-                y: this.y + this.colOffsetY * this.pixelSize,
+                x: pos.x + this.colOffsetX * this.pixelSize,
+                y: pos.y + this.colOffsetY * this.pixelSize,
                 width: this.colWidth * this.pixelSize,
                 height: this.colHeight * this.pixelSize,
                 offsetX: this.colOffsetX * this.pixelSize,
@@ -73,22 +76,18 @@ yespix.define('collision', {
         return yespix.collisionInside(this, entity);
     },
 
-    drawDebugCollision: function(context, drawBox)
-    {
-    	console.log('drawDebugCollision');
-	    if (this.collisionBox) {
-	        var box = drawBox || this.collisionBox();
-	        context.globalAlpha = 1;
-	        context.lineWidth = 0.5;
-	        context.strokeStyle = "#000099";
-	        if (yespix.isUndefined())
-	        {
-	        	context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-	        } else
-	        {
-	        	context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-	        }
-	    }
+    drawDebugCollision: function(context, drawBox) {
+        if (this.collisionBox) {
+            var box = drawBox || this.collisionBox();
+            context.globalAlpha = 1;
+            context.lineWidth = 0.5;
+            context.strokeStyle = "#000099";
+            if (yespix.isUndefined()) {
+                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+            } else {
+                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+            }
+        }
     }
 
 

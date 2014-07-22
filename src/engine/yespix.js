@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-06-03 */
+/*! yespix - v0.1.0 - 2014-07-22 */
 (function(undefined) {
 
     /**
@@ -39,9 +39,6 @@
 
     // bunch init
     Bunch = function(list) {
-        // if (list) console.log('Bunch :: list = '+list+', length = '+list.length+', instanceOf Bunch = '+(this instanceof Bunch));
-        //else console.log('Bunch :: list = '+list+', length = -');
-        //console.log('Bunch :: instanceOf Bunch = '+(this instanceof Bunch));
         if (!(this instanceof Bunch)) return new Bunch(list);
         this.__bunch_init.apply(this, arguments);
     };
@@ -52,7 +49,6 @@
         for (var t = 0; t < this.length; t++) {
             for (var u = t + 1; u < this.length; u++) {
                 if (this[t] === this[u]) {
-                    //console.log('Bunch.unique :: splice an element');
                     this.splice(u--, 1);
                 }
             }
@@ -67,9 +63,6 @@
 	*/
 
     Bunch.prototype.__bunch_init = function(list) {
-        // if (list) console.log('Bunch.init :: list = '+list+', length = '+list.length);
-        // else console.log('Bunch.init :: list = '+list+', length = -');
-
         if (list && list.length > 0) {
             for (var t = 0; t < list.length; t++) this.push(list[t]);
             this.unique();
@@ -103,35 +96,50 @@
      */
 
     /**
-     * @todo  moving rotating the parent will affect the children
+     * @todo  rotating the parent will affect the children
      * @param {entity} parent The parent
      * @param {entity|array} child An entity to attached or an array of entities
-     * @example attach(entity1, entity2) attaches entity2 to entity1
-     * @example attach(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
+     * @example childAdd(entity1, entity2) attaches entity2 to entity1
+     * @example childAdd(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
      */
-    yespix.fn.attach = function(parent, child) {
-        // multiple children
-        if (this.isArray(child)) {
-            for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
+    yespix.fn.childAdd = function(parent, child) {
+
+        if (!parent) {
+            console.warn('childAdd :: cannot add child, parent undefined');
+            return this;
+        }
+        if (!child) {
+            console.warn('childAdd :: cannot add child, child undefined');
             return this;
         }
 
-        // try to attach an entity already attached to the parent
-        if (child._parent == parent) return null;
+        // multiple children
+        if (this.isArray(child)) {
+            for (var t = 0; t < child.length; t++) this.childAdd(parent, child[t]);
+            return this;
+        }
 
-        // attach
+        // try to childAdd an entity already attached to the parent
+        if (child && !child._parent == parent) return null;
+
+        // childAdd
         if (!parent._children) parent._children = [child];
         else parent._children.push(child);
 
-        if (child._parent) this.detach(child._parent, child);
+        if (child._parent) this.childRemove(child._parent, child);
         child._parent = parent;
         return this;
     };
 
-    yespix.fn.detach = function(parent, child) {
+    yespix.fn.childRemove = function(parent, child) {
+        if (!parent) {
+            console.warn('childRemove :: cannot remove child, parent undefined');
+            return this;
+        }
+
         var t;
 
-        // detach everything 
+        // childRemove everything 
         if (!child) {
             if (parent._children) {
                 for (t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
@@ -140,16 +148,16 @@
             return this;
         }
 
-        // detach all the children
+        // childRemove all the children
         if (this.isArray(child)) {
-            for (t = 0; t < child.length; t++) this.detach(parent, child[t]);
+            for (t = 0; t < child.length; t++) this.childRemove(parent, child[t]);
             return this;
         }
 
-        // try to detach an entity already detached
+        // try to childRemove an entity already detached
         if (child._parent != parent) return null;
 
-        // detach one child
+        // childRemove one child
         child._parent = null;
         for (t = 0; t < parent._children.length; t++)
             if (parent._children[t] == child) {
@@ -166,9 +174,11 @@
 
     /**
      * clear the collision map
+     * @chainable
      */
     yespix.fn.collisionClear = function() {
         this.data.collisionMap = [];
+        return this;
     };
 
     /**
@@ -179,6 +189,7 @@
         if (size < 1) size = 32;
         this.collisionSize = size;
         this.collisionClear();
+        return this;
     };
 
     /**
@@ -199,6 +210,7 @@
 
     /**
      * Add the entity in the collision map according to the collision box
+     * @chainable
      * @todo shouldnt always be a box (cirle, elipse ...)
      * @todo multiple box for an entity
      */
@@ -210,18 +222,16 @@
         var cellY = minCellY = Math.floor(box.y / this.collisionSize);
         var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
         var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
-        //if (this.key(' ')) this.dump(box, 'collisionOccupy :: box for entity "' + entity.name + '"');
-        //if (this.key(' ')) console.log('collisionOccupy :: minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
 
         while (cellX <= maxCellX) {
             cellY = minCellY;
             while (cellY <= maxCellY) {
-                //if (this.key(' ')) console.log('collisionOccupy :: cellX = ' + cellX + ', cellY = ' + cellY);
                 this.collisionAdd(entity, cellX, cellY);
                 cellY++;
             }
             cellX++;
         }
+        return this;
     };
 
     yespix.fn.collisionAdd = function(entity, x, y, type) {
@@ -234,19 +244,14 @@
         if (!line) {
             line = this.data.collisionMap[x] = [];
             line[y] = [entity];
-            //if (this.key(' ')) console.log('collisionAdd :: new line');
-            //if (this.key(' ')) console.log('collisionAdd :: final entity count 1');
-            return true;
+            return this;
         }
         if (!line[y]) {
             line[y] = [];
-            if (this.key(' ')) console.log('collisionAdd :: new column, final entity count 1');
         }
         line[y].push(entity);
-        if (this.key(' ')) console.log('collisionAdd :: before unique count ' + line[y].length);
         this.unique(line[y]);
-        if (this.key(' ')) console.log('collisionAdd :: final entity count ' + line[y].length);
-        return true;
+        return this;
     };
 
     yespix.fn.collisionCheck = function(entity1, entity2) {
@@ -300,13 +305,14 @@
         return false;
     };
 
+    /**
+     * @chainable
+     */
     yespix.fn.collision = function(entity) {
-        //if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
         var entities = []; // store checked entities to check for collision only once
 
         var box = entity.collisionBox();
         if (box.width <= 0 || box.height <= 0) {
-            //if (this.key(' ')) console.log('no collision box');
             return;
         }
         var cellX = minCellX = Math.floor(box.x / this.collisionSize);
@@ -314,19 +320,13 @@
         var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
         var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
 
-        //if (this.key(' ')) console.log('minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
         while (cellX <= maxCellX) {
-            //if (this.key(' ')) console.log('cellX = ' + cellX);
             cellY = minCellY;
             while (cellY <= maxCellY) {
-                //if (this.key(' ')) console.log('cellY = ' + cellY);
                 var cell = this.collisionCell(cellX, cellY);
-                //if (this.key(' ')) console.log(cell.length + ' entities in cell ' + cellX + ', ' + cellY);
                 for (var t = 0; t < cell.length; t++) {
                     if (cell[t] !== entity && !this.inArray(entities, cell[t])) {
-                        //if (this.key(' ')) console.log('collision t=' + t + ', cw = ' + entity.collisionWith(cell[t]) + ', cc = ' + this.collisionCheck(entity, cell[t]));
                         if (entity.collisionWith(cell[t]) && this.collisionCheck(entity, cell[t])) {
-                            //console.log('trigger collide on entity "' + entity.name + '"');
                             entity.trigger('collide', {
                                 entity: cell[t]
                             });
@@ -338,7 +338,7 @@
             }
             cellX++;
         }
-
+        return this;
     };
 
     /**
@@ -412,7 +412,6 @@
 
         if (this.isUndefined(selector)) {
             var result = this.bunch(this.entityInstances['']);
-            //console.log('undefined, length = '+result.length);
             if (fn) this.each(result, fn);
             return result;
         }
@@ -424,7 +423,6 @@
             // return all entities if the selector is an empty string
             if (selector === '') {
                 var result = this.bunch(this.entityInstances['']);
-                //console.log('empty "", length = '+result.length);
                 if (fn) this.each(result, fn);
                 return result;
             }
@@ -434,8 +432,6 @@
         } else
         // if selector is the entity._id (integer)
         if (this.isInt(selector)) {
-            //console.log('selector is an int, entity = '+this.entityInstances[+selector]);
-            // return the entity
             if (this.entityInstances[+selector]) return this.bunch([this.entityInstances[+selector]]);
             return this.bunch();
         } else
@@ -444,7 +440,6 @@
             // empty properties return all the entities
             if (this.pLength(selector) == 0) {
                 var result = this.bunch(this.entityInstances['']);
-                //console.log('empty {}, length = '+result.length);
                 if (fn) this.each(result, fn);
                 return result;
             }
@@ -482,29 +477,21 @@
             }
             // no class, return empty bunch
             else {
-                //console.log('return empty bunch');
                 return this.bunch();
             }
         }
         // if not, parse the whole list (slow)
         else instances = this.entityInstances[''];
 
-        // console.log('instances length = '+instances.length);
         for (var t = 0; t < instances.length; t++) {
             var count = 0;
-            // console.log('find: checking entity ['+t+'] with name "'+instances[t]._name+'"');
             for (var n in properties) {
-                // if (instances[t]) console.log('loop :: t='+t+', n='+n+', [t][n]='+instances[t][n]+', prop='+properties[n]);
-                // else console.log('loop :: t='+t+', n='+n+', [t][n]=undefined, prop='+properties[n]);
                 if (instances[t] !== undefined && instances[t][n] !== undefined && this.selectorCompare(instances[t][n], properties[n])) count++;
-                //console.log('property "'+n+'", propMatch = '+propMatch+', count = '+count);
                 if (count >= propMatch) {
-                    //console.log('find: adding entity to result');
                     result.push(instances[t]);
                 }
             }
         }
-        // console.log('find: result length = '+result.length);
 
         if (fn) this.each(result, fn);
 
@@ -541,12 +528,10 @@
     yespix.fn.selectorCompare = function(entityValue, value) {
         if (this.isString(value)) {
             if (this.isArray(entityValue)) return this.inArray(entityValue, value);
-            //if (this.isString(entityValue)) return entityValue === value; 
             return entityValue === value;
         }
         if (this.isArray(value)) {
             if (this.isString(entityValue)) return this.inArray(value, entityValue);
-            //if (this.isString(entityValue)) return entityValue === value; 
             return entityValue === value;
         }
         if (this.isRegexp(value)) {
@@ -604,9 +589,10 @@
         }
     };
 
-
+    /**
+     * Returns the list of ancestors of the entity
+     */
     yespix.fn.ancestors = function(name) {
-        //				console.log('ancestors :: name = '+name);
         if (this.entityClasses[name]) {
             var list = [];
             for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -614,10 +600,8 @@
                 list = list.concat(this.ancestors(a));
             }
             list.push(name);
-            //					console.log('ancestors :: return list length '+list.length);
             return list;
         } else {
-            //					console.log('ancestors :: return empty list');
             return [];
         }
     };
@@ -654,10 +638,9 @@
         };
 
         // adding the ancestors
-        this.entityFetchAncestors(name);
-        this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
+        if (this.entityFetchAncestors(name)) this.entityClasses[name].ancestors = this.unique(this.entityClasses[name].ancestors);
 
-        if (!this.isEntityAncestorsPending[name]) {
+        if (!this.isEntityAncestorsPending(name)) {
             if (this.entityAncestorsPending.length > 0) {
                 var length = this.entityAncestorsPending.length;
                 var count = 0; // number of entity ancestors initiated
@@ -679,9 +662,6 @@
         });
 
         return this;
-        //console.log('entity.define :: entity class name "'+name+'" added');
-        //console.log('entity.define :: ancestors = "'+this.entityClasses[name].ancestors.join(', ')+'"');
-        //console.log('----');
     };
 
     /**
@@ -703,7 +683,6 @@
             if (list[t] != '') {
                 if (!this.entityClasses[list[t]]) {
                     if (mode == 'pending') {
-                        console.warn('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for class "' + className + '", add as pending entity');
                         this.entityAncestorsPending.push(className);
                         this.entityClasses[className].ancestors = [];
                         this.entityClasses[className].ancestorsReady = false;
@@ -715,8 +694,21 @@
                         return false;
                     }
                 } else if (list[t] == className) {
-                    if (mode != 'slient') console.warn('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
+                    if (mode != 'slient') console.error('entityFetchAncestors :: entity class cannot add itself to ancestors, skipping');
                 } else {
+                    if (!this.entityClasses[list[t]].ancestorsReady) {
+                        if (mode == 'pending') {
+                            this.entityAncestorsPending.push(className);
+                            this.entityClasses[className].ancestors = [];
+                            this.entityClasses[className].ancestorsReady = false;
+                            return false;
+                            break;
+                        } else {
+                            if (mode != 'silent') console.error('entityFetchAncestors :: cannot find the ancestor class name "' + list[t] + '" for entity class "' + className + '"');
+                            this.entityClasses[className].ancestorsReady = false;
+                            return false;
+                        }
+                    }
                     this.entityClasses[className].ancestors = this.entityClasses[className].ancestors.concat(this.ancestors(list[t]));
                 }
             }
@@ -730,7 +722,6 @@
         for (var t = 0; t < len; t++) {
             if (this.entityAncestorsPending[t] == className) return true;
         }
-        //console.log('isEntityAncestorsPending :: entity "' + className + '" not pending');
 
         return false;
     };
@@ -757,9 +748,8 @@
 
         // check if the entity was waiting other classes to load
         if (this.isEntityAncestorsPending(name)) {
-            console.log('spawn :: entity "' + name + '" is pending. Getting ancestors ...');
             this.entityFetchAncestors(name, 'force');
-        } else console.log('spawn :: entity "' + name + '" is NOT pending');
+        }
 
         // mixin with the ancestors
         for (var t = 0; t < this.entityClasses[name].ancestors.length; t++) {
@@ -773,7 +763,6 @@
         // mixin with the class name
         this.mixin(entity, this.entityClasses[name].properties);
 
-
         // copy the spawn properties
         for (var fn in properties) {
             entity[fn] = properties[fn];
@@ -782,16 +771,27 @@
         entity._ancestors = this.entityClasses[name]['ancestors'];
         entity._id = this.entityNextId++;
 
-        this.instanceAdd(entity);
-
         // executing the init functions on ancestors
         this.call(entity, 'init', [properties]);
         if (this.isFunction(entity.init)) entity.init(properties);
 
+        if (entity['registerInstance']) this.instanceAdd(entity);
+
+        // Trigger some events to dispatch the spawn of an entity
+        var event = {
+            entity: entity,
+            type: 'spawn'
+        }
+        entity.trigger('spawn', event);
+        this.trigger('spawn', event);
+
         if (entity._ancestors.length > 0)
-            for (t = 0; t < entity._ancestors.length; t++) this.trigger('spawn:' + entity._ancestors[t], {
-                entity: entity
-            });
+            for (t = 0; t < entity._ancestors.length; t++) {
+                entity.trigger('spawn:' + entity._ancestors[t], event);
+                this.trigger('spawn:' + entity._ancestors[t], event);
+            }
+        entity.trigger('spawn:' + entity._class, event);
+        this.trigger('spawn:' + entity._class, event);
 
         return entity;
     };
@@ -807,17 +807,29 @@
      */
     yespix.fn.instanceAdd = function(entity) {
         // the entity must not be in any instances list because we are overriding his _instances object
-        if (entity._instances) this.instanceRemove(entity);
+        if (entity._instanceExists) this.instanceRemove(entity);
         entity._instances = {};
+
+        // entity must be unique
+        if (entity.isUnique == true) {
+            this.find('.' + entity._class + ', /' + entity._class).destroy();
+            if (this.isArray(this.entityInstances['.' + entity._class]) && this.entityInstances['.' + entity._class].length > 0) {
+                var list = this.entityInstances['.' + entity._class];
+                var count = list.length;
+                for (var t = 0; t < count; t++) {
+                    this.instanceRemove(list[0]);
+                }
+            }
+        }
 
 
         // insert reference in the global instances list
         if (this.isUndefined(this.entityInstances['']) || this.entityInstances[''].length == 0) {
             this.entityInstances[''] = [entity];
-            entity._instances[''] = 0;
+            //entity._instances[''] = 0;
         } else {
             this.entityInstances[''].push(entity);
-            entity._instances[''] = this.entityInstances[''].length - 1;
+            //entity._instances[''] = this.entityInstances[''].length - 1;
         }
 
         // insert reference with the entity Id
@@ -826,10 +838,10 @@
         // insert reference in the class instances list for its own class name
         if (this.isUndefined(this.entityInstances['.' + entity._class]) || this.entityInstances['.' + entity._class].length == 0) {
             this.entityInstances['.' + entity._class] = [entity];
-            entity._instances[entity._class] = 0;
+            //entity._instances[entity._class] = 0;
         } else {
             this.entityInstances['.' + entity._class].push(entity);
-            entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
+            //entity._instances[entity._class] = this.entityInstances['.' + entity._class].length - 1;
         }
 
         // insert a reference in the ancestor instances list for all its ancestors
@@ -837,37 +849,62 @@
             for (var t = 0; t < entity._ancestors.length; t++) {
                 if (this.isUndefined(this.entityInstances['/' + entity._ancestors[t]]) || this.entityInstances['/' + entity._ancestors[t]].length == 0) {
                     this.entityInstances['/' + entity._ancestors[t]] = [entity];
-                    entity._instances[entity._ancestors[t]] = 0;
+                    //entity._instances[entity._ancestors[t]] = 0;
                 } else {
-                    console.log('add instance to /' + entity._ancestors[t]);
                     this.entityInstances['/' + entity._ancestors[t]].push(entity);
-                    entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
+                    //entity._instances[entity._ancestors[t]] = this.entityInstances['/' + entity._ancestors[t]].length - 1;
                 }
             }
 
-        // Trigger some events to dispatch the spawn of an entity
-        this.trigger('spawn', {
-            entity: entity
-        });
-        this.trigger('spawn:' + entity._class, {
-            entity: entity
-        });
+        entity._instanceExists = true;
     };
 
     yespix.fn.instanceRemove = function(entity) {
+        var t, u;
+        if (!entity) {
+            console.warn('instanceRemove :: parameter entity is undefined');
+            return false;
+        }
         // remove reference from the global instances list
-        if (this.entityInstances['']) this.entityInstances[''].splice(entity._instances[''], 1);
+        if (this.entityInstances['']) {
+            //this.entityInstances[''].splice(entity._instances[''], 1); // remove instance by index // obsolete
+            for (t = 0; t < this.entityInstances[''].length; t++) {
+                if (this.entityInstances[''][t] == entity) {
+                    this.entityInstances[''].splice(t, 1);
+                    break;
+                }
+            }
+        }
 
         // remove reference with the entity Id
         delete this.entityInstances[+entity._id];
 
         // remove reference from the class instances list for its own class name
-        if (this.entityInstances['.' + entity._class]) this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1);
+        if (this.entityInstances['.' + entity._class]) {
+            //this.entityInstances['.' + entity._class].splice(entity._instances[entity._class], 1); // remove instance by index // obsolee
+            for (t = 0; t < this.entityInstances['.' + entity._class].length; t++) {
+                if (this.entityInstances['.' + entity._class][t] == entity) {
+                    this.entityInstances['.' + entity._class].splice(t, 1);
+                    break;
+                }
+            }
+        }
 
         // insert a reference in the class instances list for all its ancestors
         if (entity._ancestors.length > 0)
-            for (var t = 0; t < entity._ancestors.length; t++)
-                if (this.entityInstances['/' + entity._ancestors[t]]) this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1);
+            for (t = 0; t < entity._ancestors.length; t++) {
+                if (this.entityInstances['/' + entity._ancestors[t]]) {
+                    //this.entityInstances['/' + entity._ancestors[t]].splice(entity._instances[entity._ancestors[t]], 1); // obsolete
+                    for (u = 0; u < this.entityInstances["/" + entity._ancestors[t]].length; u++) {
+                        if (this.entityInstances["/" + entity._ancestors[t]][u] == entity) {
+                            this.entityInstances["/" + entity._ancestors[t]].splice(u, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+        entity._instanceExists = false;
 
         this.trigger('remove', {
             entity: entity
@@ -903,7 +940,7 @@
     };
 
     /**
-     * Call some entity class functions on the context of an entity object. e.g.
+     * Call some entity class functions of ancestors in the context of an entity object. e.g.
      * @trigger call
      * @param {object} entity Entity instance
      * @param {string|function} fn Function name in a string or function reference to call // @todo
@@ -916,7 +953,6 @@
      * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
      */
     yespix.fn.call = function(entity, fn, ancestors, params) {
-        //console.log('call : entity._class='+entity._class+', fn='+fn+', ancestors='+ancestors);
 
         if (!this.isDefined(entity._class)) return null;
         if (this.isString(ancestors)) ancestors = ancestors.split(',');
@@ -929,8 +965,6 @@
 
         if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
         else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
-
-        //console.log('ancestors = '+ancestors.join(', '));
 
         var result = [];
         for (var t = 0; t < ancestors.length; t++) {
@@ -1120,21 +1154,18 @@
         // listen to multiple properties
         if (this.isArray(pname)) {
             for (t = 0; t < pname.length; t++) this.listen(obj, pname[t], callback);
-            return true;
+            return this;
         }
 
         // listen to multiple objects
         if (this.isArray(obj)) {
             for (t = 0; t < obj.length; t++) this.listen(obj[t], pname, callback);
-            return true;
+            return this;
         }
 
-        //console.log('listen :: obj[pname] = ' + obj[pname]);
         var initValue = obj[pname];
         callback = callback || this.listenTrigger;
         if (Object.defineProperty) {
-            //				var value = obj[pname];
-            //				console.log('value = '+value);
             obj['__var_callback_' + pname] = callback;
 
             Object.defineProperty(obj, pname, {
@@ -1171,9 +1202,7 @@
             obj['__var_old_' + pname] = initValue;
             obj['__var_new_' + pname] = initValue;
             obj['__var_callback_' + pname] = callback;
-            //console.log('listen :: name = ' + pname + ', value = ' + obj[pname]);
             this.on('enterFrame', function() {
-                //console.log('listen :: enterFrame :: name = '+pname+', value = '+this[pname]+', old = '+this['__var_old_'+pname]);
                 if (this[pname] != this['__var_new_' + pname]) {
                     this['__var_old_' + pname] = this['__var_new_' + pname];
                     this['__var_new_' + pname] = this[pname];
@@ -1187,9 +1216,8 @@
             }, obj, this);
 
         }
-        //console.log('listen :: before set obj[pname] = ' + obj[pname]);
         obj[pname] = initValue;
-        //console.log('listen :: after set obj[pname] = ' + obj[pname]);
+        return this;
     };
 
     yespix.fn.listenTrigger = function(obj, e) {
@@ -1197,6 +1225,7 @@
         if (!obj._changedList) obj._changedList = {};
         obj._changedList[e.name] = true;
         obj.trigger('change:' + e.name, e);
+        return this;
     };
 
     /**
@@ -1417,9 +1446,8 @@
                         state: file.state,
                         url: file.url,
                         file: file,
-                        entity: options['entity'],
+                        //                    entity: options['entity'],
                     };
-                    console.log('file.options.entity: ' + file.options.entity);
 
                     // loop inside file.options
                     if (file.options)
@@ -1497,6 +1525,7 @@
                             // executes error and complete functions
                             for (var t = 0; t < this.file.options.length; t++) {
                                 newEvent.stat = this.file.options[t].stat;
+                                if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                                 newEvent.type = 'error';
                                 this.file.options[t]['error'](newEvent);
                                 newEvent.type = 'complete';
@@ -1509,6 +1538,7 @@
                         // executes success and complete functions
                         newEvent.state = file.state = 'loaded';
                         for (var t = 0; t < this.file.options.length; t++) {
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             newEvent.stat = this.file.options[t].stat;
                             newEvent.type = 'success';
                             this.file.options[t]['success'](newEvent);
@@ -1527,6 +1557,7 @@
                         newEvent.type = 'progress';
                         for (var t = 0; t < this.file.options.length; t++) {
                             newEvent.stat = this.file.options[t].stat;
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             this.file.options[t]['progress'](newEvent);
                         }
                     }
@@ -1662,11 +1693,9 @@
 
                 var interval_id = setInterval(function() { // start checking whether the style sheet has successfully loaded
                         try {
-                            //console.log('len = '+s[sheet][cssRules].length);
                             if (s[sheet] && s[sheet][cssRules].length) { // SUCCESS! our style sheet has loaded
                                 clearInterval(interval_id); // clear the counters
                                 clearTimeout(timeout_id);
-                                //console.log('addcss :: load link success');
                                 complete(e);
                             }
                         } catch (e) {} finally {}
@@ -1682,9 +1711,7 @@
         } else {
             var token = 0;
             options['complete'] = function(e) {
-                //						console.log('complete::: token ='+token+', url = '+fileList[token]);
                 if (fileList[token] == e.url) {
-                    //console.log('complete css '+e.file);
                     var s = document.createElement('link');
                     s.type = 'text/css';
                     s.rel = 'stylesheet';
@@ -2319,7 +2346,7 @@
                 }
 
                 // change the drawEntities because some entity instances have been added or removed
-                if (yespix.drawEntitiesChange) {
+                if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                     yespix.drawEntities = yespix.entityInstances['/gfx'];
                     if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
                     yespix.drawEntitiesChange = false;
@@ -2391,7 +2418,6 @@
 
             // triggers on YESPIX engine
             yespix.trigger(e.type, e);
-            console.log('trigger ' + e.type);
             //return false;
         };
 
@@ -2447,7 +2473,6 @@
          * blur
          */
         document.onblur = function(e) {
-            //console.log('blur');
             yespix.data.key.pressed = {};
             yespix.data.key.hold = {};
             yespix.data.key.down = {};
@@ -2495,7 +2520,6 @@
         var t;
 
         type = type || 'hold';
-        //console.log('type = '+type);
         if (this.isString(s)) {
             if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
                 var arr = s.split('|', 2);
@@ -2551,7 +2575,6 @@
      *
      */
     yespix.fn.support = function(type) {
-        //console.log('yespix.support :: type='+type);
         if (!type) return null;
         var types = type.split('/');
 
@@ -2576,14 +2599,11 @@
 
         // create element if needed
         if (this.data.support.elements[types[0]] === undefined) {
-            //console.log('type='+type+', types[0]='+types[0]+', types[1]='+types[1]);
             this.data.support.elements[types[0]] = document.createElement(types[0]);
-            //		if ( !! this.data.support.elements[types[0]] == false) this.data.support.elements[types[0]] = false;
             if (this.data.support.elements[types[0]] === false) this.data.support.elements[types[0]] = false;
         }
 
         var e = this.data.support.elements[types[0]];
-        //	if (!e || !! e.canPlayType == false) return false;
         if (!e || e.canPlayType === false) return false;
 
         var str = e.canPlayType(type);
@@ -2692,8 +2712,6 @@
                 };
         })();
 
-        //console.log('timer.start, onFrame = '+this.onFrame);
-
         this.frameMs = 1000 / this.fps;
         var yespix = this;
         this.frameTick = function() {
@@ -2737,8 +2755,6 @@
             });
 
             this.collisionClear();
-            //console.log('collision length = '+this.find('/collision').length);
-            //				this.dump(this.find('/collision'), 'find(/collision)');
             var list = this.find('/collision');
             if (list.length > 0) list.collisionOccupy().collision();
 
@@ -2770,6 +2786,259 @@
 
     function initEntities(yespix) {
 
+        /**
+         ************************************************************************************************************
+         * @class entity.base
+         */
+
+        yespix.define('base', {
+
+            /**
+             * Reference to the YESPIX engine (in case you lost it)
+             * @property _yespix
+             * @type {object}
+             */
+            _yespix: yespix,
+
+
+            /**
+             * Entity class name initiated on the spawn of the entity
+             * @property _class
+             * @type string
+             */
+            _class: '',
+
+            /**
+             * Array of ancestor names initiated on the spawn of the entity
+             * @property _ancestors
+             * @type array
+             */
+            _ancestors: [],
+
+            /**
+             * Reference to the scene of the entity initiated by the scene entity
+             * @property _scene
+             * @type object
+             */
+            _scene: null,
+
+            /**
+             * Unique integer of the entity instance
+             * @property _id
+             * @type integer
+             */
+            _id: 1,
+
+            /**
+             * Array of children reference
+             * @property _children
+             * @type array
+             */
+            _children: null,
+
+            /**
+             * Reference to the parent
+             * @property _parent
+             * @type object
+             */
+            _parent: null,
+
+            /**
+             * Set True when the entity deletion is in progress
+             * @property _deleting
+             * @type boolean
+             */
+            _deleting: false,
+
+            /**
+             * Set True if the entity instance was added to the global YESPIX entity list
+             * @property _instanceExists
+             * @type boolean
+             * @default true
+             */
+            _instanceExists: false,
+
+            /**
+             * Set True if the entity is active
+             * @property isActive
+             * @type boolean
+             * @default true
+             */
+            isActive: true,
+
+            /**
+             * Set True if the entity is visible
+             * @property isVisible
+             * @type boolean
+             * @default false
+             */
+            isVisible: false,
+
+            /**
+             * Set True if the entity is global
+             * @property isGlobal
+             * @type boolean
+             * @default false
+             */
+            isGlobal: false,
+
+            /**
+             * Name of the entity, not unique
+             * @property name
+             * @type string
+             */
+            name: '',
+
+            /**
+             * Register instance in the engine when spawned
+             */
+            registerInstance: true,
+
+            /**
+             * Set to True if the entity must be unique (only one instance)
+             * @property isUnique
+             * @type boolean
+             * @default false
+             */
+            isUnique: false,
+
+            /**
+             *
+             */
+
+
+            readyFunctions: [],
+
+            ///////////////////////////////// Main functions ////////////////////////////////
+
+            /**
+             * Return the array of assets used for the entity. The original code of the function is called for
+             * the class name of the entity and each ancestor classes
+             */
+            assets: function() {
+                return [];
+            },
+
+            /**
+             * Initilize the entity object. The original code of the function is called for the class name of
+             * the entity and each ancestor classes
+             */
+            init: function(properties) {
+                this.readyFunctions = [];
+                this.on('spawn', this.checkReadyState);
+                return true;
+            },
+
+            checkReadyState: function() {
+                for (var t = 0; t < this.readyFunctions.length; t++) {
+                    if (!this.readyFunctions[t].apply(this)) {
+                        return false;
+                    }
+                }
+                this.ready();
+                return true;
+            },
+
+            ready: function() {
+                this.isReady = true;
+                this.trigger('entityReady');
+            },
+
+            ancestor: function(name) {
+                return yespix.inArray(this._ancestors, name);
+            },
+
+            typeof: function(name) {
+                if (yespix.isArray(name)) {
+                    for (var t = 0; t < name.length; t++)
+                        if (this.typeOf(name[t])) return true;
+                    return false;
+                }
+                return (this.ancestor(name) || this._class == name);
+            },
+
+            prop: function(name, value) {
+                if (yespix.isObject(name)) {
+                    for (var n in name) {
+                        this[n] = name[n];
+                    }
+                    return this;
+                }
+                this[name] = value;
+                return this;
+            },
+
+            /**
+             * Clone an entity
+             */
+            clone: function(properties) {
+                var entity = yespix.clone(this);
+                entity._id = yespix.entityNextId++;
+                if (properties) entity.prop(properties);
+                entity._instances = false;
+                yespix.dump(yespix.entityInstances);
+                yespix.instanceAdd(entity);
+                yespix.dump(yespix.entityInstances);
+                return entity;
+            },
+
+            childAdd: function(entity) {
+                yespix.childAdd(this, entity);
+                return this;
+            },
+
+            setParent: function(entity) {
+                yespix.childAdd(entity, this);
+                return this;
+            },
+
+            childRemove: function(entity) {
+                yespix.childRemove(this, entity);
+                return this;
+            },
+
+            trigger: function(name, e) {
+                yespix.trigger(name, e, this);
+                return this;
+            },
+
+            on: function(name, callback) {
+                yespix.on(name, callback, this, this);
+                return this;
+            },
+
+            off: function(name, callback) {
+                yespix.off(name, callback, this, this);
+                return this;
+            },
+
+            listen: function(pname, callback) {
+                return yespix.listen(this, pname, callback);
+                return this;
+            },
+
+            destroy: function() {
+                this._deleting = true;
+                this.isActive = false;
+                this.isVisible = false;
+
+                if (this._children) {
+                    for (var t = 0; t < this._children.length; t++) {
+                        if (this._children[t] && !this._children[t]._deleting) {
+                            //console.log('base :: destroy :: destroying child t='+t);
+                            this._children[t].destroy();
+                        }
+                    }
+                }
+                this._children = null;
+
+                yespix.instanceRemove(this);
+                return this;
+            }
+
+        });
+        yespix.entityRootClassname = 'base';
+
         yespix.define('actor', 'anim, move, collision', {
 
             isAttacking: false,
@@ -2783,7 +3052,9 @@
             actorDirection: '',
             actorAnims: {},
             actorInit: function(options) {},
-            init: function() {},
+            init: function() {
+
+            },
 
             applyFriction: function() {
                 this.speedX *= (1 - this.moveFriction);
@@ -2858,6 +3129,12 @@
             init: function() {},
 
             move: function() {
+                if (this._parent && !this._parent.isReady) return false;
+
+                this.trigger('moveStart', {
+                    entity: this
+                });
+
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
 
@@ -2867,12 +3144,15 @@
                 if (yespix.level) yespix.level.collision(this);
                 this.x += this.speedX;
                 this.y += this.speedY;
+
+                this.trigger('moveEnd', {
+                    entity: this
+                });
             },
 
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }
@@ -2928,103 +3208,7 @@
             init: function() {},
         });
 
-        yespix.define('actor2w', 'actor', {
-            actorMove: {
-                'idle': true,
-
-                'right': true,
-                'left': true,
-
-                'lookup': true,
-                'lookdown': true,
-
-                'walk': true,
-                'run': true,
-
-                'jump': true,
-                'longjump': true,
-                'doublejump': true,
-
-                'crouch': true,
-                'guard': true,
-
-                'damage': true,
-                'dead': true,
-
-                'throw': true,
-                'attack': true,
-                'use': true,
-                'default': 'idle',
-            },
-
-            actorSpeedJump: 1.1,
-            actorGravity: true,
-            actorDirection: 'right',
-
-            actorAnims: {
-                'idleright': 'idleright',
-                'idleleft': 'idleleft',
-
-                'walkright': 'walkright',
-                'walkleft': 'walkleft',
-
-                'lookup': 'lookup',
-                'lookdown': 'lookdown',
-
-                'lookup': 'lookup',
-                'lookdown': 'lookdown',
-
-                'attackleft': 'attackleft',
-                'attackright': 'attackright',
-
-                'jumpleft': 'jumpleft',
-                'jumpright': 'jumpright',
-                'airleft': 'airleft',
-                'airright': 'airright',
-                'landleft': 'landleft',
-                'landright': 'landright',
-
-                'left': 'left',
-                'right': 'right',
-            },
-
-            actorInit: function(options) {},
-
-            init: function() {},
-
-            move: function() {
-                this.speedX += this.accelX;
-                this.speedY += this.accelY;
-
-                this.applyFriction();
-                this.applyGravity();
-
-                if (yespix.level) yespix.level.collision(this);
-                this.x += this.speedX;
-                this.y += this.speedY;
-            },
-
-            applyGravity: function() {
-                if (!yespix.gravity) return false;
-                if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
-                    if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
-                    if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
-                }
-            },
-
-            applyFriction: function() {
-                this.speedX *= (1 - this.moveFriction);
-                this.speedY *= (1 - this.moveFriction);
-                if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
-                if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
-                return true;
-            },
-
-        });
-
-
-        yespix.define('anim', 'image', {
+        yespix.define('anim', 'sprite', {
             animDefault: {
                 width: 32, // default tile width
                 height: 32, // default tile height
@@ -3035,7 +3219,6 @@
             animSelected: '',
             animFrame: 0,
             animSpeed: 1,
-            animReady: false,
             animWait: false,
             animNext: '',
 
@@ -3065,13 +3248,10 @@
              * @return {[type]} [description]
              */
             animFramesInit: function() {
-                //console.log('animFramesInit');
 
                 // check every animation
                 for (var name in this.anims) {
                     var anim = this.anims[name];
-
-                    //console.log('animFramesInit :: name = ' + name);
 
                     // only animation that is not ready
                     if (!anim.isReady) {
@@ -3080,8 +3260,6 @@
                         if (anim.frames && anim.frames.length)
                             for (var t = 0; t < anim.frames.length; t++) {
                                 var frame = anim.frames[t];
-                                // console.log('animFramesInit :: frame '+t+', isReady = '+frame.isReady+', image = '+frame.image);
-                                //if (frame.image) console.log('image.isReady = ' + frame.image.isReady);
                                 if (frame.isReady) continue;
                                 if (!frame.image || !frame.image.isReady) {
                                     frame.isReady = false;
@@ -3113,14 +3291,11 @@
                                     // so we need to update this variable on each frame
                                     maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
 
-                                    console.log('maxLine = ' + maxLine);
-
                                     if (maxLine > 0) {
                                         frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
                                         frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
                                         frame.isReady = true;
-                                        console.log('frame :: t=' + t + ', frameIndex=' + frame.frameIndex + ', from=' + anim.from + ', maxLine=' + maxLine + ', x=' + frame.x + ', y=' + frame.y);
-                                    } //else console.log('frame :: t='+t+', frameIndex='+frame.frameIndex+', maxLine='+maxLine);
+                                    }
                                 }
                             if (anim.extendsTo) {
                                 for (var t = 0; t < anim.extendsTo.length; t++) {
@@ -3135,9 +3310,7 @@
                                             if (this.anims[anim.extendsTo[t]].flipX) this.anims[anim.extendsTo[t]].frames[u].flipX = !this.anims[anim.extendsTo[t]].frames[u].flipX;
                                             if (this.anims[anim.extendsTo[t]].flipY) this.anims[anim.extendsTo[t]].frames[u].flipY = !this.anims[anim.extendsTo[t]].frames[u].flipY;
                                             if (this.anims[anim.extendsTo[t]].oldFrames && this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                                //                                              console.log('oldFrames '+u+' exists');
                                                 for (var n in this.anims[anim.extendsTo[t]].oldFrames[u]) {
-                                                    //                                                  console.log('copy property n='+n);
                                                     this.anims[anim.extendsTo[t]].frames[u][n] = this.anims[anim.extendsTo[t]].oldFrames[u][n];
                                                 }
                                             }
@@ -3152,12 +3325,9 @@
             },
 
             animInit: function() {
-                //console.log('animInit :: this.anims = ' + this.anims);
-
                 for (var name in this.anims) {
 
                     var anim = this.anims[name];
-                    //console.log('animInit :: anim name = ' + name);
 
                     // check if all images are ready
                     anim.name = name;
@@ -3169,13 +3339,12 @@
                         if (!this.animSelected) this.animSelected = name;
                     }
 
-                    //console.log('animInit :: anim.extendsFrom = ' + anim.extendsFrom);
                     if (anim.extendsFrom) {
                         if (this.anims[anim.extendsFrom]) {
                             if (!this.anims[anim.extendsFrom].extendsTo) this.anims[anim.extendsFrom].extendsTo = [name];
                             else this.anims[anim.extendsFrom].extendsTo.push(name);
-                        } //else console.log('animInit :: anim.extendsFrom "' + anim.extendsFrom + '" does not exist');
-                    } //else 
+                        }
+                    }
 
                     // "frames" is an array of frames
                     else if (yespix.isArray(anim['frames'])) {
@@ -3250,8 +3419,6 @@
                 var frame = this.anims[name].frames[from];
                 if (!frame) return null;
 
-                console.log('playing anim "' + name + '"');
-
                 this.animSelected = name;
                 this.animFrame = from;
                 this.animSpeed = speed;
@@ -3284,7 +3451,6 @@
                 if (!this.animTime || this.animTime <= now) {
                     this.animFrame++;
 
-                    //console.log('animFrame = '+this.animFrame+', frames.length = '+this.anims[this.animSelected].frames.length);
                     if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                         this.animFrame = 0;
                         animEnded = true;
@@ -3304,13 +3470,46 @@
                         });
                         this.animWait = false;
                         if (this.animNext && this.animNext != '') {
-                            console.log('animNext = ' + this.animNext);
                             this.animPlay(this.animNext);
                         }
                     }
                 }
             },
 
+            getFrame: function(animIndex, frameIndex) {
+                animIndex = animIndex || this.animSelected;
+                if (!this.anims[animIndex]) return false;
+                frameIndex = frameIndex || this.animFrame;
+                if (!this.anims[animIndex].frames[frameIndex]) return false;
+                return this.anims[animIndex].frames[frameIndex];
+            },
+
+            getDrawBox: function() {
+                if (this.snapToPixel) {
+                    var x = parseInt(this.x);
+                    var y = parseInt(this.y);
+                } else {
+                    var x = this.x;
+                    var y = this.y;
+                }
+                var width = this.width;
+                var height = this.height;
+
+                var frame = this.getFrame();
+                //if (yespix.key('a') && !frame) console.log('frame = ');
+                //if (yespix.key('a')) console.log(frame);
+                var type = 'anim';
+                width = frame.width;
+                height = frame.height;
+
+                return {
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height,
+                    type: type
+                };
+            },
 
             draw: function(context) {
 
@@ -3328,19 +3527,19 @@
                     } else context = this._context;
                 }
 
-                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
                 var frame = this.anims[this.animSelected].frames[this.animFrame];
                 var img = frame.image;
 
                 var scaleX = frame.flipX ? -1 : 1;
                 var scaleY = frame.flipY ? -1 : 1;
+                var position = this.getPosition();
 
                 if (this.snapToPixel) {
-                    var canvasX = parseInt(this.x * scaleX - frame.flipX * frame.width * this.pixelSize);
-                    var canvasY = parseInt(this.y * scaleY - frame.flipY * frame.height * this.pixelSize);
+                    var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
+                    var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
                 } else {
-                    var canvasX = this.x * scaleX - frame.flipX * frame.width * this.pixelSize;
-                    var canvasY = this.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+                    var canvasX = position.x * scaleX - frame.flipX * frame.width * this.pixelSize;
+                    var canvasY = position.y * scaleY - frame.flipY * frame.height * this.pixelSize;
                 }
                 var x = frame.x;
                 var y = frame.y;
@@ -3352,7 +3551,6 @@
                         context.scale(scaleX, scaleY);
                     }
                     context.globalAlpha = this.alpha;
-                    if (this.isJumping) console.log('draw :: frame = ' + this.animFrame + ', animSelected = ' + this.animSelected + ', x = ' + x + ', y = ' + y + ', width = ' + frame.width + ', height = ' + frame.height + ', canvasX = ' + canvasX + ', canvasY = ' + canvasY);
                     context.drawImage(img.element, //image element
                         x, // x position on image
                         y, // y position on image
@@ -3389,199 +3587,6 @@
             },
 
         });
-
-        /**
-         ************************************************************************************************************
-         * @class entity.base
-         */
-
-        yespix.define('base', {
-
-            /**
-             * Reference to the YESPIX engine (in case you lost it)
-             * @property _yespix
-             * @type {object}
-             */
-            _yespix: yespix,
-
-
-            /**
-             * Entity class name initiated on the spawn of the entity
-             * @property _class
-             * @type string
-             */
-            _class: '',
-
-            /**
-             * Array of ancestor names initiated on the spawn of the entity
-             * @property _ancestors
-             * @type array
-             */
-            _ancestors: [],
-
-            /**
-             * Reference to the scene of the entity initiated by the scene entity
-             * @property _scene
-             * @type object
-             */
-            _scene: null,
-
-            /**
-             * Unique integer of the entity instance
-             * @property _id
-             * @type integer
-             */
-            _id: 1,
-
-            /**
-             * Array of children reference
-             * @property _children
-             * @type array
-             */
-            _children: null,
-
-            /**
-             * Reference to the parent
-             * @property _parent
-             * @type object
-             */
-            _parent: null,
-
-            /**
-             * Set True if the entity is active
-             * @property isActive
-             * @type boolean
-             * @default true
-             */
-            isActive: true,
-
-            /**
-             * Set True if the entity is visible
-             * @property isVisible
-             * @type boolean
-             * @default false
-             */
-            isVisible: false,
-
-            /**
-             * Set True if the entity is global
-             * @property isGlobal
-             * @type boolean
-             * @default false
-             */
-            isGlobal: false,
-
-            /**
-             * Name of the entity, not unique
-             * @property name
-             * @type string
-             */
-            name: '',
-
-
-            ///////////////////////////////// Main functions ////////////////////////////////
-
-            /**
-             * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
-             */
-            assets: function() {
-                return [];
-            },
-
-            /**
-             * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
-             */
-            init: function(properties) {
-                return true;
-            },
-
-            ancestor: function(name) {
-                return yespix.inArray(this._ancestors, name);
-            },
-
-            typeof: function(name) {
-                if (yespix.isArray(name)) {
-                    for (var t = 0; t < name.length; t++)
-                        if (this.typeOf(name[t])) return true;
-                    return false;
-                }
-                return (this.ancestor(name) || this._class == name);
-            },
-
-            prop: function(name, value) {
-                if (yespix.isObject(name)) {
-                    for (var n in name) {
-                        this[n] = name[n];
-                    }
-                    return this;
-                }
-                this[name] = value;
-                return this;
-            },
-
-            /**
-             * Clone an entity
-             */
-            clone: function(properties) {
-                var entity = yespix.clone(this);
-                entity._id = yespix.entityNextId++;
-                if (properties) entity.prop(properties);
-                entity._instances = null;
-                yespix.dump(yespix.entityInstances);
-                yespix.instanceAdd(entity);
-                yespix.dump(yespix.entityInstances);
-                return entity;
-            },
-
-            attach: function(entity) {
-                yespix.attach(this, entity);
-                return this;
-            },
-
-            detach: function(entity) {
-                yespix.detach(this, entity);
-                return this;
-            },
-
-            trigger: function(name, e) {
-                yespix.trigger(name, e, this);
-                return this;
-            },
-
-            on: function(name, callback) {
-                yespix.on(name, callback, this);
-                return this;
-            },
-
-            off: function(name, callback) {
-                yespix.off(name, callback, this);
-                return this;
-            },
-
-            listen: function(pname, callback) {
-                return yespix.listen(this, pname, callback);
-                return this;
-            },
-
-            destroy: function() {
-                this._deleting = true;
-                this.isActive = false;
-                this.isVisible = false;
-
-                if (this._children) {
-                    for (var t = 0; t < this._children.length; t++) {
-                        if (this._children[t] && !this._children[t].deleting) {
-                            this._children[t].destroy();
-                        }
-                    }
-                }
-
-                yespix.instanceRemove(this);
-                return this;
-            }
-
-        });
-        yespix.entityRootClassname = 'base';
 
         yespix.define('canvas', {
             canvasOptions: null,
@@ -3642,61 +3647,15 @@
             },
         });
 
+        yespix.define('circle', 'path', {
 
-        yespix.define('scene', {
-            sceneOptions: null,
-            document: null,
+            circleRadius: 5,
 
-            init: function(options) {
-                this.create(options);
-            },
+            init: function() {},
 
-            create: function(options) {
-                options = options || {};
-                options.document = options.document || yespix.document;
-
-                this.sceneOptions = options;
-            },
-
-        });
-
-
-
-        yespix.define('move', {
-            speedX: 0,
-            speedY: 0,
-            accelX: 0,
-            accelY: 0,
-            moveFriction: 0.05,
-
-            moveStop: function() {
-                this.speedX = this.speedY = this.accelX = this.accelY = 0;
-            },
-
-
-            init: function() {
-                yespix.on('enterFrame', this.move, this, yespix);
-            },
-
-            move: function() {
-                if (this.applyGravity && yespix.gravity) this.applyGravity();
-                this.speedX += this.accelX;
-                this.speedY += this.accelY;
-                this.speedX *= 1 - this.moveFriction;
-                this.speedY *= 1 - this.moveFriction;
-                if (yespix.level) yespix.level.collision(this);
-                this.x += this.speedX;
-                this.y += this.speedY;
-            },
-
-            applyGravity: function() {
-                /*
-				if (!this.isOnGround && yespix.gravity) {
-					console.log('this.isOnGround = '+this.isOnGround+', apply gravity')
-					if (yespix.gravity.x) this.accelX += yespix.gravity.x / 20;
-					if (yespix.gravity.y) this.accelY += yespix.gravity.y / 20;
-				}
-				*/
+            drawPath: function(context) {
+                context.beginPath();
+                context.arc(this.x + this.circleRadius, this.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
             },
 
         });
@@ -3720,11 +3679,14 @@
                 return false;
             },
 
-            collisionBox: function() {
+            collisionBox: function(relative) {
+
+                var pos = this.getPosition(relative);
+
                 if (yespix.isUndefined(this.pixelSize)) {
                     return {
-                        x: this.x + this.colOffsetX,
-                        y: this.y + this.colOffsetY,
+                        x: pos.x + this.colOffsetX,
+                        y: pos.y + this.colOffsetY,
                         width: this.colWidth,
                         height: this.colHeight,
                         offsetX: this.colOffsetX,
@@ -3732,8 +3694,8 @@
                     };
                 } else {
                     return {
-                        x: this.x + this.colOffsetX * this.pixelSize,
-                        y: this.y + this.colOffsetY * this.pixelSize,
+                        x: pos.x + this.colOffsetX * this.pixelSize,
+                        y: pos.y + this.colOffsetY * this.pixelSize,
                         width: this.colWidth * this.pixelSize,
                         height: this.colHeight * this.pixelSize,
                         offsetX: this.colOffsetX * this.pixelSize,
@@ -3777,7 +3739,6 @@
             },
 
             drawDebugCollision: function(context, drawBox) {
-                console.log('drawDebugCollision');
                 if (this.collisionBox) {
                     var box = drawBox || this.collisionBox();
                     context.globalAlpha = 1;
@@ -3814,13 +3775,15 @@
             _flipX: false,
             _flipY: false,
 
+            debugAlpha: 1,
+
             ///////////////////////////////// Main functions ////////////////////////////////
 
             asset: function() {
                 return [];
             },
 
-            // initilize object
+            // initilize entity
             init: function() {
 
                 yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
@@ -3830,45 +3793,64 @@
                 return true;
             },
 
-            getDrawBox: function() {
-                if (this.snapToPixel) {
-                    var x = parseInt(this.x);
-                    var y = parseInt(this.y);
+            getPosition: function(relative) {
+                if (relative || !this._parent) {
+                    return {
+                        x: this.x,
+                        y: this.y
+                    };
                 } else {
-                    var x = this.x;
-                    var y = this.y;
+                    var position = this._parent.getPosition();
+                    if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
+                    if (position) return {
+                        x: this.x + position.x,
+                        y: this.y + position.y
+                    };
                 }
-                var width = this.width;
-                var height = this.height;
+                return {
+                    x: this.x,
+                    y: this.y
+                };
+            },
 
-                if (this.typeof('image')) {
-                    var img = this.image(this.imageSelected);
-                    width = this.width || img.width || img.realWidth;
-                    height = this.height || img.height || img.realHeight;
-                } else if (this.typeof('anim')) {
-                    var img = this.image(this.imageSelected);
-                    width = this.width || img.width || img.realWidth;
-                    height = this.height || img.height || img.realHeight;
-                }
+            getDrawBox: function(relative) {
+                var position = this.getPosition(relative);
 
                 return {
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: height
+                    x: position.x,
+                    y: position.y,
+                    width: this.width,
+                    height: this.height,
+                    type: this._class
                 };
             },
 
             getContext: function() {
                 if (this._context) return this._context;
-                if (this._parent == null) {
-                    var canvas = yespix.find('.canvas')[0];
-                    if (!this._context && canvas) this._context = canvas.context;
-                }
+                var canvas = yespix.find('.canvas')[0];
+                if (canvas) this._context = canvas.context;
                 return this._context;
             },
 
+            draw: function() {
+                if (this.canDrawDebug()) this.drawDebug();
+            },
+
+            drawAlpha: function(context, type) {
+                if (!type) {
+                    context.globalAlpha = this.alpha;
+                } else {
+                    if (!this[type + 'Alpha']) context.globalAlpha = 0;
+                    else context.globalAlpha = this.alpha * this[type + 'Alpha'];
+                }
+            },
+
+            canDrawDebug: function() {
+                return this.debug;
+            },
+
             drawDebug: function(context, box) {
+                this.drawAlpha(context, 'debug');
                 if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
                 if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
                 if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
@@ -3877,7 +3859,6 @@
 
             drawDebugPosition: function(context, drawBox) {
                 var box = drawBox || this.getDrawBox();
-                context.globalAlpha = 1;
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#ff1111";
                 context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
@@ -3925,6 +3906,18 @@
                 }
 
                 this.imageInit();
+
+                this.readyFunctions.push(this.checkReadyStateImage);
+                this.on('imageReady', this.checkReadyState);
+            },
+
+            checkReadyStateImage: function() {
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t].isReady) {
+                        return false;
+                    }
+                }
+                return true;
             },
 
             resize: function(img, scale) {
@@ -3964,7 +3957,6 @@
             },
 
             image: function(properties) {
-                //console.log('image :: properties = '+properties);
 
                 if (properties == undefined)
                     if (this.images[0]) return this.imageInit(this.images[0]);
@@ -3979,10 +3971,8 @@
                 var max = Object.keys(properties).length;
                 var count = 0;
                 for (var t = 0; t < this.images.length; t++) {
-                    //console.log('checking image ['+t+'] with name "'+this.images[t].name+'"');
                     for (var n in properties) {
                         if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
-                        //console.log('property "'+n+'", max = '+max+', count = '+count);
                         if (count >= max) return this.imageInit(this.images[t]);
                     }
                 }
@@ -4007,10 +3997,8 @@
                 image.isInitiated = true;
                 image.entity = entity;
                 image.element = document.createElement('img');
-                //console.log('createElement :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
 
                 if (image.element) image.element.onload = image.element.onLoad = function() {
-                    //console.log('image.onlad :: imageSelected = '+entity.imageSelected+', src = '+image.src+', image.element = '+image.element);
                     image.realWidth = this.width;
                     image.realHeight = this.height;
                     image.isReady = true;
@@ -4019,12 +4007,7 @@
                         image.element = entity.resize(image.element, entity.pixelSize);
                         image.realWidth = this.width * entity.pixelSize;
                         image.realHeight = this.height * entity.pixelSize;
-
-                        //console.log('image resized');
-                        //yespix.call(entity, 'draw', 'gfx');
-                        //yespix.error();
                     }
-                    //yespix.timerStop();
 
                     entity.trigger('imageReady', {
                         target: image,
@@ -4058,7 +4041,6 @@
                     } else context = this._context;
                 }
 
-                //console.log('context = '+context+', element = '+this.image(this.imageSelected).element+', src = '+this.image(this.imageSelected).element.src);
                 var img = this.image(this.imageSelected);
                 var box = this.getDrawBox();
                 var scaleX = this.flipX ? -1 : 1;
@@ -4092,31 +4074,186 @@
 
         });
 
-        /**
-         ************************************************************************************************************
-         ************************************************************************************************************
-         * Level
-         *
-         */
-
-        yespix.define('level', 'gfx', {
-            data: {},
+        yespix.define('layer', 'gfx', {
 
             isVisible: true,
 
+            isReady: false,
+
+            canvas: null,
+            drawContext: null,
+
+            layerData: null,
+
+            level: null,
+
+            create: function() {
+
+            },
+
+            setLevel: function(level) {
+                this.level = level;
+            },
+
+            load: function(layerData) {
+                this.layerData = layerData;
+                this.update();
+            },
+
+            update: function() {
+                if (!this.layerData) return false;
+
+                this.canvas = document.createElement('canvas');
+                this.drawContext = this.canvas.getContext('2d');
+
+                this.width = this.layerData.width * this.layerData.tilewidth;
+                this.height = this.layerData.height * this.layerData.tilewidth;
+                if (this.layerData.properties.z) this.z = this.layerData.properties.z;
+                if (this.layerData.opacity) this.alpha = this.layerData.opacity;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            },
+
+            drawTile: function(spriteIndex, cellX, cellY) {
+                var image, imageIndex;
+
+                for (var t = 0; t < this.level.tilesets.images.length; t++) {
+                    if (!this.level.tilesets.images[t].isReady) {
+                        console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
+                        return false;
+                    }
+                }
+
+                image = this.level.tilesets.getSpriteImage(spriteIndex);
+
+                if (!image) {
+                    console.error('layer::drawTile :: no image found for spriteIndex ' + spriteIndex);
+                    return false;
+                }
+
+                if (!image.isReady) {
+                    console.error('layer::drawTile :: image of the tileset is not ready');
+                    return false;
+                }
+
+                spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
+                var max = Math.floor(image.realWidth / this.level.levelData.tilewidth);
+                var line = Math.floor(spriteIndex / max);
+                var col = spriteIndex - (line * max);
+                this.drawContext.drawImage(image.element, //image element
+                    col * this.layerData.tilewidth, // x position on image
+                    line * this.layerData.tilewidth, // y position on image
+                    this.layerData.tilewidth, // width on image
+                    this.layerData.tilewidth, // height on image
+                    cellX * this.layerData.tilewidth, // x position on canvas
+                    cellY * this.layerData.tilewidth, // y position on canvas
+                    this.layerData.tilewidth, // width on canvas
+                    this.layerData.tilewidth // height on canvas
+                );
+            },
+
+            clear: function() {
+                if (this.canvas) this.canvas.width = this.canvas.width;
+            },
+
+
+            make: function() {
+                this.clear();
+                if (!this.layerData || !this.level) return;
+
+                var index = 0;
+
+                for (var y = 0; y < this.layerData.height; y++) {
+                    for (var x = 0; x < this.layerData.width; x++) {
+                        if (this.layerData && this.layerData.data) {
+                            var spriteIndex = this.layerData.data[index] - 1;
+                            if (spriteIndex >= 0) {
+                                this.drawTile(spriteIndex, x, y);
+                            }
+                        }
+                        index++;
+                    }
+                }
+                this.ready();
+            },
+
+            draw: function(context) {
+                if (!this.isVisible) return;
+
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+                //console.log('layer.draw :: context = '+context);
+                if (context && this.canvas) {
+                    //if (yespix.key('a')) console.log('layer.draw :: context = '+context+', canvas = '+this.canvas+', x = '+this.x+', y = '+this.y+', width = '+this.canvas.width+', height = '+this.canvas.height);
+                    context.globalAlpha = this.alpha * this.level.alpha;
+                    var box = this.getDrawBox();
+                    if (this.layerData.properties.type == 'parallax') {
+                        if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
+                        if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
+                    }
+                    context.drawImage(this.canvas, //image element
+                        box.x, // x position on image
+                        box.y, // y position on image
+                        this.canvas.width, // width on image
+                        this.canvas.height // height on image
+                    );
+                }
+            },
+        });
+
+        yespix.define('level', 'gfx,move', {
+            levelData: null,
+            levelCollision: [],
+
+            isVisible: true,
             isReady: false,
 
             layers: [],
 
             canvas: null,
             context: null,
+            tilesets: null,
+            levelDir: '',
+            followOptions: null,
+
+            isUnique: true,
+            canApplyGravity: false,
 
 
-            block: function(x, y) {
-                var index = y * this.data.width + x;
-                var tileIndex = this.data.layers[0].data[index];
-                //console.log('block :: index = ' + index + ', tileIndex = ' + tileIndex);
-                if (tileIndex > 1) return true;
+            init: function() {
+                this.readyFunctions.push(this.checkReadyStateLevel);
+            },
+
+            checkReadyStateLevel: function() {
+                // @todo
+                return false;
+            },
+
+            buildLevelCollision: function() {
+                for (var t = 0; t < this.levelData.layers.length; t++) {
+                    var layer = this.levelData.layers[t];
+                    if (layer.properties && layer.properties['type'] && (layer.properties['type'] == 'decor' || layer.properties['type'] == 'parallax')) {
+                        continue;
+                    }
+                    if (layer.data)
+                        for (var u = 0; u < layer.data.length; u++) {
+                            if (!this.levelCollision[u]) this.levelCollision[u] = 0;
+                            this.levelCollision[u] = this.levelCollision[u] + layer.data[u];
+                        }
+                }
+            },
+
+            block: function(cellX, cellY) {
+                if (cellX < 0 || cellY < 0) return false;
+                if (cellX >= this.levelData.width || cellY >= this.levelData.height) return false;
+
+                var index = cellY * this.levelData.width + cellX;
+                var tileIndex = this.levelCollision[index];
+                if (tileIndex && tileIndex > 0) return true;
                 return false;
             },
 
@@ -4125,27 +4262,32 @@
             },
 
             collisionRight: function(entity, box, cellX, cellY) {
+                //console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
                 this.hit(cellX, cellY, 'right', entity.speedX);
-                entity.x = this.x + cellX * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                entity.x = cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
                 entity.speedX = 0;
             },
 
             collisionLeft: function(entity, box, cellX, cellY) {
+                //console.log('collisionLeft :: cellX: '+cellX+', cellY: '+cellY);
                 this.hit(cellX, cellY, 'left', entity.speedX);
-                entity.x = this.x + (cellX + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
+                entity.x = (cellX + 1) * this.levelData.tilewidth + 0.0001 - box.offsetX;
                 entity.speedX = 0;
             },
 
             collisionUp: function(entity, box, cellX, cellY) {
+                //console.log('collisionUp :: cellX: '+cellX+', cellY: '+cellY);
                 this.hit(cellX, cellY, 'up', entity.speedY);
-                var posY = this.y + (cellY + 1) * this.data.tileheight + 1 - box.offsetY;
+                var posY = (cellY + 1) * this.levelData.tileheight + 1 - box.offsetY;
                 entity.y = posY;
                 entity.speedY = 0;
             },
 
             collisionDown: function(entity, box, cellX, cellY) {
+                //if (yespix.frameIndex<100) console.log('collisionDown :: tileheight: '+this.levelData.tileheight+', cellY: '+cellY+', entity.y: '+entity.y+', box.y: '+box.y+', box.offsetY: '+box.offsetY+', box.height: '+box.height);
                 this.hit(cellX, cellY, 'down', entity.speedY);
-                entity.y = this.y + (cellY) * this.data.tileheight - box.offsetY - box.height - 1;
+                var delta = box.y - entity.y;
+                entity.y = cellY * this.levelData.tileheight - box.offsetY - box.height - 1;
                 entity.speedY = 0;
                 entity.isOnGround = true;
                 entity.isJumping = false;
@@ -4155,36 +4297,34 @@
 
             collision: function(entity) {
                 if (entity.speedX == 0 && entity.speedY == 0) return;
+                if (!entity.collisionBox) return;
 
                 var left = false,
                     right = false,
                     up = false,
                     down = false;
 
-                //console.log('level.collision :: #1 speedX = ' + entity.speedX + ', speedY = ' + entity.speedY);
-
-                var box = entity.collisionBox();
-
+                var box = entity.collisionBox(true);
 
                 if (entity.speedX > 0) {
                     // check every collision on the right
-                    var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                    var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
+                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
 
                     if (cellNext > cellRight) {
 
                         right = true;
 
-                        var cellTop = Math.floor(box.y / this.data.tileheight);
-                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var cellTop = Math.floor(box.y / this.levelData.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                         var stopped = false;
                         for (var x = cellRight; x <= cellNext; x++) {
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
                                     this.collisionRight(entity, box, x, y);
-                                    //var posX = this.x + (x) * this.data.tilewidth - 0.0001 - box.offsetX - box.width;
+                                    //var posX = this.x + (x) * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
                                     //entity.x = posX;
                                     //entity.speedX = 0;
                                     stopped = true;
@@ -4196,27 +4336,22 @@
                     }
                 } else if (entity.speedX < 0) {
                     // check every collision on the left
-                    var cellLeft = Math.floor(box.x / this.data.tilewidth);
+                    var cellLeft = Math.floor((box.x) / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the left of the entity
-                    var cellNext = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-
-                    //console.log('cellLeft = '+cellLeft+', cellNext = '+cellNext);
+                    var cellNext = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
 
                     if (cellNext < cellLeft) {
 
                         left = true;
 
-                        var cellTop = Math.floor(box.y / this.data.tileheight);
-                        var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                        var cellTop = Math.floor(box.y / this.levelData.tileheight);
+                        var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                         var stopped = false;
                         for (var x = cellLeft; x >= cellNext; x--) {
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
                                     this.collisionLeft(entity, box, x, y);
-                                    /*var posX = this.x + (x + 1) * this.data.tilewidth + 0.0001 - box.offsetX;
-									entity.x = posX;
-									entity.speedX = 0;*/
                                     stopped = true;
                                     break;
                                 }
@@ -4227,27 +4362,25 @@
                 }
 
                 if (entity.speedY > 0) {
-                    // check every collision on the bottom
-                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
+                    // check every collision on the floor
+                    var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
 
-                    // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
-
-                    //console.log('cellBottom = '+cellBottom+', cellNext = '+cellNext);
+                    // cellNext is the final cell under the entity
+                    var cellNext = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
 
                     if (cellNext > cellBottom) {
 
                         down = true;
 
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellBottom; y <= cellNext; y++) {
                             for (var x = cellLeft; x <= cellRight; x++) {
                                 if (this.block(x, y)) {
                                     this.collisionDown(entity, box, x, y);
                                     /*
-									var posY = this.y + (y) * this.data.tileheight - box.offsetY - box.height - 1;
+									var posY = this.y + (y) * this.levelData.tileheight - box.offsetY - box.height - 1;
 									//console.log('block :: x = '+x+', y = '+y+', poxY = '+posY);
 									console.log('entity posY from ' + entity.y + ' to ' + posY);
 									entity.y = posY;
@@ -4264,32 +4397,23 @@
                         }
                     }
                 } else if (entity.speedY < 0) {
-                    // check every collision on the bottom
-                    var cellTop = Math.floor(box.y / this.data.tileheight);
+                    // check every collision on the ceiling
+                    var cellTop = Math.floor(box.y / this.levelData.tileheight);
 
-                    // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.y + entity.speedY) / this.data.tileheight);
-
-                    //console.log('cellTop = ' + cellTop + ', cellNext = ' + cellNext);
+                    // cellNext is the final cell on the top of the entity
+                    var cellNext = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
 
                     if (cellNext < cellTop) {
 
                         up = true;
 
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellTop; y >= cellNext; y--) {
                             for (var x = cellLeft; x <= cellRight; x++) {
-                                //console.log('level.collision :: x=' + x + ', y=' + y + ', block=' + this.block(x, y));
                                 if (this.block(x, y)) {
                                     this.collisionUp(entity, box, x, y);
-                                    /*
-									var posY = this.y + (y + 1) * this.data.tileheight + 1 - box.offsetY;
-									console.log('entity posY from ' + entity.y + ' to ' + posY);
-									entity.y = posY;
-									entity.speedY = 0;
-									*/
                                     stopped = true;
                                     break;
                                 }
@@ -4300,34 +4424,30 @@
                 }
 
                 if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
-                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellTop)) {
-                        console.log('Double collision right top');
                         this.collisionUp(entity, box, cellRight, cellTop);
                         this.collisionRight(entity, box, cellRight, cellTop);
                     }
                 } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
-                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.data.tilewidth);
-                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellRight, cellBottom)) {
-                        console.log('Double collision right down');
-                        this.collisionDown(entity, box, cellRight, cellBottom);
+                        //this.collisionDown(entity, box, cellRight, cellBottom);
                         this.collisionRight(entity, box, cellRight, cellBottom);
                     }
                 } else if (!down && !left && entity.speedX < 0 && entity.speedY > 0) {
-                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.data.tileheight);
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
+                    var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellBottom)) {
-                        console.log('Double collision left down');
-                        this.collisionDown(entity, box, cellLeft, cellBottom);
+                        //this.collisionDown(entity, box, cellLeft, cellBottom);
                         this.collisionLeft(entity, box, cellLeft, cellBottom);
                     }
                 } else if (!up && !left && entity.speedX < 0 && entity.speedY < 0) {
-                    var cellLeft = Math.floor((box.x + entity.speedX) / this.data.tilewidth);
-                    var cellTop = Math.floor((box.y + entity.speedY) / this.data.tileheight);
+                    var cellLeft = Math.floor((box.x + entity.speedX) / this.levelData.tilewidth);
+                    var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
                     if (this.block(cellLeft, cellTop)) {
-                        console.log('Double collision left up');
                         this.collisionUp(entity, box, cellLeft, cellTop);
                         this.collisionLeft(entity, box, cellLeft, cellTop);
                     }
@@ -4335,20 +4455,18 @@
 
                 if (entity.speedY == 0) {
                     // check if the entity is on ground
-                    var cellBottom = Math.floor((box.y + box.height) / this.data.tileheight);
-                    var cellNext = Math.floor((box.y + box.height + 1) / this.data.tileheight);
+                    var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
+                    var cellNext = Math.floor((box.y + box.height + 1) / this.levelData.tileheight);
                     if (cellNext == cellBottom) {
                         entity.isOnGround = false;
-                        //console.log('entity NOT on ground');
                     } else {
                         entity.isOnGround = false;
-                        var cellLeft = Math.floor(box.x / this.data.tilewidth);
-                        var cellRight = Math.floor((box.x + box.width) / this.data.tilewidth);
+                        var cellLeft = Math.floor(box.x / this.levelData.tilewidth);
+                        var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
                         var stopped = false;
                         for (var y = cellBottom; y <= cellNext; y++) {
                             for (var x = cellLeft; x <= cellRight; x++) {
                                 if (this.block(x, y)) {
-                                    //console.log('entity on ground');
                                     entity.isOnGround = true;
                                     entity.isJumping = false;
                                     entity.isFalling = false;
@@ -4366,49 +4484,302 @@
 
 
             load: function(src) {
-                // destroy other loaded levels @todo
-                //yespix.find('/level').not(this).destroy();
+                this.levelDir = yespix.getDir(src);
+
+                this.canvas = document.createElement('canvas');
+                this.context = this.canvas.getContext('2d');
 
                 yespix.load(src, {
                     'complete': function(e) {
-                        yespix.dump(e);
-
                         var entity = e.entity;
-                        entity.data = JSON.parse(e.content);
+                        var pixelSize = 1;
+                        if (entity.pixelSize && entity.pixelSize > 0) pixelSize = entity.pixelSize;
 
+                        entity.levelData = JSON.parse(e.content);
 
-                        entity.canvas = document.createElement('canvas');
-                        entity.context = entity.canvas.getContext('2d');
+                        entity.levelData.tilewidth = entity.levelData.tilewidth * entity.pixelSize;
+                        entity.levelData.tileheight = entity.levelData.tileheight * entity.pixelSize;
 
-                        var index = 0;
-                        var colors = ['', '', '#ff9900', '#FF0000', '#006600', '#000099'];
+                        entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
+                        entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
 
-                        entity.canvas.width = entity.data.width * entity.data.tilewidth;
-                        entity.canvas.height = entity.data.height * entity.data.tileheight;
+                        entity.width = entity.canvas.width;
+                        entity.height = entity.canvas.height;
 
-                        for (var y = 0; y < entity.data.height; y++) {
-                            for (var x = 0; x < entity.data.width; x++) {
-                                var tileIndex = entity.data.layers[0].data[index];
-                                if (tileIndex > 1) {
-                                    //console.log('x=' + x + ', y=' + y + ', tileIndex=' + tileIndex);
-                                    entity.context.fillStyle = colors[tileIndex];
-                                    entity.context.fillRect(x * entity.data.tilewidth, y * entity.data.tileheight, entity.data.tilewidth, entity.data.tileheight);
-                                }
-                                index++;
+                        entity.buildLevelCollision();
+
+                        if (entity.levelData.layers) {
+                            // load tilesets
+                            var images = [];
+                            var count = entity.levelData.tilesets.length;
+                            for (var t = 0; t < count; t++) {
+                                images.push(entity.levelDir + entity.levelData.tilesets[t].image);
                             }
+                            entity.tilesets = yespix.spawn(
+                                'sprite', {
+                                    registerInstance: false,
+                                    images: images,
+                                    pixelSize: pixelSize,
+                                    spriteWidth: entity.levelData.tilewidth,
+                                    spriteHeight: entity.levelData.tileheight
+                                });
+                            entity.tilesets.on('imageReady', function() {
+                                entity.tilesetsReady();
+                                yespix.level = entity;
+                            }, entity);
+
                         }
-                        entity.isReady = true;
-                        yespix.level = entity;
                     },
                     'entity': this,
                 });
+                return this;
             },
 
-            draw: function(context) {
-                //console.log('level draw');
-                if (!this.isVisible) return;
+            tilesetsReady: function() {
+                if (this._deleting) {
+                    return false;
+                }
 
-                //console.log('level draw #2');
+                // check if all tilesets images are ready
+                if (!this.tilesets.isReady) {
+                    return false;
+                }
+
+                // load layers
+                var layer = null;
+                var count = this.levelData.layers.length;
+
+                for (var t = 0; t < count; t++) {
+                    layer = yespix.spawn('layer');
+                    this.childAdd(layer);
+                    layer.setLevel(this);
+
+                    this.levelData.layers[t].tilewidth = this.levelData.tilewidth;
+                    layer.load(this.levelData.layers[t]);
+                    layer.make();
+                    this.layers.push(layer);
+                }
+                this.ready();
+            },
+
+            follow: function(entity, options) {
+                if (!entity) {
+                    console.error('follow :: invalid entity to follow')
+                    return false;
+                }
+
+                this.childAdd(entity);
+
+                options = options || {};
+                if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;
+                if (yespix.isUndefined(options.positionY)) options.positionY = 0.5;
+                if (yespix.isUndefined(options.speedX)) options.speedX = 1;
+                if (yespix.isUndefined(options.speedY)) options.speedY = 0.02;
+
+                this.followOptions = options;
+
+                if (options.reset) this.followReset(entity);
+
+                entity.on('moveEnd', function(e) {
+                    if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);
+                });
+            },
+
+            followReset: function(entity) {
+                if (!entity.isReady) {
+                    entity.on('entityReady', function() {
+                        this._parent.followReset(this);
+                    });
+                    return false;
+                }
+
+                var delta = this.followEntityDelta(entity);
+                if (delta) {
+                    this.moveTo(this.x + delta.x, this.y + delta.y);
+                    return true;
+                }
+                return false;
+            },
+
+            followEntityDelta: function(entity, context) {
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+                var boxEntity = entity.getDrawBox(true);
+                var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
+                var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;
+                var deltaX = centerX - boxEntity.x - this.x;
+                var deltaY = centerY - boxEntity.y - this.y;
+                if (isNaN(deltaX) && isNaN(deltaY)) return false;
+                return {
+                    x: deltaX,
+                    y: deltaY
+                };
+            },
+
+            followEntity: function(entity, context) {
+                if (!context) {
+                    if (!this._context) {
+                        this.getContext();
+                        if (this._context) context = this._context;
+                    } else context = this._context;
+                }
+                var delta = this.followEntityDelta(entity, context);
+                if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+            },
+
+            unfollow: function() {
+                this.followOptions = null;
+                this.moveStop();
+            },
+
+
+        });
+
+        yespix.define('move', {
+            speedX: 0,
+            speedY: 0,
+            accelX: 0,
+            accelY: 0,
+            moveFriction: 0.05,
+
+            canApplyGravity: true,
+
+            moveStop: function() {
+                this.speedX = this.speedY = this.accelX = this.accelY = 0;
+            },
+
+
+            init: function() {
+                yespix.on('enterFrame', this.move, this, yespix);
+            },
+
+            moveTo: function(x, y) {
+                if (isNaN(x) || isNaN(y)) return false;
+
+                // move children
+                var deltaX = x - this.x,
+                    deltaY = y - this.y;
+
+                //this.moveChildren(deltaX, deltaY);
+
+                // move entity
+                this.x = x;
+                this.y = y;
+            },
+
+            move: function() {
+                this.trigger('moveStart', {
+                    entity: this
+                });
+
+                // apply gravity
+                if (this.canApplyGravity && yespix.gravity) this.applyGravity();
+
+                // apply acceleration
+                this.speedX += this.accelX;
+                this.speedY += this.accelY;
+
+                // apply friction
+                this.speedX *= 1 - this.moveFriction;
+                this.speedY *= 1 - this.moveFriction;
+
+                // apply level collision
+                if (yespix.level) yespix.level.collision(this);
+
+                // apply speed
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // move children
+                //this.moveChildren(this.speedX, this.speedY);
+
+                this.trigger('moveEnd', {
+                    entity: this
+                });
+            },
+
+            /*
+    moveChildren: function(deltaX, deltaY) {
+        var count = 0;
+        if (this._children) count = this._children.length;
+        if (!this._children || this._children.length == 0) return false;
+
+        var t = 0,
+            length = this._children.length;
+
+        for (; t < length; t++) {
+            if (this._children[t].isActive) {
+                if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
+                this._children[t].x += deltaX;
+                this._children[t].y += deltaY;
+            }
+        }
+    },
+    */
+            applyGravity: function() {
+                if (!yespix.gravity) return false;
+                if (!this.isOnGround && yespix.gravity) {
+                    if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
+                    if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
+                }
+            },
+
+        });
+
+        yespix.define('path', 'gfx', {
+
+            lineWidth: 0,
+            lineColor: '',
+            lineAlpha: 1.0,
+
+            fillColor: '',
+            fillAlpha: 1.0,
+
+            isVisible: true,
+
+            init: function() {},
+
+            canDraw: function() {
+                return this.isVisible && this.alpha > 0;
+            },
+
+            canDrawPath: function() {
+                return true;
+            },
+
+            drawPath: function(context, box) {
+
+            },
+
+            canDrawLine: function() {
+                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+            },
+
+            drawLine: function(context, box) {
+                this.drawAlpha(context, 'line');
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                context.stroke();
+            },
+
+            canDrawFill: function() {
+                return this.fillColor != '' && this.fillAlpha > 0;
+            },
+
+            drawFill: function(context, box) {
+                this.drawAlpha(context, 'fill');
+                context.fillStyle = this.fillColor;
+                context.fill();
+            },
+
+
+            draw: function(context) {
+                if (!this.canDraw()) return;
+
                 if (!context) {
                     if (!this._context) {
                         this.getContext();
@@ -4416,20 +4787,13 @@
                     } else context = this._context;
                 }
 
-                //console.log('level draw #3 context = '+context+', isReady = '+this.isReady);
-                if (context && this.isReady) {
-                    context.globalAlpha = this.alpha;
-                    //console.log('level draw #4');
-                    context.drawImage(this.canvas, //image element
-                        0, // x position on image
-                        0, // y position on image
-                        this.canvas.width, // width on image
-                        this.canvas.height, // height on image
-                        0, // x position on canvas
-                        0, // y position on canvas
-                        this.canvas.width, // width on canvas
-                        this.canvas.height // height on canvas
-                    );
+                var box = this.getDrawBox();
+
+                if (context) {
+                    if (this.canDrawPath()) this.drawPath(context, box);
+                    if (this.canDrawFill()) this.drawFill(context, box);
+                    if (this.canDrawLine()) this.drawLine(context, box);
+                    if (this.canDrawDebug()) this.drawDebug(context, box);
                 }
             },
         });
@@ -4499,9 +4863,9 @@
                         this.animNext = 'air' + this.actorDirection;
                         this.isJumping = true;
                         this.jumpTime = (new Date).getTime();
-                        console.log('this.jumpTime = ' + this.jumpTime);
+                        //                console.log('this.jumpTime = ' + this.jumpTime);
                     } else if (this.isJumping) {
-                        console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
+                        //                console.log('jumpTime = ' + this.jumpTime + ', now = ' + ((new Date).getTime()) + ', +400 ? ' + (this.jumpTime + 400 > (new Date).getTime()));
                         if (this.jumpTime + 200 > (new Date).getTime() && yespix.key(this.actorKeys.jump)) {
                             this.accelY = -(this.actorSpeedJump / 6);
                             //this.accelY = 0;
@@ -4548,105 +4912,78 @@
 
         });
 
-        yespix.define('rect', 'gfx', {
-
-            lineWidth: 0,
-            lineColor: '#000000',
-            rectColor: '#999999',
-            isVisible: true,
+        yespix.define('rect', 'path', {
 
             init: function() {},
 
-            draw: function(context) {
-                if (!this.isVisible) return;
-
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
-
-                var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
-
-                if (context) {
-                    context.globalAlpha = this.alpha;
-
-                    if (this.rectColor !== '') {
-                        context.fillStyle = this.rectColor;
-                        context.fillRect(
-                            box.x, // x position on canvas
-                            box.y, // y position on canvas
-                            box.width, // width on canvas
-                            box.height // height on canvas
-                        );
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        context.strokeRect(box.x, box.y, box.width, box.height);
-                    }
-
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
+            drawFill: function(context, box) {
+                context.fillStyle = this.fillColor;
+                context.fillRect(
+                    this.x, // x position on canvas
+                    this.y, // y position on canvas
+                    this.width, // width on canvas
+                    this.height // height on canvas
+                );
             },
 
+            drawLine: function(context, box) {
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                context.strokeRect(box.x, box.y, box.width, box.height);
+            }
         });
 
         yespix.define('roundrect', 'rect', {
 
-            rectRadius: 5,
+            borderRadius: 5,
 
             init: function() {},
 
-            drawPath: function(context) {
-                context.beginPath();
-                context.moveTo(this.x + this.rectRadius, this.y);
-                context.lineTo(this.x + this.width - this.rectRadius, this.y);
-                context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + this.rectRadius);
-                context.lineTo(this.x + this.width, this.y + this.height - this.rectRadius);
-                context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - this.rectRadius, this.y + this.height);
-                context.lineTo(this.x + this.rectRadius, this.y + this.height);
-                context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - this.rectRadius);
-                context.lineTo(this.x, this.y + this.rectRadius);
-                context.quadraticCurveTo(this.x, this.y, this.x + this.rectRadius, this.y);
+            getBorderRadius: function() {
+                if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
+                if (this.height < this.width) return this.height / 2;
+                return this.width / 2;
             },
 
-            draw: function(context) {
-                if (!this.isVisible) return;
+            drawPath: function(context) {
+                var radius = this.getBorderRadius();
+                context.beginPath();
+                context.moveTo(this.x + radius, this.y);
+                context.lineTo(this.x + this.width - radius, this.y);
+                context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + radius);
+                context.lineTo(this.x + this.width, this.y + this.height - radius);
+                context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height);
+                context.lineTo(this.x + radius, this.y + this.height);
+                context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - radius);
+                context.lineTo(this.x, this.y + radius);
+                context.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
+            },
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+            drawLine: function(context, box) {
+                this.drawAlpha(context, 'line');
+                context.stroke();
+            },
 
-                var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
+            drawFill: function(context, box) {
+                this.drawAlpha(context, 'fill');
+                context.fill();
+            },
 
-                if (context) {
-                    context.globalAlpha = this.alpha;
-                    if (this.rectColor != '') {
-                        context.fillStyle = this.rectColor;
-                        this.drawPath(context);
-                        context.fill();
-                    }
-                    if (this.lineWidth > 0 && this.lineColor != '') {
-                        context.lineWidth = this.lineWidth;
-                        context.strokeStyle = this.lineColor;
-                        if (this.rectColor == '') this.drawPath(context);
-                        context.stroke();
-                    }
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
+        });
+
+        yespix.define('scene', {
+            sceneOptions: null,
+            document: null,
+
+            init: function(options) {
+                this.create(options);
+            },
+
+            create: function(options) {
+                options = options || {};
+                options.document = options.document || yespix.document;
+
+                this.sceneOptions = options;
             },
 
         });
@@ -4944,6 +5281,45 @@
                 };
 
             },
+        });
+
+        yespix.define('sprite', 'image', {
+
+            spriteWidth: 32,
+            spriteHeight: 32,
+
+            getSpriteCount: function(imageIndex) {
+                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+                var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
+                var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
+                return cols * rows;
+            },
+
+            getSpriteImage: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return this.images[t];
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            },
+
+            getSpriteImageIndex: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return globalIndex;
+                    globalIndex = globalIndex - count;
+                }
+                //        console.log('getSpriteImage :: not found');
+                return false;
+            }
+
         });
 
         yespix.define('text', 'gfx', {

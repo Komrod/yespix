@@ -11,7 +11,9 @@ yespix.define('actor', 'anim, move, collision', {
     actorDirection: '',
     actorAnims: {},
     actorInit: function(options) {},
-    init: function() {},
+    init: function() {
+
+    },
 
     applyFriction: function() {
         this.speedX *= (1 - this.moveFriction);

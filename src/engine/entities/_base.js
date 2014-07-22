@@ -56,6 +56,21 @@
 		    _parent: null,
 
 		    /**
+		     * Set True when the entity deletion is in progress
+		     * @property _deleting
+		     * @type boolean
+		     */
+		    _deleting: false,
+
+		    /**
+		     * Set True if the entity instance was added to the global YESPIX entity list
+		     * @property _instanceExists
+		     * @type boolean
+		     * @default true
+		     */
+		    _instanceExists: false,
+
+		    /**
 		     * Set True if the entity is active
 		     * @property isActive
 		     * @type boolean
@@ -86,21 +101,59 @@
 		     */
 		    name: '',
 
+		    /**
+		     * Register instance in the engine when spawned
+		     */
+		    registerInstance: true,
+
+		    /**
+		     * Set to True if the entity must be unique (only one instance)
+		     * @property isUnique
+		     * @type boolean
+		     * @default false
+		     */
+		    isUnique: false,
+
+		    /**
+		     *
+		     */
+
+
+		    readyFunctions: [],
 
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
 		    /**
-		     * Return the array of assets used for the entity. The original code of the function is called for the class name of the entity and each ancestor classes
+		     * Return the array of assets used for the entity. The original code of the function is called for
+		     * the class name of the entity and each ancestor classes
 		     */
 		    assets: function() {
 		        return [];
 		    },
 
 		    /**
-		     * Initilize the entity object. The original code of the function is called for the class name of the entity and each ancestor classes
+		     * Initilize the entity object. The original code of the function is called for the class name of
+		     * the entity and each ancestor classes
 		     */
 		    init: function(properties) {
+		        this.readyFunctions = [];
+		        this.on('spawn', this.checkReadyState);
 		        return true;
+		    },
+
+		    checkReadyState: function() {
+		        for (var t = 0; t < this.readyFunctions.length; t++) {
+		            if (!this.readyFunctions[t].apply(this)) {
+		                return false;
+		            }
+		        }
+		        this.ready();
+		        return true;
+		    },
+
+		    ready: function() {
+		        this.isReady = true;
+		        this.trigger('entityReady');
 		    },
 
 		    ancestor: function(name) {
@@ -134,20 +187,25 @@
 		        var entity = yespix.clone(this);
 		        entity._id = yespix.entityNextId++;
 		        if (properties) entity.prop(properties);
-		        entity._instances = null;
+		        entity._instances = false;
 		        yespix.dump(yespix.entityInstances);
 		        yespix.instanceAdd(entity);
 		        yespix.dump(yespix.entityInstances);
 		        return entity;
 		    },
 
-		    attach: function(entity) {
-		        yespix.attach(this, entity);
+		    childAdd: function(entity) {
+		        yespix.childAdd(this, entity);
 		        return this;
 		    },
 
-		    detach: function(entity) {
-		        yespix.detach(this, entity);
+		    setParent: function(entity) {
+		        yespix.childAdd(entity, this);
+		        return this;
+		    },
+
+		    childRemove: function(entity) {
+		        yespix.childRemove(this, entity);
 		        return this;
 		    },
 
@@ -157,12 +215,12 @@
 		    },
 
 		    on: function(name, callback) {
-		        yespix.on(name, callback, this);
+		        yespix.on(name, callback, this, this);
 		        return this;
 		    },
 
 		    off: function(name, callback) {
-		        yespix.off(name, callback, this);
+		        yespix.off(name, callback, this, this);
 		        return this;
 		    },
 
@@ -178,11 +236,13 @@
 
 		        if (this._children) {
 		            for (var t = 0; t < this._children.length; t++) {
-		                if (this._children[t] && !this._children[t].deleting) {
+		                if (this._children[t] && !this._children[t]._deleting) {
+		                    //console.log('base :: destroy :: destroying child t='+t);
 		                    this._children[t].destroy();
 		                }
 		            }
 		        }
+		        this._children = null;
 
 		        yespix.instanceRemove(this);
 		        return this;

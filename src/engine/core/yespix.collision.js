@@ -5,9 +5,11 @@
 
 /**
  * clear the collision map
+ * @chainable
  */
 yespix.fn.collisionClear = function() {
     this.data.collisionMap = [];
+    return this;
 };
 
 /**
@@ -18,6 +20,7 @@ yespix.fn.collisionCellSize = function(size) {
     if (size < 1) size = 32;
     this.collisionSize = size;
     this.collisionClear();
+    return this;
 };
 
 /**
@@ -38,6 +41,7 @@ yespix.fn.collisionCell = function(x, y, type) {
 
 /**
  * Add the entity in the collision map according to the collision box
+ * @chainable
  * @todo shouldnt always be a box (cirle, elipse ...)
  * @todo multiple box for an entity
  */
@@ -49,18 +53,16 @@ yespix.fn.collisionOccupy = function(entity) {
     var cellY = minCellY = Math.floor(box.y / this.collisionSize);
     var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
     var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
-    //if (this.key(' ')) this.dump(box, 'collisionOccupy :: box for entity "' + entity.name + '"');
-    //if (this.key(' ')) console.log('collisionOccupy :: minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
 
     while (cellX <= maxCellX) {
         cellY = minCellY;
         while (cellY <= maxCellY) {
-            //if (this.key(' ')) console.log('collisionOccupy :: cellX = ' + cellX + ', cellY = ' + cellY);
             this.collisionAdd(entity, cellX, cellY);
             cellY++;
         }
         cellX++;
     }
+    return this;
 };
 
 yespix.fn.collisionAdd = function(entity, x, y, type) {
@@ -73,19 +75,14 @@ yespix.fn.collisionAdd = function(entity, x, y, type) {
     if (!line) {
         line = this.data.collisionMap[x] = [];
         line[y] = [entity];
-        //if (this.key(' ')) console.log('collisionAdd :: new line');
-        //if (this.key(' ')) console.log('collisionAdd :: final entity count 1');
-        return true;
+        return this;
     }
     if (!line[y]) {
         line[y] = [];
-        if (this.key(' ')) console.log('collisionAdd :: new column, final entity count 1');
     }
     line[y].push(entity);
-    if (this.key(' ')) console.log('collisionAdd :: before unique count ' + line[y].length);
     this.unique(line[y]);
-    if (this.key(' ')) console.log('collisionAdd :: final entity count ' + line[y].length);
-    return true;
+    return this;
 };
 
 yespix.fn.collisionCheck = function(entity1, entity2) {
@@ -139,13 +136,14 @@ yespix.fn.collisionInside = function(entity1, entity2) {
     return false;
 };
 
+/**
+ * @chainable
+ */
 yespix.fn.collision = function(entity) {
-    //if (this.key(' ')) console.log('check collision for entity "' + entity.name + '"');
     var entities = []; // store checked entities to check for collision only once
 
     var box = entity.collisionBox();
     if (box.width <= 0 || box.height <= 0) {
-        //if (this.key(' ')) console.log('no collision box');
         return;
     }
     var cellX = minCellX = Math.floor(box.x / this.collisionSize);
@@ -153,19 +151,13 @@ yespix.fn.collision = function(entity) {
     var maxCellX = Math.floor((box.x + box.width) / this.collisionSize);
     var maxCellY = Math.floor((box.y + box.height) / this.collisionSize);
 
-    //if (this.key(' ')) console.log('minCellX = ' + minCellX + ', minCellY = ' + minCellY + ', maxCellX = ' + maxCellX + ', maxCellY = ' + maxCellY);
     while (cellX <= maxCellX) {
-        //if (this.key(' ')) console.log('cellX = ' + cellX);
         cellY = minCellY;
         while (cellY <= maxCellY) {
-            //if (this.key(' ')) console.log('cellY = ' + cellY);
             var cell = this.collisionCell(cellX, cellY);
-            //if (this.key(' ')) console.log(cell.length + ' entities in cell ' + cellX + ', ' + cellY);
             for (var t = 0; t < cell.length; t++) {
                 if (cell[t] !== entity && !this.inArray(entities, cell[t])) {
-                    //if (this.key(' ')) console.log('collision t=' + t + ', cw = ' + entity.collisionWith(cell[t]) + ', cc = ' + this.collisionCheck(entity, cell[t]));
                     if (entity.collisionWith(cell[t]) && this.collisionCheck(entity, cell[t])) {
-                        //console.log('trigger collide on entity "' + entity.name + '"');
                         entity.trigger('collide', {
                             entity: cell[t]
                         });
@@ -177,5 +169,5 @@ yespix.fn.collision = function(entity) {
         }
         cellX++;
     }
-
+    return this;
 };

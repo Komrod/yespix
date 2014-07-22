@@ -1,49 +1,82 @@
+
 TODO list:
 
+- actor2w disociate speed and direction
+- level follow change position relative to entity speed
+- auto attach every entity to the current level
+- make layer a general empty drawable canvas (view), put the old layer level build on the level entity
+- create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
-- fix bug collision between entities
-- Make an entity dump where you can see where properties come from
+- on actor entity, make walk animation speed progressive
+- fix collision between entities
 - Make a basic Zombie Sim
-- tag version 0.14
-- limit image draw to visible canvas when an image try to draw partialy outside the canvas
+- tag version 0.1.4
+- remove entity._instances array = obsolete
+- limit image draw to visible canvas when an image try to draw partially outside the canvas
 - animate properties
 - tiled level import
 - draw text
 - draw polygon, line, circle, elipse, star
-- tag version 0.15
+- tag version 0.1.5
 - draw SVG image
 - rotation
 - parent position and rotation affect children
 - Make an Arkanoid game
-- tag version 0.16
+- tag version 0.1.6
 - font from image
 - typewritter: text showing letter by letter with sound
 - panel
 - button
 - Add fillAlpha and lineAlpha in rect entity
 - Make a Steel Sky game (raiden like)
-- tag version 0.17
+- tag version 0.1.7
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
 - function keyCapture() stops the propagation of the pressed key
-- tag version 0.18
+- tag version 0.1.8
 - Bunch must concat, splice, push with arrays
 - create temporary class with space, not only with "," like yespix.spawn('rect move')
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
-- tag version 0.19
+- tag version 0.1.9
 - Create a function to add / remove modules
 - Create a DEV trunk and separate modules with entity definitions
 - Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
-- Make a
-- tag version 0.20
+- tag version 0.2
+- Make the Chuck game
+
+
+LATER:
+- option collisionAtBorders that avoid entities to get out of the level
+- option stopAtBorders that makes the level follow stops at level border
 
 
 DONE:
+- set a pixelSize for the level
+- fix level collision loop when outside level
+- fix parallax layers
+- handle gid and multiple tileset on level // 2014-07-18
+- handle tileset with multiple lines
+- follow reset when entity is ready
+- fix level collision with floor after jump, make children position relative to parent
+- fix level collision when level is not at (0,0)
+- fix layer opacity // 2014-06-30
+- fix player get throught floor on high gravity
+- entity.isReady set True when all entity files loaded and entityReady event launch
+- fix follow big level
+- level follow an entity
+- parallax layer // 2014-06-25
+- getDrawBox sometimes get x and y as NaN on actor2w
+- move level view, make attached entities move on parent move
+- fix level collision on level position // 2014-06-23
+- property entityUnique True to be sure that only one instance of the entity is spawned
+- multiple layer level
+- layer alpha and type (decor)
+- Add path entity for objects
 - unit test: instanciation
 - make examples work
 - unit test: general function
@@ -99,7 +132,7 @@ PENDING:
 - do real js classes with prototype for entity classes
 - do a partial draw for each gfx entities
 - prerender canvas for the partial draw
-- function xload which try to do something with the loaded file (execute a .js script, add .css file to document ...)
+- function xload which try to execute an action depending the extension of the loaded file (execute a .js script, add .css file to document ...)
 
 
 

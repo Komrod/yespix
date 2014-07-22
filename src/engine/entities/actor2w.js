@@ -63,6 +63,12 @@
             init: function() {},
 
             move: function() {
+                if (this._parent && !this._parent.isReady) return false;
+
+                this.trigger('moveStart', {
+                    entity: this
+                });
+
                 this.speedX += this.accelX;
                 this.speedY += this.accelY;
 
@@ -72,12 +78,15 @@
                 if (yespix.level) yespix.level.collision(this);
                 this.x += this.speedX;
                 this.y += this.speedY;
+
+                this.trigger('moveEnd', {
+                    entity: this
+                });
             },
 
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
-                    //console.log('this.isOnGround = ' + this.isOnGround + ', apply gravity')
                     if (yespix.gravity.x) this.speedX += yespix.gravity.x / 20;
                     if (yespix.gravity.y) this.speedY += yespix.gravity.y / 20;
                 }

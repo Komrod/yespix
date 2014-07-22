@@ -216,9 +216,8 @@ yespix.fn.load = function(fileList, complete, options) {
                     state: file.state,
                     url: file.url,
                     file: file,
-                    entity: options['entity'],
+                    //                    entity: options['entity'],
                 };
-                console.log('file.options.entity: ' + file.options.entity);
 
                 // loop inside file.options
                 if (file.options)
@@ -296,6 +295,7 @@ yespix.fn.load = function(fileList, complete, options) {
                         // executes error and complete functions
                         for (var t = 0; t < this.file.options.length; t++) {
                             newEvent.stat = this.file.options[t].stat;
+                            if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                             newEvent.type = 'error';
                             this.file.options[t]['error'](newEvent);
                             newEvent.type = 'complete';
@@ -308,6 +308,7 @@ yespix.fn.load = function(fileList, complete, options) {
                     // executes success and complete functions
                     newEvent.state = file.state = 'loaded';
                     for (var t = 0; t < this.file.options.length; t++) {
+                        if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                         newEvent.stat = this.file.options[t].stat;
                         newEvent.type = 'success';
                         this.file.options[t]['success'](newEvent);
@@ -326,6 +327,7 @@ yespix.fn.load = function(fileList, complete, options) {
                     newEvent.type = 'progress';
                     for (var t = 0; t < this.file.options.length; t++) {
                         newEvent.stat = this.file.options[t].stat;
+                        if (this.file.options[t].entity) newEvent.entity = this.file.options[t].entity
                         this.file.options[t]['progress'](newEvent);
                     }
                 }
@@ -461,11 +463,9 @@ yespix.fn.css = function(fileList, complete, options) {
 
             var interval_id = setInterval(function() { // start checking whether the style sheet has successfully loaded
                     try {
-                        //console.log('len = '+s[sheet][cssRules].length);
                         if (s[sheet] && s[sheet][cssRules].length) { // SUCCESS! our style sheet has loaded
                             clearInterval(interval_id); // clear the counters
                             clearTimeout(timeout_id);
-                            //console.log('addcss :: load link success');
                             complete(e);
                         }
                     } catch (e) {} finally {}
@@ -481,9 +481,7 @@ yespix.fn.css = function(fileList, complete, options) {
     } else {
         var token = 0;
         options['complete'] = function(e) {
-            //						console.log('complete::: token ='+token+', url = '+fileList[token]);
             if (fileList[token] == e.url) {
-                //console.log('complete css '+e.file);
                 var s = document.createElement('link');
                 s.type = 'text/css';
                 s.rel = 'stylesheet';

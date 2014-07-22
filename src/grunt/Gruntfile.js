@@ -51,7 +51,8 @@ module.exports = function(grunt) {
             },
             out: {
                 src: [
-                    '../engine/core/*.js'
+                      '../engine/core/*.js',
+                      '../engine/entities/*.js'
                 ]
             }
         },
@@ -116,7 +117,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: ['../engine/**/*.js'],
+                files: ['../engine/core/*.js', '../engine/entities/*.js'],
                 tasks: ['default'],
                 options: {
                     spawn: false,

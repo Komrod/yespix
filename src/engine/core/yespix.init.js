@@ -270,7 +270,7 @@ yespix.fn.init = function(options) {
             }
 
             // change the drawEntities because some entity instances have been added or removed
-            if (yespix.drawEntitiesChange) {
+            if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                 yespix.drawEntities = yespix.entityInstances['/gfx'];
                 if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
                 yespix.drawEntitiesChange = false;
@@ -342,7 +342,6 @@ yespix.fn.init = function(options) {
 
         // triggers on YESPIX engine
         yespix.trigger(e.type, e);
-        console.log('trigger ' + e.type);
         //return false;
     };
 
@@ -398,7 +397,6 @@ yespix.fn.init = function(options) {
      * blur
      */
     document.onblur = function(e) {
-        //console.log('blur');
         yespix.data.key.pressed = {};
         yespix.data.key.hold = {};
         yespix.data.key.down = {};

@@ -18,13 +18,15 @@ yespix.define('gfx', {
     _flipX: false,
     _flipY: false,
 
+    debugAlpha: 1,
+
     ///////////////////////////////// Main functions ////////////////////////////////
 
     asset: function() {
         return [];
     },
 
-    // initilize object
+    // initilize entity
     init: function() {
 
         yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
@@ -34,59 +36,75 @@ yespix.define('gfx', {
         return true;
     },
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
+    getPosition: function(relative) {
+        if (relative || !this._parent) {
+            return {
+                x: this.x,
+                y: this.y
+            };
         } else {
-            var x = this.x;
-            var y = this.y;
+            var position = this._parent.getPosition();
+            if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
+            if (position) return {
+                x: this.x + position.x,
+                y: this.y + position.y
+            };
         }
-        var width = this.width;
-        var height = this.height;
+        return {
+            x: this.x,
+            y: this.y
+        };
+    },
 
-        if (this.typeof('image')) {
-            var img = this.image(this.imageSelected);
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        } else if (this.typeof('anim')) {
-            var img = this.image(this.imageSelected);
-            width = this.width || img.width || img.realWidth;
-            height = this.height || img.height || img.realHeight;
-        }
+    getDrawBox: function(relative) {
+        var position = this.getPosition(relative);
 
         return {
-            x: x,
-            y: y,
-            width: width,
-            height: height
+            x: position.x,
+            y: position.y,
+            width: this.width,
+            height: this.height,
+            type: this._class
         };
     },
 
     getContext: function() {
         if (this._context) return this._context;
-        if (this._parent == null) {
-            var canvas = yespix.find('.canvas')[0];
-            if (!this._context && canvas) this._context = canvas.context;
-        }
+        var canvas = yespix.find('.canvas')[0];
+        if (canvas) this._context = canvas.context;
         return this._context;
     },
 
-    drawDebug: function (context, box)
-    {
-    	if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
-    	if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
-    	if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
-    	if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+    draw: function() {
+        if (this.canDrawDebug()) this.drawDebug();
     },
 
-    drawDebugPosition: function(context, drawBox)
-    {
+    drawAlpha: function(context, type) {
+        if (!type) {
+            context.globalAlpha = this.alpha;
+        } else {
+            if (!this[type + 'Alpha']) context.globalAlpha = 0;
+            else context.globalAlpha = this.alpha * this[type + 'Alpha'];
+        }
+    },
+
+    canDrawDebug: function() {
+        return this.debug;
+    },
+
+    drawDebug: function(context, box) {
+        this.drawAlpha(context, 'debug');
+        if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
+        if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
+        if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
+        if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+    },
+
+    drawDebugPosition: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
-        context.globalAlpha = 1;
         context.lineWidth = 0.5;
         context.strokeStyle = "#ff1111";
         context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
     },
-    
+
 });

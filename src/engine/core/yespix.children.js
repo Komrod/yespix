@@ -4,35 +4,50 @@
  */
 
 /**
- * @todo  moving rotating the parent will affect the children
+ * @todo  rotating the parent will affect the children
  * @param {entity} parent The parent
  * @param {entity|array} child An entity to attached or an array of entities
- * @example attach(entity1, entity2) attaches entity2 to entity1
- * @example attach(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
+ * @example childAdd(entity1, entity2) attaches entity2 to entity1
+ * @example childAdd(entity1, [entity2, entity3 ...]) attaches multiple entities to entity1
  */
-yespix.fn.attach = function(parent, child) {
-    // multiple children
-    if (this.isArray(child)) {
-        for (var t = 0; t < child.length; t++) this.attach(parent, child[t]);
+yespix.fn.childAdd = function(parent, child) {
+
+    if (!parent) {
+        console.warn('childAdd :: cannot add child, parent undefined');
+        return this;
+    }
+    if (!child) {
+        console.warn('childAdd :: cannot add child, child undefined');
         return this;
     }
 
-    // try to attach an entity already attached to the parent
-    if (child._parent == parent) return null;
+    // multiple children
+    if (this.isArray(child)) {
+        for (var t = 0; t < child.length; t++) this.childAdd(parent, child[t]);
+        return this;
+    }
 
-    // attach
+    // try to childAdd an entity already attached to the parent
+    if (child && !child._parent == parent) return null;
+
+    // childAdd
     if (!parent._children) parent._children = [child];
     else parent._children.push(child);
 
-    if (child._parent) this.detach(child._parent, child);
+    if (child._parent) this.childRemove(child._parent, child);
     child._parent = parent;
     return this;
 };
 
-yespix.fn.detach = function(parent, child) {
+yespix.fn.childRemove = function(parent, child) {
+    if (!parent) {
+        console.warn('childRemove :: cannot remove child, parent undefined');
+        return this;
+    }
+
     var t;
 
-    // detach everything 
+    // childRemove everything 
     if (!child) {
         if (parent._children) {
             for (t = 0; t < parent._children.length; t++) parent._children[t]._parent = null;
@@ -41,16 +56,16 @@ yespix.fn.detach = function(parent, child) {
         return this;
     }
 
-    // detach all the children
+    // childRemove all the children
     if (this.isArray(child)) {
-        for (t = 0; t < child.length; t++) this.detach(parent, child[t]);
+        for (t = 0; t < child.length; t++) this.childRemove(parent, child[t]);
         return this;
     }
 
-    // try to detach an entity already detached
+    // try to childRemove an entity already detached
     if (child._parent != parent) return null;
 
-    // detach one child
+    // childRemove one child
     child._parent = null;
     for (t = 0; t < parent._children.length; t++)
         if (parent._children[t] == child) {

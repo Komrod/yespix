@@ -29,8 +29,6 @@ yespix.fn.timerStart = function() {
             };
     })();
 
-    //console.log('timer.start, onFrame = '+this.onFrame);
-
     this.frameMs = 1000 / this.fps;
     var yespix = this;
     this.frameTick = function() {
@@ -74,8 +72,6 @@ yespix.fn.timerStep = function() {
         });
 
         this.collisionClear();
-        //console.log('collision length = '+this.find('/collision').length);
-        //				this.dump(this.find('/collision'), 'find(/collision)');
         var list = this.find('/collision');
         if (list.length > 0) list.collisionOccupy().collision();
 
