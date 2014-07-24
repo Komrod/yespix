@@ -53,7 +53,7 @@ TODO list:
 LATER:
 - option collisionAtBorders that avoid entities to get out of the level
 - option stopAtBorders that makes the level follow stops at level border
-
+- bug with pixelSize level from 3 and up
 
 DONE:
 - set a pixelSize for the level
