@@ -38,9 +38,15 @@ yespix.define('player2w', 'actor2w', {
         yespix.on('enterFrame', function() {
             var move = '';
 
-            if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
-            else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
-            else this.accelX = 0;
+            if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right))
+            {
+                this.actorDirection = 'left';
+                this.accelX = -this.actorSpeed;
+            } else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) 
+            {
+                this.actorDirection = 'right';
+                this.accelX = this.actorSpeed;
+            } else this.accelX = 0;
 
             //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
             //console.log('isOnGround = '+this.isOnGround+'');
@@ -73,10 +79,8 @@ yespix.define('player2w', 'actor2w', {
             } else this.accelY = 0;
 
             if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
-                this.actorDirection = 'right';
                 if (this.isOnGround) move = 'walk';
             } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
-                this.actorDirection = 'left';
                 if (this.isOnGround) move = 'walk';
             }
             if (!this.isOnGround) {
