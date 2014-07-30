@@ -1,9 +1,7 @@
 
 TODO list:
 
-- actor2w disociate speed and direction
 - level follow change position relative to entity speed
-- auto attach every entity to the current level
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
@@ -55,7 +53,10 @@ LATER:
 - option stopAtBorders that makes the level follow stops at level border
 - bug with pixelSize level from 3 and up
 
+
 DONE:
+- auto attach every entity with childAdd() to the current level
+- actor2w disociate speed and direction // 2014-07-28
 - set a pixelSize for the level
 - fix level collision loop when outside level
 - fix parallax layers
