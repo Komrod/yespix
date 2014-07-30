@@ -185,9 +185,9 @@
 				return yespix.hasAncestors(this._class, ancestors);
 		    },
 
-		    hasClass: function(class)
+		    hasClass: function(_class)
 		    {
-				return this._class === class;
+				return this._class === _class;
 		    },
 
 		    /**
