@@ -1,7 +1,9 @@
 
 TODO list:
 
+- fix follow reset when level is not ready
 - level follow change position relative to entity speed
+- smooth move on camera position change
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - create a sprite entity from anim enity
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
