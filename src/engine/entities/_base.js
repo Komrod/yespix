@@ -180,6 +180,16 @@
 		        return this;
 		    },
 
+		    hasAncestors: function(ancestors)
+		    {
+				return yespix.hasAncestors(this._class, ancestors);
+		    },
+
+		    hasClass: function(class)
+		    {
+				return this._class === class;
+		    },
+
 		    /**
 		     * Clone an entity
 		     */
