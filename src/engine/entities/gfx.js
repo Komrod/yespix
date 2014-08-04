@@ -18,7 +18,14 @@ yespix.define('gfx', {
     _flipX: false,
     _flipY: false,
 
-    debugAlpha: 1,
+    debugAlpha: 1.0,
+
+    debugPosition: true,
+    debugImage: true,
+    debugCollision: true,
+    debugMove: true,
+
+
 
     ///////////////////////////////// Main functions ////////////////////////////////
 
@@ -79,11 +86,12 @@ yespix.define('gfx', {
         if (this.canDrawDebug()) this.drawDebug();
     },
 
-    drawAlpha: function(context, type) {
+    drawAlpha: function(context, type, doNotUseGlobal) {
         if (!type) {
             context.globalAlpha = this.alpha;
         } else {
             if (!this[type + 'Alpha']) context.globalAlpha = 0;
+            else if (doNotUseGlobal) context.globalAlpha = this[type + 'Alpha'];
             else context.globalAlpha = this.alpha * this[type + 'Alpha'];
         }
     },
@@ -92,19 +100,36 @@ yespix.define('gfx', {
         return this.debug;
     },
 
+    canDrawDebugPosition: function() {
+        return yespix.isFunction(this.drawDebugPosition) && this.debugPosition;
+    },
+
+    canDrawDebugImage: function() {
+        return yespix.isFunction(this.drawDebugImage) && this.debugImage;
+    },
+
+    canDrawDebugCollision: function() {
+        return yespix.isFunction(this.drawDebugCollision) && this.debugCollision;
+    },
+
+    canDrawDebugMove: function() {
+        return yespix.isFunction(this.drawDebugMove) && this.debugMove;
+    },
+
     drawDebug: function(context, box) {
-        this.drawAlpha(context, 'debug');
-        if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
-        if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
-        if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
-        if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+        this.drawAlpha(context, 'debug', true);
+        if (this.canDrawDebugPosition()) this.drawDebugPosition(context, box);
+        if (this.canDrawDebugImage()) this.drawDebugImage(context, box);
+        if (this.canDrawDebugCollision()) this.drawDebugCollision(context, box);
+        if (this.canDrawDebugMove()) this.drawDebugMove(context, box);
     },
 
     drawDebugPosition: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
         context.lineWidth = 0.5;
         context.strokeStyle = "#ff1111";
-        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+        context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);
+        console.log(box);
     },
 
 });

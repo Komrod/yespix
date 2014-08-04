@@ -378,7 +378,7 @@ yespix.define('level', 'gfx,move', {
 
         this.followOptions = options;
 
-        if (options.reset) this.followReset(entity);
+        if (options.resetOnStart) this.followReset(entity);
 
         entity.on('moveEnd', function(e) {
             if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);
