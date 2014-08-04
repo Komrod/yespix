@@ -1,7 +1,6 @@
 
 TODO list:
 
-- fix follow reset when level is not ready
 - level follow change position relative to entity speed
 - smooth move on camera position change
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
@@ -9,12 +8,15 @@ TODO list:
 - make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - on actor entity, make walk animation speed progressive
+- stop and resume time
+- slow time
 - fix collision between entities
 - Make a basic Zombie Sim
 - tag version 0.1.4
 - remove entity._instances array = obsolete
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - animate properties
+- create moveOnGround() for actor, set position on ground on startUp
 - tiled level import
 - draw text
 - draw polygon, line, circle, elipse, star
@@ -57,6 +59,7 @@ LATER:
 
 
 DONE:
+- fix follow reset when level is not ready // 2014-08-04
 - auto attach every entity with childAdd() to the current level
 - actor2w disociate speed and direction // 2014-07-28
 - set a pixelSize for the level
