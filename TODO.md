@@ -1,15 +1,13 @@
 
 TODO list:
 
+- create a sprite entity from anim enity
 - level follow change position relative to entity speed
 - smooth move on camera position change
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- create a sprite entity from anim enity
-- make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
 - make a debug panel where you can change variables and see entities
 - on actor entity, make walk animation speed progressive
 - stop and resume time
-- slow time
 - fix collision between entities
 - Make a basic Zombie Sim
 - tag version 0.1.4
@@ -50,15 +48,19 @@ TODO list:
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - tag version 0.2
 - Make the Chuck game
-
+- slow time
+- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
 
 LATER:
+- make drawDebugImage(), drawDebugCollision(), drawDebugMove()
+- draw debug ignore general alpha value of entity
 - option collisionAtBorders that avoid entities to get out of the level
 - option stopAtBorders that makes the level follow stops at level border
 - bug with pixelSize level from 3 and up
 
 
 DONE:
+- make drawDebug(), drawDebugPosition()
 - fix follow reset when level is not ready // 2014-08-04
 - auto attach every entity with childAdd() to the current level
 - actor2w disociate speed and direction // 2014-07-28
