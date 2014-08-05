@@ -127,9 +127,17 @@ yespix.define('gfx', {
     drawDebugPosition: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
         context.lineWidth = 0.5;
-        context.strokeStyle = "#ff1111";
+        context.strokeStyle = "#cc3333";
         context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);
-        console.log(box);
+
+        context.strokeStyle = "#ff0000";
+        context.beginPath();
+        context.moveTo(box.x - 2, box.y - 2);
+        context.lineTo(box.x + 2, box.y + 2);
+        context.stroke();
+        context.moveTo(box.x + 2, box.y - 2);
+        context.lineTo(box.x - 2, box.y + 2);
+        context.stroke();
     },
 
 });
