@@ -1,34 +1,31 @@
 
 TODO list:
 
-- create a sprite entity from anim enity
-- level follow change position relative to entity speed
-- smooth move on camera position change
+- the level follow changes the aimed position relative to the entity speed
+- smooth move on aimed position change
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- make a debug panel where you can change variables and see entities
-- on actor entity, make walk animation speed progressive
-- stop and resume time
-- fix collision between entities
 - Make a basic Zombie Sim
 - tag version 0.1.4
+- stop and resume time
+- make a debug panel where you can change variables and see entities
+- fix collision between entities
 - remove entity._instances array = obsolete
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - animate properties
 - create moveOnGround() for actor, set position on ground on startUp
 - tiled level import
 - draw text
-- draw polygon, line, circle, elipse, star
+- draw polygon, line, elipse, star
 - tag version 0.1.5
 - draw SVG image
 - rotation
-- parent position and rotation affect children
+- parent rotation affects children
 - Make an Arkanoid game
 - tag version 0.1.6
 - font from image
 - typewritter: text showing letter by letter with sound
 - panel
 - button
-- Add fillAlpha and lineAlpha in rect entity
 - Make a Steel Sky game (raiden like)
 - tag version 0.1.7
 - duplicate, add, remove image
@@ -41,11 +38,9 @@ TODO list:
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
 - tag version 0.1.9
-- Create a function to add / remove modules
-- Create a DEV trunk and separate modules with entity definitions
-- Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
+- on actor entity, make walk animation speed progressive
 - tag version 0.2
 - Make the Chuck game
 - slow time
@@ -77,7 +72,10 @@ DONE:
 - entity.isReady set True when all entity files loaded and entityReady event launch
 - fix follow big level
 - level follow an entity
+- parent position affects children
 - parallax layer // 2014-06-25
+- Add fillAlpha and lineAlpha in rect entity
+- Make the circle and roundrect entity
 - getDrawBox sometimes get x and y as NaN on actor2w
 - move level view, make attached entities move on parent move
 - fix level collision on level position // 2014-06-23
@@ -133,6 +131,7 @@ DONE:
 
 
 CANCELED:
+- create a sprite entity from anim enity // anim is doing the trick
 - override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 
 
