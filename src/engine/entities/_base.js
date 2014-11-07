@@ -152,14 +152,15 @@
 		    },
 
 		    ready: function() {
-		        this.isReady = true;
-		        this.trigger('entityReady');
-
 		        // Trigger some events to dispatch the entityReady
 			    var event = {
 			        entity: this,
 			        type: 'entityReady'
 			    }
+
+		        this.isReady = true;
+		        this.trigger('entityReady', event);
+
 		        yespix.trigger(event.type, event);
 
 			    event = {
@@ -233,7 +234,7 @@
 		    },
 
 		    trigger: function(name, e) {
-		        yespix.trigger(name, e, this);
+		        yespix.trigger(name, e, this, this);
 		        return this;
 		    },
 

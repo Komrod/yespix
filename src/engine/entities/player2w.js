@@ -26,15 +26,53 @@ yespix.define('player2w', 'actor2w', {
         'attackleft': 'punch1left',
         'attackright': 'punch1right',
     },
-
+    playerSpawnOnFloor: false,
     playerAirFriction: 0.02,
     playerGroundFriction: 0.13,
 
-    actorOptions: {
-        alwaysRun: false,
-    },
-
     init: function() {
+        var player = this;
+        //console.log(yespix);
+        if (this.playerSpawnOnFloor)
+        {
+            console.log('playerSpawnOnFloor');
+            if (yespix.level && yespix.level.isReady)
+            {
+                console.log('level already set');
+                if (player.isReady) {
+                    console.log('player is ready #1');
+                    player.playerFindGround();
+                } else
+                {
+                    console.log('player is ready #1');
+                    yespix.entitiesReady([player, yespix.level], function(entities) {
+                        console.log('both ready #1');
+                        player.playerFindGround();
+                    });
+                }
+            } else
+            {
+                console.log('level not set');
+                yespix.on('entityReady', function(e) {
+                    console.log('entityReady :: e = ', e);
+                }, this);
+                yespix.on('entityReady:level', function(e) {
+                    console.log('entityReady:level', e);
+                    if (player.isReady) {
+                        console.log('player is ready #2');
+                        player.playerFindGround();
+                    } else
+                    {
+                        console.log('player is not ready #2');
+                        yespix.entitiesReady([player, yespix.level], function(entities) {
+                            console.log('both ready #2');
+                            player.playerFindGround();
+                        });
+                    }
+                }, this);
+            }
+        }
+
         yespix.on('enterFrame', function() {
             var move = '';
 
@@ -111,6 +149,10 @@ yespix.define('player2w', 'actor2w', {
         if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
         if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
         return true;
+    },
+
+    playerFindGround: function() {
+        console.log('playerFindGround :: start');
     },
 
 
