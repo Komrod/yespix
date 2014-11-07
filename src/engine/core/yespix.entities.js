@@ -657,3 +657,27 @@ yespix.fn.call = function(entity, fn, ancestors, params) {
 
     return result;
 };
+
+yespix.fn.entitiesReady = function(entities, fn) {
+    if (!this.isArray(entities) || entities.length === 0) return false;
+
+    function checkAllEntitiesReady() {
+        for (var t=0; t<entities.length; t++) {
+            if (!entities[t].isReady) {
+                return false;
+            }
+        }
+        fn(entities);
+        return true;
+    }
+
+    if (checkAllEntitiesReady() == false)
+    {
+        for (var t=0; t<entities.length; t++) {
+            entities[t].on('entityReady', checkAllEntitiesReady);
+        }        
+    }
+
+    return true;
+
+};

@@ -4,6 +4,7 @@ TODO list:
 - the level follow changes the aimed position relative to the entity speed
 - smooth move on aimed position change
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
+- calculate vector from a position to another position
 - Make a basic Zombie Sim
 - tag version 0.1.4
 - stop and resume time
@@ -55,6 +56,7 @@ LATER:
 
 
 DONE:
+- create entitiesReady function to check if all entities are ready // 2014-11-07
 - make drawDebug(), drawDebugPosition()
 - fix follow reset when level is not ready // 2014-08-04
 - auto attach every entity with childAdd() to the current level
