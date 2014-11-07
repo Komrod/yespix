@@ -109,8 +109,8 @@ yespix.fn.collisionTouch = function(entity1, entity2, pixel) {
     if (this.isUndefined(pixel)) pixel = 1;
     var box1 = entity1.collisionBox();
     var box2 = entity2.collisionBox();
-    this.dump(box1, 'box1');
-    this.dump(box2, 'box2');
+    //this.dump(box1, 'box1');
+    //this.dump(box2, 'box2');
     // check if box1 is left of box2
     if (box1.x + box1.width > box2.x - pixel && box1.x + box1.width < box2.x + pixel) return true;
 
