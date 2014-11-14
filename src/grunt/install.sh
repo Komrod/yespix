@@ -4,7 +4,7 @@
 # Runs "packageupdate" to update the rest
 #
 
-npm install grunt -g
-npm install grunt-cli -g
+npm install grunt
+npm install grunt-cli
 npm install grunt-shell --save-dev
 grunt packupdate
