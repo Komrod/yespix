@@ -218,6 +218,14 @@ yespix.fn.getType = function(obj) {
 };
 
 /**
+ * @method contains
+ */
+yespix.fn.contains = function(str, search) {
+    return (str+'').indexOf(search) > -1;
+};
+
+
+/**
  * Check if the value is in the array
  * @param arr The array to check
  * @return {boolean} True if the value is in the array

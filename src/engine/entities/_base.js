@@ -212,9 +212,9 @@
 		        entity._id = yespix.entityNextId++;
 		        if (properties) entity.prop(properties);
 		        entity._instances = false;
-		        yespix.dump(yespix.entityInstances);
+		        //yespix.dump(yespix.entityInstances);
 		        yespix.instanceAdd(entity);
-		        yespix.dump(yespix.entityInstances);
+		        //yespix.dump(yespix.entityInstances);
 		        return entity;
 		    },
 

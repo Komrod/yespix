@@ -18,8 +18,29 @@ yespix.define('canvas', {
         options.class = options.class || '';
         options.autoAppend = options.autoAppend || true;
 
-        this.canvasOptions = options;
         this.document = options.document;
+
+        // apply relative width and height
+        if (yespix.contains(options.width, '%'))
+        {
+            var clientWidth = 800;
+            if (this.document.width) clientWidth = this.document.width;
+            else if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
+            else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
+            //console.log('width = '+clientWidth+' * '+(parseFloat(options.width.replace('%', '')) / 100));
+            options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
+        }
+        if (yespix.contains(options.height, '%'))
+        {
+            var clientHeight = 800;
+            if (this.document.height) clientHeight = this.document.height;
+            else if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight;
+            else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight;
+            //console.log('height = '+clientHeight+' * '+(parseFloat(options.height.replace('%', '')) / 100));
+            options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
+        }
+        //console.log(options);
+        this.canvasOptions = options;
 
         var canvas = this.document.createElement('canvas');
         canvas.id = options.id;
@@ -35,6 +56,7 @@ yespix.define('canvas', {
 
         this.use(canvas, options);
     },
+
 
     use: function(canvasElement, options) {
         options = options || {};

@@ -2,16 +2,26 @@
 <html>
 <head>
 	<script type="text/javascript" src="../engine/yespix.js"></script>
+	<style>
+
+	canvas, body {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		overflow: hidden;
+	}
+
+	</style>
 </head>
 <body>
 <script type="text/javascript">
 
-	var yp = yespix({canvas: {width: 800, height: 600}, fps: 50});
+	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 50});
 	
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
-		pixelSize: 2,
+		pixelSize: 3,
 		colOffsetX: 8,
 		colOffsetY: 10,
 		colWidth: 14,
@@ -90,11 +100,13 @@
 			{
 				from: 8,
 				length: 5,
+				duration: 100,
 			},
 			punch2right:
 			{
 				from: 16,
 				length: 5,
+				duration: 100,
 			},
 			jumpright:
 			{
@@ -161,6 +173,5 @@
 	//yp.find().prop({alpha: 0.1});
 
 </script>
-
 </body>
 </html>
