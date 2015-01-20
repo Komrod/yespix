@@ -177,7 +177,8 @@ yespix.define('image', 'gfx', {
         var box = this.getDrawBox();
         var scaleX = this.flipX ? -1 : 1;
         var scaleY = this.flipY ? -1 : 1;
-
+        var draw = this.getContextDrawBox(context, img, box);
+        /*
         if (context && img && img.element && img.isReady) {
             context.globalAlpha = this.alpha;
             context.drawImage(img.element, //image element
@@ -193,7 +194,22 @@ yespix.define('image', 'gfx', {
             if (this.debug) {
                 this.drawDebug(context, box);
             }
-        }
+
+        } */
+    },
+
+
+    getContextDrawBox: function(context, img, box) {
+        var imgBox = {
+            x: 0,
+            y: 0,
+            width: img.realWidth,
+            height: img.realHeight
+        };
+        console.log(imgBox);
+        console.log(box);
+        console.log(context);
+        stop();
     },
 
     drawDebugImage: function(context, drawBox) {
