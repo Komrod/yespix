@@ -27,7 +27,7 @@ yespix.define('image', 'gfx', {
         for (var t = 0; t < this.images.length; t++) {
             // if the array element is a string, it's the src of the image
             if (yespix.isString(this.images[t])) this.images[t] = {
-                src: this.images[t],
+                src: this.images[t]
             };
 
             // init the default properties
@@ -36,7 +36,6 @@ yespix.define('image', 'gfx', {
             }
             if (this.images[t].name === '') this.images[t].name = 'image' + count++;
         }
-
         this.imageInit();
 
         this.readyFunctions.push(this.checkReadyStateImage);
@@ -125,6 +124,7 @@ yespix.define('image', 'gfx', {
         // image already initiated
         if (image.isInitiated) return image;
 
+        // start initialisation
         image.isReady = false;
         image.isInitiated = true;
         image.entity = entity;
@@ -133,6 +133,8 @@ yespix.define('image', 'gfx', {
         if (image.element) image.element.onload = image.element.onLoad = function() {
             image.realWidth = this.width;
             image.realHeight = this.height;
+            image.entity.width = this.width;
+            image.entity.height = this.height;
             image.isReady = true;
 
             if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
@@ -177,10 +179,11 @@ yespix.define('image', 'gfx', {
         var box = this.getDrawBox();
         var scaleX = this.flipX ? -1 : 1;
         var scaleY = this.flipY ? -1 : 1;
-        var draw = this.getContextDrawBox(context, img, box);
-        /*
+        //var draw = this.getContextDrawBox(context, img, box);
+        
         if (context && img && img.element && img.isReady) {
             context.globalAlpha = this.alpha;
+
             context.drawImage(img.element, //image element
                 0, // x position on image
                 0, // y position on image
@@ -194,22 +197,26 @@ yespix.define('image', 'gfx', {
             if (this.debug) {
                 this.drawDebug(context, box);
             }
-
-        } */
+        }
     },
 
-
     getContextDrawBox: function(context, img, box) {
-        var imgBox = {
-            x: 0,
-            y: 0,
-            width: img.realWidth,
-            height: img.realHeight
+        
+        var draw = {
+            img_x: 0,
+            img_y: 0,
+            img_width: img.realWidth,
+            img_height: img.realHeight,
+            context_x: box.x,
+            context_y: box.y,
+            context_width: box.width,
+            context_height: box.height
         };
-        console.log(imgBox);
+        console.log(draw);
         console.log(box);
         console.log(context);
-        stop();
+        fuckyou();
+        
     },
 
     drawDebugImage: function(context, drawBox) {
