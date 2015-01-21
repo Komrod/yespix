@@ -119,12 +119,47 @@ yespix.define('layer', 'gfx', {
                 if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
                 if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
             }
+
+
+            // check if image outside canvas
+            if (box.x > context.canvas.clientWidth 
+                || box.y > context.canvas.clientHeight 
+                || box.x + box.width < 0
+                || box.y + box.height < 0)
+                return;
+                
+            var contextDrawBox = this.getContextDrawBox(context, 
+                {realWidth: this.canvas.width, realHeight: this.canvas.height}, 
+                box);
+
+            /*console.log('context = ');
+            console.log(context);
+            console.log('this.canvas = ');
+            console.log(this.canvas);
+            console.log('box = ');
+            console.log(box);
+
+            console.log(contextDrawBox);*/
+
+            context.drawImage(this.canvas, //image element
+                contextDrawBox.img_x, // x position on image
+                contextDrawBox.img_y, // y position on image
+                contextDrawBox.img_width, // width on image
+                contextDrawBox.img_height, // height on image
+                contextDrawBox.context_x, // x position on canvas
+                contextDrawBox.context_y, // y position on canvas
+                contextDrawBox.context_width, // width on canvas
+                contextDrawBox.context_height // height on canvas
+            );
+
+            /*
             context.drawImage(this.canvas, //image element
                 box.x, // x position on image
                 box.y, // y position on image
                 this.canvas.width, // width on image
                 this.canvas.height // height on image
             );
+            */
         }
     },
 });
