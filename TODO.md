@@ -1,5 +1,6 @@
 
 TODO list:
+- optimize: only call getDrawBox once per entity
 - calculate vector from a position to another position
 - stop and resume time
 - Bug: draw debug on chuck
