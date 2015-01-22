@@ -11,11 +11,17 @@ yespix.define('path', 'gfx', {
 
     init: function() {},
 
-    canDraw: function() {
+    canDraw: function(context, box) {
+        if (box.x > context.canvas.clientWidth 
+            || box.y > context.canvas.clientHeight 
+            || box.x + box.width < 0
+            || box.y + box.height < 0)
+            return false;
+    
         return this.isVisible && this.alpha > 0;
     },
 
-    canDrawPath: function() {
+    canDrawPath: function(context, box) {
         return true;
     },
 
@@ -23,7 +29,7 @@ yespix.define('path', 'gfx', {
 
     },
 
-    canDrawLine: function() {
+    canDrawLine: function(context, box) {
         return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
     },
 
@@ -34,7 +40,7 @@ yespix.define('path', 'gfx', {
         context.stroke();
     },
 
-    canDrawFill: function() {
+    canDrawFill: function(context, box) {
         return this.fillColor != '' && this.fillAlpha > 0;
     },
 
@@ -46,22 +52,25 @@ yespix.define('path', 'gfx', {
 
 
     draw: function(context) {
-        if (!this.canDraw()) return;
-
         if (!context) {
             if (!this._context) {
                 this.getContext();
                 if (this._context) context = this._context;
             } else context = this._context;
         }
-
         var box = this.getDrawBox();
 
+        if (!this.canDraw(context, box)) return;
+
+
         if (context) {
-            if (this.canDrawPath()) this.drawPath(context, box);
-            if (this.canDrawFill()) this.drawFill(context, box);
-            if (this.canDrawLine()) this.drawLine(context, box);
-            if (this.canDrawDebug()) this.drawDebug(context, box);
+            if (this.canDrawPath(context, box))
+            {
+                this.drawPath(context, box);
+                if (this.canDrawFill(context, box)) this.drawFill(context, box);
+                if (this.canDrawLine(context, box)) this.drawLine(context, box);
+            }
+            if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
         }
     },
 });

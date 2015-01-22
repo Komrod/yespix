@@ -16,7 +16,7 @@
 <body>
 <script type="text/javascript">
 
-	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 50});
+	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 60});
 	
 	yp.define('chuck', 'player2w',
 	{
@@ -169,8 +169,21 @@
 
 	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
+	
+	for (var t=0; t<1000; t++) {
+
+		yp.spawn('circle', {
+			x: yp.randInt(0, 3000), 
+			y: yp.randInt(0, 600), 
+			circleRadius:15,
+            lineColor: '',
+            fillColor: '#19D1FF'}).setParent(mylevel);
+	}
+	
+	yp.spawn('fps', {x: 10, y: 20});
+
 	mylevel.follow(mychuck, {resetOnStart: true});
-	//yp.find().prop({alpha: 0.1});
+
 
 </script>
 </body>

@@ -4,9 +4,9 @@ yespix.define('circle', 'path', {
 
     init: function() {},
 
-    drawPath: function(context) {
+    drawPath: function(context, box) {
         context.beginPath();
-        context.arc(this.x + this.circleRadius, this.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+        context.arc(box.x + this.circleRadius, box.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
     },
 
     drawDebugPosition: function(context, drawBox) {
