@@ -1,6 +1,5 @@
 
 TODO list:
-- limit image draw to visible canvas when an image try to draw partially outside the canvas
 - calculate vector from a position to another position
 - stop and resume time
 - Bug: draw debug on chuck
@@ -13,6 +12,7 @@ TODO list:
 - button
 - disable key capture on phones
 - Separate the fall down / jump up animation of a character
+
 
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - Make a basic Zombie Sim
@@ -59,6 +59,7 @@ LATER:
 
 
 DONE:
+- limit image draw to visible canvas when an image try to draw partially outside the canvas
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
 - create entitiesReady function to check if all entities are ready // 2014-11-07
 - make drawDebug(), drawDebugPosition()
