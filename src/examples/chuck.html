@@ -2,16 +2,26 @@
 <html>
 <head>
 	<script type="text/javascript" src="../engine/yespix.js"></script>
+	<style>
+
+	canvas, body {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		overflow: hidden;
+	}
+
+	</style>
 </head>
 <body>
 <script type="text/javascript">
 
-	var yp = yespix({canvas: {width: 800, height: 600}, fps: 50});
+	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 50});
 	
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
-		pixelSize: 2,
+		pixelSize: 3,
 		colOffsetX: 8,
 		colOffsetY: 10,
 		colWidth: 14,
@@ -19,6 +29,8 @@
 		//debug: true,
 		actorSpeed: 1,
 		actorSpeedJump: 10,
+		playerSpawnOnFloor: true,
+
 		snapToPixel: true,
 
 		init: function()
@@ -88,11 +100,13 @@
 			{
 				from: 8,
 				length: 5,
+				duration: 50,
 			},
 			punch2right:
 			{
 				from: 16,
 				length: 5,
+				duration: 50,
 			},
 			jumpright:
 			{
@@ -151,15 +165,13 @@
 
 
     
-	yp.gravity = { y: 20 };
+	yp.gravity = { y: 22 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 100, y: 100, pixelSize: 2}).load('chuck/test.json');
-	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 0, y: -250, z: 1000});
-	//mylevel.childAdd(mychuck);
-	mylevel.follow(mychuck, {reset: true});
-	yp.find().prop({alpha: 0.1});
+	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1}).load('chuck/test.json');
+	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
+	mylevel.follow(mychuck, {resetOnStart: true});
+	//yp.find().prop({alpha: 0.1});
 
 </script>
-
 </body>
 </html>

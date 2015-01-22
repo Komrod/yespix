@@ -28,7 +28,7 @@
 		    _ancestors: [],
 
 		    /**
-		     * Reference to the scene of the entity initiated by the scene entity
+		     * Reference to the scene of the entity, initiated by the scene entity
 		     * @property _scene
 		     * @type object
 		     */
@@ -152,8 +152,22 @@
 		    },
 
 		    ready: function() {
+		        // Trigger some events to dispatch the entityReady
+			    var event = {
+			        entity: this,
+			        type: 'entityReady'
+			    }
+
 		        this.isReady = true;
-		        this.trigger('entityReady');
+		        this.trigger('entityReady', event);
+
+		        yespix.trigger(event.type, event);
+
+			    event = {
+			        entity: this,
+			        type: 'entityReady:' + this._class
+			    }
+		        yespix.trigger(event.type, event);
 		    },
 
 		    ancestor: function(name) {
@@ -180,6 +194,16 @@
 		        return this;
 		    },
 
+		    hasAncestors: function(ancestors)
+		    {
+				return yespix.hasAncestors(this._class, ancestors);
+		    },
+
+		    hasClass: function(_class)
+		    {
+				return this._class === _class;
+		    },
+
 		    /**
 		     * Clone an entity
 		     */
@@ -188,9 +212,9 @@
 		        entity._id = yespix.entityNextId++;
 		        if (properties) entity.prop(properties);
 		        entity._instances = false;
-		        yespix.dump(yespix.entityInstances);
+		        //yespix.dump(yespix.entityInstances);
 		        yespix.instanceAdd(entity);
-		        yespix.dump(yespix.entityInstances);
+		        //yespix.dump(yespix.entityInstances);
 		        return entity;
 		    },
 
@@ -210,7 +234,7 @@
 		    },
 
 		    trigger: function(name, e) {
-		        yespix.trigger(name, e, this);
+		        yespix.trigger(name, e, this, this);
 		        return this;
 		    },
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="100" height="19" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="19" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="tiles_test" tilewidth="32" tileheight="32">
   <image source="tiles_test.png" width="160" height="32"/>
  </tileset>
  <tileset firstgid="6" name="squares" tilewidth="32" tileheight="32">
   <image source="squares.png" width="128" height="128"/>
  </tileset>
- <layer name="back 2" width="100" height="19" opacity="0.46">
+ <layer name="back 2" width="100" height="19" opacity="0.11">
   <properties>
    <property name="speedX" value="0.2"/>
    <property name="type" value="parallax"/>
@@ -140,10 +140,14 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="triggers" width="100" height="19">
+ <objectgroup name="triggers">
   <properties>
-   <property name="type" value="trigger"/>
+   <property name="type" value="triggers"/>
   </properties>
-  <object name="levelend" x="2965" y="134" width="227" height="351"/>
+  <object name="levelend" x="2967.47" y="141.673" width="226" height="351">
+   <properties>
+    <property name="once" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

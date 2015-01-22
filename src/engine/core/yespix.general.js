@@ -125,6 +125,21 @@ yespix.fn.isRegexp = function(value) {
 };
 
 /**
+ *
+*/
+yespix.fn.isEntity = function(object) {
+    if (!yespix.isObject(object)) return false;
+    if (entity.hasOwnProperty('_class') 
+        && entity.hasOwnProperty('_ancestors') 
+        && entity.hasOwnProperty('_id')
+        && entity.hasOwnProperty('_children')
+        && entity.hasOwnProperty('_parent')) {
+        return true;
+    }
+    return false;
+};
+
+/**
  * Trim string left and right
  * @param  {string} str String to trim
  * @return {string} Result string
@@ -203,6 +218,14 @@ yespix.fn.getType = function(obj) {
 };
 
 /**
+ * @method contains
+ */
+yespix.fn.contains = function(str, search) {
+    return (str+'').indexOf(search) > -1;
+};
+
+
+/**
  * Check if the value is in the array
  * @param arr The array to check
  * @return {boolean} True if the value is in the array
@@ -227,79 +250,4 @@ yespix.fn.each = function(array, fn, args) {
         }
     }
     return this;
-};
-
-/**
- * @method dump
- */
-yespix.fn.dump = function(obj, string, properties, expand) {
-    string = string || '';
-    properties = properties || [];
-    expand = expand || 9;
-
-    console.group();
-    console.info('Object dump: ' + string);
-
-    var count = 1,
-        str = '',
-        t;
-    for (var n in obj) {
-        if (this.isObject(obj) && properties.length > 0 && !this.inArray(properties, n)) continue;
-
-        if (obj[n] === null) console.log(' - ' + n + ' : null');
-        else if (typeof obj[n] === 'undefined') console.log(' - ' + n + ' = undefined');
-        else if (typeof obj[n] === 'boolean') console.log(' - ' + n + ' = "' + obj[n] + '" (boolean)');
-        else if (typeof obj[n] === 'number') console.log(' - ' + n + ' = ' + obj[n] + ' (number)');
-        else if (typeof obj[n] === 'function') console.log(' - ' + n + ' (function)');
-        else if (this.isString(obj[n])) console.log(' - ' + n + ' = "' + obj[n] + '" (string)');
-        else if (this.isArray(obj[n])) {
-            str = '';
-            if (expand)
-                for (t = 0; t < obj[n].length; t++) {
-                    if (t > 0) str += ', ';
-                    str += '[' + t + '] ';
-                    if (obj[n][t] === null) str += 'null';
-                    else if (typeof obj[n][t] === 'undefined') str += 'undefined';
-                    else if (typeof obj[n][t] === 'boolean') str += '"' + obj[n][t] + '" (boolean)';
-                    else if (typeof obj[n][t] === 'number') str += obj[n][t] + ' (number)';
-                    else if (typeof obj[n][t] === 'string') str += '"' + obj[n][t] + '" (string)';
-                    else if (typeof obj[n][t] === 'function') str += 'function';
-                    else if (this.isArray(obj[n][t])) str += 'Array (' + obj[n][t].length + ')';
-                    else str += obj[n][t];
-                    if (t > expand) {
-                        str += ' ...';
-                        break;
-                    }
-                }
-            if (str === '') console.log(' - ' + n + ' (array), length ' + obj[n].length + '');
-            else console.log(' - ' + n + ' (array), length ' + obj[n].length + ', content: ' + str);
-        } else if (this.isObject(obj[n])) {
-            str = '';
-            t = 0;
-            if (expand)
-                for (var f in obj[n]) {
-
-                    if (properties.length > 0 && !this.inArray(properties, f)) continue;
-
-                    if (t > 0) str += ', ';
-                    str += '[' + t + '] ' + f + ': ';
-                    if (obj[n][f] === null) str += 'null';
-                    else if (typeof obj[n][f] === 'undefined') str += 'undefined';
-                    else if (typeof obj[n][f] === 'boolean') str += '"' + obj[n][f] + '" (boolean)';
-                    else if (typeof obj[n][f] === 'number') str += obj[n][f] + ' (number)';
-                    else if (typeof obj[n][f] === 'string') str += '"' + obj[n][f] + '" (string)';
-                    else if (typeof obj[n][f] === 'function') str += 'function';
-                    else if (this.isArray(obj[n][f])) str += 'Array (' + obj[n][f].length + ')';
-                    else str += obj[n][f];
-                    if (t > expand) {
-                        str += ' ...';
-                        break;
-                    }
-                    t++;
-                }
-            if (str === '') console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + '');
-            else console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + ', content: ' + str);
-        } else console.log(' - ' + n + ' : "' + obj[n] + '" (' + (typeof obj[n]) + ')');
-    }
-    console.groupEnd();
 };

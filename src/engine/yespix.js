@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2014-07-22 */
+/*! yespix - v0.1.0 - 2015-01-20 */
 (function(undefined) {
 
     /**
@@ -56,11 +56,11 @@
     };
 
     /*
-	Bunch.prototype.concat = function()
-	{
-		// @todo
-	};
-	*/
+    	Bunch.prototype.concat = function()
+    	{
+    		// @todo
+    	};
+    	*/
 
     Bunch.prototype.__bunch_init = function(list) {
         if (list && list.length > 0) {
@@ -278,8 +278,8 @@
         if (this.isUndefined(pixel)) pixel = 1;
         var box1 = entity1.collisionBox();
         var box2 = entity2.collisionBox();
-        this.dump(box1, 'box1');
-        this.dump(box2, 'box2');
+        //this.dump(box1, 'box1');
+        //this.dump(box2, 'box2');
         // check if box1 is left of box2
         if (box1.x + box1.width > box2.x - pixel && box1.x + box1.width < box2.x + pixel) return true;
 
@@ -1001,6 +1001,28 @@
         return result;
     };
 
+    yespix.fn.entitiesReady = function(entities, fn) {
+        if (!this.isArray(entities) || entities.length === 0) return false;
+
+        function checkAllEntitiesReady() {
+            for (var t = 0; t < entities.length; t++) {
+                if (!entities[t].isReady) {
+                    return false;
+                }
+            }
+            fn(entities);
+            return true;
+        }
+
+        if (checkAllEntitiesReady() == false) {
+            for (var t = 0; t < entities.length; t++) {
+                entities[t].on('entityReady', checkAllEntitiesReady);
+            }
+        }
+
+        return true;
+
+    };
     /**
      ************************************************************************************************************
      ************************************************************************************************************
@@ -1895,6 +1917,17 @@
     };
 
     /**
+     *
+     */
+    yespix.fn.isEntity = function(object) {
+        if (!yespix.isObject(object)) return false;
+        if (entity.hasOwnProperty('_class') && entity.hasOwnProperty('_ancestors') && entity.hasOwnProperty('_id') && entity.hasOwnProperty('_children') && entity.hasOwnProperty('_parent')) {
+            return true;
+        }
+        return false;
+    };
+
+    /**
      * Trim string left and right
      * @param  {string} str String to trim
      * @return {string} Result string
@@ -1973,6 +2006,14 @@
     };
 
     /**
+     * @method contains
+     */
+    yespix.fn.contains = function(str, search) {
+        return (str + '').indexOf(search) > -1;
+    };
+
+
+    /**
      * Check if the value is in the array
      * @param arr The array to check
      * @return {boolean} True if the value is in the array
@@ -1997,81 +2038,6 @@
             }
         }
         return this;
-    };
-
-    /**
-     * @method dump
-     */
-    yespix.fn.dump = function(obj, string, properties, expand) {
-        string = string || '';
-        properties = properties || [];
-        expand = expand || 9;
-
-        console.group();
-        console.info('Object dump: ' + string);
-
-        var count = 1,
-            str = '',
-            t;
-        for (var n in obj) {
-            if (this.isObject(obj) && properties.length > 0 && !this.inArray(properties, n)) continue;
-
-            if (obj[n] === null) console.log(' - ' + n + ' : null');
-            else if (typeof obj[n] === 'undefined') console.log(' - ' + n + ' = undefined');
-            else if (typeof obj[n] === 'boolean') console.log(' - ' + n + ' = "' + obj[n] + '" (boolean)');
-            else if (typeof obj[n] === 'number') console.log(' - ' + n + ' = ' + obj[n] + ' (number)');
-            else if (typeof obj[n] === 'function') console.log(' - ' + n + ' (function)');
-            else if (this.isString(obj[n])) console.log(' - ' + n + ' = "' + obj[n] + '" (string)');
-            else if (this.isArray(obj[n])) {
-                str = '';
-                if (expand)
-                    for (t = 0; t < obj[n].length; t++) {
-                        if (t > 0) str += ', ';
-                        str += '[' + t + '] ';
-                        if (obj[n][t] === null) str += 'null';
-                        else if (typeof obj[n][t] === 'undefined') str += 'undefined';
-                        else if (typeof obj[n][t] === 'boolean') str += '"' + obj[n][t] + '" (boolean)';
-                        else if (typeof obj[n][t] === 'number') str += obj[n][t] + ' (number)';
-                        else if (typeof obj[n][t] === 'string') str += '"' + obj[n][t] + '" (string)';
-                        else if (typeof obj[n][t] === 'function') str += 'function';
-                        else if (this.isArray(obj[n][t])) str += 'Array (' + obj[n][t].length + ')';
-                        else str += obj[n][t];
-                        if (t > expand) {
-                            str += ' ...';
-                            break;
-                        }
-                    }
-                if (str === '') console.log(' - ' + n + ' (array), length ' + obj[n].length + '');
-                else console.log(' - ' + n + ' (array), length ' + obj[n].length + ', content: ' + str);
-            } else if (this.isObject(obj[n])) {
-                str = '';
-                t = 0;
-                if (expand)
-                    for (var f in obj[n]) {
-
-                        if (properties.length > 0 && !this.inArray(properties, f)) continue;
-
-                        if (t > 0) str += ', ';
-                        str += '[' + t + '] ' + f + ': ';
-                        if (obj[n][f] === null) str += 'null';
-                        else if (typeof obj[n][f] === 'undefined') str += 'undefined';
-                        else if (typeof obj[n][f] === 'boolean') str += '"' + obj[n][f] + '" (boolean)';
-                        else if (typeof obj[n][f] === 'number') str += obj[n][f] + ' (number)';
-                        else if (typeof obj[n][f] === 'string') str += '"' + obj[n][f] + '" (string)';
-                        else if (typeof obj[n][f] === 'function') str += 'function';
-                        else if (this.isArray(obj[n][f])) str += 'Array (' + obj[n][f].length + ')';
-                        else str += obj[n][f];
-                        if (t > expand) {
-                            str += ' ...';
-                            break;
-                        }
-                        t++;
-                    }
-                if (str === '') console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + '');
-                else console.log(' - ' + n + ' (object), length ' + this.pLength(obj[n]) + ', content: ' + str);
-            } else console.log(' - ' + n + ' : "' + obj[n] + '" (' + (typeof obj[n]) + ')');
-        }
-        console.groupEnd();
     };
 
     /**
@@ -2816,7 +2782,7 @@
             _ancestors: [],
 
             /**
-             * Reference to the scene of the entity initiated by the scene entity
+             * Reference to the scene of the entity, initiated by the scene entity
              * @property _scene
              * @type object
              */
@@ -2940,8 +2906,22 @@
             },
 
             ready: function() {
+                // Trigger some events to dispatch the entityReady
+                var event = {
+                    entity: this,
+                    type: 'entityReady'
+                }
+
                 this.isReady = true;
-                this.trigger('entityReady');
+                this.trigger('entityReady', event);
+
+                yespix.trigger(event.type, event);
+
+                event = {
+                    entity: this,
+                    type: 'entityReady:' + this._class
+                }
+                yespix.trigger(event.type, event);
             },
 
             ancestor: function(name) {
@@ -2968,6 +2948,14 @@
                 return this;
             },
 
+            hasAncestors: function(ancestors) {
+                return yespix.hasAncestors(this._class, ancestors);
+            },
+
+            hasClass: function(_class) {
+                return this._class === _class;
+            },
+
             /**
              * Clone an entity
              */
@@ -2976,9 +2964,9 @@
                 entity._id = yespix.entityNextId++;
                 if (properties) entity.prop(properties);
                 entity._instances = false;
-                yespix.dump(yespix.entityInstances);
+                //yespix.dump(yespix.entityInstances);
                 yespix.instanceAdd(entity);
-                yespix.dump(yespix.entityInstances);
+                //yespix.dump(yespix.entityInstances);
                 return entity;
             },
 
@@ -2998,7 +2986,7 @@
             },
 
             trigger: function(name, e) {
-                yespix.trigger(name, e, this);
+                yespix.trigger(name, e, this, this);
                 return this;
             },
 
@@ -3561,28 +3549,10 @@
                         frame.width * this.pixelSize, // width on canvas
                         frame.height * this.pixelSize // height on canvas
                     );
-                    if (this.debug) {
-                        context.globalAlpha = 1;
-                        context.lineWidth = 0.5;
-                        context.strokeStyle = "#ff1111";
-                        context.strokeRect(canvasX - 0.5 * scaleX, canvasY - 0.5 * scaleY, frame.width * this.pixelSize + 1 * scaleX, frame.height * this.pixelSize + 1 * scaleY);
-                    }
                     if (frame.flipX || frame.flipY) {
                         context.restore();
                     }
-                    if (this.debug) {
-                        context.globalAlpha = 1;
-                        context.fillStyle = '#999999';
-                        context.font = "10px sans-serif";
-                        context.fillText("Anim: " + this.animSelected + ' / ' + this.animFrame, parseInt(this.x), parseInt(this.y - 5));
-
-                        if (this.collisionBox) {
-                            var box = this.collisionBox();
-                            context.lineWidth = 0.5;
-                            context.strokeStyle = "#000099";
-                            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                        }
-                    }
+                    if (this.canDrawDebug()) this.drawDebug(context);
                 }
             },
 
@@ -3608,8 +3578,27 @@
                 options.class = options.class || '';
                 options.autoAppend = options.autoAppend || true;
 
-                this.canvasOptions = options;
                 this.document = options.document;
+
+                // apply relative width and height
+                if (yespix.contains(options.width, '%')) {
+                    var clientWidth = 800;
+                    if (this.document.width) clientWidth = this.document.width;
+                    else if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
+                    else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
+                    //console.log('width = '+clientWidth+' * '+(parseFloat(options.width.replace('%', '')) / 100));
+                    options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
+                }
+                if (yespix.contains(options.height, '%')) {
+                    var clientHeight = 800;
+                    if (this.document.height) clientHeight = this.document.height;
+                    else if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight;
+                    else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight;
+                    //console.log('height = '+clientHeight+' * '+(parseFloat(options.height.replace('%', '')) / 100));
+                    options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
+                }
+                //console.log(options);
+                this.canvasOptions = options;
 
                 var canvas = this.document.createElement('canvas');
                 canvas.id = options.id;
@@ -3625,6 +3614,7 @@
 
                 this.use(canvas, options);
             },
+
 
             use: function(canvasElement, options) {
                 options = options || {};
@@ -3656,6 +3646,22 @@
             drawPath: function(context) {
                 context.beginPath();
                 context.arc(this.x + this.circleRadius, this.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+            },
+
+            drawDebugPosition: function(context, drawBox) {
+                var box = drawBox || this.getDrawBox();
+                context.lineWidth = 0.5;
+                context.strokeStyle = "#cc3333";
+                context.strokeRect(box.x - 0.5, box.y - 0.5, this.circleRadius * 2 + 1, this.circleRadius * 2 + 1);
+
+                context.strokeStyle = "#ff0000";
+                context.beginPath();
+                context.moveTo(box.x - 2, box.y - 2);
+                context.lineTo(box.x + 2, box.y + 2);
+                context.stroke();
+                context.moveTo(box.x + 2, box.y - 2);
+                context.lineTo(box.x - 2, box.y + 2);
+                context.stroke();
             },
 
         });
@@ -3744,11 +3750,12 @@
                     context.globalAlpha = 1;
                     context.lineWidth = 0.5;
                     context.strokeStyle = "#000099";
-                    if (yespix.isUndefined()) {
-                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
-                    } else {
-                        context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
-                    }
+                    // @TODO draw a better debug collision
+                    //if (yespix.isUndefined()) {
+                    //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                    //} else {
+                    //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+                    //}
                 }
             }
 
@@ -3775,7 +3782,14 @@
             _flipX: false,
             _flipY: false,
 
-            debugAlpha: 1,
+            debugAlpha: 1.0,
+
+            debugPosition: true,
+            debugImage: true,
+            debugCollision: true,
+            debugMove: true,
+
+
 
             ///////////////////////////////// Main functions ////////////////////////////////
 
@@ -3836,11 +3850,12 @@
                 if (this.canDrawDebug()) this.drawDebug();
             },
 
-            drawAlpha: function(context, type) {
+            drawAlpha: function(context, type, doNotUseGlobal) {
                 if (!type) {
                     context.globalAlpha = this.alpha;
                 } else {
                     if (!this[type + 'Alpha']) context.globalAlpha = 0;
+                    else if (doNotUseGlobal) context.globalAlpha = this[type + 'Alpha'];
                     else context.globalAlpha = this.alpha * this[type + 'Alpha'];
                 }
             },
@@ -3849,19 +3864,44 @@
                 return this.debug;
             },
 
+            canDrawDebugPosition: function() {
+                return yespix.isFunction(this.drawDebugPosition) && this.debugPosition;
+            },
+
+            canDrawDebugImage: function() {
+                return yespix.isFunction(this.drawDebugImage) && this.debugImage;
+            },
+
+            canDrawDebugCollision: function() {
+                return yespix.isFunction(this.drawDebugCollision) && this.debugCollision;
+            },
+
+            canDrawDebugMove: function() {
+                return yespix.isFunction(this.drawDebugMove) && this.debugMove;
+            },
+
             drawDebug: function(context, box) {
-                this.drawAlpha(context, 'debug');
-                if (yespix.isFunction(this.drawDebugPosition)) this.drawDebugPosition(context, box);
-                if (yespix.isFunction(this.drawDebugImage)) this.drawDebugImage(context, box);
-                if (yespix.isFunction(this.drawDebugCollision)) this.drawDebugCollision(context, box);
-                if (yespix.isFunction(this.drawDebugMove)) this.drawDebugMove(context, box);
+                this.drawAlpha(context, 'debug', true);
+                if (this.canDrawDebugPosition()) this.drawDebugPosition(context, box);
+                if (this.canDrawDebugImage()) this.drawDebugImage(context, box);
+                if (this.canDrawDebugCollision()) this.drawDebugCollision(context, box);
+                if (this.canDrawDebugMove()) this.drawDebugMove(context, box);
             },
 
             drawDebugPosition: function(context, drawBox) {
                 var box = drawBox || this.getDrawBox();
                 context.lineWidth = 0.5;
-                context.strokeStyle = "#ff1111";
-                context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                context.strokeStyle = "#cc3333";
+                context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);
+
+                context.strokeStyle = "#ff0000";
+                context.beginPath();
+                context.moveTo(box.x - 2, box.y - 2);
+                context.lineTo(box.x + 2, box.y + 2);
+                context.stroke();
+                context.moveTo(box.x + 2, box.y - 2);
+                context.lineTo(box.x - 2, box.y + 2);
+                context.stroke();
             },
 
         });
@@ -4226,6 +4266,11 @@
 
             init: function() {
                 this.readyFunctions.push(this.checkReadyStateLevel);
+                yespix.on('spawn', function(e) {
+                    if (e.entity._class != 'level' && !e.entity.hasAncestors('level') && e.entity._parent == null) {
+                        this.childAdd(e.entity);
+                    }
+                }, this, yespix);
             },
 
             checkReadyStateLevel: function() {
@@ -4578,7 +4623,7 @@
 
                 this.followOptions = options;
 
-                if (options.reset) this.followReset(entity);
+                if (options.resetOnStart) this.followReset(entity);
 
                 entity.on('moveEnd', function(e) {
                     if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);
@@ -4703,23 +4748,23 @@
             },
 
             /*
-    moveChildren: function(deltaX, deltaY) {
-        var count = 0;
-        if (this._children) count = this._children.length;
-        if (!this._children || this._children.length == 0) return false;
+            moveChildren: function(deltaX, deltaY) {
+                var count = 0;
+                if (this._children) count = this._children.length;
+                if (!this._children || this._children.length == 0) return false;
 
-        var t = 0,
-            length = this._children.length;
+                var t = 0,
+                    length = this._children.length;
 
-        for (; t < length; t++) {
-            if (this._children[t].isActive) {
-                if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
-                this._children[t].x += deltaX;
-                this._children[t].y += deltaY;
-            }
-        }
-    },
-    */
+                for (; t < length; t++) {
+                    if (this._children[t].isActive) {
+                        if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
+                        this._children[t].x += deltaX;
+                        this._children[t].y += deltaY;
+                    }
+                }
+            },
+            */
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
@@ -4826,21 +4871,58 @@
                 'attackleft': 'punch1left',
                 'attackright': 'punch1right',
             },
-
+            playerSpawnOnFloor: false,
             playerAirFriction: 0.02,
             playerGroundFriction: 0.13,
 
-            actorOptions: {
-                alwaysRun: false,
-            },
-
             init: function() {
+                var player = this;
+                //console.log(yespix);
+                if (this.playerSpawnOnFloor) {
+                    console.log('playerSpawnOnFloor');
+                    if (yespix.level && yespix.level.isReady) {
+                        console.log('level already set');
+                        if (player.isReady) {
+                            console.log('player is ready #1');
+                            player.playerFindGround();
+                        } else {
+                            console.log('player is ready #1');
+                            yespix.entitiesReady([player, yespix.level], function(entities) {
+                                console.log('both ready #1');
+                                player.playerFindGround();
+                            });
+                        }
+                    } else {
+                        console.log('level not set');
+                        yespix.on('entityReady', function(e) {
+                            console.log('entityReady :: e = ', e);
+                        }, this);
+                        yespix.on('entityReady:level', function(e) {
+                            console.log('entityReady:level', e);
+                            if (player.isReady) {
+                                console.log('player is ready #2');
+                                player.playerFindGround();
+                            } else {
+                                console.log('player is not ready #2');
+                                yespix.entitiesReady([player, yespix.level], function(entities) {
+                                    console.log('both ready #2');
+                                    player.playerFindGround();
+                                });
+                            }
+                        }, this);
+                    }
+                }
+
                 yespix.on('enterFrame', function() {
                     var move = '';
 
-                    if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) this.accelX = -this.actorSpeed;
-                    else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) this.accelX = this.actorSpeed;
-                    else this.accelX = 0;
+                    if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) {
+                        this.actorDirection = 'left';
+                        this.accelX = -this.actorSpeed;
+                    } else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) {
+                        this.actorDirection = 'right';
+                        this.accelX = this.actorSpeed;
+                    } else this.accelX = 0;
 
                     //console.log('yespix.key('+this.actorKeys.attack+') = '+yespix.key(this.actorKeys.attack));
                     //console.log('isOnGround = '+this.isOnGround+'');
@@ -4873,10 +4955,8 @@
                     } else this.accelY = 0;
 
                     if (this.speedX > 0 && this.speedX >= this.speedY && this.speedX >= -this.speedY) {
-                        this.actorDirection = 'right';
                         if (this.isOnGround) move = 'walk';
                     } else if (this.speedX < 0 && this.speedX <= this.speedY && this.speedX <= -this.speedY) {
-                        this.actorDirection = 'left';
                         if (this.isOnGround) move = 'walk';
                     }
                     if (!this.isOnGround) {
@@ -4907,6 +4987,10 @@
                 if (this.speedX < this.actorSpeedMin && this.speedX > -this.actorSpeedMin) this.speedX = 0;
                 if (this.speedY < this.actorSpeedMin && this.speedY > -this.actorSpeedMin) this.speedY = 0;
                 return true;
+            },
+
+            playerFindGround: function() {
+                console.log('playerFindGround :: start');
             },
 
 
@@ -4961,11 +5045,14 @@
 
             drawLine: function(context, box) {
                 this.drawAlpha(context, 'line');
+                context.strokeStyle = this.lineColor;
+                context.lineWidth = this.lineWidth;
                 context.stroke();
             },
 
             drawFill: function(context, box) {
                 this.drawAlpha(context, 'fill');
+                context.fillStyle = this.fillColor;
                 context.fill();
             },
 
@@ -5324,9 +5411,21 @@
 
         yespix.define('text', 'gfx', {
             textAlign: 'left', // "left" / "right" / "center"
-            textFont: '16px sans-serif',
+            textFont: 'sans-serif',
+            textSize: 16,
             textColor: '#000000',
             text: '',
+
+            getDrawBox: function(relative) {
+                var position = this.getPosition(relative);
+                return {
+                    x: position.x,
+                    y: position.y - this.textSize,
+                    width: this._context.measureText(this.text).width,
+                    height: this.textSize,
+                    type: this._class
+                };
+            },
 
             draw: function(context) {
                 if (!this.isVisible) return;
@@ -5342,11 +5441,11 @@
 
                     context.globalAlpha = this.alpha;
                     context.fillStyle = this.textColor;
-                    context.font = this.textFont;
+                    context.font = this.textSize + 'px ' + this.textFont;
                     context.fillText(this.text, this.x, this.y);
 
                     if (this.debug) {
-                        this.drawDebug(context, box);
+                        this.drawDebug(context, this.getDrawBox());
                     }
                 }
             },

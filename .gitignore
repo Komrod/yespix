@@ -221,6 +221,7 @@ pip-log.txt
 #############
 
 src/grunt/node_modules/*
+node_modules/*
 
 
 

@@ -26,11 +26,14 @@ yespix.define('roundrect', 'rect', {
 
     drawLine: function(context, box) {
         this.drawAlpha(context, 'line');
+        context.strokeStyle = this.lineColor;
+        context.lineWidth = this.lineWidth;
         context.stroke();
     },
 
     drawFill: function(context, box) {
         this.drawAlpha(context, 'fill');
+        context.fillStyle = this.fillColor;
         context.fill();
     },
 

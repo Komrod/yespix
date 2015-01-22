@@ -27,7 +27,7 @@ yespix.define('image', 'gfx', {
         for (var t = 0; t < this.images.length; t++) {
             // if the array element is a string, it's the src of the image
             if (yespix.isString(this.images[t])) this.images[t] = {
-                src: this.images[t],
+                src: this.images[t]
             };
 
             // init the default properties
@@ -36,7 +36,6 @@ yespix.define('image', 'gfx', {
             }
             if (this.images[t].name === '') this.images[t].name = 'image' + count++;
         }
-
         this.imageInit();
 
         this.readyFunctions.push(this.checkReadyStateImage);
@@ -125,6 +124,7 @@ yespix.define('image', 'gfx', {
         // image already initiated
         if (image.isInitiated) return image;
 
+        // start initialisation
         image.isReady = false;
         image.isInitiated = true;
         image.entity = entity;
@@ -133,6 +133,8 @@ yespix.define('image', 'gfx', {
         if (image.element) image.element.onload = image.element.onLoad = function() {
             image.realWidth = this.width;
             image.realHeight = this.height;
+            image.entity.width = this.width;
+            image.entity.height = this.height;
             image.isReady = true;
 
             if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
@@ -165,7 +167,6 @@ yespix.define('image', 'gfx', {
 
     draw: function(context) {
         if (!this.isVisible) return;
-
         if (!context) {
             if (!this._context) {
                 this.getContext();
@@ -175,26 +176,41 @@ yespix.define('image', 'gfx', {
 
         var img = this.image(this.imageSelected);
         var box = this.getDrawBox();
+
+        // check if image outside canvas
+        if (box.x > context.canvas.clientWidth 
+            || box.y > context.canvas.clientHeight 
+            || box.x + box.width < 0
+            || box.y + box.height < 0)
+            return;
+
         var scaleX = this.flipX ? -1 : 1;
         var scaleY = this.flipY ? -1 : 1;
-
+        var contextDrawBox = this.getContextDrawBox(context, img, box);
+        
         if (context && img && img.element && img.isReady) {
             context.globalAlpha = this.alpha;
+        
+            //console.log(contextDrawBox);
+
             context.drawImage(img.element, //image element
-                0, // x position on image
-                0, // y position on image
-                img.realWidth, // width on image
-                img.realHeight, // height on image
-                box.x, // x position on canvas
-                box.y, // y position on canvas
-                box.width, // width on canvas
-                box.height // height on canvas
+                contextDrawBox.img_x, // x position on image
+                contextDrawBox.img_y, // y position on image
+                contextDrawBox.img_width, // width on image
+                contextDrawBox.img_height, // height on image
+                contextDrawBox.context_x, // x position on canvas
+                contextDrawBox.context_y, // y position on canvas
+                contextDrawBox.context_width, // width on canvas
+                contextDrawBox.context_height // height on canvas
             );
+            //fuckyou();
             if (this.debug) {
                 this.drawDebug(context, box);
             }
         }
     },
+
+
 
     drawDebugImage: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();

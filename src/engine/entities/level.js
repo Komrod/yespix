@@ -19,6 +19,13 @@ yespix.define('level', 'gfx,move', {
 
     init: function() {
         this.readyFunctions.push(this.checkReadyStateLevel);
+        yespix.on('spawn', function(e)
+        {
+            if (e.entity._class != 'level' && !e.entity.hasAncestors('level') && e.entity._parent == null)
+            {
+                this.childAdd(e.entity);
+            }
+        }, this, yespix);
     },
 
     checkReadyStateLevel: function() {
@@ -371,7 +378,7 @@ yespix.define('level', 'gfx,move', {
 
         this.followOptions = options;
 
-        if (options.reset) this.followReset(entity);
+        if (options.resetOnStart) this.followReset(entity);
 
         entity.on('moveEnd', function(e) {
             if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);

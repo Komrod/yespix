@@ -1,34 +1,32 @@
 
 TODO list:
-
-- actor2w disociate speed and direction
-- level follow change position relative to entity speed
-- auto attach every entity to the current level
-- make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- create a sprite entity from anim enity
-- make drawDebug(), drawDebugPosition(), drawDebugImage(), drawDebugCollision(), drawDebugMove()
-- make a debug panel where you can change variables and see entities
-- on actor entity, make walk animation speed progressive
-- fix collision between entities
-- Make a basic Zombie Sim
-- tag version 0.1.4
+- calculate vector from a position to another position
+- stop and resume time
+- Bug: draw debug on chuck
+- Make movement relative to time, not frame
 - remove entity._instances array = obsolete
-- limit image draw to visible canvas when an image try to draw partially outside the canvas
-- animate properties
-- tiled level import
-- draw text
-- draw polygon, line, circle, elipse, star
-- tag version 0.1.5
-- draw SVG image
-- rotation
-- parent position and rotation affect children
-- Make an Arkanoid game
-- tag version 0.1.6
-- font from image
+- create moveOnGround() for actor, set position on ground on startUp
+- draw text based on image
 - typewritter: text showing letter by letter with sound
 - panel
 - button
-- Add fillAlpha and lineAlpha in rect entity
+- disable key capture on phones
+- Separate the fall down / jump up animation of a character
+
+
+- make layer a general empty drawable canvas (view), put the old layer level build on the level entity
+- Make a basic Zombie Sim
+- tag version 0.1.4
+- make a debug panel where you can change variables and see entities
+- fix collision between entities
+- animate properties
+- draw polygon, line, elipse, star
+- tag version 0.1.5
+- draw SVG image
+- rotation
+- parent rotation affects children
+- Make an Arkanoid game
+- tag version 0.1.6
 - Make a Steel Sky game (raiden like)
 - tag version 0.1.7
 - duplicate, add, remove image
@@ -41,21 +39,33 @@ TODO list:
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
 - tag version 0.1.9
-- Create a function to add / remove modules
-- Create a DEV trunk and separate modules with entity definitions
-- Add optional CombineWith and conflictWith properties to the entity definitions
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
+- on actor entity, make walk animation speed progressive
 - tag version 0.2
 - Make the Chuck game
+- slow time
+- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
 
 
 LATER:
+- the level follow changes the aimed position relative to the entity speed
+- smooth move on aimed position change for the level follow
+- make drawDebugImage(), drawDebugCollision(), drawDebugMove()
+- draw debug ignore general alpha value of entity
 - option collisionAtBorders that avoid entities to get out of the level
 - option stopAtBorders that makes the level follow stops at level border
+- bug with pixelSize level from 3 and up
 
 
 DONE:
+- limit image draw to visible canvas when an image try to draw partially outside the canvas
+- Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
+- create entitiesReady function to check if all entities are ready // 2014-11-07
+- make drawDebug(), drawDebugPosition()
+- fix follow reset when level is not ready // 2014-08-04
+- auto attach every entity with childAdd() to the current level
+- actor2w disociate speed and direction // 2014-07-28
 - set a pixelSize for the level
 - fix level collision loop when outside level
 - fix parallax layers
@@ -69,7 +79,10 @@ DONE:
 - entity.isReady set True when all entity files loaded and entityReady event launch
 - fix follow big level
 - level follow an entity
+- parent position affects children
 - parallax layer // 2014-06-25
+- Add fillAlpha and lineAlpha in rect entity
+- Make the circle and roundrect entity
 - getDrawBox sometimes get x and y as NaN on actor2w
 - move level view, make attached entities move on parent move
 - fix level collision on level position // 2014-06-23
@@ -125,6 +138,7 @@ DONE:
 
 
 CANCELED:
+- create a sprite entity from anim enity // anim is doing the trick
 - override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 
 

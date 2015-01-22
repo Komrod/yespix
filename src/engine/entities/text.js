@@ -1,8 +1,20 @@
 yespix.define('text', 'gfx', {
     textAlign: 'left', // "left" / "right" / "center"
-    textFont: '16px sans-serif',
+    textFont: 'sans-serif',
+    textSize: 16,
     textColor: '#000000',
     text: '',
+
+    getDrawBox: function(relative) {
+        var position = this.getPosition(relative);
+        return {
+            x: position.x,
+            y: position.y - this.textSize,
+            width: this._context.measureText(this.text).width,
+            height: this.textSize,
+            type: this._class
+        };
+    },
 
     draw: function(context) {
         if (!this.isVisible) return;
@@ -18,11 +30,11 @@ yespix.define('text', 'gfx', {
 
             context.globalAlpha = this.alpha;
             context.fillStyle = this.textColor;
-            context.font = this.textFont;
+            context.font = this.textSize+'px '+this.textFont;
             context.fillText(this.text, this.x, this.y);
 
             if (this.debug) {
-                this.drawDebug(context, box);
+                this.drawDebug(context, this.getDrawBox());
             }
         }
     },
