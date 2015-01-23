@@ -123,22 +123,22 @@ yespix.define('fps', 'text', {
             }
             
             context.globalAlpha = this.alpha;
+            context.lineWidth = this.lineWidth;
+            context.strokeStyle = this.lineColor;
+            context.beginPath();
             for (var t=0; t<120; t++) {
-                context.lineWidth = this.lineWidth;
-                context.strokeStyle = this.lineColor;
-                context.beginPath();
                 var scale = 0;
-                if (max > 0) scale = 46 / max;
+                if (max > 0) scale = (this.height - 4) / max;
                 if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
                 else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
                 else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
                 else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
                 else context.strokeStyle = this.fpsColors[4];
 
-                context.moveTo(this.x + t + 2, this.y + 48);
-                context.lineTo(this.x + t + 2, this.y + 47 - this.fpsData[t] * scale);
-                context.stroke();
+                context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
             }
+            context.stroke();
 
             // drawing fps
             context.globalAlpha = this.alpha;
