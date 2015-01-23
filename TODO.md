@@ -1,7 +1,5 @@
 
 TODO list:
-- optimize: only call getDrawBox once per entity
-- change licence
 - examples and build folders in the root project
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
@@ -65,6 +63,8 @@ LATER:
 
 
 DONE:
+- bug: invalid index on draw image
+- optimize: only call getDrawBox once per entity
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
 - create entitiesReady function to check if all entities are ready // 2014-11-07
