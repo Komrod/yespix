@@ -3,7 +3,7 @@ yespix.define('rect', 'path', {
     init: function() {},
 
     drawFill: function(context, box) {
-        context.fillStyle = this.fillColor;
+        ontext.fillStyle = this.fillColor;
         context.fillRect(
             this.x, // x position on canvas
             this.y, // y position on canvas

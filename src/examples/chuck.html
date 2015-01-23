@@ -4,7 +4,7 @@
 	<script type="text/javascript" src="../engine/yespix.js"></script>
 	<style>
 
-	canvas, body {
+	html, canvas, body {
 		margin: 0;
 		padding: 0;
 		border: 0;
@@ -13,8 +13,7 @@
 
 	</style>
 </head>
-<body>
-<script type="text/javascript">
+<body><script type="text/javascript">
 
 	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 60});
 	
@@ -170,21 +169,22 @@
 	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
 	
-	for (var t=0; t<1000; t++) {
-
-		yp.spawn('circle', {
-			x: yp.randInt(0, 3000), 
-			y: yp.randInt(0, 600), 
-			circleRadius:15,
-            lineColor: '',
-            fillColor: '#19D1FF'}).setParent(mylevel);
+	var width = 100;
+	var height = 100;
+	for (var t=0; t<50; t++) {
+		for (var u=0; u<20; u++) {
+			yp.spawn('image', {
+				x: -500 + t*width, 
+				y: -200 + u*height,
+				images: 'zardoz/image/zardoz_small.png'
+	            }); //.setParent(mylevel);
+		}
 	}
 	
-	yp.spawn('fps', {x: 10, y: 20});
+	yp.spawn('fps', {x: 5, y: 5});
 
 	mylevel.follow(mychuck, {resetOnStart: true});
 
 
-</script>
-</body>
+</script></body>
 </html>

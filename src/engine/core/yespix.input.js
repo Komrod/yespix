@@ -11,7 +11,7 @@
  * AND "-" and OR "|" can be used in the selector.
  * @param  {int|string} s The selector or the key code of the character. Selector can be special keys ("shift", "ctrl" ...), multiple keys separated
  *                        with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority
- *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for character "|" and "-", the characters
+ *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for keys "|" and "-", the characters
  *                        must be escaped if there is more than one character in the selector, like "\|" and "\-".
  * @param  {string} type "pressed" / "hold" / "down" / "up", default is "hold"
  * @return {boolean} Returns True on success
@@ -65,3 +65,7 @@ yespix.fn.specialKey = function(s, type) {
     if (type == 'hold' && this.data.key['up'][this.data.key.special[s.toLowerCase()]]) return true;
     return !!this.data.key[type][this.data.key.special[s.toLowerCase()]];
 };
+
+yespix.fn.keyDisable = function() {
+
+}

@@ -89,15 +89,20 @@ yespix.define('image', 'gfx', {
 
     image: function(properties) {
 
-        if (properties == undefined)
-            if (this.images[0]) return this.imageInit(this.images[0]);
-            else return null;
-        if (typeof properties == 'string') properties = {
-            name: properties
-        };
-        else if (yespix.isInt(properties))
+        if (yespix.isInt(properties))
+        {
             if (this.images[properties]) return this.imageInit(this.images[properties]);
             else return null;
+        } else if (properties == undefined)
+        {
+            if (this.images[0]) return this.imageInit(this.images[0]);
+            else return null;
+        } else if (typeof properties == 'string') 
+        {
+            properties = {
+                name: properties
+            };
+        } 
 
         var max = Object.keys(properties).length;
         var count = 0;
@@ -175,20 +180,28 @@ yespix.define('image', 'gfx', {
         }
 
         var img = this.image(this.imageSelected);
-        var box = this.getDrawBox();
 
-        // check if image outside canvas
-        if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight 
-            || box.x + box.width < 0
-            || box.y + box.height < 0)
-            return;
-
-        var scaleX = this.flipX ? -1 : 1;
-        var scaleY = this.flipY ? -1 : 1;
-        var contextDrawBox = this.getContextDrawBox(context, img, box);
-        
         if (context && img && img.element && img.isReady) {
+
+            var box = this.getDrawBox();
+
+            // check if image outside canvas
+            if (box.x > context.canvas.clientWidth 
+                || box.y > context.canvas.clientHeight 
+                || box.x + box.width < 0
+                || box.y + box.height < 0)
+                return;
+
+            var contextDrawBox = this.getContextDrawBox(context, img, box);
+
+            if (contextDrawBox.img_width == 0
+                || contextDrawBox.img_height == 0
+                || contextDrawBox.context_width == 0
+                || contextDrawBox.context_height == 0)
+                return;
+
+            //var scaleX = this.flipX ? -1 : 1;
+            //var scaleY = this.flipY ? -1 : 1;
             context.globalAlpha = this.alpha;
         
             //console.log(contextDrawBox);

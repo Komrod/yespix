@@ -9,6 +9,18 @@ yespix.define('circle', 'path', {
         context.arc(box.x + this.circleRadius, box.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
     },
 
+    getDrawBox: function(relative) {
+        var position = this.getPosition(relative);
+
+        return {
+            x: position.x,
+            y: position.y,
+            width: this.circleRadius * 2,
+            height: this.circleRadius * 2,
+            type: this._class
+        };
+    },
+
     drawDebugPosition: function(context, drawBox) {
         var box = drawBox || this.getDrawBox();
         context.lineWidth = 0.5;

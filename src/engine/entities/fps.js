@@ -7,6 +7,7 @@ yespix.define('fps', 'text', {
 
     text: '',
     textMinMax: '',
+    textAverage: '',
 
     lineWidth: 1,
     lineColor: '#000000',
@@ -116,16 +117,17 @@ yespix.define('fps', 'text', {
                 this.fpsData.push(parseInt(fps));
             }
 
-            var min = max = 0;
+            var min = max = average = 0;
             for (var t=0; t<120; t++) {
                 if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
                 if (max < this.fpsData[t]) max = this.fpsData[t];
+                average += this.fpsData[t];
             }
-            
+            average = average / 120;
+
             context.globalAlpha = this.alpha;
             context.lineWidth = this.lineWidth;
             context.strokeStyle = this.lineColor;
-            context.beginPath();
             for (var t=0; t<120; t++) {
                 var scale = 0;
                 if (max > 0) scale = (this.height - 4) / max;
@@ -135,10 +137,11 @@ yespix.define('fps', 'text', {
                 else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
                 else context.strokeStyle = this.fpsColors[4];
 
+                context.beginPath();
                 context.moveTo(this.x + t + 2, this.y + this.height - 2);
                 context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                context.stroke();
             }
-            context.stroke();
 
             // drawing fps
             context.globalAlpha = this.alpha;
@@ -148,10 +151,17 @@ yespix.define('fps', 'text', {
 
             // drawing min/max
             this.textMinMax = '('+min+'-'+max+')';
-            context.globalAlpha = this.alpha * 0.8;
-            context.fillStyle = this.textColor;
-            context.font = this.textSize+'px '+this.textFont;
-            context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 10);
+            //context.globalAlpha = this.alpha * 0.8;
+            //context.fillStyle = this.textColor;
+            //context.font = this.textSize+'px '+this.textFont;
+            context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
+
+            // drawing average
+            this.textAverage = parseInt(average * 100) / 100 + '';
+            //context.globalAlpha = this.alpha * 0.8;
+            //context.fillStyle = this.textColor;
+            //context.font = this.textSize+'px '+this.textFont;
+            context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
         }
     },
 

@@ -51,7 +51,7 @@ yespix.define('gfx', {
             };
         } else {
             var position = this._parent.getPosition();
-            if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
+            //if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
             if (position) return {
                 x: this.x + position.x,
                 y: this.y + position.y
@@ -131,36 +131,45 @@ yespix.define('gfx', {
     },
 
     draw: function() {
-        if (this.canDrawDebug()) this.drawDebug();
+        var context = this.getContext();
+        var box = this.getDrawBox();
+        if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
     },
 
     drawAlpha: function(context, type, doNotUseGlobal) {
         if (!type) {
             context.globalAlpha = this.alpha;
         } else {
-            if (!this[type + 'Alpha']) context.globalAlpha = 0;
-            else if (doNotUseGlobal) context.globalAlpha = this[type + 'Alpha'];
-            else context.globalAlpha = this.alpha * this[type + 'Alpha'];
+            if (!this[type + 'Alpha'])
+            {
+                context.globalAlpha = 0;
+            } else if (doNotUseGlobal)
+            {
+                context.globalAlpha = this[type + 'Alpha'];
+            } else 
+            {
+                context.globalAlpha = this.alpha * this[type + 'Alpha'];
+            }
         }
     },
 
-    canDrawDebug: function() {
+    canDrawDebug: function(context, box) {
         return this.debug;
     },
 
-    canDrawDebugPosition: function() {
+    canDrawDebugPosition: function(context, box) {
         return yespix.isFunction(this.drawDebugPosition) && this.debugPosition;
     },
 
-    canDrawDebugImage: function() {
+    canDrawDebugImage: function(context, box) {
         return yespix.isFunction(this.drawDebugImage) && this.debugImage;
     },
 
-    canDrawDebugCollision: function() {
+    canDrawDebugCollision: function(context, box) {
         return yespix.isFunction(this.drawDebugCollision) && this.debugCollision;
     },
 
-    canDrawDebugMove: function() {
+    canDrawDebugMove: function(context, box) {
         return yespix.isFunction(this.drawDebugMove) && this.debugMove;
     },
 
@@ -172,8 +181,7 @@ yespix.define('gfx', {
         if (this.canDrawDebugMove()) this.drawDebugMove(context, box);
     },
 
-    drawDebugPosition: function(context, drawBox) {
-        var box = drawBox || this.getDrawBox();
+    drawDebugPosition: function(context, box) {
         context.lineWidth = 0.5;
         context.strokeStyle = "#cc3333";
         context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);

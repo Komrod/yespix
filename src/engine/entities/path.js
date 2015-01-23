@@ -17,7 +17,7 @@ yespix.define('path', 'gfx', {
             || box.x + box.width < 0
             || box.y + box.height < 0)
             return false;
-    
+        
         return this.isVisible && this.alpha > 0;
     },
 
@@ -26,7 +26,7 @@ yespix.define('path', 'gfx', {
     },
 
     drawPath: function(context, box) {
-
+        context.beginPath();
     },
 
     canDrawLine: function(context, box) {
