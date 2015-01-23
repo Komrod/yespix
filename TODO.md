@@ -1,10 +1,15 @@
 
 TODO list:
 - optimize: only call getDrawBox once per entity
+- change licence
+- examples and build folders in the root project
+- fix position of followed entity in the center of entity
+- key remanence (for jump)
+- phone mode: disable keys, fullscreen
 - calculate vector from a position to another position
 - stop and resume time
-- Bug: draw debug on chuck
-- Make movement relative to time, not frame
+- bug: draw debug on chuck
+- make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
 - draw text based on image
