@@ -251,3 +251,46 @@ yespix.fn.each = function(array, fn, args) {
     }
     return this;
 };
+
+
+/*
+ * Get the font height and puts it in cache
+ */
+yespix.fn.getFontHeight = function(fontStyle) {
+    var result = this.data.fontHeight[fontStyle];
+
+    if (!result) {
+        var fontDraw = document.createElement("canvas");
+        var ctx = fontDraw.getContext('2d');
+        ctx.fillRect(0, 0, fontDraw.width, fontDraw.height);
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = 'white';
+        ctx.font = fontStyle;
+        ctx.fillText('gM', 0, 0);
+        var pixels = ctx.getImageData(0, 0, fontDraw.width, fontDraw.height).data;
+        var start = -1;
+        var end = -1;
+        for (var row = 0; row < fontDraw.height; row++) {
+            for (var column = 0; column < fontDraw.width; column++) {
+                var index = (row * fontDraw.width + column) * 4;
+                if (pixels[index] === 0) {
+                    if (column === fontDraw.width - 1 && start !== -1) {
+                        end = row;
+                        row = fontDraw.height;
+                        break;
+                    }
+                    continue;
+                } else {
+                    if (start === -1) {
+                        start = row;
+                    }
+                    break;
+                }
+            }
+        }
+        result = end - start;
+        this.data.fontHeight[fontStyle] = result;
+    }
+    return result;
+};
+
