@@ -184,6 +184,10 @@ yespix.define('image', 'gfx', {
         if (context && img && img.element && img.isReady) {
 
             var box = this.getDrawBox();
+            if (this.snapToPixel) {
+                box.x = parseInt(box.x);
+                box.y = parseInt(box.y);
+            }
 
             // check if image outside canvas
             if (box.x > context.canvas.clientWidth 
