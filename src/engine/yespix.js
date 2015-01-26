@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-01-20 */
+/*! yespix - v0.1.0 - 2015-01-26 */
 (function(undefined) {
 
     /**
@@ -2040,6 +2040,49 @@
         return this;
     };
 
+
+    /*
+     * Get the font height and puts it in cache
+     */
+    yespix.fn.getFontHeight = function(fontStyle) {
+        var result = this.data.fontHeight[fontStyle];
+
+        if (!result) {
+            var fontDraw = document.createElement("canvas");
+            var ctx = fontDraw.getContext('2d');
+            ctx.fillRect(0, 0, fontDraw.width, fontDraw.height);
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = 'white';
+            ctx.font = fontStyle;
+            ctx.fillText('gM', 0, 0);
+            var pixels = ctx.getImageData(0, 0, fontDraw.width, fontDraw.height).data;
+            var start = -1;
+            var end = -1;
+            for (var row = 0; row < fontDraw.height; row++) {
+                for (var column = 0; column < fontDraw.width; column++) {
+                    var index = (row * fontDraw.width + column) * 4;
+                    if (pixels[index] === 0) {
+                        if (column === fontDraw.width - 1 && start !== -1) {
+                            end = row;
+                            row = fontDraw.height;
+                            break;
+                        }
+                        continue;
+                    } else {
+                        if (start === -1) {
+                            start = row;
+                        }
+                        break;
+                    }
+                }
+            }
+            result = end - start;
+            this.data.fontHeight[fontStyle] = result;
+        }
+        return result;
+    };
+
+
     /**
      ***********************************************************************************************************
      ***********************************************************************************************************
@@ -2085,6 +2128,11 @@
 
         // initialise the data
         this.data = {
+
+            // font height
+            fontHeight: {
+
+            },
 
             // collision map of the entities
             collisionMap: {
@@ -2339,12 +2387,6 @@
 
         // init functions for input keys 
         yespix.on('exitFrame', function(e) {
-            // delete old keypressed
-            /*
-				if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
-				if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
-				if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
-				*/
             // save current keypressed as old keypressed and delete current keypressed
             this.data.key.pressed = {
                 //	old: this.data.key.pressed
@@ -2468,7 +2510,7 @@
      * AND "-" and OR "|" can be used in the selector.
      * @param  {int|string} s The selector or the key code of the character. Selector can be special keys ("shift", "ctrl" ...), multiple keys separated
      *                        with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority
-     *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for character "|" and "-", the characters
+     *                        over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for keys "|" and "-", the characters
      *                        must be escaped if there is more than one character in the selector, like "\|" and "\-".
      * @param  {string} type "pressed" / "hold" / "down" / "up", default is "hold"
      * @return {boolean} Returns True on success
@@ -2523,11 +2565,14 @@
         return !!this.data.key[type][this.data.key.special[s.toLowerCase()]];
     };
 
-    /**
-     ************************************************************************************************************
-     ************************************************************************************************************
-     * SUPPORT
-     */
+    yespix.fn.keyDisable = function() {
+
+        }
+        /**
+         ************************************************************************************************************
+         ************************************************************************************************************
+         * SUPPORT
+         */
 
     /**
      * Media support detection. The function support(type) return true if the requested audio or video is supported
@@ -2656,14 +2701,14 @@
 
     yespix.fn.frameIndex = 0; // frame
     yespix.fn.frameTime = 0;
-    yespix.fn.frameMs = 1; // milliSecPerFrame
+    yespix.fn.frameMs = 1; // minimum milliSecPerFrame
     yespix.fn.frameRequest = null; // onFrame
     yespix.fn.frameRequestId = null; // requestId
     yespix.fn.frameTick = null;
     yespix.fn.frameTickNext = (new Date()).getTime(); // nextGameTick
 
     yespix.fn.time = +new Date(); // currentTime
-    yespix.fn.fps = 60;
+    yespix.fn.fps = 60; // maximum frames in 1 second
 
     yespix.fn.timerStart = function() {
         // Init the requestAnimationFrame in this.frameRequest
@@ -2709,7 +2754,7 @@
     };
 
     yespix.fn.timerStep = function() {
-        loops = 0;
+        var loops = 0;
         this.frameTime = +new Date();
         if (this.frameTime - this.frameTickNext > 60 * this.frameMs) {
             this.frameTickNext = this.frameTime - this.frameMs;
@@ -3583,19 +3628,21 @@
                 // apply relative width and height
                 if (yespix.contains(options.width, '%')) {
                     var clientWidth = 800;
-                    if (this.document.width) clientWidth = this.document.width;
-                    else if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
+                    if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
+                    else if (this.document.width) clientWidth = this.document.width;
                     else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
                     //console.log('width = '+clientWidth+' * '+(parseFloat(options.width.replace('%', '')) / 100));
                     options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
                 }
                 if (yespix.contains(options.height, '%')) {
-                    var clientHeight = 800;
-                    if (this.document.height) clientHeight = this.document.height;
-                    else if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight;
-                    else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight;
-                    //console.log('height = '+clientHeight+' * '+(parseFloat(options.height.replace('%', '')) / 100));
+                    var clientHeight = 600;
+                    var delta = 4;
+                    if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight - delta;
+                    else if (this.document.height) clientHeight = this.document.height - delta;
+                    else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight - delta;
+                    console.log('options.height = ' + clientHeight + ' * ' + (parseFloat(options.height.replace('%', '')) / 100));
                     options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
+                    console.log('options.height = ' + options.height);
                 }
                 //console.log(options);
                 this.canvasOptions = options;
@@ -3633,7 +3680,8 @@
 
             clear: function() {
                 //			this.context.clearRect(0,0,this.element.width, this.element.height);
-                if (this.element) this.element.width = this.element.width;
+                //if (this.element) 
+                this.element.width = this.element.width;
             },
         });
 
@@ -3643,9 +3691,21 @@
 
             init: function() {},
 
-            drawPath: function(context) {
+            drawPath: function(context, box) {
                 context.beginPath();
-                context.arc(this.x + this.circleRadius, this.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+                context.arc(box.x + this.circleRadius, box.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+            },
+
+            getDrawBox: function(relative) {
+                var position = this.getPosition(relative);
+
+                return {
+                    x: position.x,
+                    y: position.y,
+                    width: this.circleRadius * 2,
+                    height: this.circleRadius * 2,
+                    type: this._class
+                };
             },
 
             drawDebugPosition: function(context, drawBox) {
@@ -3762,6 +3822,175 @@
 
         });
 
+        yespix.define('fps', 'text', {
+
+            textAlign: 'left', // "left" / "right" / "center"
+            textFont: 'sans-serif',
+            textSize: 9,
+            textColor: '#FFFFFF',
+
+            text: '',
+            textMinMax: '',
+            textAverage: '',
+
+            lineWidth: 1,
+            lineColor: '#000000',
+            lineAlpha: 1.0,
+
+            fillColor: '#303030',
+            fillAlpha: 0.9,
+
+            isVisible: true,
+
+            fpsLastTime: 0,
+            fpsAverageTime: 250,
+            fpsAverageFrames: 0,
+            fpsAverage: 0,
+
+            fpsColors: ['#ffffff', '#FF0000', '#FF8C00', '#F9F900', '#5EFC32'],
+
+            fpsData: [],
+
+            width: 124,
+            height: 50,
+
+            init: function() {
+                this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            },
+
+            canDraw: function() {
+                return this.isVisible && this.alpha > 0;
+            },
+
+            canDrawLine: function() {
+                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
+            },
+
+            canDrawFill: function() {
+                return this.fillColor != '' && this.fillAlpha > 0;
+            },
+
+            drawFill: function(context, box) {
+                context.fillStyle = this.fillColor;
+                context.fillRect(
+                    this.x, // x position on canvas
+                    this.y, // y position on canvas
+                    this.width, // width on canvas
+                    this.height // height on canvas
+                );
+            },
+
+            drawLine: function(context, box) {
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                context.strokeRect(this.x, this.y, this.width, this.height);
+            },
+
+            getDrawBox: function(relative) {
+                var position = this.getPosition(relative);
+                var context = this.getContext();
+                if (!context) return {
+                    x: position.x,
+                    y: position.y - this.textSize,
+                    width: 0,
+                    height: 0,
+                    type: this._class
+                };
+
+                return {
+                    x: position.x,
+                    y: position.y - this.textSize,
+                    width: this._context.measureText(this.text).width,
+                    height: this.textSize,
+                    type: this._class
+                };
+            },
+
+            draw: function() {
+                if (!this.isVisible) return;
+
+                var context = this.getContext();
+
+                if (context) {
+                    var box = this.getDrawBox();
+                    if (this.canDrawFill()) this.drawFill(context, box);
+                    if (this.canDrawLine()) this.drawLine(context, box);
+
+                    if (this.fpsLastTime == 0) {
+                        this.fpsLastTime = yespix.frameTime;
+                        return;
+                    }
+
+                    if (this.fpsAverageTime > 0) {
+                        this.fpsAverageFrames++;
+                        this.fpsAverage += yespix.frameTime - this.fpsLastTime;
+                        if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
+                            var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
+                            this.fpsAverage = 0;
+                            this.fpsAverageFrames = 0;
+                            this.text = parseInt(fps * 100) / 100;
+                            this.fpsData.shift();
+                            this.fpsData.push(parseInt(fps));
+                        }
+                        this.fpsLastTime = yespix.frameTime;
+                    } else {
+                        var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                        this.fpsLastTime = yespix.frameTime;
+                        this.text = parseInt(fps * 100) / 100;
+                        this.fpsData.shift();
+                        this.fpsData.push(parseInt(fps));
+                    }
+
+                    var min = max = average = 0;
+                    for (var t = 0; t < 120; t++) {
+                        if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
+                        if (max < this.fpsData[t]) max = this.fpsData[t];
+                        average += this.fpsData[t];
+                    }
+                    average = average / 120;
+
+                    context.globalAlpha = this.alpha;
+                    context.lineWidth = this.lineWidth;
+                    context.strokeStyle = this.lineColor;
+                    for (var t = 0; t < 120; t++) {
+                        var scale = 0;
+                        if (max > 0) scale = (this.height - 4) / max;
+                        if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
+                        else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
+                        else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
+                        else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
+                        else context.strokeStyle = this.fpsColors[4];
+
+                        context.beginPath();
+                        context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                        context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                        context.stroke();
+                    }
+
+                    // drawing fps
+                    context.globalAlpha = this.alpha;
+                    context.fillStyle = this.textColor;
+                    context.font = this.textSize + 'px ' + this.textFont;
+                    context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
+
+                    // drawing min/max
+                    this.textMinMax = '(' + min + '-' + max + ')';
+                    //context.globalAlpha = this.alpha * 0.8;
+                    //context.fillStyle = this.textColor;
+                    //context.font = this.textSize+'px '+this.textFont;
+                    context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
+
+                    // drawing average
+                    this.textAverage = parseInt(average * 100) / 100 + '';
+                    //context.globalAlpha = this.alpha * 0.8;
+                    //context.fillStyle = this.textColor;
+                    //context.font = this.textSize+'px '+this.textFont;
+                    context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+                }
+            },
+
+        });
+
         /**
          * @class entity.gfx
          */
@@ -3789,9 +4018,10 @@
             debugCollision: true,
             debugMove: true,
 
+            prerender: false,
+            prerenderCanvas: false,
 
 
-            ///////////////////////////////// Main functions ////////////////////////////////
 
             asset: function() {
                 return [];
@@ -3804,8 +4034,55 @@
                     yespix.drawEntitiesSort = true;
                 });
 
+                if (this.prerender) {
+                    this.prerenderInit();
+                }
+
                 return true;
             },
+
+            ///////////////////////////// Pre-render functions /////////////////////////////
+
+            prerenderInit: function() {
+                //console.log('prerenderInit');
+                this.prerenderCreate();
+            },
+
+            prerenderCreate: function() {
+                this.prerenderCanvas = yespix.document.createElement('canvas');
+                this.prerenderCanvas.context = this.prerenderCanvas.getContext('2d');
+
+                this.prerenderUpdate();
+            },
+
+            prerenderUpdate: function() {
+                /*
+                        console.log('prerenderUpdate');
+                        this.prerenderCanvas.width = this.width;
+                        this.prerenderCanvas.height = this.height;
+                        var current_x = this.x;
+                        var current_y = this.y;
+                        this.x = this.y = 0;
+                        var contextDrawBox = this.getContextDrawBox(
+                                this.prerenderCanvas.context, 
+                                {
+                                    realWidth: this.prerenderCanvas.width,
+                                    realHeight: this.prerenderCanvas.height,
+                                    name: 'prerenderUpdate'
+                                }
+                            );
+
+                        this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+                        fuckyou();
+                        this.x = current_x;
+                        this.y = current_y;*/
+            },
+
+            prerenderUse: function(context) {
+
+            },
+
+            ///////////////////////////////// Main functions ////////////////////////////////
 
             getPosition: function(relative) {
                 if (relative || !this._parent) {
@@ -3815,7 +4092,7 @@
                     };
                 } else {
                     var position = this._parent.getPosition();
-                    if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
+                    //if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
                     if (position) return {
                         x: this.x + position.x,
                         y: this.y + position.y
@@ -3827,7 +4104,7 @@
                 };
             },
 
-            getDrawBox: function(relative) {
+            getDrawBox: function(relative, context) {
                 var position = this.getPosition(relative);
 
                 return {
@@ -3839,6 +4116,55 @@
                 };
             },
 
+            getContextDrawBox: function(context, img, box) {
+
+                var contextDrawBox = {
+                    img_x: 0,
+                    img_y: 0,
+                    img_width: img.realWidth,
+                    img_height: img.realHeight,
+                    context_x: box.x,
+                    context_y: box.y,
+                    context_width: box.width,
+                    context_height: box.height
+                };
+
+                if (context.name) contextDrawBox.name = context.name;
+
+                // check if the whole image is inside canvas
+                // as image here cant be entirely outside canvas
+                if (box.x > 0 && box.x + box.width < context.canvas.clientWidth && box.y > 0 && box.y + box.height < context.canvas.clientHeight)
+                    return contextDrawBox;
+
+                // crop the image
+                var scale_x = contextDrawBox.context_width / contextDrawBox.img_width;
+                var scale_y = contextDrawBox.context_height / contextDrawBox.img_height;
+                if (contextDrawBox.context_x < 0) {
+                    contextDrawBox.img_x = contextDrawBox.img_x - contextDrawBox.context_x / scale_x;
+                    contextDrawBox.img_width = contextDrawBox.img_width + contextDrawBox.context_x / scale_x;
+                    contextDrawBox.context_width = contextDrawBox.context_width + contextDrawBox.context_x;
+                    contextDrawBox.context_x = 0;
+                }
+                if (contextDrawBox.context_y < 0) {
+                    contextDrawBox.img_y = contextDrawBox.img_y - contextDrawBox.context_y / scale_y;
+                    contextDrawBox.img_height = contextDrawBox.img_height + contextDrawBox.context_y / scale_y;
+                    contextDrawBox.context_height = contextDrawBox.context_height + contextDrawBox.context_y;
+                    contextDrawBox.context_y = 0;
+                }
+                if (contextDrawBox.context_x + contextDrawBox.context_width > context.canvas.clientWidth) {
+                    var delta = contextDrawBox.context_x + contextDrawBox.context_width - context.canvas.clientWidth;
+                    contextDrawBox.img_width = contextDrawBox.img_width - delta / scale_x;
+                    contextDrawBox.context_width = contextDrawBox.context_width - delta;
+                }
+                if (contextDrawBox.context_y + contextDrawBox.context_height > context.canvas.clientHeight) {
+                    var delta = contextDrawBox.context_y + contextDrawBox.context_height - context.canvas.clientHeight;
+                    contextDrawBox.img_height = contextDrawBox.img_height - delta / scale_y;
+                    contextDrawBox.context_height = contextDrawBox.context_height - delta;
+                }
+                return contextDrawBox;
+
+            },
+
             getContext: function() {
                 if (this._context) return this._context;
                 var canvas = yespix.find('.canvas')[0];
@@ -3846,37 +4172,45 @@
                 return this._context;
             },
 
-            draw: function() {
-                if (this.canDrawDebug()) this.drawDebug();
+            draw: function(context) {
+                /*
+                if (!context) context = this.getContext();
+                var box = this.getDrawBox();
+                if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
+                */
             },
 
             drawAlpha: function(context, type, doNotUseGlobal) {
                 if (!type) {
                     context.globalAlpha = this.alpha;
                 } else {
-                    if (!this[type + 'Alpha']) context.globalAlpha = 0;
-                    else if (doNotUseGlobal) context.globalAlpha = this[type + 'Alpha'];
-                    else context.globalAlpha = this.alpha * this[type + 'Alpha'];
+                    if (!this[type + 'Alpha']) {
+                        context.globalAlpha = 0;
+                    } else if (doNotUseGlobal) {
+                        context.globalAlpha = this[type + 'Alpha'];
+                    } else {
+                        context.globalAlpha = this.alpha * this[type + 'Alpha'];
+                    }
                 }
             },
 
-            canDrawDebug: function() {
+            canDrawDebug: function(context, box) {
                 return this.debug;
             },
 
-            canDrawDebugPosition: function() {
+            canDrawDebugPosition: function(context, box) {
                 return yespix.isFunction(this.drawDebugPosition) && this.debugPosition;
             },
 
-            canDrawDebugImage: function() {
+            canDrawDebugImage: function(context, box) {
                 return yespix.isFunction(this.drawDebugImage) && this.debugImage;
             },
 
-            canDrawDebugCollision: function() {
+            canDrawDebugCollision: function(context, box) {
                 return yespix.isFunction(this.drawDebugCollision) && this.debugCollision;
             },
 
-            canDrawDebugMove: function() {
+            canDrawDebugMove: function(context, box) {
                 return yespix.isFunction(this.drawDebugMove) && this.debugMove;
             },
 
@@ -3888,8 +4222,7 @@
                 if (this.canDrawDebugMove()) this.drawDebugMove(context, box);
             },
 
-            drawDebugPosition: function(context, drawBox) {
-                var box = drawBox || this.getDrawBox();
+            drawDebugPosition: function(context, box) {
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#cc3333";
                 context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);
@@ -3935,7 +4268,7 @@
                 for (var t = 0; t < this.images.length; t++) {
                     // if the array element is a string, it's the src of the image
                     if (yespix.isString(this.images[t])) this.images[t] = {
-                        src: this.images[t],
+                        src: this.images[t]
                     };
 
                     // init the default properties
@@ -3944,7 +4277,6 @@
                     }
                     if (this.images[t].name === '') this.images[t].name = 'image' + count++;
                 }
-
                 this.imageInit();
 
                 this.readyFunctions.push(this.checkReadyStateImage);
@@ -3998,15 +4330,17 @@
 
             image: function(properties) {
 
-                if (properties == undefined)
-                    if (this.images[0]) return this.imageInit(this.images[0]);
-                    else return null;
-                if (typeof properties == 'string') properties = {
-                    name: properties
-                };
-                else if (yespix.isInt(properties))
+                if (yespix.isInt(properties)) {
                     if (this.images[properties]) return this.imageInit(this.images[properties]);
                     else return null;
+                } else if (properties == undefined) {
+                    if (this.images[0]) return this.imageInit(this.images[0]);
+                    else return null;
+                } else if (typeof properties == 'string') {
+                    properties = {
+                        name: properties
+                    };
+                }
 
                 var max = Object.keys(properties).length;
                 var count = 0;
@@ -4033,6 +4367,7 @@
                 // image already initiated
                 if (image.isInitiated) return image;
 
+                // start initialisation
                 image.isReady = false;
                 image.isInitiated = true;
                 image.entity = entity;
@@ -4041,6 +4376,8 @@
                 if (image.element) image.element.onload = image.element.onLoad = function() {
                     image.realWidth = this.width;
                     image.realHeight = this.height;
+                    image.entity.width = this.width;
+                    image.entity.height = this.height;
                     image.isReady = true;
 
                     if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
@@ -4073,7 +4410,6 @@
 
             draw: function(context) {
                 if (!this.isVisible) return;
-
                 if (!context) {
                     if (!this._context) {
                         this.getContext();
@@ -4082,27 +4418,48 @@
                 }
 
                 var img = this.image(this.imageSelected);
-                var box = this.getDrawBox();
-                var scaleX = this.flipX ? -1 : 1;
-                var scaleY = this.flipY ? -1 : 1;
 
                 if (context && img && img.element && img.isReady) {
+
+                    var box = this.getDrawBox();
+                    if (this.snapToPixel) {
+                        box.x = parseInt(box.x);
+                        box.y = parseInt(box.y);
+                    }
+
+                    // check if image outside canvas
+                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                        return;
+
+                    var contextDrawBox = this.getContextDrawBox(context, img, box);
+
+                    if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
+                        return;
+
+                    //var scaleX = this.flipX ? -1 : 1;
+                    //var scaleY = this.flipY ? -1 : 1;
                     context.globalAlpha = this.alpha;
+
+                    //console.log(contextDrawBox);
+
                     context.drawImage(img.element, //image element
-                        0, // x position on image
-                        0, // y position on image
-                        img.realWidth, // width on image
-                        img.realHeight, // height on image
-                        box.x, // x position on canvas
-                        box.y, // y position on canvas
-                        box.width, // width on canvas
-                        box.height // height on canvas
+                        contextDrawBox.img_x, // x position on image
+                        contextDrawBox.img_y, // y position on image
+                        contextDrawBox.img_width, // width on image
+                        contextDrawBox.img_height, // height on image
+                        contextDrawBox.context_x, // x position on canvas
+                        contextDrawBox.context_y, // y position on canvas
+                        contextDrawBox.context_width, // width on canvas
+                        contextDrawBox.context_height // height on canvas
                     );
+                    //fuckyou();
                     if (this.debug) {
                         this.drawDebug(context, box);
                     }
                 }
             },
+
+
 
             drawDebugImage: function(context, drawBox) {
                 var box = drawBox || this.getDrawBox();
@@ -4235,12 +4592,51 @@
                         if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
                         if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
                     }
+
+                    if (this.level.snapToPixel) {
+                        box.x = parseInt(box.x);
+                        box.y = parseInt(box.y);
+                    }
+
+
+                    // check if image outside canvas
+                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                        return;
+
+                    var contextDrawBox = this.getContextDrawBox(context, {
+                            realWidth: this.canvas.width,
+                            realHeight: this.canvas.height
+                        },
+                        box);
+
+                    /*console.log('context = ');
+                    console.log(context);
+                    console.log('this.canvas = ');
+                    console.log(this.canvas);
+                    console.log('box = ');
+                    console.log(box);
+                    */
+                    //alert('contextDrawBox: context x='+contextDrawBox.context_x+', y='+contextDrawBox.context_y+', w='+contextDrawBox.context_width+', h='+contextDrawBox.context_height+' / img x='+contextDrawBox.img_x+', y='+contextDrawBox.img_y+', w='+contextDrawBox.img_width+', h='+contextDrawBox.img_height);
+
+                    context.drawImage(this.canvas, //image element
+                        contextDrawBox.img_x, // x pdsition on image
+                        contextDrawBox.img_y, // y position on image
+                        contextDrawBox.img_width, // width on image
+                        contextDrawBox.img_height, // height on image
+                        contextDrawBox.context_x, // x position on canvas
+                        contextDrawBox.context_y, // y position on canvas
+                        contextDrawBox.context_width, // width on canvas
+                        contextDrawBox.context_height // height on canvas
+                    );
+
+                    /*
                     context.drawImage(this.canvas, //image element
                         box.x, // x position on image
                         box.y, // y position on image
                         this.canvas.width, // width on image
                         this.canvas.height // height on image
                     );
+                    */
                 }
             },
         });
@@ -4788,19 +5184,22 @@
 
             init: function() {},
 
-            canDraw: function() {
+            canDraw: function(context, box) {
+                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                    return false;
+
                 return this.isVisible && this.alpha > 0;
             },
 
-            canDrawPath: function() {
+            canDrawPath: function(context, box) {
                 return true;
             },
 
             drawPath: function(context, box) {
-
+                context.beginPath();
             },
 
-            canDrawLine: function() {
+            canDrawLine: function(context, box) {
                 return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
             },
 
@@ -4811,7 +5210,7 @@
                 context.stroke();
             },
 
-            canDrawFill: function() {
+            canDrawFill: function(context, box) {
                 return this.fillColor != '' && this.fillAlpha > 0;
             },
 
@@ -4823,22 +5222,24 @@
 
 
             draw: function(context) {
-                if (!this.canDraw()) return;
-
                 if (!context) {
                     if (!this._context) {
                         this.getContext();
                         if (this._context) context = this._context;
                     } else context = this._context;
                 }
-
                 var box = this.getDrawBox();
 
+                if (!this.canDraw(context, box)) return;
+
+
                 if (context) {
-                    if (this.canDrawPath()) this.drawPath(context, box);
-                    if (this.canDrawFill()) this.drawFill(context, box);
-                    if (this.canDrawLine()) this.drawLine(context, box);
-                    if (this.canDrawDebug()) this.drawDebug(context, box);
+                    if (this.canDrawPath(context, box)) {
+                        this.drawPath(context, box);
+                        if (this.canDrawFill(context, box)) this.drawFill(context, box);
+                        if (this.canDrawLine(context, box)) this.drawLine(context, box);
+                    }
+                    if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
                 }
             },
         });
@@ -5001,7 +5402,7 @@
             init: function() {},
 
             drawFill: function(context, box) {
-                context.fillStyle = this.fillColor;
+                ontext.fillStyle = this.fillColor;
                 context.fillRect(
                     this.x, // x position on canvas
                     this.y, // y position on canvas
@@ -5045,14 +5446,14 @@
 
             drawLine: function(context, box) {
                 this.drawAlpha(context, 'line');
-                context.strokeStyle = this.lineColor;
-                context.lineWidth = this.lineWidth;
+                if (context.strokeStyle != this.lineColor) context.strokeStyle = this.lineColor;
+                if (context.lineWidth != this.lineWidth) context.lineWidth = this.lineWidth;
                 context.stroke();
             },
 
             drawFill: function(context, box) {
                 this.drawAlpha(context, 'fill');
-                context.fillStyle = this.fillColor;
+                if (context.fillStyle != this.fillColor) context.fillStyle = this.fillColor;
                 context.fill();
             },
 
@@ -5415,40 +5816,133 @@
             textSize: 16,
             textColor: '#000000',
             text: '',
+            prerender: false,
 
-            getDrawBox: function(relative) {
+            prerenderUpdate: function() {
+                //console.log('prerenderUpdate');
+                var drawBox = this.getDrawBox();
+                this.prerenderCanvas.width = drawBox.width;
+                this.prerenderCanvas.height = drawBox.height;
+
+                //this.prerenderCanvas.context.fillStyle = '#FF0000';
+                //this.prerenderCanvas.context.fillRect(0,0,100,100);
+
+                var drawBox = this.getDrawBox();
+                //console.log('prerenderUpdate :: drawbox = ');
+                //console.log(drawBox);
+                var contextDrawBox = {
+                    img_x: 0,
+                    img_y: 0,
+                    img_width: drawBox.width,
+                    img_height: drawBox.height,
+                    context_x: 0,
+                    context_y: drawBox.height,
+                    context_width: drawBox.width,
+                    context_height: drawBox.height
+                };
+                //console.log('prerenderUpdate :: contextDrawBox = ');
+                //console.log(contextDrawBox);
+                this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+            },
+
+            getDrawBox: function(relative, context) {
                 var position = this.getPosition(relative);
+                //console.log('getDrawBox');
+                //console.log(context);
+                if (!context) {
+                    if (this.prerender) context = this.prerenderCanvas.context;
+                    else context = this.getContext();
+                }
+
+                //console.log(context);
+                var size = context.measureText(this.text);
+                //console.log('size = ');
+                //console.log(size);
+                size.height = yespix.getFontHeight(this.font);
+                //console.log('size = ');
+                //console.log(size);
                 return {
                     x: position.x,
-                    y: position.y - this.textSize,
-                    width: this._context.measureText(this.text).width,
-                    height: this.textSize,
+                    y: position.y,
+                    width: size.width * 2,
+                    height: size.height * 2,
                     type: this._class
                 };
             },
 
-            draw: function(context) {
+            draw: function() {
                 if (!this.isVisible) return;
+                //this.prerender = !this.prerender;
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+                var context;
+                //console.log(canvas);
+                //console.log('draw');
+                //console.log(context);
+                if (!context) context = this.getContext();
+                //console.log(context);
+                //console.log(this.prerenderCanvas);
+
+                if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+                    var box = this.getDrawBox(true, context);
+                    if (this.snapToPixel) {
+                        box.x = parseInt(box.x);
+                        box.y = parseInt(box.y);
+                    }
+
+                    // check if image outside canvas
+                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                        return;
+
+                    var contextDrawBox = this.getContextDrawBox(context, {
+                        realWidth: box.width,
+                        realHeight: box.height
+                    }, box);
+
+                    if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
+                        return;
+
+                    context.globalAlpha = this.alpha;
+
+                    //console.log(contextDrawBox);
+                    //console.log(this.prerenderCanvas);
+
+                    context.drawImage(this.prerenderCanvas, //image element
+                        contextDrawBox.img_x, // x position on image
+                        contextDrawBox.img_y, // y position on image
+                        contextDrawBox.img_width, // width on image
+                        contextDrawBox.img_height, // height on image
+                        contextDrawBox.context_x, // x position on canvas
+                        contextDrawBox.context_y - box.height, // y position on canvas
+                        contextDrawBox.context_width, // width on canvas
+                        contextDrawBox.context_height // height on canvas
+                    );
+                    return;
+                } //else console.log('no prerender');
 
                 if (context) {
 
-                    context.globalAlpha = this.alpha;
-                    context.fillStyle = this.textColor;
-                    context.font = this.textSize + 'px ' + this.textFont;
-                    context.fillText(this.text, this.x, this.y);
-
-                    if (this.debug) {
-                        this.drawDebug(context, this.getDrawBox());
-                    }
+                    this.drawRender(context, {
+                        context_x: this.x,
+                        context_y: this.y
+                    });
                 }
+
+                if (this.debug) {
+                    this.drawDebug(context, this.getDrawBox());
+                }
+
             },
+
+            drawRender: function(context, contextDrawBox) {
+                //console.log('drawRender');
+                //console.log(context);
+                //console.log(contextDrawBox);
+
+                context.globalAlpha = this.alpha;
+                context.fillStyle = this.textColor;
+                context.font = this.textSize + 'px ' + this.textFont;
+                context.fillText(this.text, contextDrawBox.context_x, contextDrawBox.context_y);
+            }
 
         });
 

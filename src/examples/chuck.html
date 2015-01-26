@@ -18,7 +18,7 @@
 </head>
 <body><script type="text/javascript">
 
-	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 60});
+	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 100});
 	
 	yp.define('chuck', 'player2w',
 	{
@@ -174,8 +174,8 @@
 	
 	var width = 25;
 	var height = 25;
-	for (var t=0; t<150; t++) {
-		for (var u=0; u<80; u++) {
+	for (var t=0; t<30; t++) {
+		for (var u=0; u<30; u++) {
 			
 			/*yp.spawn('image', {
 				x: -1000 + t*width, 
@@ -184,13 +184,21 @@
 				images: 'zardoz/image/zardoz_small.png'
 	            });*/
 			yp.spawn('text', {
-				x: -1000 + t*width, 
+				x: -500 + t*width, 
 				y: -500 + u*height,
 				snapToPixel: true,
-				text: 'Ceci est un test'
+				text: 'Ceci est un test',
+				prerender: true
 	            });
 		}
 	}
+			/*yp.spawn('text', {
+				x: 100, 
+				y: 100,
+				snapToPixel: true,
+				text: 'Ceci est un test',
+				prerender: true
+	            });*/
 	
 	yp.spawn('fps', {x: 5, y: 5});
 

@@ -29,7 +29,6 @@ yespix.define('gfx', {
     prerenderCanvas: false,
 
 
-    ///////////////////////////////// Main functions ////////////////////////////////
 
     asset: function() {
         return [];
@@ -42,22 +41,54 @@ yespix.define('gfx', {
             yespix.drawEntitiesSort = true;
         });
 
+    if (this.prerender) {
+        this.prerenderInit();
+    }
+
         return true;
     },
 
+    ///////////////////////////// Pre-render functions /////////////////////////////
+
     prerenderInit: function() {
-        
+        //console.log('prerenderInit');
+        this.prerenderCreate();
     },
 
     prerenderCreate: function() {
-        this.prerenderCanvas = this.document.createElement('canvas');
+        this.prerenderCanvas = yespix.document.createElement('canvas');
+        this.prerenderCanvas.context = this.prerenderCanvas.getContext('2d');
+
         this.prerenderUpdate();
     },
 
-    prerenderUpdate: function() {
+    prerenderUpdate: function() {/*
+        console.log('prerenderUpdate');
+        this.prerenderCanvas.width = this.width;
+        this.prerenderCanvas.height = this.height;
+        var current_x = this.x;
+        var current_y = this.y;
+        this.x = this.y = 0;
+        var contextDrawBox = this.getContextDrawBox(
+                this.prerenderCanvas.context, 
+                {
+                    realWidth: this.prerenderCanvas.width,
+                    realHeight: this.prerenderCanvas.height,
+                    name: 'prerenderUpdate'
+                }
+            );
+
+        this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+        fuckyou();
+        this.x = current_x;
+        this.y = current_y;*/
+    },
+
+    prerenderUse: function(context) {
 
     },
 
+    ///////////////////////////////// Main functions ////////////////////////////////
 
     getPosition: function(relative) {
         if (relative || !this._parent) {
@@ -79,7 +110,7 @@ yespix.define('gfx', {
         };
     },
 
-    getDrawBox: function(relative) {
+    getDrawBox: function(relative, context) {
         var position = this.getPosition(relative);
 
         return {
@@ -103,6 +134,8 @@ yespix.define('gfx', {
             context_width: box.width,
             context_height: box.height
         };
+        
+        if (context.name) contextDrawBox.name = context.name;
 
         // check if the whole image is inside canvas
         // as image here cant be entirely outside canvas
@@ -146,10 +179,12 @@ yespix.define('gfx', {
         return this._context;
     },
 
-    draw: function() {
-        var context = this.getContext();
+    draw: function(context) {
+        /*
+        if (!context) context = this.getContext();
         var box = this.getDrawBox();
         if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
+        */
     },
 
     drawAlpha: function(context, type, doNotUseGlobal) {

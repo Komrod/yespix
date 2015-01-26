@@ -64,6 +64,15 @@ yespix.define('fps', 'text', {
 
     getDrawBox: function(relative) {
         var position = this.getPosition(relative);
+        var context = this.getContext();
+        if (!context) return {
+            x: position.x,
+            y: position.y - this.textSize,
+            width: 0,
+            height: 0,
+            type: this._class
+        };
+
         return {
             x: position.x,
             y: position.y - this.textSize,
@@ -73,15 +82,10 @@ yespix.define('fps', 'text', {
         };
     },
     
-    draw: function(context) {
+    draw: function() {
         if (!this.isVisible) return;
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+        var context = this.getContext();
 
         if (context) {
             var box = this.getDrawBox();
