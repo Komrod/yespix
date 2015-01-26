@@ -9,6 +9,9 @@
 		padding: 0;
 		border: 0;
 		overflow: hidden;
+		position: absolute:
+		top: 0;
+		left: 0;
 	}
 
 	</style>
@@ -166,18 +169,26 @@
     
 	yp.gravity = { y: 22 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1}).load('chuck/test.json');
+	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
 	
-	var width = 100;
-	var height = 100;
-	for (var t=0; t<50; t++) {
-		for (var u=0; u<20; u++) {
-			yp.spawn('image', {
-				x: -500 + t*width, 
-				y: -200 + u*height,
+	var width = 25;
+	var height = 25;
+	for (var t=0; t<150; t++) {
+		for (var u=0; u<80; u++) {
+			
+			/*yp.spawn('image', {
+				x: -1000 + t*width, 
+				y: -500 + u*height,
+				snapToPixel: true,
 				images: 'zardoz/image/zardoz_small.png'
-	            }); //.setParent(mylevel);
+	            });*/
+			yp.spawn('text', {
+				x: -1000 + t*width, 
+				y: -500 + u*height,
+				snapToPixel: true,
+				text: 'Ceci est un test'
+	            });
 		}
 	}
 	

@@ -25,6 +25,8 @@ yespix.define('gfx', {
     debugCollision: true,
     debugMove: true,
 
+    prerender: false,
+    prerenderCanvas: false,
 
 
     ///////////////////////////////// Main functions ////////////////////////////////
@@ -42,6 +44,20 @@ yespix.define('gfx', {
 
         return true;
     },
+
+    prerenderInit: function() {
+        
+    },
+
+    prerenderCreate: function() {
+        this.prerenderCanvas = this.document.createElement('canvas');
+        this.prerenderUpdate();
+    },
+
+    prerenderUpdate: function() {
+
+    },
+
 
     getPosition: function(relative) {
         if (relative || !this._parent) {
