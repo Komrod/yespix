@@ -120,6 +120,11 @@ yespix.define('layer', 'gfx', {
                 if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
             }
 
+            if (this.level.snapToPixel) {
+                box.x = parseInt(box.x);
+                box.y = parseInt(box.y);
+            }
+
 
             // check if image outside canvas
             if (box.x > context.canvas.clientWidth 
@@ -138,11 +143,11 @@ yespix.define('layer', 'gfx', {
             console.log(this.canvas);
             console.log('box = ');
             console.log(box);
-
-            console.log(contextDrawBox);*/
+            */
+            //alert('contextDrawBox: context x='+contextDrawBox.context_x+', y='+contextDrawBox.context_y+', w='+contextDrawBox.context_width+', h='+contextDrawBox.context_height+' / img x='+contextDrawBox.img_x+', y='+contextDrawBox.img_y+', w='+contextDrawBox.img_width+', h='+contextDrawBox.img_height);
 
             context.drawImage(this.canvas, //image element
-                contextDrawBox.img_x, // x position on image
+                contextDrawBox.img_x, // x pdsition on image
                 contextDrawBox.img_y, // y position on image
                 contextDrawBox.img_width, // width on image
                 contextDrawBox.img_height, // height on image
