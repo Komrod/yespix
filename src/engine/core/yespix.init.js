@@ -44,6 +44,11 @@ yespix.fn.init = function(options) {
     // initialise the data
     this.data = {
 
+        // font height
+        fontHeight: {
+
+        },
+
         // collision map of the entities
         collisionMap: {
 
