@@ -2,6 +2,8 @@
 TODO list:
 - pre render gfx on rectangle
 - pre render gfx on rounded rectangle
+- use clearRect to clear faster the canvas
+- use hack rounding: rounded = ~~ (0.5 + somenum)
 - center draw path
 - examples and build folders in the root project
 - fps yoyo after pre-render optimization
@@ -17,8 +19,8 @@ TODO list:
 - create moveOnGround() for actor, set position on ground on startUp
 - draw text based on image
 - typewritter: text showing letter by letter with sound
-- panel
-- button
+- container entity
+- button entity
 - disable key capture on phones
 - Separate the fall down / jump up animation of a character
 

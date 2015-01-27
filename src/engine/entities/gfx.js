@@ -75,10 +75,18 @@ yespix.define('gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        //console.log('prerenderUpdate');
+
         var drawBox = this.getDrawBox();
+
+        //console.log('prerenderUpdate :: drawBox = ');
+        //console.log(drawBox);
+
         this.prerenderCanvas.width = drawBox.width;
         this.prerenderCanvas.height = drawBox.height;
+
+        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+        //console.log(this.prerenderCanvas);
+
         //console.log(drawBox);
         var contextDrawBox = {
             img_x: 0,
@@ -95,6 +103,9 @@ yespix.define('gfx', {
             o_height: drawBox.height
             };
 
+        //console.log('prerenderUpdate :: contextDrawBox = ');
+        //console.log(contextDrawBox);
+
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },
 
@@ -103,8 +114,10 @@ yespix.define('gfx', {
      */
     prerenderUse: function(context) {
         var box = this.getDrawBox(false, context);
-        //console.log('prerenderUse :: box = ');
+        
+        //console.log('prerenderUse :: drawBox = ');
         //console.log(box);
+
         if (this.snapToPixel) {
             box.x = parseInt(box.x);
             box.y = parseInt(box.y);
@@ -127,7 +140,10 @@ yespix.define('gfx', {
             return false;
 
         context.globalAlpha = this.alpha;
-    
+        
+        //console.log('prerenderUse :: contextDrawBox = ');
+        //console.log(contextDrawBox);
+
         context.drawImage(this.prerenderCanvas, //image element
             contextDrawBox.img_x, // x position on image
             contextDrawBox.img_y, // y position on image
@@ -175,9 +191,9 @@ yespix.define('gfx', {
         };
     },
 
-    getContextDrawBox: function(context, img, box) {
+    getContextDrawBoxDefault: function(context, img, box) {
         
-        var contextDrawBox = {
+        return {
             img_x: 0,
             img_y: 0,
             img_width: img.realWidth,
@@ -191,9 +207,12 @@ yespix.define('gfx', {
             o_width: box.width,
             o_height: box.height
         };
-        
-        if (context.name) contextDrawBox.name = context.name;
+    },
 
+    getContextDrawBox: function(context, img, box) {
+        
+        var contextDrawBox = this.getContextDrawBoxDefault(context, img, box);
+        
         // check if the whole image is inside canvas
         // as image here cant be entirely outside canvas
         if (box.x > 0 && box.x + box.width < context.canvas.clientWidth 

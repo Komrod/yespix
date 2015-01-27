@@ -1,3 +1,4 @@
+
 yespix.define('path', 'gfx', {
 
     lineWidth: 0,
@@ -11,6 +12,36 @@ yespix.define('path', 'gfx', {
 
     init: function() {
 
+    },
+
+    getDrawBox: function(relative) {
+        var position = this.getPosition(relative);
+
+        return {
+            x: position.x,
+            y: position.y,
+            width: this.width + this.lineWidth,
+            height: this.height + this.lineWidth,
+            type: this._class
+        };
+    },
+
+    getContextDrawBoxDefault: function(context, img, box) {
+        
+        return {
+            img_x: 0,
+            img_y: 0,
+            img_width: img.realWidth,
+            img_height: img.realHeight,
+            context_x: box.x,
+            context_y: box.y,
+            context_width: box.width,
+            context_height: box.height,
+            o_x: box.x + this.lineWidth / 2,
+            o_y: box.y + this.lineWidth / 2,
+            o_width: box.width,
+            o_height: box.height
+        };
     },
 
     canDraw: function(context, contextDrawBox) {
@@ -53,6 +84,8 @@ yespix.define('path', 'gfx', {
     },
 
     drawRender: function(context, contextDrawBox, img) {
+        //console.log('drawRender :: contextDrawBox = ');
+        //console.log(contextDrawBox);
         if (this.canDrawPath(context, contextDrawBox))
         {
             this.drawPath(context, contextDrawBox);
@@ -65,26 +98,87 @@ yespix.define('path', 'gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        //console.log('prerenderUpdate');
         var drawBox = this.getDrawBox();
+
+        //console.log('prerenderUpdate :: drawBox = ');
+        //console.log(drawBox);
+
         this.prerenderCanvas.width = drawBox.width;
         this.prerenderCanvas.height = drawBox.height;
-        //console.log(drawBox);
+
+        //this.prerenderCanvas.context.fillStyle = '#FF0000';
+        //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
+
+        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+        //console.log(this.prerenderCanvas);
+
         var contextDrawBox = {
             img_x: 0,
             img_y: 0,
-            img_width: drawBox.width + this.lineWidth * 2,
-            img_height: drawBox.height + this.lineWidth * 2,
+            img_width: drawBox.width,
+            img_height: drawBox.height,
             context_x: 0,
             context_y: 0,
-            context_width: drawBox.width + this.lineWidth * 2,
-            context_height: drawBox.height + this.lineWidth * 2,
-            o_x: 0,
-            o_y: 0,
-            o_width: drawBox.width + this.lineWidth * 2,
-            o_height: drawBox.height + this.lineWidth * 2
+            context_width: drawBox.width,
+            context_height: drawBox.height,
+            o_x: this.lineWidth / 2,
+            o_y: this.lineWidth / 2,
+            o_width: drawBox.width - this.lineWidth,
+            o_height: drawBox.height - this.lineWidth
             };
 
+        console.log('prerenderUpdate :: contextDrawBox = ');
+        console.log(contextDrawBox);
+        
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },
+
+    /**
+     * Draw the pre-render on a canvas context
+     */
+    prerenderUse: function(context) {
+        var box = this.getDrawBox(false, context);
+        
+        //console.log('prerenderUse :: drawBox = ');
+        //console.log(box);
+
+        if (this.snapToPixel) {
+            box.x = parseInt(box.x);
+            box.y = parseInt(box.y);
+        }
+
+        // check if image outside canvas
+        if (box.x > context.canvas.clientWidth 
+            || box.y > context.canvas.clientHeight 
+            || box.x + box.width < 0
+            || box.y + box.height < 0)
+            return false;
+
+        var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
+
+        // check if the contextDrawBox is flat
+        if (contextDrawBox.img_width == 0
+            || contextDrawBox.img_height == 0
+            || contextDrawBox.context_width == 0
+            || contextDrawBox.context_height == 0)
+            return false;
+
+        context.globalAlpha = this.alpha;
+        
+        console.log('prerenderUse :: contextDrawBox = ');
+        console.log(contextDrawBox);
+
+        context.drawImage(this.prerenderCanvas, //image element
+            contextDrawBox.img_x, // x position on image
+            contextDrawBox.img_y, // y position on image
+            contextDrawBox.img_width, // width on image
+            contextDrawBox.img_height, // height on image
+            contextDrawBox.context_x, // x position on canvas
+            contextDrawBox.context_y, // y position on canvas
+            contextDrawBox.context_width, // width on canvas
+            contextDrawBox.context_height // height on canvas
+        );
+        return true;
+    },
+
 });

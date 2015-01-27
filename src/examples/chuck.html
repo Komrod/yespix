@@ -172,10 +172,10 @@
 	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true}).load('chuck/test.json');
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
 	
-	var width = 25;
-	var height = 25;
-	for (var t=0; t<60; t++) {
-		for (var u=0; u<60; u++) {
+	var width = 50;
+	var height = 50;
+	for (var t=0; t<20; t++) {
+		for (var u=0; u<40; u++) {
 			
 			/*yp.spawn('image', {
 				x: -1000 + t*width, 
@@ -190,51 +190,124 @@
 				text: 'Ceci est un test',
 				prerender: true
 	            });*/
-			yp.spawn('circle', {
+			/*yp.spawn('circle', {
 				lineColor: '#123456',
 				lineWidth: yespix.randInt(1,10),
 				lineAlpha: 1,
 				fillColor: '#789abc',
 				fillAlpha: 1,
-				circleRadius: 5,
+				circleRadius: 10,
 				x: -500 + t*width, 
 				y: -500 + u*height,
 				snapToPixel: true,
 				prerender: false
-	            });
-		}
-	}
-			yp.spawn('circle', {
+	            });*/
+			/*yp.spawn('rect', {
 				lineColor: '#123456',
-				lineWidth: 1,
+				lineWidth: 2, //yespix.randInt(1,5),
 				lineAlpha: 1,
 				fillColor: '#789abc',
 				fillAlpha: 1,
-				circleRadius: 15,
-				x: 150, 
-				y: 150,
+				width: 5,
+				height: 5,
+				x: -500 + t*width, 
+				y: -500 + u*height,
 				snapToPixel: true,
-				prerender: true,
-				debug: true
-	            });
-			/*yp.spawn('text', {
-				x: 100, 
-				y: 100,
-				snapToPixel: true,
-				text: 'Ceci est un test',
 				prerender: true
 	            });*/
+		}
+	}
+	yp.spawn('circle', {
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		circleRadius: 15,
+		x: 150, 
+		y: 100,
+		snapToPixel: true,
+		prerender: false,
+		debug: true
+        });
+	yp.spawn('circle', {
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		circleRadius: 15,
+		x: 200, 
+		y: 100,
+		snapToPixel: true,
+		prerender: true,
+		debug: true
+        });
+	yp.spawn('rect', {
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		width: 30,
+		height: 30,
+		x: 150, 
+		y: 150,
+		snapToPixel: true,
+		prerender: false,
+		debug: true
+        });
+	yp.spawn('rect', {
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		width: 30,
+		height: 30,
+		x: 200, 
+		y: 150,
+		snapToPixel: true,
+		prerender: true,
+		debug: true
+        });
+	yp.spawn('text', {
+		x: 250, 
+		y: 100,
+		snapToPixel: true,
+		text: 'TEST test',
+		prerender: false,
+		debug: true
+        });
+	yp.spawn('text', {
+		x: 400, 
+		y: 100,
+		snapToPixel: true,
+		text: 'TEST test',
+		prerender: true,
+		debug: true
+        });
+	/*yp.spawn('rect', {
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 1,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		circleRadius: 15,
+		x: 150, 
+		y: 150,
+		width: 100,
+		height: 100,
+		snapToPixel: true,
+		z: 1000,
+		prerender: false,
+//				debug: true
+        });*/
 	
 	yp.spawn('fps', {x: 5, y: 5});
 
 	mylevel.follow(mychuck, {resetOnStart: true});
 
-	setTimeout(function() {
-		console.log('text = '+yp.find('.text')[0].text);
-		console.log('length = '+yp.find('.text').length);
-		yp.find('.text').prop('text', '...');
-		console.log('text = '+yp.find('.text')[0].text);
-	}, 10000);
 
 </script></body>
 </html>
