@@ -1,6 +1,11 @@
 
 TODO list:
+- pre render gfx on rectangle
+- pre render gfx on rounded rectangle
+- center draw path
 - examples and build folders in the root project
+- fps yoyo after pre-render optimization
+- pre render gfx on text
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
 - phone mode: disable keys, fullscreen
@@ -63,6 +68,8 @@ LATER:
 
 
 DONE:
+- pre render gfx on circle
+- pre render gfx on text
 - bug: invalid index on draw image
 - optimize: only call getDrawBox once per entity
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
