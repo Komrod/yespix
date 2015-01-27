@@ -40,21 +40,30 @@ yespix.define('gfx', {
         yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
             yespix.drawEntitiesSort = true;
         });
+        yespix.listen(this, ['prerender', 'alpha', '_flipX', '_flipY'], function(obj, e) {
+            if (obj.prerender) obj._changed = true;
+        });
 
-    if (this.prerender) {
-        this.prerenderInit();
-    }
+        if (this.prerender) {
+            this.prerenderInit();
+        }
 
         return true;
     },
 
     ///////////////////////////// Pre-render functions /////////////////////////////
 
+    /**
+     * Init the pre-render of the gfx
+     */
     prerenderInit: function() {
         //console.log('prerenderInit');
         this.prerenderCreate();
     },
 
+    /**
+     * Create the canvas for the pre-render
+     */
     prerenderCreate: function() {
         this.prerenderCanvas = yespix.document.createElement('canvas');
         this.prerenderCanvas.context = this.prerenderCanvas.getContext('2d');
@@ -62,30 +71,74 @@ yespix.define('gfx', {
         this.prerenderUpdate();
     },
 
-    prerenderUpdate: function() {/*
-        console.log('prerenderUpdate');
-        this.prerenderCanvas.width = this.width;
-        this.prerenderCanvas.height = this.height;
-        var current_x = this.x;
-        var current_y = this.y;
-        this.x = this.y = 0;
-        var contextDrawBox = this.getContextDrawBox(
-                this.prerenderCanvas.context, 
-                {
-                    realWidth: this.prerenderCanvas.width,
-                    realHeight: this.prerenderCanvas.height,
-                    name: 'prerenderUpdate'
-                }
-            );
+    /**
+     * Update the canvas for the prerender
+     */
+    prerenderUpdate: function() {
+        //console.log('prerenderUpdate');
+        var drawBox = this.getDrawBox();
+        this.prerenderCanvas.width = drawBox.width;
+        this.prerenderCanvas.height = drawBox.height;
+        //console.log(drawBox);
+        var contextDrawBox = {
+            img_x: 0,
+            img_y: 0,
+            img_width: drawBox.width,
+            img_height: drawBox.height,
+            context_x: 0,
+            context_y: 0,
+            context_width: drawBox.width,
+            context_height: drawBox.height,
+            o_x: 0,
+            o_y: 0,
+            o_width: drawBox.width,
+            o_height: drawBox.height
+            };
 
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
-        fuckyou();
-        this.x = current_x;
-        this.y = current_y;*/
     },
 
+    /**
+     * Draw the pre-render on a canvas context
+     */
     prerenderUse: function(context) {
+        var box = this.getDrawBox(false, context);
+        //console.log('prerenderUse :: box = ');
+        //console.log(box);
+        if (this.snapToPixel) {
+            box.x = parseInt(box.x);
+            box.y = parseInt(box.y);
+        }
 
+        // check if image outside canvas
+        if (box.x > context.canvas.clientWidth 
+            || box.y > context.canvas.clientHeight 
+            || box.x + box.width < 0
+            || box.y + box.height < 0)
+            return false;
+
+        var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
+
+        // check if the contextDrawBox is flat
+        if (contextDrawBox.img_width == 0
+            || contextDrawBox.img_height == 0
+            || contextDrawBox.context_width == 0
+            || contextDrawBox.context_height == 0)
+            return false;
+
+        context.globalAlpha = this.alpha;
+    
+        context.drawImage(this.prerenderCanvas, //image element
+            contextDrawBox.img_x, // x position on image
+            contextDrawBox.img_y, // y position on image
+            contextDrawBox.img_width, // width on image
+            contextDrawBox.img_height, // height on image
+            contextDrawBox.context_x, // x position on canvas
+            contextDrawBox.context_y, // y position on canvas
+            contextDrawBox.context_width, // width on canvas
+            contextDrawBox.context_height // height on canvas
+        );
+        return true;
     },
 
     ///////////////////////////////// Main functions ////////////////////////////////
@@ -132,7 +185,11 @@ yespix.define('gfx', {
             context_x: box.x,
             context_y: box.y,
             context_width: box.width,
-            context_height: box.height
+            context_height: box.height,
+            o_x: box.x,
+            o_y: box.y,
+            o_width: box.width,
+            o_height: box.height
         };
         
         if (context.name) contextDrawBox.name = context.name;
@@ -179,13 +236,39 @@ yespix.define('gfx', {
         return this._context;
     },
 
-    draw: function(context) {
-        /*
-        if (!context) context = this.getContext();
-        var box = this.getDrawBox();
-        if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
-        */
+    draw: function() {
+        if (!this.isVisible) return;
+
+        var context = this.getContext();
+
+        if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+            if (this._changed){
+                this.prerenderUpdate();
+                this._changed = false;
+            }
+            this.prerenderUse(context);
+            if (this.debug) {
+                this.drawDebug(context, this.getDrawBox());
+            }
+            return true;
+        }
+
+        if (context) {
+            var box = this.getDrawBox();
+            var getContextDrawBox = this.getContextDrawBox(context, { realWidth: this.width, realHeight: this.height}, box);
+            this.drawRender(context, getContextDrawBox);
+            if (this.debug) {
+                this.drawDebug(context, box);
+            }
+        }
     },
+
+    /**
+     * 
+     */
+    drawRender: function(context, contextDrawBox, img) {
+    },
+
 
     drawAlpha: function(context, type, doNotUseGlobal) {
         if (!type) {
@@ -226,10 +309,10 @@ yespix.define('gfx', {
 
     drawDebug: function(context, box) {
         this.drawAlpha(context, 'debug', true);
-        if (this.canDrawDebugPosition()) this.drawDebugPosition(context, box);
-        if (this.canDrawDebugImage()) this.drawDebugImage(context, box);
-        if (this.canDrawDebugCollision()) this.drawDebugCollision(context, box);
-        if (this.canDrawDebugMove()) this.drawDebugMove(context, box);
+        if (this.canDrawDebugPosition(context, box)) this.drawDebugPosition(context, box);
+        if (this.canDrawDebugImage(context, box)) this.drawDebugImage(context, box);
+        if (this.canDrawDebugCollision(context, box)) this.drawDebugCollision(context, box);
+        if (this.canDrawDebugMove(context, box)) this.drawDebugMove(context, box);
     },
 
     drawDebugPosition: function(context, box) {

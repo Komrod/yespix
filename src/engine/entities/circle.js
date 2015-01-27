@@ -4,9 +4,11 @@ yespix.define('circle', 'path', {
 
     init: function() {},
 
-    drawPath: function(context, box) {
+    drawPath: function(context, contextDrawBox) {
+        //console.log('drawPath');
+        //console.log(contextDrawBox);
         context.beginPath();
-        context.arc(box.x + this.circleRadius, box.y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+        context.arc(contextDrawBox.o_x + this.circleRadius + this.lineWidth, contextDrawBox.o_y + this.circleRadius + this.lineWidth, this.circleRadius, 0, 2 * Math.PI, false);
     },
 
     getDrawBox: function(relative) {
@@ -15,13 +17,15 @@ yespix.define('circle', 'path', {
         return {
             x: position.x,
             y: position.y,
-            width: this.circleRadius * 2,
-            height: this.circleRadius * 2,
+            width: this.circleRadius * 2 + this.lineWidth * 2,
+            height: this.circleRadius * 2 + this.lineWidth * 2,
             type: this._class
         };
     },
 
     drawDebugPosition: function(context, drawBox) {
+        //console.log('drawDebugPosition');
+        //console.log(drawBox);
         var box = drawBox || this.getDrawBox();
         context.lineWidth = 0.5;
         context.strokeStyle = "#cc3333";

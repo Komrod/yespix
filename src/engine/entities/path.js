@@ -9,68 +9,82 @@ yespix.define('path', 'gfx', {
 
     isVisible: true,
 
-    init: function() {},
+    init: function() {
 
-    canDraw: function(context, box) {
-        if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight 
-            || box.x + box.width < 0
-            || box.y + box.height < 0)
+    },
+
+    canDraw: function(context, contextDrawBox) {
+        if (contextDrawBox.o_x > context.canvas.clientWidth 
+            || contextDrawBox.o_y > context.canvas.clientHeight 
+            || contextDrawBox.o_x + contextDrawBox.o_width < 0
+            || contextDrawBox.o_y + contextDrawBox.o_height < 0)
             return false;
         
         return this.isVisible && this.alpha > 0;
     },
 
-    canDrawPath: function(context, box) {
+    canDrawPath: function(context, contextDrawBox) {
         return true;
     },
 
-    drawPath: function(context, box) {
+    drawPath: function(context, contextDrawBox) {
         context.beginPath();
     },
 
-    canDrawLine: function(context, box) {
+    canDrawLine: function(context, contextDrawBox) {
         return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
     },
 
-    drawLine: function(context, box) {
+    drawLine: function(context, contextDrawBox) {
         this.drawAlpha(context, 'line');
         context.lineWidth = this.lineWidth;
         context.strokeStyle = this.lineColor;
         context.stroke();
     },
 
-    canDrawFill: function(context, box) {
+    canDrawFill: function(context, contextDrawBox) {
         return this.fillColor != '' && this.fillAlpha > 0;
     },
 
-    drawFill: function(context, box) {
+    drawFill: function(context, contextDrawBox) {
         this.drawAlpha(context, 'fill');
         context.fillStyle = this.fillColor;
         context.fill();
     },
 
-
-    draw: function(context) {
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
+    drawRender: function(context, contextDrawBox, img) {
+        if (this.canDrawPath(context, contextDrawBox))
+        {
+            this.drawPath(context, contextDrawBox);
+            if (this.canDrawFill(context, contextDrawBox)) this.drawFill(context, contextDrawBox);
+            if (this.canDrawLine(context, contextDrawBox)) this.drawLine(context, contextDrawBox);
         }
-        var box = this.getDrawBox();
+    },
 
-        if (!this.canDraw(context, box)) return;
+    /**
+     * Update the canvas for the prerender
+     */
+    prerenderUpdate: function() {
+        //console.log('prerenderUpdate');
+        var drawBox = this.getDrawBox();
+        this.prerenderCanvas.width = drawBox.width;
+        this.prerenderCanvas.height = drawBox.height;
+        //console.log(drawBox);
+        var contextDrawBox = {
+            img_x: 0,
+            img_y: 0,
+            img_width: drawBox.width + this.lineWidth * 2,
+            img_height: drawBox.height + this.lineWidth * 2,
+            context_x: 0,
+            context_y: 0,
+            context_width: drawBox.width + this.lineWidth * 2,
+            context_height: drawBox.height + this.lineWidth * 2,
+            o_x: 0,
+            o_y: 0,
+            o_width: drawBox.width + this.lineWidth * 2,
+            o_height: drawBox.height + this.lineWidth * 2
+            };
 
-
-        if (context) {
-            if (this.canDrawPath(context, box))
-            {
-                this.drawPath(context, box);
-                if (this.canDrawFill(context, box)) this.drawFill(context, box);
-                if (this.canDrawLine(context, box)) this.drawLine(context, box);
-            }
-            if (this.canDrawDebug(context, box)) this.drawDebug(context, box);
-        }
+        this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },
 });
