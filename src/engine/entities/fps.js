@@ -76,8 +76,8 @@ yespix.define('fps', 'text', {
         return {
             x: position.x,
             y: position.y - this.textSize,
-            width: this._context.measureText(this.text).width,
-            height: this.textSize,
+            width: this.width,
+            height: this.height,
             type: this._class
         };
     },

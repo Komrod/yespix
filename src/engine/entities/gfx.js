@@ -78,14 +78,14 @@ yespix.define('gfx', {
 
         var drawBox = this.getDrawBox();
 
-        //console.log('prerenderUpdate :: drawBox = ');
-        //console.log(drawBox);
+        console.log('prerenderUpdate :: drawBox = ');
+        console.log(drawBox);
 
         this.prerenderCanvas.width = drawBox.width;
         this.prerenderCanvas.height = drawBox.height;
 
-        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
-        //console.log(this.prerenderCanvas);
+        console.log('prerenderUpdate :: this.prerenderCanvas = ');
+        console.log(this.prerenderCanvas);
 
         //console.log(drawBox);
         var contextDrawBox = {
@@ -102,9 +102,11 @@ yespix.define('gfx', {
             o_width: drawBox.width,
             o_height: drawBox.height
             };
-
-        //console.log('prerenderUpdate :: contextDrawBox = ');
-        //console.log(contextDrawBox);
+        
+        this.prerenderCanvas.context.fillStyle = '#ff0000';
+        this.prerenderCanvas.context.fillRect(0,0,200,200);
+        console.log('prerenderUpdate :: contextDrawBox = ');
+        console.log(contextDrawBox);
 
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },

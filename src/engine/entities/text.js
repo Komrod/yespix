@@ -33,11 +33,11 @@ yespix.define('text', 'gfx', {
 
         var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
 
-        console.log('text.prerenderUse :: drawBox = ');
-        console.log(box);
+        //console.log('text.prerenderUse :: drawBox = ');
+        //console.log(box);
 
-        console.log('text.prerenderUse :: contextDrawBox = ');
-        console.log(contextDrawBox);
+        //console.log('text.prerenderUse :: contextDrawBox = ');
+        //console.log(contextDrawBox);
 
         // check if the contextDrawBox is flat
         if (contextDrawBox.img_width == 0
@@ -48,12 +48,12 @@ yespix.define('text', 'gfx', {
 
         context.globalAlpha = this.alpha;
     
-        console.log('text.prerenderUse :: prerenderCanvas = ');
-        console.log(this.prerenderCanvas);
+        //console.log('text.prerenderUse :: prerenderCanvas = ');
+        //console.log(this.prerenderCanvas);
         
-        console.log('text.prerenderUse :: context = ');
-        console.log(context);
-        console.log(this.prerenderCanvas, //image element
+        //console.log('text.prerenderUse :: context = ');
+        //console.log(context);
+        /*console.log(this.prerenderCanvas, //image element
             contextDrawBox.img_x, // x position on image
             contextDrawBox.img_y, // y position on image
             contextDrawBox.img_width, // width on image
@@ -61,7 +61,7 @@ yespix.define('text', 'gfx', {
             contextDrawBox.context_x, // x position on canvas
             contextDrawBox.context_y + box.height, // y position on canvas
             contextDrawBox.context_width, // width on canvas
-            contextDrawBox.context_height);
+            contextDrawBox.context_height);*/
 
         context.drawImage(
             this.prerenderCanvas, //image element
@@ -70,7 +70,7 @@ yespix.define('text', 'gfx', {
             contextDrawBox.img_width, // width on image
             contextDrawBox.img_height, // height on image
             contextDrawBox.context_x, // x position on canvas
-            contextDrawBox.context_y + box.height, // y position on canvas
+            contextDrawBox.context_y, // y position on canvas
             contextDrawBox.context_width, // width on canvas
             contextDrawBox.context_height // height on canvas
         );
@@ -86,12 +86,14 @@ yespix.define('text', 'gfx', {
         }
 
         var size = context.measureText(this.text);
-        size.height = yespix.getFontHeight(this.font);
+        var height = Math.ceil(yespix.getFontHeight(this.font));
+        var width = Math.ceil(size.width);
+
         return {
             x: position.x,
             y: position.y,
-            width: size.width * 2,
-            height: size.height * 2,
+            width: width * 2,
+            height: height * 2,
             type: this._class
         };
     },
@@ -101,7 +103,7 @@ yespix.define('text', 'gfx', {
         context.globalAlpha = this.alpha;
         context.fillStyle = this.textColor;
         context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.text, contextDrawBox.context_x, contextDrawBox.context_y);
+        context.fillText(this.text, contextDrawBox.context_x, contextDrawBox.context_y + this.textSize);
     }
 
 });
