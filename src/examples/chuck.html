@@ -24,9 +24,9 @@
 	{
 		images: 'chuck/player.png',
 		pixelSize: 3,
-		colOffsetX: 8,
+		colOffsetX: 10,
 		colOffsetY: 10,
-		colWidth: 14,
+		colWidth: 12,
 		colHeight: 29,
 		//debug: true,
 		actorSpeed: 1,
@@ -169,12 +169,14 @@
     
 	yp.gravity = { y: 22 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true}).load('chuck/test.json');
+	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true})
+		.load('chuck/test.json');
+
 	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
 	
 	var width = 50;
 	var height = 50;
-	for (var t=0; t<20; t++) {
+	for (var t=0; t<50; t++) {
 		for (var u=0; u<40; u++) {
 			
 			/*yp.spawn('image', {
@@ -217,7 +219,8 @@
 	            });*/
 		}
 	}
-	/*yp.spawn('circle', {
+/*
+	yp.spawn('circle', {
 		lineColor: '#123456',
 		lineWidth: 10,
 		lineAlpha: 0.5,
@@ -270,7 +273,37 @@
 		snapToPixel: true,
 		prerender: true,
 		debug: true
-        });*/
+        });
+	yp.spawn('roundrect', {
+		borderRadius: 10,
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		width: 30,
+		height: 30,
+		x: 150, 
+		y: 200,
+		snapToPixel: true,
+		prerender: false,
+		debug: true
+        });
+	yp.spawn('roundrect', {
+		borderRadius: 10,
+		lineColor: '#123456',
+		lineWidth: 10,
+		lineAlpha: 0.5,
+		fillColor: '#789abc',
+		fillAlpha: 1,
+		width: 30,
+		height: 30,
+		x: 200, 
+		y: 200,
+		snapToPixel: true,
+		prerender: true,
+		debug: true
+        });
 	yp.spawn('text', {
 		x: 250, 
 		y: 150,
@@ -287,23 +320,7 @@
 		prerender: true,
 		debug: true
         });
-	/*yp.spawn('rect', {
-		lineColor: '#123456',
-		lineWidth: 10,
-		lineAlpha: 1,
-		fillColor: '#789abc',
-		fillAlpha: 1,
-		circleRadius: 15,
-		x: 150, 
-		y: 150,
-		width: 100,
-		height: 100,
-		snapToPixel: true,
-		z: 1000,
-		prerender: false,
-//				debug: true
-        });*/
-	
+	*/
 	yp.spawn('fps', {x: 5, y: 5});
 
 	mylevel.follow(mychuck, {resetOnStart: true});

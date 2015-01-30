@@ -2,7 +2,9 @@
  * @class entity.gfx
  */
 yespix.define('gfx', {
+
     _changed: false,
+    
 
     isReady: false,
     isVisible: true,
@@ -51,7 +53,9 @@ yespix.define('gfx', {
         return true;
     },
 
+    
     ///////////////////////////// Pre-render functions /////////////////////////////
+    // Render shape on a canvas and only draw canvas to save time
 
     /**
      * Init the pre-render of the gfx
@@ -78,14 +82,14 @@ yespix.define('gfx', {
 
         var drawBox = this.getDrawBox();
 
-        console.log('prerenderUpdate :: drawBox = ');
-        console.log(drawBox);
+        //console.log('prerenderUpdate :: drawBox = ');
+        //console.log(drawBox);
 
         this.prerenderCanvas.width = drawBox.width;
         this.prerenderCanvas.height = drawBox.height;
 
-        console.log('prerenderUpdate :: this.prerenderCanvas = ');
-        console.log(this.prerenderCanvas);
+        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+        //console.log(this.prerenderCanvas);
 
         //console.log(drawBox);
         var contextDrawBox = {
@@ -103,10 +107,10 @@ yespix.define('gfx', {
             o_height: drawBox.height
             };
         
-        this.prerenderCanvas.context.fillStyle = '#ff0000';
-        this.prerenderCanvas.context.fillRect(0,0,200,200);
-        console.log('prerenderUpdate :: contextDrawBox = ');
-        console.log(contextDrawBox);
+        //this.prerenderCanvas.context.fillStyle = '#ff0000';
+        //this.prerenderCanvas.context.fillRect(0,0,200,200);
+        //console.log('prerenderUpdate :: contextDrawBox = ');
+        //console.log(contextDrawBox);
 
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },
@@ -127,7 +131,7 @@ yespix.define('gfx', {
 
         // check if image outside canvas
         if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight 
+            || box.y > context.canvas.clientHeight
             || box.x + box.width < 0
             || box.y + box.height < 0)
             return false;
@@ -161,6 +165,28 @@ yespix.define('gfx', {
 
     ///////////////////////////////// Main functions ////////////////////////////////
 
+    /*
+    box: {
+        type: _class,
+        draw: {x, y, width, height},
+        path: {x, y, width, height},
+        context: {x, y, width, height},
+        img: {x, y, width, height},
+    }
+    */
+
+    /**
+     *
+     */
+    getBox: function(relative) {
+        var box = {
+            type: this._class
+        };
+        box.draw = this.getDrawBox(relative);
+        return box;
+    },
+
+
     getPosition: function(relative) {
         if (relative || !this._parent) {
             return {
@@ -181,7 +207,7 @@ yespix.define('gfx', {
         };
     },
 
-    getDrawBox: function(relative, context) {
+    getDrawBox: function(relative) {
         var position = this.getPosition(relative);
 
         return {
@@ -189,7 +215,6 @@ yespix.define('gfx', {
             y: position.y,
             width: this.width,
             height: this.height,
-            type: this._class
         };
     },
 

@@ -2,28 +2,33 @@ yespix.define('roundrect', 'rect', {
 
     borderRadius: 5,
 
+    
     init: function() {},
-
+    
     getBorderRadius: function() {
         if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
         if (this.height < this.width) return this.height / 2;
         return this.width / 2;
     },
-
-    drawPath: function(context) {
+    
+    drawPath: function(context, contextDrawBox) {
         var radius = this.getBorderRadius();
         context.beginPath();
-        context.moveTo(this.x + radius, this.y);
-        context.lineTo(this.x + this.width - radius, this.y);
-        context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + radius);
-        context.lineTo(this.x + this.width, this.y + this.height - radius);
-        context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height);
-        context.lineTo(this.x + radius, this.y + this.height);
-        context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - radius);
-        context.lineTo(this.x, this.y + radius);
-        context.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
-    },
 
+        contextDrawBox.o_width = contextDrawBox.o_width - this.lineWidth;
+        contextDrawBox.o_height = contextDrawBox.o_height - this.lineWidth;
+
+        context.moveTo(contextDrawBox.o_x + radius, contextDrawBox.o_y);
+        context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y);
+        context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y, contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + radius);
+        context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height - radius);
+        context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y + contextDrawBox.o_height);
+        context.lineTo(contextDrawBox.o_x + radius, contextDrawBox.o_y + contextDrawBox.o_height);
+        context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height - radius);
+        context.lineTo(contextDrawBox.o_x, contextDrawBox.o_y + radius);
+        context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y, contextDrawBox.o_x + radius, contextDrawBox.o_y);
+    },
+    
     drawLine: function(context, box) {
         this.drawAlpha(context, 'line');
         if (context.strokeStyle != this.lineColor) context.strokeStyle = this.lineColor;

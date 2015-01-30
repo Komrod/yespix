@@ -19,7 +19,7 @@ yespix.define('fps', 'text', {
     isVisible: true,
 
     fpsLastTime: 0,
-    fpsAverageTime: 250,
+    fpsAverageTime: 200,
     fpsAverageFrames: 0,
     fpsAverage: 0,
 
@@ -29,6 +29,8 @@ yespix.define('fps', 'text', {
 
     width: 124,
     height: 50,
+
+    z: 1000000,
     
     init: function() {
         this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -88,6 +90,7 @@ yespix.define('fps', 'text', {
         var context = this.getContext();
 
         if (context) {
+            context.globalAlpha = this.alpha;
             var box = this.getDrawBox();
             if (this.canDrawFill()) this.drawFill(context, box);
             if (this.canDrawLine()) this.drawLine(context, box);
@@ -105,20 +108,22 @@ yespix.define('fps', 'text', {
                 if (this.fpsAverage>this.fpsAverageTime && this.fpsAverageFrames > 0)
                 {
                     var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
+                    if (this.fps > 60) fps = 60;
                     this.fpsAverage = 0;
                     this.fpsAverageFrames = 0;
                     this.text = parseInt(fps * 100) / 100;
                     this.fpsData.shift();
-                    this.fpsData.push(parseInt(fps));
+                    this.fpsData.push(fps);
                 }
                 this.fpsLastTime = yespix.frameTime;
             } else
             {
                 var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                if (this.fps > 60) fps = 60;
                 this.fpsLastTime = yespix.frameTime;
                 this.text = parseInt(fps * 100) / 100;
                 this.fpsData.shift();
-                this.fpsData.push(parseInt(fps));
+                this.fpsData.push(fps);
             }
 
             var min = max = average = 0;
@@ -129,7 +134,6 @@ yespix.define('fps', 'text', {
             }
             average = average / 120;
 
-            context.globalAlpha = this.alpha;
             context.lineWidth = this.lineWidth;
             context.strokeStyle = this.lineColor;
             for (var t=0; t<120; t++) {
@@ -148,13 +152,12 @@ yespix.define('fps', 'text', {
             }
 
             // drawing fps
-            context.globalAlpha = this.alpha;
             context.fillStyle = this.textColor;
             context.font = this.textSize+'px '+this.textFont;
             context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
 
             // drawing min/max
-            this.textMinMax = '('+min+'-'+max+')';
+            this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
             //context.globalAlpha = this.alpha * 0.8;
             //context.fillStyle = this.textColor;
             //context.font = this.textSize+'px '+this.textFont;

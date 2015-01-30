@@ -18,7 +18,7 @@ yespix.define('text', 'gfx', {
      * Draw pre-render for text, change y position on canvas context
      */
     prerenderUse: function(context) {
-        var box = this.getDrawBox(true, context);
+        var box = this.getDrawBox(false, context);
         if (this.snapToPixel) {
             box.x = parseInt(box.x);
             box.y = parseInt(box.y);
@@ -85,6 +85,15 @@ yespix.define('text', 'gfx', {
             else context = this.getContext();
         }
 
+        if (!context) {
+            return {
+                x: position.x,
+                y: position.y,
+                width: 0,
+                height: 0,
+                type: this._class
+            };
+        }
         var size = context.measureText(this.text);
         var height = Math.ceil(yespix.getFontHeight(this.font));
         var width = Math.ceil(size.width);
@@ -103,7 +112,7 @@ yespix.define('text', 'gfx', {
         context.globalAlpha = this.alpha;
         context.fillStyle = this.textColor;
         context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.text, contextDrawBox.context_x, contextDrawBox.context_y + this.textSize);
+        context.fillText(this.text, contextDrawBox.o_x, contextDrawBox.o_y + this.textSize);
     }
 
 });

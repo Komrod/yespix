@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-01-28 */
+/*! yespix - v0.1.0 - 2015-01-30 */
 (function(undefined) {
 
     /**
@@ -3853,7 +3853,7 @@
             isVisible: true,
 
             fpsLastTime: 0,
-            fpsAverageTime: 250,
+            fpsAverageTime: 200,
             fpsAverageFrames: 0,
             fpsAverage: 0,
 
@@ -3863,6 +3863,8 @@
 
             width: 124,
             height: 50,
+
+            z: 1000000,
 
             init: function() {
                 this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -3922,6 +3924,7 @@
                 var context = this.getContext();
 
                 if (context) {
+                    context.globalAlpha = this.alpha;
                     var box = this.getDrawBox();
                     if (this.canDrawFill()) this.drawFill(context, box);
                     if (this.canDrawLine()) this.drawLine(context, box);
@@ -3936,19 +3939,21 @@
                         this.fpsAverage += yespix.frameTime - this.fpsLastTime;
                         if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
                             var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
+                            if (this.fps > 60) fps = 60;
                             this.fpsAverage = 0;
                             this.fpsAverageFrames = 0;
                             this.text = parseInt(fps * 100) / 100;
                             this.fpsData.shift();
-                            this.fpsData.push(parseInt(fps));
+                            this.fpsData.push(fps);
                         }
                         this.fpsLastTime = yespix.frameTime;
                     } else {
                         var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                        if (this.fps > 60) fps = 60;
                         this.fpsLastTime = yespix.frameTime;
                         this.text = parseInt(fps * 100) / 100;
                         this.fpsData.shift();
-                        this.fpsData.push(parseInt(fps));
+                        this.fpsData.push(fps);
                     }
 
                     var min = max = average = 0;
@@ -3959,7 +3964,6 @@
                     }
                     average = average / 120;
 
-                    context.globalAlpha = this.alpha;
                     context.lineWidth = this.lineWidth;
                     context.strokeStyle = this.lineColor;
                     for (var t = 0; t < 120; t++) {
@@ -3978,13 +3982,12 @@
                     }
 
                     // drawing fps
-                    context.globalAlpha = this.alpha;
                     context.fillStyle = this.textColor;
                     context.font = this.textSize + 'px ' + this.textFont;
                     context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
 
                     // drawing min/max
-                    this.textMinMax = '(' + min + '-' + max + ')';
+                    this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
                     //context.globalAlpha = this.alpha * 0.8;
                     //context.fillStyle = this.textColor;
                     //context.font = this.textSize+'px '+this.textFont;
@@ -4005,7 +4008,9 @@
          * @class entity.gfx
          */
         yespix.define('gfx', {
+
             _changed: false,
+
 
             isReady: false,
             isVisible: true,
@@ -4054,7 +4059,9 @@
                 return true;
             },
 
+
             ///////////////////////////// Pre-render functions /////////////////////////////
+            // Render shape on a canvas and only draw canvas to save time
 
             /**
              * Init the pre-render of the gfx
@@ -4081,14 +4088,14 @@
 
                 var drawBox = this.getDrawBox();
 
-                console.log('prerenderUpdate :: drawBox = ');
-                console.log(drawBox);
+                //console.log('prerenderUpdate :: drawBox = ');
+                //console.log(drawBox);
 
                 this.prerenderCanvas.width = drawBox.width;
                 this.prerenderCanvas.height = drawBox.height;
 
-                console.log('prerenderUpdate :: this.prerenderCanvas = ');
-                console.log(this.prerenderCanvas);
+                //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+                //console.log(this.prerenderCanvas);
 
                 //console.log(drawBox);
                 var contextDrawBox = {
@@ -4106,10 +4113,10 @@
                     o_height: drawBox.height
                 };
 
-                this.prerenderCanvas.context.fillStyle = '#ff0000';
-                this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
-                console.log('prerenderUpdate :: contextDrawBox = ');
-                console.log(contextDrawBox);
+                //this.prerenderCanvas.context.fillStyle = '#ff0000';
+                //this.prerenderCanvas.context.fillRect(0,0,200,200);
+                //console.log('prerenderUpdate :: contextDrawBox = ');
+                //console.log(contextDrawBox);
 
                 this.drawRender(this.prerenderCanvas.context, contextDrawBox);
             },
@@ -4161,6 +4168,28 @@
 
             ///////////////////////////////// Main functions ////////////////////////////////
 
+            /*
+            box: {
+                type: _class,
+                draw: {x, y, width, height},
+                path: {x, y, width, height},
+                context: {x, y, width, height},
+                img: {x, y, width, height},
+            }
+            */
+
+            /**
+             *
+             */
+            getBox: function(relative) {
+                var box = {
+                    type: this._class
+                };
+                box.draw = this.getDrawBox(relative);
+                return box;
+            },
+
+
             getPosition: function(relative) {
                 if (relative || !this._parent) {
                     return {
@@ -4181,7 +4210,7 @@
                 };
             },
 
-            getDrawBox: function(relative, context) {
+            getDrawBox: function(relative) {
                 var position = this.getPosition(relative);
 
                 return {
@@ -4189,7 +4218,6 @@
                     y: position.y,
                     width: this.width,
                     height: this.height,
-                    type: this._class
                 };
             },
 
@@ -5346,8 +5374,9 @@
             },
 
             drawRender: function(context, contextDrawBox, img) {
-                //console.log('drawRender :: contextDrawBox = ');
+                //console.log('path.drawRender :: contextDrawBox = ');
                 //console.log(contextDrawBox);
+
                 if (this.canDrawPath(context, contextDrawBox)) {
                     this.drawPath(context, contextDrawBox);
                     if (this.canDrawFill(context, contextDrawBox)) this.drawFill(context, contextDrawBox);
@@ -5359,9 +5388,9 @@
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
-                var drawBox = this.getDrawBox();
+                var drawBox = this.getDrawBox(false, this._context);
 
-                //console.log('prerenderUpdate :: drawBox = ');
+                //console.log('path.prerenderUpdate :: drawBox = ');
                 //console.log(drawBox);
 
                 this.prerenderCanvas.width = drawBox.width;
@@ -5370,7 +5399,7 @@
                 //this.prerenderCanvas.context.fillStyle = '#FF0000';
                 //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
 
-                //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+                //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
                 //console.log(this.prerenderCanvas);
 
                 var contextDrawBox = {
@@ -5384,12 +5413,12 @@
                     context_height: drawBox.height,
                     o_x: this.lineWidth / 2,
                     o_y: this.lineWidth / 2,
-                    o_width: drawBox.width - this.lineWidth,
-                    o_height: drawBox.height - this.lineWidth
+                    o_width: drawBox.width,
+                    o_height: drawBox.height
                 };
 
-                console.log('prerenderUpdate :: contextDrawBox = ');
-                console.log(contextDrawBox);
+                //console.log('path.prerenderUpdate :: contextDrawBox = ');
+                //console.log(contextDrawBox);
 
                 this.drawRender(this.prerenderCanvas.context, contextDrawBox);
             },
@@ -5423,8 +5452,8 @@
 
                 context.globalAlpha = this.alpha;
 
-                console.log('prerenderUse :: contextDrawBox = ');
-                console.log(contextDrawBox);
+                /*console.log('prerenderUse :: contextDrawBox = ');
+                console.log(contextDrawBox);*/
 
                 context.drawImage(this.prerenderCanvas, //image element
                     contextDrawBox.img_x, // x position on image
@@ -5602,28 +5631,31 @@
 
             drawFill: function(context, contextDrawBox) {
                 context.fillStyle = this.fillColor;
+                this.drawAlpha(context, 'fill');
                 context.fillRect(
                     contextDrawBox.o_x, // x position on canvas
                     contextDrawBox.o_y, // y position on canvas
-                    contextDrawBox.o_width, // width on canvas
-                    contextDrawBox.o_height // height on canvas
+                    contextDrawBox.o_width - this.lineWidth, // width on canvas
+                    contextDrawBox.o_height - this.lineWidth // height on canvas
                 );
             },
 
             drawLine: function(context, contextDrawBox) {
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
+                this.drawAlpha(context, 'line');
                 context.strokeRect(
                     contextDrawBox.o_x,
                     contextDrawBox.o_y,
-                    contextDrawBox.o_width,
-                    contextDrawBox.o_height);
+                    contextDrawBox.o_width - this.lineWidth,
+                    contextDrawBox.o_height - this.lineWidth);
             }
         });
 
         yespix.define('roundrect', 'rect', {
 
             borderRadius: 5,
+
 
             init: function() {},
 
@@ -5633,18 +5665,22 @@
                 return this.width / 2;
             },
 
-            drawPath: function(context) {
+            drawPath: function(context, contextDrawBox) {
                 var radius = this.getBorderRadius();
                 context.beginPath();
-                context.moveTo(this.x + radius, this.y);
-                context.lineTo(this.x + this.width - radius, this.y);
-                context.quadraticCurveTo(this.x + this.width, this.y, this.x + this.width, this.y + radius);
-                context.lineTo(this.x + this.width, this.y + this.height - radius);
-                context.quadraticCurveTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height);
-                context.lineTo(this.x + radius, this.y + this.height);
-                context.quadraticCurveTo(this.x, this.y + this.height, this.x, this.y + this.height - radius);
-                context.lineTo(this.x, this.y + radius);
-                context.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
+
+                contextDrawBox.o_width = contextDrawBox.o_width - this.lineWidth;
+                contextDrawBox.o_height = contextDrawBox.o_height - this.lineWidth;
+
+                context.moveTo(contextDrawBox.o_x + radius, contextDrawBox.o_y);
+                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y);
+                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y, contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + radius);
+                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height - radius);
+                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y + contextDrawBox.o_height);
+                context.lineTo(contextDrawBox.o_x + radius, contextDrawBox.o_y + contextDrawBox.o_height);
+                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height - radius);
+                context.lineTo(contextDrawBox.o_x, contextDrawBox.o_y + radius);
+                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y, contextDrawBox.o_x + radius, contextDrawBox.o_y);
             },
 
             drawLine: function(context, box) {
@@ -6033,7 +6069,7 @@
              * Draw pre-render for text, change y position on canvas context
              */
             prerenderUse: function(context) {
-                var box = this.getDrawBox(true, context);
+                var box = this.getDrawBox(false, context);
                 if (this.snapToPixel) {
                     box.x = parseInt(box.x);
                     box.y = parseInt(box.y);
@@ -6097,6 +6133,15 @@
                     else context = this.getContext();
                 }
 
+                if (!context) {
+                    return {
+                        x: position.x,
+                        y: position.y,
+                        width: 0,
+                        height: 0,
+                        type: this._class
+                    };
+                }
                 var size = context.measureText(this.text);
                 var height = Math.ceil(yespix.getFontHeight(this.font));
                 var width = Math.ceil(size.width);
@@ -6115,7 +6160,7 @@
                 context.globalAlpha = this.alpha;
                 context.fillStyle = this.textColor;
                 context.font = this.textSize + 'px ' + this.textFont;
-                context.fillText(this.text, contextDrawBox.context_x, contextDrawBox.context_y + this.textSize);
+                context.fillText(this.text, contextDrawBox.o_x, contextDrawBox.o_y + this.textSize);
             }
 
         });

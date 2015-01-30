@@ -84,8 +84,9 @@ yespix.define('path', 'gfx', {
     },
 
     drawRender: function(context, contextDrawBox, img) {
-        //console.log('drawRender :: contextDrawBox = ');
+        //console.log('path.drawRender :: contextDrawBox = ');
         //console.log(contextDrawBox);
+
         if (this.canDrawPath(context, contextDrawBox))
         {
             this.drawPath(context, contextDrawBox);
@@ -98,9 +99,9 @@ yespix.define('path', 'gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        var drawBox = this.getDrawBox();
+        var drawBox = this.getDrawBox(false, this._context);
 
-        //console.log('prerenderUpdate :: drawBox = ');
+        //console.log('path.prerenderUpdate :: drawBox = ');
         //console.log(drawBox);
 
         this.prerenderCanvas.width = drawBox.width;
@@ -109,7 +110,7 @@ yespix.define('path', 'gfx', {
         //this.prerenderCanvas.context.fillStyle = '#FF0000';
         //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
 
-        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
+        //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
         //console.log(this.prerenderCanvas);
 
         var contextDrawBox = {
@@ -123,12 +124,12 @@ yespix.define('path', 'gfx', {
             context_height: drawBox.height,
             o_x: this.lineWidth / 2,
             o_y: this.lineWidth / 2,
-            o_width: drawBox.width - this.lineWidth,
-            o_height: drawBox.height - this.lineWidth
+            o_width: drawBox.width,
+            o_height: drawBox.height
             };
 
-        console.log('prerenderUpdate :: contextDrawBox = ');
-        console.log(contextDrawBox);
+        //console.log('path.prerenderUpdate :: contextDrawBox = ');
+        //console.log(contextDrawBox);
         
         this.drawRender(this.prerenderCanvas.context, contextDrawBox);
     },
@@ -165,8 +166,8 @@ yespix.define('path', 'gfx', {
 
         context.globalAlpha = this.alpha;
         
-        console.log('prerenderUse :: contextDrawBox = ');
-        console.log(contextDrawBox);
+        /*console.log('prerenderUse :: contextDrawBox = ');
+        console.log(contextDrawBox);*/
 
         context.drawImage(this.prerenderCanvas, //image element
             contextDrawBox.img_x, // x position on image
