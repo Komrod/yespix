@@ -1,10 +1,10 @@
 
 TODO list:
-- pre render gfx on rectangle
-- pre render gfx on rounded rectangle
 - use clearRect to clear faster the canvas
-- use hack rounding: rounded = ~~ (0.5 + somenum)
+- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - center draw path
+- path object drawbox must contains line
+- line in path object must not override box content
 - examples and build folders in the root project
 - fps yoyo after pre-render optimization
 - pre render gfx on text
@@ -70,6 +70,9 @@ LATER:
 
 
 DONE:
+- Make fps average use float values instead of round values
+- pre render gfx on rounded rectangle
+- pre render gfx on rectangle
 - pre render gfx on circle
 - pre render gfx on text
 - bug: invalid index on draw image
