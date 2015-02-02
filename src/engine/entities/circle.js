@@ -10,29 +10,32 @@ yespix.define('circle', 'path', {
 
     },
 
-    drawPath: function(context, contextDrawBox) {
-        //console.log('drawPath');
-        //console.log(contextDrawBox);
+    drawPath: function(context) {
         context.beginPath();
-        context.arc(contextDrawBox.o_x + this.circleRadius, contextDrawBox.o_y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+        context.arc(this._box.path.x + this.circleRadius, 
+            this._box.path.y + this.circleRadius, 
+            this.circleRadius, 
+            0, 
+            2 * Math.PI, 
+            false);
     },
 
-    getDrawBox: function(relative) {
-        var position = this.getPosition(relative);
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
 
         return {
             x: position.x,
             y: position.y,
-            width: this.circleRadius * 2 + this.lineWidth * 2,
-            height: this.circleRadius * 2 + this.lineWidth * 2,
-            type: this._class
+            width: this.circleRadius * 2 + this.lineWidth,
+            height: this.circleRadius * 2 + this.lineWidth
         };
     },
 
-    drawDebugPosition: function(context, drawBox) {
+    drawDebugPosition: function(context, box) {
         //console.log('drawDebugPosition');
         //console.log(drawBox);
-        var box = drawBox || this.getDrawBox();
+        box = box || this._box.draw;
+
         context.lineWidth = 0.5;
         context.strokeStyle = "#cc3333";
         context.strokeRect(box.x, box.y, this.circleRadius * 2 + this.lineWidth, this.circleRadius * 2 + this.lineWidth);

@@ -18,8 +18,9 @@
 </head>
 <body><script type="text/javascript">
 
-	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 60});
+	var yp = yespix({canvas: {width: '100%', height: '100%'}, fps: 50});
 	
+	/*
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
@@ -217,9 +218,9 @@
 				snapToPixel: true,
 				prerender: true
 	            });*/
-		}
-	}
-/*
+//		}
+//	}
+
 	yp.spawn('circle', {
 		lineColor: '#123456',
 		lineWidth: 10,
@@ -233,6 +234,7 @@
 		prerender: false,
 		debug: true
         });
+	
 	yp.spawn('circle', {
 		lineColor: '#123456',
 		lineWidth: 10,
@@ -320,10 +322,10 @@
 		prerender: true,
 		debug: true
         });
-	*/
+	
 	yp.spawn('fps', {x: 5, y: 5});
 
-	mylevel.follow(mychuck, {resetOnStart: true});
+	//mylevel.follow(mychuck, {resetOnStart: true});
 
 
 </script></body>

@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-01-30 */
+/*! yespix - v0.1.0 - 2015-02-02 */
 (function(undefined) {
 
     /**
@@ -3609,11 +3609,6 @@
             document: null,
 
             init: function(options) {
-                if (options === true || options.create) this.create(options);
-            },
-
-            create: function(options) {
-
                 options = options || {};
 
                 options.document = options.document || yespix.document;
@@ -3649,16 +3644,11 @@
                 this.canvasOptions = options;
 
                 var canvas = null;
-                if (options.create) {
-                    canvas = this.document.createElement('canvas');
-                    canvas.id = options.id;
-                    canvas.width = options.width;
-                    canvas.height = options.height;
-                    canvas.className = options.class;
-                    for (var n in options.style) canvas.style[n] = options.style[n];
-                } else if (options.canvas) {
-                    canvas = options.canvas;
-                }
+                if (!options.canvas) canvas = this.create(options);
+                else if (options.canvas) canvas = options.canvas;
+
+                console.log(canvas);
+                console.log(options);
 
                 if (canvas) {
                     if (options.autoAppend) {
@@ -3670,6 +3660,15 @@
                     yespix.canvas = canvas;
                     yespix.context = canvas.getContext('2d');
                 }
+            },
+
+            create: function(options) {
+                var canvas = this.document.createElement('canvas');
+                canvas.id = options.id;
+                canvas.width = options.width;
+                canvas.height = options.height;
+                canvas.className = options.class;
+                return canvas;
             },
 
 
@@ -3706,29 +3705,32 @@
 
             },
 
-            drawPath: function(context, contextDrawBox) {
-                //console.log('drawPath');
-                //console.log(contextDrawBox);
+            drawPath: function(context) {
                 context.beginPath();
-                context.arc(contextDrawBox.o_x + this.circleRadius, contextDrawBox.o_y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+                context.arc(this._box.path.x + this.circleRadius,
+                    this._box.path.y + this.circleRadius,
+                    this.circleRadius,
+                    0,
+                    2 * Math.PI,
+                    false);
             },
 
-            getDrawBox: function(relative) {
-                var position = this.getPosition(relative);
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
 
                 return {
                     x: position.x,
                     y: position.y,
-                    width: this.circleRadius * 2 + this.lineWidth * 2,
-                    height: this.circleRadius * 2 + this.lineWidth * 2,
-                    type: this._class
+                    width: this.circleRadius * 2 + this.lineWidth,
+                    height: this.circleRadius * 2 + this.lineWidth
                 };
             },
 
-            drawDebugPosition: function(context, drawBox) {
+            drawDebugPosition: function(context, box) {
                 //console.log('drawDebugPosition');
                 //console.log(drawBox);
-                var box = drawBox || this.getDrawBox();
+                box = box || this._box.draw;
+
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#cc3333";
                 context.strokeRect(box.x, box.y, this.circleRadius * 2 + this.lineWidth, this.circleRadius * 2 + this.lineWidth);
@@ -3841,7 +3843,7 @@
 
         });
 
-        yespix.define('fps', 'text', {
+        yespix.define('fps', 'gfx', {
 
             textAlign: 'left', // "left" / "right" / "center"
             textFont: 'sans-serif',
@@ -3879,18 +3881,6 @@
                 this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             },
 
-            canDraw: function() {
-                return this.isVisible && this.alpha > 0;
-            },
-
-            canDrawLine: function() {
-                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
-            },
-
-            canDrawFill: function() {
-                return this.fillColor != '' && this.fillAlpha > 0;
-            },
-
             drawFill: function(context, box) {
                 context.fillStyle = this.fillColor;
                 context.fillRect(
@@ -3909,7 +3899,7 @@
 
             getDrawBox: function(relative) {
                 var position = this.getPosition(relative);
-                var context = this.getContext();
+                var context = yespix.context;
                 if (!context) return {
                     x: position.x,
                     y: position.y - this.textSize,
@@ -3920,95 +3910,91 @@
 
                 return {
                     x: position.x,
-                    y: position.y - this.textSize,
+                    y: position.y,
                     width: this.width,
                     height: this.height,
                     type: this._class
                 };
             },
 
-            draw: function() {
-                if (!this.isVisible) return;
+            drawRender: function(context) {
 
-                var context = this.getContext();
+                context.globalAlpha = this.alpha;
+                this.getBox();
+                this.drawFill(context);
+                this.drawLine(context);
 
-                if (context) {
-                    context.globalAlpha = this.alpha;
-                    var box = this.getDrawBox();
-                    if (this.canDrawFill()) this.drawFill(context, box);
-                    if (this.canDrawLine()) this.drawLine(context, box);
+                if (this.fpsLastTime == 0) {
+                    this.fpsLastTime = yespix.frameTime;
+                    return;
+                }
 
-                    if (this.fpsLastTime == 0) {
-                        this.fpsLastTime = yespix.frameTime;
-                        return;
-                    }
-
-                    if (this.fpsAverageTime > 0) {
-                        this.fpsAverageFrames++;
-                        this.fpsAverage += yespix.frameTime - this.fpsLastTime;
-                        if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
-                            var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
-                            if (this.fps > 60) fps = 60;
-                            this.fpsAverage = 0;
-                            this.fpsAverageFrames = 0;
-                            this.text = parseInt(fps * 100) / 100;
-                            this.fpsData.shift();
-                            this.fpsData.push(fps);
-                        }
-                        this.fpsLastTime = yespix.frameTime;
-                    } else {
-                        var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                if (this.fpsAverageTime > 0) {
+                    this.fpsAverageFrames++;
+                    this.fpsAverage += yespix.frameTime - this.fpsLastTime;
+                    if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
+                        var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
                         if (this.fps > 60) fps = 60;
-                        this.fpsLastTime = yespix.frameTime;
+                        this.fpsAverage = 0;
+                        this.fpsAverageFrames = 0;
                         this.text = parseInt(fps * 100) / 100;
                         this.fpsData.shift();
                         this.fpsData.push(fps);
                     }
-
-                    var min = max = average = 0;
-                    for (var t = 0; t < 120; t++) {
-                        if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
-                        if (max < this.fpsData[t]) max = this.fpsData[t];
-                        average += this.fpsData[t];
-                    }
-                    average = average / 120;
-
-                    context.lineWidth = this.lineWidth;
-                    context.strokeStyle = this.lineColor;
-                    for (var t = 0; t < 120; t++) {
-                        var scale = 0;
-                        if (max > 0) scale = (this.height - 4) / max;
-                        if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
-                        else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
-                        else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
-                        else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
-                        else context.strokeStyle = this.fpsColors[4];
-
-                        context.beginPath();
-                        context.moveTo(this.x + t + 2, this.y + this.height - 2);
-                        context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
-                        context.stroke();
-                    }
-
-                    // drawing fps
-                    context.fillStyle = this.textColor;
-                    context.font = this.textSize + 'px ' + this.textFont;
-                    context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
-
-                    // drawing min/max
-                    this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
-                    //context.globalAlpha = this.alpha * 0.8;
-                    //context.fillStyle = this.textColor;
-                    //context.font = this.textSize+'px '+this.textFont;
-                    context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
-
-                    // drawing average
-                    this.textAverage = parseInt(average * 100) / 100 + '';
-                    //context.globalAlpha = this.alpha * 0.8;
-                    //context.fillStyle = this.textColor;
-                    //context.font = this.textSize+'px '+this.textFont;
-                    context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+                    this.fpsLastTime = yespix.frameTime;
+                } else {
+                    var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                    if (this.fps > 60) fps = 60;
+                    this.fpsLastTime = yespix.frameTime;
+                    this.text = parseInt(fps * 100) / 100;
+                    this.fpsData.shift();
+                    this.fpsData.push(fps);
                 }
+
+                var min = max = average = 0;
+                for (var t = 0; t < 120; t++) {
+                    if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
+                    if (max < this.fpsData[t]) max = this.fpsData[t];
+                    average += this.fpsData[t];
+                }
+                average = average / 120;
+
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                for (var t = 0; t < 120; t++) {
+                    var scale = 0;
+                    if (max > 0) scale = (this.height - 4) / max;
+                    if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
+                    else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
+                    else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
+                    else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
+                    else context.strokeStyle = this.fpsColors[4];
+
+                    context.beginPath();
+                    context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                    context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                    context.stroke();
+                }
+
+                // drawing fps
+                context.fillStyle = this.textColor;
+                context.font = this.textSize + 'px ' + this.textFont;
+                context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
+
+                // drawing min/max
+                this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
+                //context.globalAlpha = this.alpha * 0.8;
+                //context.fillStyle = this.textColor;
+                //context.font = this.textSize+'px '+this.textFont;
+                context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
+
+                // drawing average
+                this.textAverage = parseInt(average * 100) / 100 + '';
+                //context.globalAlpha = this.alpha * 0.8;
+                //context.fillStyle = this.textColor;
+                //context.font = this.textSize+'px '+this.textFont;
+                context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+
             },
 
         });
@@ -4100,40 +4086,22 @@
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
+                this._box = this.getBox(this.prerenderCanvas.context);
 
-                var box = this.getDrawBox();
+                // save original coordinates
+                var drawX = this._box.draw.x,
+                    drawY = this._box.draw.y;
+                this._box.draw.x = 0;
+                this._box.draw.y = 0;
 
-                //console.log('prerenderUpdate :: drawBox = ');
-                //console.log(drawBox);
+                this.prerenderCanvas.width = this._box.draw.width;
+                this.prerenderCanvas.height = this._box.draw.height;
 
-                this.prerenderCanvas.width = drawBox.width;
-                this.prerenderCanvas.height = drawBox.height;
+                this.drawRender(this.prerenderCanvas.context);
 
-                //console.log('prerenderUpdate :: this.prerenderCanvas = ');
-                //console.log(this.prerenderCanvas);
-
-                //console.log(drawBox);
-                var contextDrawBox = {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: drawBox.width,
-                    img_height: drawBox.height,
-                    context_x: 0,
-                    context_y: 0,
-                    context_width: drawBox.width,
-                    context_height: drawBox.height,
-                    o_x: 0,
-                    o_y: 0,
-                    o_width: drawBox.width,
-                    o_height: drawBox.height
-                };
-
-                //this.prerenderCanvas.context.fillStyle = '#ff0000';
-                //this.prerenderCanvas.context.fillRect(0,0,200,200);
-                //console.log('prerenderUpdate :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+                // set original coordinates
+                this._box.draw.x = drawX;
+                this._box.draw.y = drawY;
             },
 
             /**
@@ -4144,11 +4112,6 @@
 
                 //console.log('prerenderUse :: drawBox = ');
                 //console.log(box);
-
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
 
                 // check if image outside canvas
                 if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
@@ -4212,21 +4175,28 @@
              * @return {object} Result {x, y}
              */
             getPosition: function(absolute) {
+                var x = this.x,
+                    y = this.y;
+
+                if (this.snapToPixel) {
+                    x = parseInt(x);
+                    y = parseInt(y);
+                }
                 if (absolute || !this._parent) {
                     return {
-                        x: this.x,
-                        y: this.y
+                        x: x,
+                        y: y
                     };
                 } else {
                     var position = this._parent.getPosition();
                     if (position) return {
-                        x: this.x + position.x,
-                        y: this.y + position.y
+                        x: x + position.x,
+                        y: y + position.y
                     };
                 }
                 return {
-                    x: this.x,
-                    y: this.y
+                    x: x,
+                    y: y
                 };
             },
 
@@ -4246,69 +4216,65 @@
                 };
             },
 
-            getContextBoxDefault: function(context, box) {
+            getContextBoxDefault: function(context) {
 
                 return {
-                    x: box.draw.x,
-                    y: box.draw.y,
-                    width: box.draw.width,
-                    height: box.draw.height,
+                    x: this._box.draw.x,
+                    y: this._box.draw.y,
+                    width: this._box.draw.width,
+                    height: this._box.draw.height,
                 };
             },
 
-            getContextBox: function(context, box) {
+            getContextBox: function(context, img) {
 
-                var contextBox = this.getContextBoxDefault(context, box);
+                this._box.context = this.getContextBoxDefault(context);
 
-                // check if the whole image is inside canvas
-                // as image here cant be entirely outside canvas
-                if (box.draw.x >= 0 && box.draw.x + box.draw.width < context.canvas.clientWidth && box.draw.y >= 0 && box.draw.y + box.draw.height < context.canvas.clientHeight)
-                    return contextBox;
+                if (img) {
+                    this._box.img = {
+                        x: 0,
+                        y: 0,
+                        width: img.realWidth ? img.realWith : img.width,
+                        height: img.realHeight ? img.realHeight : img.height,
+                    }
+                }
+
+                // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
+                if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight)
+                    return this._box.context;
+
+                if (img) {
+                    var scaleX = this._box.context.width / this._box.img.width;
+                    var scaleY = this._box.context.height / this._box.img.height;
+                }
 
                 if (contextBox.x < 0) {
-                    contextBox.width = contextBox.width + contextBox.x;
-                    contextBox.x = 0;
+                    if (img) {
+                        this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
+                        this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
+                    }
+                    this._box.context.width = contextBox.width + contextBox.x;
+                    this._box.context.x = 0;
                 }
-                if (contextBox.y < 0) {
-                    contextBox.height = contextBox.height + contextBox.y;
-                    contextBox.y = 0;
+                if (this._box.context.y < 0) {
+                    if (img) {
+                        this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
+                        this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
+                    }
+                    this._box.context.height = contextBox.height + contextBox.y;
+                    this._box.context.y = 0;
                 }
-                if (contextBox.context_x + contextBox.context_width > context.canvas.clientWidth) {
-                    var delta = contextBox.x + contextBox.width - context.canvas.clientWidth;
-                    contextBox.context_width = contextBox.context_width - delta;
+                if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
+                    var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
+                    if (img) this._box.img.width = this._box.img.width - delta / scaleX;
+                    this._box.context.width = this._box.context.width - delta;
                 }
-                if (contextBox.context_y + contextBox.context_height > context.canvas.clientHeight) {
-                    var delta = contextBox.context_y + contextBox.context_height - context.canvas.clientHeight;
-                    contextBox.context_height = contextBox.context_height - delta;
+                if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
+                    var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
+                    if (img) this._box.img.height = this._box.img.height - delta / scaleY;
+                    this._box.context.height = this._box.context.height - delta;
                 }
 
-                /*
-                // crop the image
-                var scale_x = contextBox.context_width / contextBox.img_width;
-                var scale_y = contextBox.context_height / contextBox.img_height;
-                if (contextBox.context_x < 0) {
-                    contextBox.img_x = contextBox.img_x - contextBox.context_x / scale_x;
-                    contextBox.img_width = contextBox.img_width + contextBox.context_x / scale_x;
-                    contextBox.context_width = contextBox.context_width + contextBox.context_x;
-                    contextBox.context_x = 0;
-                }
-                if (contextBox.context_y < 0) {
-                    contextBox.img_y = contextBox.img_y - contextBox.context_y / scale_y;
-                    contextBox.img_height = contextBox.img_height + contextBox.context_y / scale_y;
-                    contextBox.context_height = contextBox.context_height + contextBox.context_y;
-                    contextBox.context_y = 0;
-                }
-                if (contextBox.context_x + contextBox.context_width > context.canvas.clientWidth) {
-                    var delta = contextBox.context_x + contextBox.context_width - context.canvas.clientWidth;
-                    contextBox.img_width = contextBox.img_width - delta / scale_x;
-                    contextBox.context_width = contextBox.context_width - delta;
-                }
-                if (contextBox.context_y + contextBox.context_height > context.canvas.clientHeight) {
-                    var delta = contextBox.context_y + contextBox.context_height - context.canvas.clientHeight;
-                    contextBox.img_height = contextBox.img_height - delta / scale_y;
-                    contextBox.context_height = contextBox.context_height - delta;
-                }
-                */
                 return contextBox;
 
             },
@@ -4327,10 +4293,13 @@
                 context = context || yespix.context;
 
                 // if cannot draw, exit now
-                if (!this.canDraw()) return this.drawExit(false);
+                if (!this.canDraw(context)) return this.drawExit(false);
 
-                // reset _box
-                this._box = false;
+                // get the draw box
+                this._box = this.getBox(context);
+
+                // if cannot draw from this draw box
+                if (!this.canDrawBox(context)) return this.drawExit(false);
 
                 // pre render on canvas
                 if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
@@ -4348,19 +4317,10 @@
                     return this.drawExit(true);
                 }
 
-                // get the draw box
-                this._box = this.getBox(context);
-
-                // if cannot draw from this draw box
-                if (!this.canDrawBox(context)) return this.drawExit(false);
-
-                // get the context box
-                this._box.context = this.getContextBox(context);
-
-                this.drawRender(context, getContextBox);
+                this.drawRender(context);
 
                 // draw debug
-                if (this.debug) this.drawDebug(context, box);
+                if (this.debug) this.drawDebug(context);
 
                 // exit
                 return this.drawExit(true);
@@ -4404,7 +4364,7 @@
              * @param {object} context Context object
              * @param {object} box Box object with the coordinates
              */
-            drawRender: function(context, box) {
+            drawRender: function(context) {
                 // Empty. Child entities must provide the code
             },
 
@@ -4649,55 +4609,53 @@
                 return image; //source != '';
             },
 
-            draw: function(context) {
-                if (!this.isVisible) return;
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                var img = this.image(this.imageSelected);
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context || !img || !img.element || !img.isReady)
+                    return false;
 
+                return true;
+            },
+
+
+            drawRender: function() {
                 var img = this.image(this.imageSelected);
 
-                if (context && img && img.element && img.isReady) {
-
-                    var box = this.getDrawBox();
-                    if (this.snapToPixel) {
-                        box.x = parseInt(box.x);
-                        box.y = parseInt(box.y);
-                    }
-
-                    // check if image outside canvas
-                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
-                        return;
-
-                    var contextDrawBox = this.getContextDrawBox(context, img, box);
-
-                    if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
-                        return;
-
-                    //var scaleX = this.flipX ? -1 : 1;
-                    //var scaleY = this.flipY ? -1 : 1;
-                    context.globalAlpha = this.alpha;
-
-                    //console.log(contextDrawBox);
-
-                    context.drawImage(img.element, //image element
-                        contextDrawBox.img_x, // x position on image
-                        contextDrawBox.img_y, // y position on image
-                        contextDrawBox.img_width, // width on image
-                        contextDrawBox.img_height, // height on image
-                        contextDrawBox.context_x, // x position on canvas
-                        contextDrawBox.context_y, // y position on canvas
-                        contextDrawBox.context_width, // width on canvas
-                        contextDrawBox.context_height // height on canvas
-                    );
-                    //fuckyou();
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
+                var box = this.getDrawBox();
+                if (this.snapToPixel) {
+                    box.x = parseInt(box.x);
+                    box.y = parseInt(box.y);
                 }
+
+                // check if image outside canvas
+                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                    return;
+
+                var contextDrawBox = this.getContextDrawBox(context, img, box);
+
+                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0)
+                    return;
+
+                //var scaleX = this.flipX ? -1 : 1;
+                //var scaleY = this.flipY ? -1 : 1;
+                context.globalAlpha = this.alpha;
+
+                //console.log(contextDrawBox);
+
+                context.drawImage(img.element, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
+                );
             },
 
 
@@ -5395,107 +5353,121 @@
 
         yespix.define('path', 'gfx', {
 
-            lineWidth: 0,
-            lineColor: '',
+            lineWidth: 1,
+            lineColor: '#000000',
             lineAlpha: 1.0,
 
-            fillColor: '',
+            fillColor: '#ffffff',
             fillAlpha: 1.0,
 
             isVisible: true,
+
+            prerender: false,
+
 
             init: function() {
 
             },
 
 
+            /**
+             * Get the position and width in an object. In this object, it will be added later some other coordinates (path, context ...)
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {_type: "class", draw: {x, y, width, height}}
+             */
+            getBox: function(absolute) {
+                this._box = {
+                    type: this._class
+                };
+                this._box.draw = this.getDrawBox(absolute);
+                this._box.path = this.getPathBox();
+                return this._box;
+            },
 
-            getPathBox: function(absolute) {
+            /**
+             * Get the draw box with absolute position or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y, width, height}
+             */
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
+
                 return {
                     x: position.x,
                     y: position.y,
                     width: this.width + this.lineWidth,
                     height: this.height + this.lineWidth,
-                    type: this._class
                 };
             },
 
-            getContextDrawBoxDefault: function(context, img, box) {
-
+            getPathBox: function() {
                 return {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: img.realWidth,
-                    img_height: img.realHeight,
-                    context_x: box.x,
-                    context_y: box.y,
-                    context_width: box.width,
-                    context_height: box.height,
-                    o_x: box.x + this.lineWidth / 2,
-                    o_y: box.y + this.lineWidth / 2,
-                    o_width: box.width,
-                    o_height: box.height
+                    x: this._box.draw.x + this.lineWidth / 2,
+                    y: this._box.draw.y + this.lineWidth / 2,
+                    width: this.width,
+                    height: this.height
                 };
             },
 
-            canDrawBox: function(context, contextDrawBox) {
-                if (contextDrawBox.o_x > context.canvas.clientWidth || contextDrawBox.o_y > context.canvas.clientHeight || contextDrawBox.o_x + contextDrawBox.o_width < 0 || contextDrawBox.o_y + contextDrawBox.o_height < 0)
-                    return false;
-
-                return this.isVisible && this.alpha > 0;
-            },
-
-            canDrawPath: function(context, contextDrawBox) {
+            canDrawPath: function(context) {
                 return true;
             },
 
-            drawPath: function(context, contextDrawBox) {
+            drawPath: function(context) {
                 context.beginPath();
             },
 
-            canDrawLine: function(context, contextDrawBox) {
+            canDrawLine: function(context) {
                 return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
             },
 
-            drawLine: function(context, contextDrawBox) {
+            drawLine: function(context) {
                 this.drawAlpha(context, 'line');
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
                 context.stroke();
             },
 
-            canDrawFill: function(context, contextDrawBox) {
+            canDrawFill: function(context) {
                 return this.fillColor != '' && this.fillAlpha > 0;
             },
 
-            drawFill: function(context, contextDrawBox) {
+            drawFill: function(context) {
                 this.drawAlpha(context, 'fill');
                 context.fillStyle = this.fillColor;
                 context.fill();
             },
 
-            drawRender: function(context, contextDrawBox, img) {
-                //console.log('path.drawRender :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                if (this.canDrawPath(context, contextDrawBox)) {
-                    this.drawPath(context, contextDrawBox);
-                    if (this.canDrawFill(context, contextDrawBox)) this.drawFill(context, contextDrawBox);
-                    if (this.canDrawLine(context, contextDrawBox)) this.drawLine(context, contextDrawBox);
+            drawRender: function(context) {
+                if (this.canDrawPath(context)) {
+                    this.drawPath(context);
+                    if (this.canDrawFill(context)) this.drawFill(context);
+                    if (this.canDrawLine(context)) this.drawLine(context);
                 }
             },
+
 
             /**
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
-                var drawBox = this.getDrawBox(false, this._context);
+                this._box = this.getBox(this.prerenderCanvas.context);
 
+                // save original coordinates
+                var drawX = this._box.draw.x,
+                    drawY = this._box.draw.y,
+                    pathX = this._box.path.x,
+                    pathY = this._box.path.y;
+
+                this._box.draw.x = 0;
+                this._box.draw.y = 0;
+                this._box.path.x = this.lineWidth / 2;
+                this._box.path.y = this.lineWidth / 2;
                 //console.log('path.prerenderUpdate :: drawBox = ');
                 //console.log(drawBox);
 
-                this.prerenderCanvas.width = drawBox.width;
-                this.prerenderCanvas.height = drawBox.height;
+                this.prerenderCanvas.width = this._box.draw.width;
+                this.prerenderCanvas.height = this._box.draw.height;
 
                 //this.prerenderCanvas.context.fillStyle = '#FF0000';
                 //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
@@ -5503,52 +5475,34 @@
                 //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
                 //console.log(this.prerenderCanvas);
 
-                var contextDrawBox = {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: drawBox.width,
-                    img_height: drawBox.height,
-                    context_x: 0,
-                    context_y: 0,
-                    context_width: drawBox.width,
-                    context_height: drawBox.height,
-                    o_x: this.lineWidth / 2,
-                    o_y: this.lineWidth / 2,
-                    o_width: drawBox.width,
-                    o_height: drawBox.height
-                };
 
                 //console.log('path.prerenderUpdate :: contextDrawBox = ');
                 //console.log(contextDrawBox);
 
-                this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+                this.drawRender(this.prerenderCanvas.context);
+
+                // set original coordinates
+                this._box.draw.x = drawX;
+                this._box.draw.y = drawY;
+                this._box.path.x = pathX;
+                this._box.path.y = pathY;
             },
 
             /**
              * Draw the pre-render on a canvas context
              */
             prerenderUse: function(context) {
-                var box = this.getDrawBox(false, context);
-
                 //console.log('prerenderUse :: drawBox = ');
                 //console.log(box);
 
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
-
                 // check if image outside canvas
-                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return false;
 
-                var contextDrawBox = this.getContextDrawBox(context, {
-                    realWidth: box.width,
-                    realHeight: box.height
-                }, box);
+                this.getContextBox(context, this.prerenderCanvas);
 
                 // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
+                if (this._box.context.width <= 0 || this._box.context.height <= 0)
                     return false;
 
                 context.globalAlpha = this.alpha;
@@ -5557,14 +5511,14 @@
                 console.log(contextDrawBox);*/
 
                 context.drawImage(this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height // height on canvas
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
                 );
                 return true;
             },
@@ -5728,32 +5682,32 @@
 
             init: function() {},
 
-            drawPath: function(context, contextDrawBox) {},
+            drawPath: function(context) {},
 
-            drawFill: function(context, contextDrawBox) {
+            drawFill: function(context) {
                 context.fillStyle = this.fillColor;
                 this.drawAlpha(context, 'fill');
                 context.fillRect(
-                    contextDrawBox.o_x, // x position on canvas
-                    contextDrawBox.o_y, // y position on canvas
-                    contextDrawBox.o_width - this.lineWidth, // width on canvas
-                    contextDrawBox.o_height - this.lineWidth // height on canvas
+                    this._box.path.x, // x position on canvas
+                    this._box.path.y, // y position on canvas
+                    this._box.path.width, // width on canvas
+                    this._box.path.height // height on canvas
                 );
             },
 
-            drawLine: function(context, contextDrawBox) {
+            drawLine: function(context) {
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
                 this.drawAlpha(context, 'line');
                 context.strokeRect(
-                    contextDrawBox.o_x,
-                    contextDrawBox.o_y,
-                    contextDrawBox.o_width - this.lineWidth,
-                    contextDrawBox.o_height - this.lineWidth);
+                    this._box.path.x,
+                    this._box.path.y,
+                    this._box.path.width,
+                    this._box.path.height);
             }
         });
 
-        yespix.define('roundrect', 'rect', {
+        yespix.define('roundrect', 'path', {
 
             borderRadius: 5,
 
@@ -5766,35 +5720,19 @@
                 return this.width / 2;
             },
 
-            drawPath: function(context, contextDrawBox) {
+            drawPath: function(context) {
                 var radius = this.getBorderRadius();
                 context.beginPath();
 
-                contextDrawBox.o_width = contextDrawBox.o_width - this.lineWidth;
-                contextDrawBox.o_height = contextDrawBox.o_height - this.lineWidth;
-
-                context.moveTo(contextDrawBox.o_x + radius, contextDrawBox.o_y);
-                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y);
-                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y, contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + radius);
-                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height - radius);
-                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y + contextDrawBox.o_height);
-                context.lineTo(contextDrawBox.o_x + radius, contextDrawBox.o_y + contextDrawBox.o_height);
-                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height - radius);
-                context.lineTo(contextDrawBox.o_x, contextDrawBox.o_y + radius);
-                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y, contextDrawBox.o_x + radius, contextDrawBox.o_y);
-            },
-
-            drawLine: function(context, box) {
-                this.drawAlpha(context, 'line');
-                if (context.strokeStyle != this.lineColor) context.strokeStyle = this.lineColor;
-                if (context.lineWidth != this.lineWidth) context.lineWidth = this.lineWidth;
-                context.stroke();
-            },
-
-            drawFill: function(context, box) {
-                this.drawAlpha(context, 'fill');
-                if (context.fillStyle != this.fillColor) context.fillStyle = this.fillColor;
-                context.fill();
+                context.moveTo(this._box.path.x + radius, this._box.path.y);
+                context.lineTo(this._box.path.x + this._box.path.width - radius, this._box.path.y);
+                context.quadraticCurveTo(this._box.path.x + this._box.path.width, this._box.path.y, this._box.path.x + this._box.path.width, this._box.path.y + radius);
+                context.lineTo(this._box.path.x + this._box.path.width, this._box.path.y + this._box.path.height - radius);
+                context.quadraticCurveTo(this._box.path.x + this._box.path.width, this._box.path.y + this._box.path.height, this._box.path.x + this._box.path.width - radius, this._box.path.y + this._box.path.height);
+                context.lineTo(this._box.path.x + radius, this._box.path.y + this._box.path.height);
+                context.quadraticCurveTo(this._box.path.x, this._box.path.y + this._box.path.height, this._box.path.x, this._box.path.y + this._box.path.height - radius);
+                context.lineTo(this._box.path.x, this._box.path.y + radius);
+                context.quadraticCurveTo(this._box.path.x, this._box.path.y, this._box.path.x + radius, this._box.path.y);
             },
 
         });
@@ -6170,80 +6108,46 @@
              * Draw pre-render for text, change y position on canvas context
              */
             prerenderUse: function(context) {
-                var box = this.getDrawBox(false, context);
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
 
                 // check if image outside canvas
-                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return;
 
-                var contextDrawBox = this.getContextDrawBox(context, {
-                    realWidth: box.width,
-                    realHeight: box.height
-                }, box);
+                this.getContextBox(context, this.prerenderCanvas);
 
-                //console.log('text.prerenderUse :: drawBox = ');
-                //console.log(box);
-
-                //console.log('text.prerenderUse :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
-                    return;
+                if (this._box.context.width <= 0 || this._box.context.height <= 0)
+                    return false;
 
                 context.globalAlpha = this.alpha;
 
-                //console.log('text.prerenderUse :: prerenderCanvas = ');
-                //console.log(this.prerenderCanvas);
-
-                //console.log('text.prerenderUse :: context = ');
-                //console.log(context);
-                /*console.log(this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y + box.height, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height);*/
-
-                context.drawImage(
-                    this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height // height on canvas
+                context.drawImage(this.prerenderCanvas, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
                 );
                 return true;
             },
 
 
-            getDrawBox: function(relative, context) {
-                var position = this.getPosition(relative);
-                if (!context) {
-                    if (this.prerender) context = this.prerenderCanvas.context;
-                    else context = this.getContext();
-                }
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
 
-                if (!context) {
+                this._context = this._context || yespix.context || this.document.createElement('canvas');
+
+                if (!this._context) {
                     return {
                         x: position.x,
                         y: position.y,
                         width: 0,
-                        height: 0,
-                        type: this._class
+                        height: 0
                     };
                 }
-                var size = context.measureText(this.text);
+                var size = this._context.measureText(this.text);
                 var height = Math.ceil(yespix.getFontHeight(this.font));
                 var width = Math.ceil(size.width);
 
@@ -6251,17 +6155,16 @@
                     x: position.x,
                     y: position.y,
                     width: width * 2,
-                    height: height * 2,
-                    type: this._class
+                    height: height * 2
                 };
             },
 
 
-            drawRender: function(context, contextDrawBox) {
+            drawRender: function(context) {
                 context.globalAlpha = this.alpha;
                 context.fillStyle = this.textColor;
                 context.font = this.textSize + 'px ' + this.textFont;
-                context.fillText(this.text, contextDrawBox.o_x, contextDrawBox.o_y + this.textSize);
+                context.fillText(this.text, this._box.draw.x, this._box.draw.y + this.textSize);
             }
 
         });

@@ -85,40 +85,22 @@ yespix.define('gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
+        this._box = this.getBox(this.prerenderCanvas.context);
 
-        var box = this.getDrawBox();
+        // save original coordinates
+        var drawX = this._box.draw.x,
+            drawY = this._box.draw.y;
+        this._box.draw.x = 0;
+        this._box.draw.y = 0;
 
-        //console.log('prerenderUpdate :: drawBox = ');
-        //console.log(drawBox);
+        this.prerenderCanvas.width = this._box.draw.width;
+        this.prerenderCanvas.height = this._box.draw.height;
 
-        this.prerenderCanvas.width = drawBox.width;
-        this.prerenderCanvas.height = drawBox.height;
+        this.drawRender(this.prerenderCanvas.context);
 
-        //console.log('prerenderUpdate :: this.prerenderCanvas = ');
-        //console.log(this.prerenderCanvas);
-
-        //console.log(drawBox);
-        var contextDrawBox = {
-            img_x: 0,
-            img_y: 0,
-            img_width: drawBox.width,
-            img_height: drawBox.height,
-            context_x: 0,
-            context_y: 0,
-            context_width: drawBox.width,
-            context_height: drawBox.height,
-            o_x: 0,
-            o_y: 0,
-            o_width: drawBox.width,
-            o_height: drawBox.height
-            };
-        
-        //this.prerenderCanvas.context.fillStyle = '#ff0000';
-        //this.prerenderCanvas.context.fillRect(0,0,200,200);
-        //console.log('prerenderUpdate :: contextDrawBox = ');
-        //console.log(contextDrawBox);
-
-        this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+        // set original coordinates
+        this._box.draw.x = drawX;
+        this._box.draw.y = drawY;
     },
 
     /**
@@ -129,11 +111,6 @@ yespix.define('gfx', {
         
         //console.log('prerenderUse :: drawBox = ');
         //console.log(box);
-
-        if (this.snapToPixel) {
-            box.x = parseInt(box.x);
-            box.y = parseInt(box.y);
-        }
 
         // check if image outside canvas
         if (box.x > context.canvas.clientWidth 
@@ -200,21 +177,27 @@ yespix.define('gfx', {
      * @return {object} Result {x, y}
      */
     getPosition: function(absolute) {
+        var x = this.x, y = this.y;
+
+        if (this.snapToPixel) {
+            x = parseInt(x);
+            y = parseInt(y);
+        }
         if (absolute || !this._parent) {
             return {
-                x: this.x,
-                y: this.y
+                x: x,
+                y: y
             };
         } else {
             var position = this._parent.getPosition();
             if (position) return {
-                x: this.x + position.x,
-                y: this.y + position.y
+                x: x + position.x,
+                y: y + position.y
             };
         }
         return {
-            x: this.x,
-            y: this.y
+            x: x,
+            y: y
         };
     },
 
@@ -234,70 +217,66 @@ yespix.define('gfx', {
         };
     },
 
-    getContextBoxDefault: function(context, box) {
+    getContextBoxDefault: function(context) {
         
         return {
-            x: box.draw.x,
-            y: box.draw.y,
-            width: box.draw.width,
-            height: box.draw.height,
+            x: this._box.draw.x,
+            y: this._box.draw.y,
+            width: this._box.draw.width,
+            height: this._box.draw.height,
         };
     },
 
-    getContextBox: function(context, box) {
+    getContextBox: function(context, img) {
         
-        var contextBox = this.getContextBoxDefault(context, box);
+        this._box.context = this.getContextBoxDefault(context);
+
+        if (img) {
+            this._box.img = {
+                x: 0,
+                y: 0,
+                width: img.realWidth ? img.realWith : img.width,
+                height: img.realHeight ? img.realHeight : img.height,    
+            }
+        }
+
+        // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
+        if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth 
+            && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight )
+            return this._box.context;
         
-        // check if the whole image is inside canvas
-        // as image here cant be entirely outside canvas
-        if (box.draw.x >= 0 && box.draw.x + box.draw.width < context.canvas.clientWidth 
-            && box.draw.y >= 0 && box.draw.y + box.draw.height < context.canvas.clientHeight )
-            return contextBox;
+        if (img) {
+            var scaleX = this._box.context.width / this._box.img.width;
+            var scaleY = this._box.context.height / this._box.img.height;
+        }
 
         if (contextBox.x < 0) {
-            contextBox.width = contextBox.width + contextBox.x;
-            contextBox.x = 0;
+            if (img) {
+                this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
+                this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
+            }
+            this._box.context.width = contextBox.width + contextBox.x;
+            this._box.context.x = 0;
         }
-        if (contextBox.y < 0) {
-            contextBox.height = contextBox.height + contextBox.y;
-            contextBox.y = 0;
+        if (this._box.context.y < 0) {
+            if (img) {
+                this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
+                this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
         }
-        if (contextBox.context_x + contextBox.context_width > context.canvas.clientWidth) {
-            var delta = contextBox.x + contextBox.width - context.canvas.clientWidth;
-            contextBox.context_width = contextBox.context_width - delta;
+            this._box.context.height = contextBox.height + contextBox.y;
+            this._box.context.y = 0;
         }
-        if (contextBox.context_y + contextBox.context_height > context.canvas.clientHeight) {
-            var delta = contextBox.context_y + contextBox.context_height - context.canvas.clientHeight;
-            contextBox.context_height = contextBox.context_height - delta;
+        if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
+            var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
+            if (img) this._box.img.width = this._box.img.width - delta / scaleX;
+            this._box.context.width = this._box.context.width - delta;
+        }
+        if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
+            var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
+            if (img) this._box.img.height = this._box.img.height - delta / scaleY;
+            this._box.context.height = this._box.context.height - delta;
         }
 
-        /*
-        // crop the image
-        var scale_x = contextBox.context_width / contextBox.img_width;
-        var scale_y = contextBox.context_height / contextBox.img_height;
-        if (contextBox.context_x < 0) {
-            contextBox.img_x = contextBox.img_x - contextBox.context_x / scale_x;
-            contextBox.img_width = contextBox.img_width + contextBox.context_x / scale_x;
-            contextBox.context_width = contextBox.context_width + contextBox.context_x;
-            contextBox.context_x = 0;
-        }
-        if (contextBox.context_y < 0) {
-            contextBox.img_y = contextBox.img_y - contextBox.context_y / scale_y;
-            contextBox.img_height = contextBox.img_height + contextBox.context_y / scale_y;
-            contextBox.context_height = contextBox.context_height + contextBox.context_y;
-            contextBox.context_y = 0;
-        }
-        if (contextBox.context_x + contextBox.context_width > context.canvas.clientWidth) {
-            var delta = contextBox.context_x + contextBox.context_width - context.canvas.clientWidth;
-            contextBox.img_width = contextBox.img_width - delta / scale_x;
-            contextBox.context_width = contextBox.context_width - delta;
-        }
-        if (contextBox.context_y + contextBox.context_height > context.canvas.clientHeight) {
-            var delta = contextBox.context_y + contextBox.context_height - context.canvas.clientHeight;
-            contextBox.img_height = contextBox.img_height - delta / scale_y;
-            contextBox.context_height = contextBox.context_height - delta;
-        }
-        */
         return contextBox;
             
     },
@@ -314,12 +293,15 @@ yespix.define('gfx', {
 
         // get the context
         context = context || yespix.context;
-
+        
         // if cannot draw, exit now
-        if (!this.canDraw()) return this.drawExit(false);
+        if (!this.canDraw(context)) return this.drawExit(false);
 
-        // reset _box
-        this._box = false;
+        // get the draw box
+        this._box = this.getBox(context);
+
+        // if cannot draw from this draw box
+        if (!this.canDrawBox(context)) return this.drawExit(false);
 
         // pre render on canvas
         if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
@@ -337,19 +319,10 @@ yespix.define('gfx', {
             return this.drawExit(true);
         }
 
-        // get the draw box
-        this._box = this.getBox(context);
-
-        // if cannot draw from this draw box
-        if (!this.canDrawBox(context)) return this.drawExit(false);
-
-        // get the context box
-        this._box.context = this.getContextBox(context);
-
-        this.drawRender(context, getContextBox);
+        this.drawRender(context);
 
         // draw debug
-        if (this.debug) this.drawDebug(context, box);
+        if (this.debug) this.drawDebug(context);
 
         // exit
         return this.drawExit(true);
@@ -400,7 +373,7 @@ yespix.define('gfx', {
      * @param {object} context Context object
      * @param {object} box Box object with the coordinates
      */
-    drawRender: function(context, box) {
+    drawRender: function(context) {
         // Empty. Child entities must provide the code
     },
 
@@ -462,7 +435,7 @@ yespix.define('gfx', {
     drawDebugPosition: function(context) {
 
         var box = this._box.draw;
-        
+
         context.lineWidth = 0.5;
         context.strokeStyle = "#cc3333";
         context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);

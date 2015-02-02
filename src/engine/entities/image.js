@@ -170,61 +170,63 @@ yespix.define('image', 'gfx', {
         return image; //source != '';
     },
 
-    draw: function(context) {
-        if (!this.isVisible) return;
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+    /**
+     * Returns true if the entity can be drawn, get this information from basic properties of the entity
+     * @return {bool} True if can be drawn
+     */
+    canDraw: function(context) {
+        var img = this.image(this.imageSelected);
+        if (!this.isActive 
+            || !this.isVisible 
+            || this.alpha <= 0
+            || !context
+            || !img
+            || !img.element
+            || !img.isReady) 
+            return false;
 
+        return true;
+    },
+
+
+    drawRender: function() {
         var img = this.image(this.imageSelected);
 
-        if (context && img && img.element && img.isReady) {
-
-            var box = this.getDrawBox();
-            if (this.snapToPixel) {
-                box.x = parseInt(box.x);
-                box.y = parseInt(box.y);
-            }
-
-            // check if image outside canvas
-            if (box.x > context.canvas.clientWidth 
-                || box.y > context.canvas.clientHeight 
-                || box.x + box.width < 0
-                || box.y + box.height < 0)
-                return;
-
-            var contextDrawBox = this.getContextDrawBox(context, img, box);
-
-            if (contextDrawBox.img_width == 0
-                || contextDrawBox.img_height == 0
-                || contextDrawBox.context_width == 0
-                || contextDrawBox.context_height == 0)
-                return;
-
-            //var scaleX = this.flipX ? -1 : 1;
-            //var scaleY = this.flipY ? -1 : 1;
-            context.globalAlpha = this.alpha;
-        
-            //console.log(contextDrawBox);
-
-            context.drawImage(img.element, //image element
-                contextDrawBox.img_x, // x position on image
-                contextDrawBox.img_y, // y position on image
-                contextDrawBox.img_width, // width on image
-                contextDrawBox.img_height, // height on image
-                contextDrawBox.context_x, // x position on canvas
-                contextDrawBox.context_y, // y position on canvas
-                contextDrawBox.context_width, // width on canvas
-                contextDrawBox.context_height // height on canvas
-            );
-            //fuckyou();
-            if (this.debug) {
-                this.drawDebug(context, box);
-            }
+        var box = this.getDrawBox();
+        if (this.snapToPixel) {
+            box.x = parseInt(box.x);
+            box.y = parseInt(box.y);
         }
+
+        // check if image outside canvas
+        if (box.x > context.canvas.clientWidth 
+            || box.y > context.canvas.clientHeight 
+            || box.x + box.width < 0
+            || box.y + box.height < 0)
+            return;
+
+        var contextDrawBox = this.getContextDrawBox(context, img, box);
+
+        if (contextDrawBox.img_width == 0
+            || contextDrawBox.img_height == 0)
+            return;
+
+        //var scaleX = this.flipX ? -1 : 1;
+        //var scaleY = this.flipY ? -1 : 1;
+        context.globalAlpha = this.alpha;
+    
+        //console.log(contextDrawBox);
+
+        context.drawImage(img.element, //image element
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
+        );
     },
 
 

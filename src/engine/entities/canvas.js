@@ -6,11 +6,6 @@ yespix.define('canvas', {
     document: null,
 
     init: function(options) {
-        if (options === true || options.create) this.create(options);
-    },
-
-    create: function(options) {
-        
         options = options || {};
 
         options.document = options.document || yespix.document;
@@ -48,17 +43,11 @@ yespix.define('canvas', {
         this.canvasOptions = options;
 
         var canvas = null;
-        if (options.create)
-        {
-            canvas = this.document.createElement('canvas');
-            canvas.id = options.id;
-            canvas.width = options.width;
-            canvas.height = options.height;
-            canvas.className = options.class;
-            for (var n in options.style) canvas.style[n] = options.style[n];
-        } else if (options.canvas) {
-            canvas = options.canvas;
-        }
+        if (!options.canvas) canvas = this.create(options);
+        else if (options.canvas) canvas = options.canvas;
+        
+        console.log(canvas);
+        console.log(options);
 
         if (canvas) {
             if (options.autoAppend) {
@@ -70,6 +59,15 @@ yespix.define('canvas', {
             yespix.canvas = canvas;
             yespix.context = canvas.getContext('2d');
         }
+    },
+
+    create: function(options) {
+        var canvas = this.document.createElement('canvas');
+        canvas.id = options.id;
+        canvas.width = options.width;
+        canvas.height = options.height;
+        canvas.className = options.class;
+        return canvas;
     },
 
 
