@@ -1,9 +1,11 @@
 
 TODO list:
-- use clearRect to clear faster the canvas
+- create an object draw box in the entity that merge all the render coordinates
+- put the snapToPixel inside getPosition
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
-- center draw path
-- path object drawbox must contains line
+- update draw box only if something change
+- use clearRect to clear faster the canvas
+- center draw path as an option for path entity
 - line in path object must not override box content
 - examples and build folders in the root project
 - fps yoyo after pre-render optimization
