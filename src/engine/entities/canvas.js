@@ -1,15 +1,18 @@
 yespix.define('canvas', {
+    
     canvasOptions: null,
     element: null,
     context: null,
     document: null,
 
     init: function(options) {
-        this.create(options);
+        if (options === true || options.create) this.create(options);
     },
 
     create: function(options) {
+        
         options = options || {};
+
         options.document = options.document || yespix.document;
         options.width = options.width || 800; // @todo default must be set to client width
         options.height = options.height || 600; // @todo default must be set to client height
@@ -44,19 +47,29 @@ yespix.define('canvas', {
         //console.log(options);
         this.canvasOptions = options;
 
-        var canvas = this.document.createElement('canvas');
-        canvas.id = options.id;
-        canvas.width = options.width;
-        canvas.height = options.height;
-        canvas.className = options.className;
-        for (var n in options.style) canvas.style[n] = options.style[n];
-
-        if (options.autoAppend) {
-            var body = this.document.getElementsByTagName("body")[0];
-            body.appendChild(canvas);
+        var canvas = null;
+        if (options.create)
+        {
+            canvas = this.document.createElement('canvas');
+            canvas.id = options.id;
+            canvas.width = options.width;
+            canvas.height = options.height;
+            canvas.className = options.class;
+            for (var n in options.style) canvas.style[n] = options.style[n];
+        } else if (options.canvas) {
+            canvas = options.canvas;
         }
 
-        this.use(canvas, options);
+        if (canvas) {
+            if (options.autoAppend) {
+                var body = this.document.getElementsByTagName("body")[0];
+                body.appendChild(canvas);
+            }
+
+            this.use(canvas, options);
+            yespix.canvas = canvas;
+            yespix.context = canvas.getContext('2d');
+        }
     },
 
 
@@ -77,7 +90,6 @@ yespix.define('canvas', {
 
     clear: function() {
         //			this.context.clearRect(0,0,this.element.width, this.element.height);
-        //if (this.element) 
         this.element.width = this.element.width;
     },
 });

@@ -286,9 +286,7 @@ yespix.fn.init = function(options) {
 
             if (yespix.drawEntities)
                 for (var t = 0; t < yespix.drawEntities.length; t++) {
-                    if (yespix.drawEntities[t] && yespix.drawEntities[t].draw) {
-                        yespix.drawEntities[t].draw();
-                    }
+                    yespix.drawEntities[t].draw();
                 }
 
         });

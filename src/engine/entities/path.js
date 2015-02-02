@@ -14,9 +14,9 @@ yespix.define('path', 'gfx', {
 
     },
 
-    getDrawBox: function(relative) {
-        var position = this.getPosition(relative);
 
+    
+    getPathBox: function(absolute) {
         return {
             x: position.x,
             y: position.y,
@@ -44,7 +44,7 @@ yespix.define('path', 'gfx', {
         };
     },
 
-    canDraw: function(context, contextDrawBox) {
+    canDrawBox: function(context, contextDrawBox) {
         if (contextDrawBox.o_x > context.canvas.clientWidth 
             || contextDrawBox.o_y > context.canvas.clientHeight 
             || contextDrawBox.o_x + contextDrawBox.o_width < 0
