@@ -1,4 +1,16 @@
 yespix.define('image', 'gfx', {
+    /**
+     * Flip the gfx horizontally if True
+     * @type {Boolean}
+     */
+    flipX: false,
+
+    /**
+     * Flip the gfx vertically if True
+     * @type {Boolean}
+     */
+    flipY: false,
+
     isVisible: true,
 
     // images
@@ -15,6 +27,12 @@ yespix.define('image', 'gfx', {
     },
 
     init: function() {
+
+        yespix.listen(this, ['flipX', 'flipY'], function(obj, e) {
+            // @todo use an event
+            obj._changed = true;
+        });
+
         var entity = this,
             count = 1;
 
@@ -189,44 +207,48 @@ yespix.define('image', 'gfx', {
     },
 
 
-    drawRender: function() {
+    drawRender: function(context) {
+        // check if image outside canvas
+        if (this._box.x > context.canvas.clientWidth 
+            || this._box.y > context.canvas.clientHeight 
+            || this._box.x + this._box.width < 0
+            || this._box.y + this._box.height < 0)
+            return;
+
         var img = this.image(this.imageSelected);
 
-        var box = this.getDrawBox();
-        if (this.snapToPixel) {
-            box.x = parseInt(box.x);
-            box.y = parseInt(box.y);
+        this.getContextBox(context, img);
+
+        if (this._box.img.width == 0
+            || this._box.img.height == 0)
+            return;
+
+        var scaleX = this.flipX ? -1 : 1;
+        var scaleY = this.flipY ? -1 : 1;
+
+        if (this.flipX || this.flipY) {
+            context.save();
+            context.scale(scaleX, scaleY);
         }
 
-        // check if image outside canvas
-        if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight 
-            || box.x + box.width < 0
-            || box.y + box.height < 0)
-            return;
-
-        var contextDrawBox = this.getContextDrawBox(context, img, box);
-
-        if (contextDrawBox.img_width == 0
-            || contextDrawBox.img_height == 0)
-            return;
-
-        //var scaleX = this.flipX ? -1 : 1;
-        //var scaleY = this.flipY ? -1 : 1;
         context.globalAlpha = this.alpha;
     
-        //console.log(contextDrawBox);
-
+        //console.log(this._box);
+        console.log('cx = '+ (this._box.context.x * scaleX + (this.flipX ? this._box.context.width : 0))+', cy = '+(this._box.context.y * scaleY + (this.flipY ? this._box.context.height : 0)));
         context.drawImage(img.element, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image
             this._box.img.width, // width on image
             this._box.img.height, // height on image
-            this._box.context.x, // x position on canvas
-            this._box.context.y, // y position on canvas
+            this._box.context.x * scaleX + (this.flipX ? -this._box.context.width : 0), // x position on canvas
+            this._box.context.y * scaleY + (this.flipY ? -this._box.context.height : 0), // y position on canvas
             this._box.context.width, // width on canvas
             this._box.context.height // height on canvas
         );
+
+        if (this.flipX || this.flipY) {
+            context.restore();
+        }
     },
 
 

@@ -101,50 +101,82 @@ yespix.define('layer', 'gfx', {
         this.ready();
     },
 
-    draw: function(context) {
-        if (!this.isVisible) return;
+    /**
+     * Returns true if the entity can be drawn, get this information from basic properties of the entity
+     * @return {bool} True if can be drawn
+     */
+    canDraw: function(context) {
+        if (!this.isActive 
+            || !this.isVisible 
+            || this.alpha <= 0
+            || !this.canvas
+            || !context
+            || !this.drawContext
+            || !this.isReady) 
+            return false;
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
+        return true;
+    },
+
+    /**
+     * Get the position absolute or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y}
+     */
+    getPosition: function(absolute) {
+        var x = this.x, y = this.y;
+
+        if (this.snapToPixel) {
+            x = parseInt(x);
+            y = parseInt(y);
         }
-        if (context && this.canvas) {
-            context.globalAlpha = this.alpha * this.level.alpha;
-            var box = this.getDrawBox();
-            if (this.layerData.properties.type == 'parallax') {
-                if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
-                if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
-            }
 
-            if (this.level.snapToPixel) {
-                box.x = parseInt(box.x);
-                box.y = parseInt(box.y);
-            }
-
-
-            // check if image outside canvas
-            if (box.x > context.canvas.clientWidth 
-                || box.y > context.canvas.clientHeight 
-                || box.x + box.width < 0
-                || box.y + box.height < 0)
-                return;
-                
-            var contextDrawBox = this.getContextDrawBox(context, 
-                {realWidth: this.canvas.width, realHeight: this.canvas.height}, 
-                box);
-
-            context.drawImage(this.canvas, //image element
-                contextDrawBox.img_x, // x position on image
-                contextDrawBox.img_y, // y position on image
-                contextDrawBox.img_width, // width on image
-                contextDrawBox.img_height, // height on image
-                contextDrawBox.context_x, // x position on canvas
-                contextDrawBox.context_y, // y position on canvas
-                contextDrawBox.context_width, // width on canvas
-                contextDrawBox.context_height // height on canvas
-            );
+        if (this.layerData.properties.type == 'parallax') {
+            if (this.layerData.properties.speedX) x = x * this.layerData.properties.speedX;
+            if (this.layerData.properties.speedY) y = y * this.layerData.properties.speedY;
         }
+
+        if (absolute || !this._parent) {
+            return {
+                x: x,
+                y: y
+            };
+        } else {
+            var position = this._parent.getPosition();
+            if (position) return {
+                x: x + position.x,
+                y: y + position.y
+            };
+        }
+        return {
+            x: x,
+            y: y
+        };
+    },
+
+
+    drawRender: function(context) {
+
+        // check if image outside canvas
+        if (this._box.x > context.canvas.clientWidth 
+            || this._box.y > context.canvas.clientHeight 
+            || this._box.x + this._box.width < 0
+            || this._box.y + this._box.height < 0)
+            return;
+
+        context.globalAlpha = this.alpha * this.level.alpha;
+
+        this.getContextBox(context, this.drawContext);
+
+        context.drawImage(this.canvas, //image element
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width * this.pixelSize, // width on canvas
+            this._box.context.height * this.pixelSize // height on canvas
+        );
     },
 });

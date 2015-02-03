@@ -5,20 +5,56 @@ yespix.define('gfx', {
 
     _changed: false,
     
+    /**
+     * True when the entity is ready to be drawn (usually when all assets are loaded)
+     * @type {Boolean}
+     */
     isReady: false,
+
+    /**
+     * True if the entity must be drawn
+     * @type {Boolean}
+     */
     isVisible: true,
+
+    /**
+     * True if the x/y position values must be rounded to nearest integer
+     * @type {Boolean}
+     */
     snapToPixel: false,
 
+    /**
+     * X position of the gfx.
+     * You should use the getPosition function to get the correct position relative to parent
+     * @type {Number}
+     */
     x: 0,
+
+    /**
+     * Y position of the gfx.
+     * You should use the getPosition function to get the correct position relative to parent
+     * @type {Number}
+     */
     y: 0,
+
+    /**
+     * Z index of the gfx. A higher Z index means the gfx will be drawn at the top
+     * @type {Number}
+     */
     z: 0,
     zGlobal: 0,
 
+    /**
+     * Alpha render of the gfx from 0.0 to 1.0
+     * @type {Number}
+     */
     alpha: 1,
+    
+    /**
+     * @TODO
+     * @type {Number}
+     */
     rotation: 0,
-
-    _flipX: false,
-    _flipY: false,
 
     /**
      * Stores all the boxes (draw, context, img ...)
@@ -26,6 +62,11 @@ yespix.define('gfx', {
      */
     _box: false,
 
+
+    /**
+     * Alpha of the debug informations draw on screen, if debug is true
+     * @type {Number}
+     */
     debugAlpha: 1.0,
 
     debugPosition: true,
@@ -33,21 +74,37 @@ yespix.define('gfx', {
     debugCollision: true,
     debugMove: true,
 
+    /**
+     * Use pre render on a canvas if True. Can improve speed fot path entity and others
+     * @type {Boolean}
+     */
     prerender: false,
+
+    /**
+     * Store the canvas where the gfx is draw to use it every frame without rewriting it
+     * @type {Boolean}
+     */
     prerenderCanvas: false,
 
-
+    /**
+     * Return the files assets
+     * @return {array} Array of string path to the files
+     */
     asset: function() {
         return [];
     },
 
-    // initilize entity
+    /**
+     * initilize entity
+     */
     init: function() {
 
         yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
+            // @todo use an event
             yespix.drawEntitiesSort = true;
         });
-        yespix.listen(this, ['prerender', 'alpha', '_flipX', '_flipY'], function(obj, e) {
+        yespix.listen(this, ['prerender', 'alpha'], function(obj, e) {
+            // @todo use an event
             obj._changed = true;
         });
 
@@ -61,8 +118,8 @@ yespix.define('gfx', {
     
     ///////////////////////////// Pre-render functions /////////////////////////////
     
-    // Render entity on a canvas and only draw canvas to save time
-    // Only enable it when the drawRender function is long (for path ...)
+    // Render entity on a canvas and only draw this canvas to save time
+    // Only enable it when the drawRender function is long (for path entities ...)
     
 
     /**
@@ -159,7 +216,8 @@ yespix.define('gfx', {
     */
 
     /**
-     * Get the position and width in an object. In this object, it will be added later some other coordinates (path, context ...)
+     * Get the position and width/height of an entity and return an object. In this object, it will be added 
+     * later some other coordinates (path, context ...)
      * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
      * @return {object} Result {_type: "class", draw: {x, y, width, height}}
      */
@@ -169,6 +227,22 @@ yespix.define('gfx', {
         };
         box.draw = this.getDrawBox(absolute);
         return box;
+    },
+
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
+
+        return {
+            x: position.x,
+            y: position.y,
+            width: this.width,
+            height: this.height,
+        };
     },
 
     /**
@@ -201,22 +275,6 @@ yespix.define('gfx', {
         };
     },
 
-    /**
-     * Get the draw box with absolute position or relative to the parent entity
-     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
-     * @return {object} Result {x, y, width, height}
-     */
-    getDrawBox: function(absolute) {
-        var position = this.getPosition(absolute);
-
-        return {
-            x: position.x,
-            y: position.y,
-            width: this.width,
-            height: this.height,
-        };
-    },
-
     getContextBoxDefault: function(context) {
         
         return {
@@ -228,14 +286,14 @@ yespix.define('gfx', {
     },
 
     getContextBox: function(context, img) {
-        
-        this._box.context = this.getContextBoxDefault(context);
+
+        this._box.context = this.getContextBoxDefault();
 
         if (img) {
             this._box.img = {
                 x: 0,
                 y: 0,
-                width: img.realWidth ? img.realWith : img.width,
+                width: img.realWidth ? img.realWidth : img.width,
                 height: img.realHeight ? img.realHeight : img.height,    
             }
         }
@@ -245,40 +303,45 @@ yespix.define('gfx', {
             && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight )
             return this._box.context;
         
+        // get the correct width and height of what will be drawn (usually an image)
         if (img) {
             var scaleX = this._box.context.width / this._box.img.width;
             var scaleY = this._box.context.height / this._box.img.height;
         }
 
-        if (contextBox.x < 0) {
+        // crop the left
+        if (this._box.context.x < 0) {
             if (img) {
                 this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
                 this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
             }
-            this._box.context.width = contextBox.width + contextBox.x;
+            this._box.context.width = this._box.context.width + contextBox.x;
             this._box.context.x = 0;
         }
+
+        // crop the top
         if (this._box.context.y < 0) {
             if (img) {
                 this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
                 this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
         }
-            this._box.context.height = contextBox.height + contextBox.y;
+            this._box.context.height = this._box.context.height + this._box.context.y;
             this._box.context.y = 0;
         }
+
+        // crop the right
         if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
             var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
             if (img) this._box.img.width = this._box.img.width - delta / scaleX;
             this._box.context.width = this._box.context.width - delta;
         }
+
+        // crop the bottom
         if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
             var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
             if (img) this._box.img.height = this._box.img.height - delta / scaleY;
             this._box.context.height = this._box.context.height - delta;
         }
-
-        return contextBox;
-            
     },
     
 
@@ -374,7 +437,7 @@ yespix.define('gfx', {
      * @param {object} box Box object with the coordinates
      */
     drawRender: function(context) {
-        // Empty. Child entities must provide the code
+        // Empty. Child entities must provide the code to draw something on the 2d context
     },
 
     /**

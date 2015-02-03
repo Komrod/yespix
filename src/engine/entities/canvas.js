@@ -46,9 +46,6 @@ yespix.define('canvas', {
         if (!options.canvas) canvas = this.create(options);
         else if (options.canvas) canvas = options.canvas;
         
-        console.log(canvas);
-        console.log(options);
-
         if (canvas) {
             if (options.autoAppend) {
                 var body = this.document.getElementsByTagName("body")[0];

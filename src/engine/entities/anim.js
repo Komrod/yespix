@@ -199,6 +199,7 @@ yespix.define('anim', 'sprite', {
     },
 
     animPlay: function(name, speed, from) {
+
         if (this.animWait) return;
         if (!name) name = this.animDefault.name;
         if (this.animSelected == name) return this;
@@ -274,87 +275,144 @@ yespix.define('anim', 'sprite', {
         return this.anims[animIndex].frames[frameIndex];
     },
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
-        } else {
-            var x = this.x;
-            var y = this.y;
-        }
-        var width = this.width;
-        var height = this.height;
-
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
         var frame = this.getFrame();
-        //if (yespix.key('a') && !frame) console.log('frame = ');
-        //if (yespix.key('a')) console.log(frame);
-        var type = 'anim';
-        width = frame.width;
-        height = frame.height;
 
         return {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            type: type
+            x: position.x,
+            y: position.y,
+            width: frame.width,
+            height: frame.height,
         };
     },
 
+
+    /**
+     * Try to draw the gfx entity on a canvas
+     * @return {bool} True if drawn
+     */
     draw: function(context) {
-
+        
         this.animStep();
-        if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
-        if (!this.anims[this.animSelected]) return;
 
-        if (!this.isVisible) return;
+        // get the context
+        context = context || yespix.context;
+        
+        // if cannot draw, exit now
+        if (!this.canDraw(context)) return this.drawExit(false);
 
+        // get the draw box
+        this._box = this.getBox(context);
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
+        // if cannot draw from this draw box
+        if (!this.canDrawBox(context)) return this.drawExit(false);
+
+        // pre render on canvas
+        if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+
+            // if changed, update the pre render canvas
+            if (this._changed) this.prerenderUpdate(context);
+
+            // use the pre render canvas
+            this.prerenderUse(context);
+
+            // draw debug
+            if (this.debug) this.drawDebug(context);
+
+            // exit
+            return this.drawExit(true);
         }
 
-        var frame = this.anims[this.animSelected].frames[this.animFrame];
-        var img = frame.image;
+        this.drawRender(context);
 
+        // draw debug
+        if (this.debug) this.drawDebug(context);
+
+        // exit
+        return this.drawExit(true);
+    },
+
+    /**
+     * Returns true if the entity can be drawn, get this information from basic properties of the entity
+     * @return {bool} True if can be drawn
+     */
+    canDraw: function(context) {
+        // @TODO put this line in init
+        if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+
+        if (!this.anims[this.animSelected]) return false;
+
+        if (!this.isActive 
+            || !this.isVisible 
+            || this.alpha <= 0
+            || !context)
+            return false;
+
+        var frame = this.getFrame();
+
+        if (!frame
+            || !frame.image
+            || !frame.image.element
+            || !frame.image.isReady) 
+            return false;
+
+        return true;
+    },
+
+    drawRender: function(context) {
+
+        // check if image outside canvas
+        if (this._box.x > context.canvas.clientWidth 
+            || this._box.y > context.canvas.clientHeight 
+            || this._box.x + this._box.width < 0
+            || this._box.y + this._box.height < 0)
+            return;
+
+        var frame = this.getFrame();
+        var img = frame.image;
         var scaleX = frame.flipX ? -1 : 1;
         var scaleY = frame.flipY ? -1 : 1;
-        var position = this.getPosition();
 
-        if (this.snapToPixel) {
-            var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
-            var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
-        } else {
-            var canvasX = position.x * scaleX - frame.flipX * frame.width * this.pixelSize;
-            var canvasY = position.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+        if (frame.flipX || frame.flipY) {
+            context.save();
+            context.scale(scaleX, scaleY);
         }
-        var x = frame.x;
-        var y = frame.y;
+        
+        this.getContextBox(context, frame);
 
-        if (context && img && img.element && img.isReady) {
+        context.globalAlpha = this.alpha;
 
-            if (frame.flipX || frame.flipY) {
-                context.save();
-                context.scale(scaleX, scaleY);
-            }
-            context.globalAlpha = this.alpha;
-            context.drawImage(img.element, //image element
-                x, // x position on image
-                y, // y position on image
-                frame.width * this.pixelSize, // width on image
-                frame.height * this.pixelSize, // height on image
-                canvasX, // x position on canvas
-                canvasY, // y position on canvas
-                frame.width * this.pixelSize, // width on canvas
-                frame.height * this.pixelSize // height on canvas
-            );
-            if (frame.flipX || frame.flipY) {
-                context.restore();
-            }
-            if (this.canDrawDebug()) this.drawDebug(context);
+        context.drawImage(img.element, //image element
+            frame.x, // x position on image
+            frame.y, // y position on image
+            frame.width * this.pixelSize, // width on image
+            frame.height * this.pixelSize, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width * this.pixelSize, // width on canvas
+            this._box.context.height * this.pixelSize // height on canvas
+        );
+
+        /*
+        context.drawImage(img.element, //image element
+            frame.x, // x position on image
+            frame.y, // y position on image
+            frame.width * this.pixelSize, // width on image
+            frame.height * this.pixelSize, // height on image
+            canvasX, // x position on canvas
+            canvasY, // y position on canvas
+            frame.width * this.pixelSize, // width on canvas
+            frame.height * this.pixelSize // height on canvas
+        );
+        */
+        if (frame.flipX || frame.flipY) {
+            context.restore();
         }
     },
 
