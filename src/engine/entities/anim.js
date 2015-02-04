@@ -1,4 +1,5 @@
 yespix.define('anim', 'sprite', {
+
     animDefault: {
         width: 32, // default tile width
         height: 32, // default tile height
@@ -391,12 +392,12 @@ yespix.define('anim', 'sprite', {
         context.drawImage(img.element, //image element
             frame.x, // x position on image
             frame.y, // y position on image
-            frame.width * this.pixelSize, // width on image
-            frame.height * this.pixelSize, // height on image
+            frame.width * this.imageScale, // width on image
+            frame.height * this.imageScale, // height on image
             this._box.context.x, // x position on canvas
             this._box.context.y, // y position on canvas
-            this._box.context.width * this.pixelSize, // width on canvas
-            this._box.context.height * this.pixelSize // height on canvas
+            this._box.context.width * this.imageScale, // width on canvas
+            this._box.context.height * this.imageScale // height on canvas
         );
 
         /*

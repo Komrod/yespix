@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+<script type="text/javascript">
+	
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 1});
+    
+    for (var t= 1; t<=10; t++) {
+        yp.spawn('image', {
+            x: 25, 
+            y: 50,
+            images: 'zardoz/image/preload_0.png',
+            imageScale: t,
+            debug: true
+            });
+    }
+
+   
+ 
+</script>
+</body>
+</html>

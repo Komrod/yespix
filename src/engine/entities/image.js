@@ -1,4 +1,5 @@
 yespix.define('image', 'gfx', {
+
     /**
      * Flip the gfx horizontally if True
      * @type {Boolean}
@@ -11,20 +12,42 @@ yespix.define('image', 'gfx', {
      */
     flipY: false,
 
+    /**
+     * If true, the entity can be drawn
+     * @type {Boolean}
+     */
     isVisible: true,
 
-    // images
+    /**
+     * List of images
+     * @type {Array}
+     */
     images: [],
 
+    /**
+     * Index of selected image to draw, default 0
+     * @type {Number}
+     */
     imageSelected: 0,
 
+    /**
+     * Default parameters for images
+     * @type {Object}
+     */
     imageDefaults: {
-        isInitiated: false, // true if imageInit() was called
+        isInitiated: false,
         isReady: false,
         src: '',
         element: null,
         document: yespix.document,
     },
+
+    /**
+     * Scale of image from 1 to 100 // @todo replace pixelSize
+     * @type {Number}
+     */
+    imageScale: 1.0,
+
 
     init: function() {
 
@@ -35,8 +58,6 @@ yespix.define('image', 'gfx', {
 
         var entity = this,
             count = 1;
-
-        if (!this.pixelSize) this.pixelSize = 1;
 
         if (yespix.isString(this.images)) this.images = [{
             src: this.images
@@ -160,12 +181,13 @@ yespix.define('image', 'gfx', {
             image.entity.height = this.height;
             image.isReady = true;
 
-            if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
-                image.element = entity.resize(image.element, entity.pixelSize);
-                image.realWidth = this.width * entity.pixelSize;
-                image.realHeight = this.height * entity.pixelSize;
+            
+            if (entity.imageScale != 1) {
+                image.element = entity.resize(image.element, entity.imageScale);
+                image.realWidth = this.width * entity.imageScale;
+                image.realHeight = this.height * entity.imageScale;
             }
-
+            
             entity.trigger('imageReady', {
                 target: image,
             });
@@ -233,8 +255,6 @@ yespix.define('image', 'gfx', {
 
         context.globalAlpha = this.alpha;
         
-        console.log(this._box);
-
         context.drawImage(img.element, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image

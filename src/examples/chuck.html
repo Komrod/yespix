@@ -20,7 +20,6 @@
 
 	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
 	
-	
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
@@ -173,8 +172,8 @@
 	//var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true})
 	//	.load('chuck/test.json');
 	
-	/*
-	var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
+	
+	//var mychuck = yp.spawn('chuck',{ name: 'chuck', x: 500, y: 50, z: 1000});
 	
 	var width = 50;
 	var height = 50;
@@ -219,7 +218,7 @@
 				snapToPixel: true,
 				prerender: true
 	            });*/
-/*
+
 		}
 	}
 	
@@ -237,6 +236,7 @@
 		prerender: false,
 		debug: true
         });
+
 	yp.spawn('circle', {
 		lineColor: '#123456',
 		lineWidth: 10,
@@ -334,70 +334,7 @@
 		images: 'zardoz/image/zardoz_small.png',
 		debug: true
         });
-*/
 
-	yp.spawn('image', {
-		x: 100, 
-		y: 100,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: false,
-		flipY: false
-        });
-
-	yp.spawn('image', {
-		x: 300, 
-		y: 100,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: true,
-		flipY: false
-        });
-
-	yp.spawn('image', {
-		x: 100, 
-		y: 300,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: false,
-		flipY: true
-        });
-
-	yp.spawn('image', {
-		x: 300, 
-		y: 300,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: true,
-		flipY: true
-        });
-
-	yp.spawn('image', {
-		x: -100, 
-		y: 300,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: true,
-		flipY: true
-        });
-
-	yp.spawn('image', {
-		x: 100, 
-		y: -100,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: true,
-		flipY: true
-        });
-
-	yp.spawn('image', {
-		x: 100, 
-		y: -100,
-		images: 'zardoz/image/zardoz_small.png',
-		debug: true,
-		flipX: true,
-		flipY: true
-        });
 
 	yp.spawn('fps', {x: 5, y: 5});
 

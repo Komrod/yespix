@@ -236,12 +236,17 @@ yespix.define('gfx', {
      */
     getDrawBox: function(absolute) {
         var position = this.getPosition(absolute);
+        
+        var scale = 1;
+        if (this.imageScale) {
+            scale = this.imageScale;
+        }
 
         return {
             x: position.x,
             y: position.y,
-            width: this.width,
-            height: this.height,
+            width: this.width * scale,
+            height: this.height * scale
         };
     },
 
@@ -276,7 +281,6 @@ yespix.define('gfx', {
     },
 
     getContextBoxDefault: function(context) {
-        
         return {
             x: this._box.draw.x,
             y: this._box.draw.y,
@@ -297,7 +301,6 @@ yespix.define('gfx', {
                 height: img.realHeight ? img.realHeight : img.height,    
             }
         }
-        console.log(' #1');
 
         // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
         if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth 

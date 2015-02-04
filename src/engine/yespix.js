@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-03 */
+/*! yespix - v0.1.0 - 2015-02-04 */
 (function(undefined) {
 
     /**
@@ -3240,6 +3240,7 @@
         });
 
         yespix.define('anim', 'sprite', {
+
             animDefault: {
                 width: 32, // default tile width
                 height: 32, // default tile height
@@ -3623,12 +3624,12 @@
                 context.drawImage(img.element, //image element
                     frame.x, // x position on image
                     frame.y, // y position on image
-                    frame.width * this.pixelSize, // width on image
-                    frame.height * this.pixelSize, // height on image
+                    frame.width * this.imageScale, // width on image
+                    frame.height * this.imageScale, // height on image
                     this._box.context.x, // x position on canvas
                     this._box.context.y, // y position on canvas
-                    this._box.context.width * this.pixelSize, // width on canvas
-                    this._box.context.height * this.pixelSize // height on canvas
+                    this._box.context.width * this.imageScale, // width on canvas
+                    this._box.context.height * this.imageScale // height on canvas
                 );
 
                 /*
@@ -4281,11 +4282,16 @@
             getDrawBox: function(absolute) {
                 var position = this.getPosition(absolute);
 
+                var scale = 1;
+                if (this.imageScale) {
+                    scale = this.imageScale;
+                }
+
                 return {
                     x: position.x,
                     y: position.y,
-                    width: this.width,
-                    height: this.height,
+                    width: this.width * scale,
+                    height: this.height * scale
                 };
             },
 
@@ -4321,7 +4327,6 @@
             },
 
             getContextBoxDefault: function(context) {
-
                 return {
                     x: this._box.draw.x,
                     y: this._box.draw.y,
@@ -4342,7 +4347,6 @@
                         height: img.realHeight ? img.realHeight : img.height,
                     }
                 }
-                console.log(' #1');
 
                 // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
                 if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight) {
@@ -4586,6 +4590,7 @@
         });
 
         yespix.define('image', 'gfx', {
+
             /**
              * Flip the gfx horizontally if True
              * @type {Boolean}
@@ -4598,20 +4603,42 @@
              */
             flipY: false,
 
+            /**
+             * If true, the entity can be drawn
+             * @type {Boolean}
+             */
             isVisible: true,
 
-            // images
+            /**
+             * List of images
+             * @type {Array}
+             */
             images: [],
 
+            /**
+             * Index of selected image to draw, default 0
+             * @type {Number}
+             */
             imageSelected: 0,
 
+            /**
+             * Default parameters for images
+             * @type {Object}
+             */
             imageDefaults: {
-                isInitiated: false, // true if imageInit() was called
+                isInitiated: false,
                 isReady: false,
                 src: '',
                 element: null,
                 document: yespix.document,
             },
+
+            /**
+             * Scale of image from 1 to 100 // @todo replace pixelSize
+             * @type {Number}
+             */
+            imageScale: 1.0,
+
 
             init: function() {
 
@@ -4622,8 +4649,6 @@
 
                 var entity = this,
                     count = 1;
-
-                if (!this.pixelSize) this.pixelSize = 1;
 
                 if (yespix.isString(this.images)) this.images = [{
                     src: this.images
@@ -4744,10 +4769,11 @@
                     image.entity.height = this.height;
                     image.isReady = true;
 
-                    if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
-                        image.element = entity.resize(image.element, entity.pixelSize);
-                        image.realWidth = this.width * entity.pixelSize;
-                        image.realHeight = this.height * entity.pixelSize;
+
+                    if (entity.imageScale != 1) {
+                        image.element = entity.resize(image.element, entity.imageScale);
+                        image.realWidth = this.width * entity.imageScale;
+                        image.realHeight = this.height * entity.imageScale;
                     }
 
                     entity.trigger('imageReady', {
@@ -4806,8 +4832,6 @@
                 }
 
                 context.globalAlpha = this.alpha;
-
-                console.log(this._box);
 
                 context.drawImage(img.element, //image element
                     this._box.img.x, // x position on image
