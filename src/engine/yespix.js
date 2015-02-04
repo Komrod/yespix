@@ -4342,10 +4342,22 @@
                         height: img.realHeight ? img.realHeight : img.height,
                     }
                 }
+                console.log(' #1');
 
                 // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
-                if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight)
+                if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight) {
+                    // flip horizontally
+                    if (this.flipX) {
+                        this._box.context.x = -this._box.context.x - this._box.context.width;
+                    }
+
+                    // flip vertically
+                    if (this.flipY) {
+                        this._box.context.y = -this._box.context.y - this._box.context.height;
+                    }
+
                     return this._box.context;
+                }
 
                 // get the correct width and height of what will be drawn (usually an image)
                 if (img) {
@@ -4359,7 +4371,7 @@
                         this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
                         this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
                     }
-                    this._box.context.width = this._box.context.width + contextBox.x;
+                    this._box.context.width = this._box.context.width + this._box.context.x;
                     this._box.context.x = 0;
                 }
 
@@ -4386,6 +4398,29 @@
                     if (img) this._box.img.height = this._box.img.height - delta / scaleY;
                     this._box.context.height = this._box.context.height - delta;
                 }
+
+                // flip horizontally
+                if (this.flipX) {
+                    if (this._box.draw.width > 0) {
+                        this._box.context.x = -this._box.context.x - this._box.context.width;
+                        if (img) {
+                            if (this._box.img.x == 0) this._box.img.x = this._box.draw.width - this._box.context.width;
+                            else this._box.img.x = 0;
+                        }
+                    }
+                }
+
+                // flip vertically
+                if (this.flipY) {
+                    if (this._box.draw.height > 0) {
+                        this._box.context.y = -this._box.context.y - this._box.context.height;
+                        if (img) {
+                            if (this._box.img.y == 0) this._box.img.y = this._box.draw.height - this._box.context.height;
+                            else this._box.img.y = 0;
+                        }
+                    }
+                }
+                //console.log(this._box.context);
             },
 
 
@@ -4474,7 +4509,8 @@
              * @param {object} box Box object with the coordinates
              */
             drawRender: function(context) {
-                // Empty. Child entities must provide the code to draw something on the 2d context
+                // Empty. 
+                // Child entities must provide the code to draw something on the 2d context
             },
 
             /**
@@ -4771,15 +4807,15 @@
 
                 context.globalAlpha = this.alpha;
 
-                //console.log(this._box);
-                console.log('cx = ' + (this._box.context.x * scaleX + (this.flipX ? this._box.context.width : 0)) + ', cy = ' + (this._box.context.y * scaleY + (this.flipY ? this._box.context.height : 0)));
+                console.log(this._box);
+
                 context.drawImage(img.element, //image element
                     this._box.img.x, // x position on image
                     this._box.img.y, // y position on image
                     this._box.img.width, // width on image
                     this._box.img.height, // height on image
-                    this._box.context.x * scaleX + (this.flipX ? -this._box.context.width : 0), // x position on canvas
-                    this._box.context.y * scaleY + (this.flipY ? -this._box.context.height : 0), // y position on canvas
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
                     this._box.context.width, // width on canvas
                     this._box.context.height // height on canvas
                 );

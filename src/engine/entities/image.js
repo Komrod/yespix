@@ -232,16 +232,16 @@ yespix.define('image', 'gfx', {
         }
 
         context.globalAlpha = this.alpha;
-    
-        //console.log(this._box);
-        console.log('cx = '+ (this._box.context.x * scaleX + (this.flipX ? this._box.context.width : 0))+', cy = '+(this._box.context.y * scaleY + (this.flipY ? this._box.context.height : 0)));
+        
+        console.log(this._box);
+
         context.drawImage(img.element, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image
             this._box.img.width, // width on image
             this._box.img.height, // height on image
-            this._box.context.x * scaleX + (this.flipX ? -this._box.context.width : 0), // x position on canvas
-            this._box.context.y * scaleY + (this.flipY ? -this._box.context.height : 0), // y position on canvas
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
             this._box.context.width, // width on canvas
             this._box.context.height // height on canvas
         );
