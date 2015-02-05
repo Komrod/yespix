@@ -1,5 +1,9 @@
 
 TODO list:
+- all draw box, path box, context box ... must be stored in an object inside entity (_box)
+- bug: size problem with entity loading multiple images
+- function imageSelect to change the selected image drawn
+- lock entity image size 
 - use clearRect to clear faster the canvas
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - center draw path
@@ -10,7 +14,7 @@ TODO list:
 - pre render gfx on text
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
-- phone mode: disable keys, fullscreen
+- phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
 - stop and resume time
 - bug: draw debug on chuck
