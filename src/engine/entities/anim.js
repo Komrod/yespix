@@ -1,4 +1,4 @@
-yespix.define('anim', 'sprite', {
+yespix.define('sprite', 'gfx', {
 
     animDefault: {
         width: 32, // default tile width
@@ -345,7 +345,7 @@ yespix.define('anim', 'sprite', {
      */
     canDraw: function(context) {
         // @TODO put this line in init
-        if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+        //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
 
         if (!this.anims[this.animSelected]) return false;
 
@@ -400,21 +400,44 @@ yespix.define('anim', 'sprite', {
             this._box.context.height * this.imageScale // height on canvas
         );
 
-        /*
-        context.drawImage(img.element, //image element
-            frame.x, // x position on image
-            frame.y, // y position on image
-            frame.width * this.pixelSize, // width on image
-            frame.height * this.pixelSize, // height on image
-            canvasX, // x position on canvas
-            canvasY, // y position on canvas
-            frame.width * this.pixelSize, // width on canvas
-            frame.height * this.pixelSize // height on canvas
-        );
-        */
         if (frame.flipX || frame.flipY) {
             context.restore();
         }
     },
+
+    
+    ///////////////////////////////// Sprite functions //////////////////////////////////////
+    
+    getSpriteCount: function(imageIndex) {
+        if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+        var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
+        var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
+        return cols * rows;
+    },
+
+    getSpriteImage: function(globalIndex) {
+        var count;
+        if (!this.isReady || !this.images) return false;
+        for (var t = 0; t < this.images.length; t++) {
+            if (!this.images[t] || !this.images[t].isReady) return false;
+            count = this.getSpriteCount(t);
+            if (count > globalIndex) return this.images[t];
+            globalIndex = globalIndex - count;
+        }
+        return false;
+    },
+
+    getSpriteImageIndex: function(globalIndex) {
+        var count;
+        if (!this.isReady || !this.images) return false;
+        for (var t = 0; t < this.images.length; t++) {
+            if (!this.images[t] || !this.images[t].isReady) return false;
+            count = this.getSpriteCount(t);
+            if (count > globalIndex) return globalIndex;
+            globalIndex = globalIndex - count;
+        }
+        //        console.log('getSpriteImage :: not found');
+        return false;
+    }
 
 });

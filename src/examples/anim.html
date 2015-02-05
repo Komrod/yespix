@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+<script type="text/javascript">
+	
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
+    
+    yp.spawn('fps');
+
+	yp.spawn('anim', {
+        x: 100, 
+        y: 100,
+        images: 'chuck/player.png',
+        animDefault:
+        {
+            width: 32,
+            height: 40,
+            name: 'walk',
+            duration: 100,
+        },
+        anims: {
+            'walk': {
+                from: 24,
+                length: 8,
+            },
+        }
+    });
+    
+
+
+   
+ 
+</script>
+</body>
+</html>

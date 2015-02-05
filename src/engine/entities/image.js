@@ -38,8 +38,7 @@ yespix.define('image', 'gfx', {
         isInitiated: false,
         isReady: false,
         src: '',
-        element: null,
-        document: yespix.document,
+        element: null
     },
 
     /**
@@ -49,7 +48,7 @@ yespix.define('image', 'gfx', {
     imageLockSize: false,
 
     /**
-     * Scale of image from 1 to 100 // @todo replace pixelSize
+     * Scale of image from 1 to 100, only work when the image is not initialized yet
      * @type {Number}
      */
     imageScale: 1.0,
@@ -134,6 +133,12 @@ yespix.define('image', 'gfx', {
         return scaled;
     },
 
+    /**
+     * Search, init and return an image object where image.element is the HTML img element. The image can only
+     * drawn when image.isReady is True
+     * @param  {int|string|object} properties Index, name of the image or properties of the image to search for
+     * @return {[type]}            [description]
+     */
     image: function(properties) {
 
         // get the image with the index

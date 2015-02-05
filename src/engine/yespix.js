@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-04 */
+/*! yespix - v0.1.0 - 2015-02-05 */
 (function(undefined) {
 
     /**
@@ -4634,6 +4634,12 @@
             },
 
             /**
+             * Lock the image size so it does not change if you select another image with imageSelect()
+             * @type {Boolean}
+             */
+            imageLockSize: false,
+
+            /**
              * Scale of image from 1 to 100 // @todo replace pixelSize
              * @type {Number}
              */
@@ -4664,7 +4670,9 @@
                     for (var n in this.imageDefaults) {
                         this.images[t][n] = this.images[t][n] || this.imageDefaults[n];
                     }
+
                     if (this.images[t].name === '') this.images[t].name = 'image' + count++;
+                    this.images[t].index = t;
                 }
                 this.imageInit();
 
@@ -4719,26 +4727,34 @@
 
             image: function(properties) {
 
+                // get the image with the index
                 if (yespix.isInt(properties)) {
                     if (this.images[properties]) return this.imageInit(this.images[properties]);
                     else return null;
-                } else if (properties == undefined) {
+                } else
+                // get the first image (index: 0)
+                if (properties == undefined) {
                     if (this.images[0]) return this.imageInit(this.images[0]);
                     else return null;
-                } else if (typeof properties == 'string') {
+                } else
+                // if properties is string, it's the name of the image
+                if (typeof properties == 'string') {
                     properties = {
                         name: properties
                     };
                 }
 
+                // search for the properties in the image list
                 var max = Object.keys(properties).length;
-                var count = 0;
                 for (var t = 0; t < this.images.length; t++) {
+                    var count = 0;
                     for (var n in properties) {
                         if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
                         if (count >= max) return this.imageInit(this.images[t]);
                     }
                 }
+
+                // not found
                 return null;
             },
 
@@ -4765,16 +4781,21 @@
                 if (image.element) image.element.onload = image.element.onLoad = function() {
                     image.realWidth = this.width;
                     image.realHeight = this.height;
-                    image.entity.width = this.width;
-                    image.entity.height = this.height;
-                    image.isReady = true;
-
 
                     if (entity.imageScale != 1) {
                         image.element = entity.resize(image.element, entity.imageScale);
                         image.realWidth = this.width * entity.imageScale;
                         image.realHeight = this.height * entity.imageScale;
                     }
+
+                    if (image.entity.selectedImage == image.index) {
+                        if (!image.entity.imageLockSize) {
+                            image.entity.width = this.width;
+                            image.entity.height = this.height;
+                        }
+                    }
+
+                    image.isReady = true;
 
                     entity.trigger('imageReady', {
                         target: image,
@@ -4796,6 +4817,17 @@
 
 
                 return image; //source != '';
+            },
+
+            imageSelect: function(properties) {
+                var imageObject = this.image(properties);
+                if (imageObject) {
+                    this.selectedImage = index;
+                    if (!this.imageLockSize) {
+                        this.width = imageObject.width;
+                        this.height = imageObject.height;
+                    }
+                }
             },
 
             /**
