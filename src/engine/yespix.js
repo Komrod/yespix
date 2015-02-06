@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-05 */
+/*! yespix - v0.1.0 - 2015-02-06 */
 (function(undefined) {
 
     /**
@@ -2083,6 +2083,44 @@
     };
 
 
+    yespix.fn.quickSort = (function() {
+
+        function partition(array, left, right) {
+            var cmp = array[right - 1],
+                minEnd = left,
+                maxEnd;
+            for (maxEnd = left; maxEnd < right - 1; maxEnd += 1) {
+                if (array[maxEnd] <= cmp) {
+                    swap(array, maxEnd, minEnd);
+                    minEnd += 1;
+                }
+            }
+            swap(array, minEnd, right - 1);
+            return minEnd;
+        }
+
+        function swap(array, i, j) {
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+            return array;
+        }
+
+        function quickSort(array, left, right) {
+            if (left < right) {
+                var p = partition(array, left, right);
+                quickSort(array, left, p);
+                quickSort(array, p + 1, right);
+            }
+            return array;
+        }
+
+        return function(array) {
+            return quickSort(array, 0, array.length);
+        };
+    }());
+
+
     /**
      ***********************************************************************************************************
      ***********************************************************************************************************
@@ -3239,7 +3277,7 @@
             init: function() {},
         });
 
-        yespix.define('anim', 'sprite', {
+        yespix.define('anim', 'image', {
 
             animDefault: {
                 width: 32, // default tile width
@@ -3259,6 +3297,7 @@
                 this.on('imageReady', function() {
                     this.animFramesInit();
                 });
+                this.animSelected = this.animDefault.name;
             },
 
 
@@ -3266,6 +3305,7 @@
              * Array of anim informations:
              * name: Name of the animation
              * imageIndex: Image index of the sprite
+             * frameIndex; Index of the frame
              * imageName: Image name of the sprite
              * image: Image reference
              * width: pixel width
@@ -3276,7 +3316,7 @@
             anims: {},
 
             /**
-             * When all anim frames are ready, animSetup will initiated the frames
+             * When an image is ready, this function will initiated the correspondant frames
              * @return {[type]} [description]
              */
             animFramesInit: function() {
@@ -3306,7 +3346,6 @@
                             anim.isReady = true;
 
                             var maxLine;
-
                             // maximum frame in one line
                             if (anim.frames && anim.frames.length)
                                 for (var t = 0; t < anim.frames.length; t++) {
@@ -3315,17 +3354,16 @@
                                     // frame initiated and ready
                                     if (frame.isReady) continue;
 
-                                    if (yespix.isUndefined(frame.index)) frame.index = t;
                                     if (yespix.isUndefined(frame.frameIndex)) frame.frameIndex = t;
                                     anim.from = anim.from || 0;
 
                                     // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                                     // so we need to update this variable on each frame
-                                    maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
-
+                                    maxLine = Math.floor(frame.image.realWidth / frame.width) / this.imageScale;
+                                    console.log('maxLine = ' + maxLine);
                                     if (maxLine > 0) {
-                                        frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
-                                        frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
+                                        frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
+                                        frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
                                         frame.isReady = true;
                                     }
                                 }
@@ -3352,7 +3390,7 @@
                                 }
                             }
                         }
-                    }
+                    } else console.log('animation "' + name + '" is ready');
                 }
             },
 
@@ -3470,7 +3508,7 @@
             },
 
             animStop: function() {
-                //this.
+                // @TODO
             },
 
             animStep: function() {
@@ -3509,12 +3547,12 @@
                 }
             },
 
-            getFrame: function(animIndex, frameIndex) {
-                animIndex = animIndex || this.animSelected;
-                if (!this.anims[animIndex]) return false;
+            getFrame: function(animName, frameIndex) {
+                animName = animName || this.animSelected;
+                if (!this.anims[animName]) return false;
                 frameIndex = frameIndex || this.animFrame;
-                if (!this.anims[animIndex].frames[frameIndex]) return false;
-                return this.anims[animIndex].frames[frameIndex];
+                if (!this.anims[animName].frames[frameIndex]) return false;
+                return this.anims[animName].frames[frameIndex];
             },
 
             /**
@@ -3529,8 +3567,8 @@
                 return {
                     x: position.x,
                     y: position.y,
-                    width: frame.width,
-                    height: frame.height,
+                    width: frame.width * this.imageScale,
+                    height: frame.height * this.imageScale,
                 };
             },
 
@@ -3586,7 +3624,7 @@
              */
             canDraw: function(context) {
                 // @TODO put this line in init
-                if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+                //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
 
                 if (!this.anims[this.animSelected]) return false;
 
@@ -3604,7 +3642,7 @@
             drawRender: function(context) {
 
                 // check if image outside canvas
-                if (this._box.x > context.canvas.clientWidth || this._box.y > context.canvas.clientHeight || this._box.x + this._box.width < 0 || this._box.y + this._box.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return;
 
                 var frame = this.getFrame();
@@ -3619,35 +3657,60 @@
 
                 this.getContextBox(context, frame);
 
+                console.log(this._box);
+
                 context.globalAlpha = this.alpha;
 
                 context.drawImage(img.element, //image element
-                    frame.x, // x position on image
-                    frame.y, // y position on image
-                    frame.width * this.imageScale, // width on image
-                    frame.height * this.imageScale, // height on image
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
                     this._box.context.x, // x position on canvas
                     this._box.context.y, // y position on canvas
-                    this._box.context.width * this.imageScale, // width on canvas
-                    this._box.context.height * this.imageScale // height on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
                 );
 
-                /*
-                context.drawImage(img.element, //image element
-                    frame.x, // x position on image
-                    frame.y, // y position on image
-                    frame.width * this.pixelSize, // width on image
-                    frame.height * this.pixelSize, // height on image
-                    canvasX, // x position on canvas
-                    canvasY, // y position on canvas
-                    frame.width * this.pixelSize, // width on canvas
-                    frame.height * this.pixelSize // height on canvas
-                );
-                */
                 if (frame.flipX || frame.flipY) {
                     context.restore();
                 }
             },
+
+
+            ///////////////////////////////// Sprite functions //////////////////////////////////////
+
+            getSpriteCount: function(imageIndex) {
+                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+                var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
+                var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
+                return cols * rows;
+            },
+
+            getSpriteImage: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return this.images[t];
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            },
+
+            getSpriteImageIndex: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return globalIndex;
+                    globalIndex = globalIndex - count;
+                }
+                //        console.log('getSpriteImage :: not found');
+                return false;
+            }
 
         });
 
@@ -4281,17 +4344,11 @@
              */
             getDrawBox: function(absolute) {
                 var position = this.getPosition(absolute);
-
-                var scale = 1;
-                if (this.imageScale) {
-                    scale = this.imageScale;
-                }
-
                 return {
                     x: position.x,
                     y: position.y,
-                    width: this.width * scale,
-                    height: this.height * scale
+                    width: this.width * this.imageScale,
+                    height: this.height * this.imageScale
                 };
             },
 
@@ -4341,10 +4398,10 @@
 
                 if (img) {
                     this._box.img = {
-                        x: 0,
-                        y: 0,
-                        width: img.realWidth ? img.realWidth : img.width,
-                        height: img.realHeight ? img.realHeight : img.height,
+                        x: img.x,
+                        y: img.y,
+                        width: (img.realWidth ? img.realWidth : img.width) * this.imageScale,
+                        height: (img.realHeight ? img.realHeight : img.height) * this.imageScale,
                     }
                 }
 
@@ -4629,8 +4686,7 @@
                 isInitiated: false,
                 isReady: false,
                 src: '',
-                element: null,
-                document: yespix.document,
+                element: null
             },
 
             /**
@@ -4640,7 +4696,7 @@
             imageLockSize: false,
 
             /**
-             * Scale of image from 1 to 100 // @todo replace pixelSize
+             * Scale of image from 1 to 100, only work when the image is not initialized yet
              * @type {Number}
              */
             imageScale: 1.0,
@@ -4678,6 +4734,10 @@
 
                 this.readyFunctions.push(this.checkReadyStateImage);
                 this.on('imageReady', this.checkReadyState);
+
+                var index = this.imageSelected;
+                this.imageSelected = -1;
+                this.imageSelect(index);
             },
 
             checkReadyStateImage: function() {
@@ -4725,6 +4785,12 @@
                 return scaled;
             },
 
+            /**
+             * Search, init and return an image object where image.element is the HTML img element. The image can only
+             * drawn when image.isReady is True
+             * @param  {int|string|object} properties Index, name of the image or properties of the image to search for
+             * @return {[type]}            [description]
+             */
             image: function(properties) {
 
                 // get the image with the index
@@ -4822,10 +4888,12 @@
             imageSelect: function(properties) {
                 var imageObject = this.image(properties);
                 if (imageObject) {
-                    this.selectedImage = index;
-                    if (!this.imageLockSize) {
-                        this.width = imageObject.width;
-                        this.height = imageObject.height;
+                    if (this.imageSelected != imageObject.index) {
+                        this.imageSelected = imageObject.index;
+                        if (imageObject.isReady && !this.imageLockSize) {
+                            this.width = imageObject.width;
+                            this.height = imageObject.height;
+                        }
                     }
                 }
             },
@@ -6295,45 +6363,6 @@
                 };
 
             },
-        });
-
-        yespix.define('sprite', 'image', {
-
-            spriteWidth: 32,
-            spriteHeight: 32,
-
-            getSpriteCount: function(imageIndex) {
-                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
-                var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
-                var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
-                return cols * rows;
-            },
-
-            getSpriteImage: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return this.images[t];
-                    globalIndex = globalIndex - count;
-                }
-                return false;
-            },
-
-            getSpriteImageIndex: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return globalIndex;
-                    globalIndex = globalIndex - count;
-                }
-                //        console.log('getSpriteImage :: not found');
-                return false;
-            }
-
         });
 
         yespix.define('text', 'gfx', {

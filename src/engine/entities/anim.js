@@ -1,4 +1,4 @@
-yespix.define('sprite', 'gfx', {
+yespix.define('anim', 'image', {
 
     animDefault: {
         width: 32, // default tile width
@@ -18,6 +18,7 @@ yespix.define('sprite', 'gfx', {
         this.on('imageReady', function() {
             this.animFramesInit();
         });
+        this.animSelected = this.animDefault.name;
     },
 
 
@@ -25,6 +26,7 @@ yespix.define('sprite', 'gfx', {
      * Array of anim informations:
      * name: Name of the animation
      * imageIndex: Image index of the sprite
+     * frameIndex; Index of the frame
      * imageName: Image name of the sprite
      * image: Image reference
      * width: pixel width
@@ -35,7 +37,7 @@ yespix.define('sprite', 'gfx', {
     anims: {},
 
     /**
-     * When all anim frames are ready, animSetup will initiated the frames
+     * When an image is ready, this function will initiated the correspondant frames
      * @return {[type]} [description]
      */
     animFramesInit: function() {
@@ -65,7 +67,6 @@ yespix.define('sprite', 'gfx', {
                     anim.isReady = true;
 
                     var maxLine;
-
                     // maximum frame in one line
                     if (anim.frames && anim.frames.length)
                         for (var t = 0; t < anim.frames.length; t++) {
@@ -74,17 +75,16 @@ yespix.define('sprite', 'gfx', {
                             // frame initiated and ready
                             if (frame.isReady) continue;
 
-                            if (yespix.isUndefined(frame.index)) frame.index = t;
                             if (yespix.isUndefined(frame.frameIndex)) frame.frameIndex = t;
                             anim.from = anim.from || 0;
 
                             // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                             // so we need to update this variable on each frame
-                            maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
-
+                            maxLine = Math.floor(frame.image.realWidth / frame.width) / this.imageScale;
+                            console.log('maxLine = '+maxLine);
                             if (maxLine > 0) {
-                                frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
-                                frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
+                                frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
+                                frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
                                 frame.isReady = true;
                             }
                         }
@@ -112,6 +112,7 @@ yespix.define('sprite', 'gfx', {
                     }
                 }
             }
+            else console.log('animation "'+name+'" is ready');
         }
     },
 
@@ -229,7 +230,7 @@ yespix.define('sprite', 'gfx', {
     },
 
     animStop: function() {
-        //this.
+        // @TODO
     },
 
     animStep: function() {
@@ -268,12 +269,12 @@ yespix.define('sprite', 'gfx', {
         }
     },
 
-    getFrame: function(animIndex, frameIndex) {
-        animIndex = animIndex || this.animSelected;
-        if (!this.anims[animIndex]) return false;
+    getFrame: function(animName, frameIndex) {
+        animName = animName || this.animSelected;
+        if (!this.anims[animName]) return false;
         frameIndex = frameIndex || this.animFrame;
-        if (!this.anims[animIndex].frames[frameIndex]) return false;
-        return this.anims[animIndex].frames[frameIndex];
+        if (!this.anims[animName].frames[frameIndex]) return false;
+        return this.anims[animName].frames[frameIndex];
     },
 
     /**
@@ -288,8 +289,8 @@ yespix.define('sprite', 'gfx', {
         return {
             x: position.x,
             y: position.y,
-            width: frame.width,
-            height: frame.height,
+            width: frame.width * this.imageScale,
+            height: frame.height * this.imageScale,
         };
     },
 
@@ -356,7 +357,7 @@ yespix.define('sprite', 'gfx', {
             return false;
 
         var frame = this.getFrame();
-
+        
         if (!frame
             || !frame.image
             || !frame.image.element
@@ -369,13 +370,13 @@ yespix.define('sprite', 'gfx', {
     drawRender: function(context) {
 
         // check if image outside canvas
-        if (this._box.x > context.canvas.clientWidth 
-            || this._box.y > context.canvas.clientHeight 
-            || this._box.x + this._box.width < 0
-            || this._box.y + this._box.height < 0)
+        if (this._box.draw.x > context.canvas.clientWidth 
+            || this._box.draw.y > context.canvas.clientHeight 
+            || this._box.draw.x + this._box.draw.width < 0
+            || this._box.draw.y + this._box.draw.height < 0)
             return;
 
-        var frame = this.getFrame();
+        var frame = this.getFrame();        
         var img = frame.image;
         var scaleX = frame.flipX ? -1 : 1;
         var scaleY = frame.flipY ? -1 : 1;
@@ -386,18 +387,20 @@ yespix.define('sprite', 'gfx', {
         }
         
         this.getContextBox(context, frame);
+        
+        console.log(this._box);
 
         context.globalAlpha = this.alpha;
 
         context.drawImage(img.element, //image element
-            frame.x, // x position on image
-            frame.y, // y position on image
-            frame.width * this.imageScale, // width on image
-            frame.height * this.imageScale, // height on image
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
             this._box.context.x, // x position on canvas
             this._box.context.y, // y position on canvas
-            this._box.context.width * this.imageScale, // width on canvas
-            this._box.context.height * this.imageScale // height on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
         );
 
         if (frame.flipX || frame.flipY) {

@@ -6,7 +6,7 @@
 <body style="background-color: #456;">
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 1});
     
     yp.spawn('fps');
 
@@ -16,7 +16,7 @@
         images: 'chuck/player.png',
         animDefault:
         {
-            width: 32,
+            width: 32,      
             height: 40,
             name: 'walk',
             duration: 100,
@@ -26,7 +26,9 @@
                 from: 24,
                 length: 8,
             },
-        }
+        },
+        imageScale: 2,
+        debug: true
     });
     
 

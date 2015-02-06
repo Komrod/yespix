@@ -25,7 +25,7 @@ TODO list:
 - disable key capture on phones
 - Separate the fall down / jump up animation of a character
 
-
+- add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - Make a basic Zombie Sim
 - make a debug panel where you can change variables and see entities

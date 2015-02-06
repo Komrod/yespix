@@ -236,17 +236,11 @@ yespix.define('gfx', {
      */
     getDrawBox: function(absolute) {
         var position = this.getPosition(absolute);
-        
-        var scale = 1;
-        if (this.imageScale) {
-            scale = this.imageScale;
-        }
-
         return {
             x: position.x,
             y: position.y,
-            width: this.width * scale,
-            height: this.height * scale
+            width: this.width * this.imageScale,
+            height: this.height * this.imageScale
         };
     },
 
@@ -295,10 +289,10 @@ yespix.define('gfx', {
 
         if (img) {
             this._box.img = {
-                x: 0,
-                y: 0,
-                width: img.realWidth ? img.realWidth : img.width,
-                height: img.realHeight ? img.realHeight : img.height,    
+                x: img.x,
+                y: img.y,
+                width: (img.realWidth ? img.realWidth : img.width) * this.imageScale,
+                height: (img.realHeight ? img.realHeight : img.height) * this.imageScale,    
             }
         }
 

@@ -86,6 +86,10 @@ yespix.define('image', 'gfx', {
 
         this.readyFunctions.push(this.checkReadyStateImage);
         this.on('imageReady', this.checkReadyState);
+
+        var index = this.imageSelected;
+        this.imageSelected = -1;
+        this.imageSelect(index);
     },
 
     checkReadyStateImage: function() {
@@ -239,10 +243,12 @@ yespix.define('image', 'gfx', {
     imageSelect: function(properties) {
         var imageObject = this.image(properties);
         if (imageObject) {
-            this.selectedImage = index;
-            if (!this.imageLockSize) {
-                this.width = imageObject.width;
-                this.height = imageObject.height;
+            if (this.imageSelected != imageObject.index) {
+                this.imageSelected = imageObject.index;
+                if (imageObject.isReady && !this.imageLockSize) {
+                    this.width = imageObject.width;
+                    this.height = imageObject.height;
+                }
             }
         }
     },
