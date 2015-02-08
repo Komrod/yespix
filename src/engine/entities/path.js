@@ -112,22 +112,10 @@ yespix.define('path', 'gfx', {
         this._box.draw.y = 0;
         this._box.path.x = this.lineWidth / 2;
         this._box.path.y = this.lineWidth / 2;
-        //console.log('path.prerenderUpdate :: drawBox = ');
-        //console.log(drawBox);
 
         this.prerenderCanvas.width = this._box.draw.width;
         this.prerenderCanvas.height = this._box.draw.height;
 
-        //this.prerenderCanvas.context.fillStyle = '#FF0000';
-        //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
-
-        //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
-        //console.log(this.prerenderCanvas);
-
-
-        //console.log('path.prerenderUpdate :: contextDrawBox = ');
-        //console.log(contextDrawBox);
-        
         this.drawRender(this.prerenderCanvas.context);
 
         // set original coordinates
@@ -141,8 +129,6 @@ yespix.define('path', 'gfx', {
      * Draw the pre-render on a canvas context
      */
     prerenderUse: function(context) {
-        //console.log('prerenderUse :: drawBox = ');
-        //console.log(box);
 
         // check if image outside canvas
         if (this._box.draw.x > context.canvas.clientWidth 
@@ -160,9 +146,6 @@ yespix.define('path', 'gfx', {
 
         context.globalAlpha = this.alpha;
         
-        /*console.log('prerenderUse :: contextDrawBox = ');
-        console.log(contextDrawBox);*/
-
         context.drawImage(this.prerenderCanvas, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image

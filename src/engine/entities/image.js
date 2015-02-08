@@ -205,14 +205,14 @@ yespix.define('image', 'gfx', {
 
             if (entity.imageScale != 1) {
                 image.element = entity.resize(image.element, entity.imageScale);
-                image.realWidth = this.width * entity.imageScale;
-                image.realHeight = this.height * entity.imageScale;
+                image.width = this.width * entity.imageScale;
+                image.height = this.height * entity.imageScale;
             }
-
-            if (image.entity.selectedImage == image.index) {
+            console.log('imageInit : '+image.entity.imageSelected+' == '+image.index);
+            if (image.entity.imageSelected == image.index) {
                 if (!image.entity.imageLockSize) {
-                    image.entity.width = this.width;
-                    image.entity.height = this.height;
+                    image.entity.width = this.width * entity.imageScale;
+                    image.entity.height = this.height * entity.imageScale;
                 }
             }
 
@@ -240,6 +240,44 @@ yespix.define('image', 'gfx', {
         return image; //source != '';
     },
 
+
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
+        var drawBox = {
+            x: position.x,
+            y: position.y,
+            width: this.width,
+            height: this.height
+        };
+        /*
+        if (this.imageScale) {
+            drawBox.width = drawBox.width * this.imageScale;
+            drawBox.height = drawBox.height * this.imageScale;
+        }*/
+        return drawBox;
+    },
+/*
+    getImageBoxDefault: function(imageBox) {
+        box = {
+            x: 0,
+            y: 0,
+            width: (imageBox.realWidth ? imageBox.realWidth : imageBox.width),
+            height: (imageBox.realHeight ? imageBox.realHeight : imageBox.height)
+        }
+        if (imageBox.x) box.x = imageBox.x;
+        if (imageBox.y) box.y = imageBox.y;
+        if (this.imageScale)  {
+            box.x = box.x * this.imageScale;
+            box.y = box.y * this.imageScale;
+        }
+        return box;
+    },
+*/
     imageSelect: function(properties) {
         var imageObject = this.image(properties);
         if (imageObject) {
@@ -274,10 +312,10 @@ yespix.define('image', 'gfx', {
 
     drawRender: function(context) {
         // check if image outside canvas
-        if (this._box.x > context.canvas.clientWidth 
-            || this._box.y > context.canvas.clientHeight 
-            || this._box.x + this._box.width < 0
-            || this._box.y + this._box.height < 0)
+        if (this._box.draw.x > context.canvas.clientWidth 
+            || this._box.draw.y > context.canvas.clientHeight 
+            || this._box.draw.x + this._box.draw.width < 0
+            || this._box.draw.y + this._box.draw.height < 0)
             return;
 
         var img = this.image(this.imageSelected);

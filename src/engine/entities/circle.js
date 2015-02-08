@@ -2,6 +2,7 @@
 yespix.define('circle', 'path', {
 
     circleRadius: 5,
+    prerender: true,
 
     init: function() {
         yespix.listen(this, ['circleRadius'], function(obj, e) {
@@ -32,8 +33,6 @@ yespix.define('circle', 'path', {
     },
 
     drawDebugPosition: function(context, box) {
-        //console.log('drawDebugPosition');
-        //console.log(drawBox);
         box = box || this._box.draw;
 
         context.lineWidth = 0.5;

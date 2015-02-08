@@ -25,7 +25,6 @@ yespix.define('canvas', {
             if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
             else if (this.document.width) clientWidth = this.document.width;
             else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
-            //console.log('width = '+clientWidth+' * '+(parseFloat(options.width.replace('%', '')) / 100));
             options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
         }
         if (yespix.contains(options.height, '%'))
@@ -35,11 +34,8 @@ yespix.define('canvas', {
             if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight - delta;
             else if (this.document.height) clientHeight = this.document.height - delta;
             else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight - delta;
-            console.log('options.height = '+clientHeight+' * '+(parseFloat(options.height.replace('%', '')) / 100));
             options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
-            console.log('options.height = '+options.height);
         }
-        //console.log(options);
         this.canvasOptions = options;
 
         var canvas = null;

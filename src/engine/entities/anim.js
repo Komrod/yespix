@@ -80,8 +80,7 @@ yespix.define('anim', 'image', {
 
                             // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                             // so we need to update this variable on each frame
-                            maxLine = Math.floor(frame.image.realWidth / frame.width) / this.imageScale;
-                            console.log('maxLine = '+maxLine);
+                            maxLine = Math.floor(frame.image.width / frame.width) / this.imageScale;
                             if (maxLine > 0) {
                                 frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
                                 frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
@@ -112,7 +111,6 @@ yespix.define('anim', 'image', {
                     }
                 }
             }
-            else console.log('animation "'+name+'" is ready');
         }
     },
 
@@ -192,7 +190,14 @@ yespix.define('anim', 'image', {
                     if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
                     if (!yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
                     if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
-
+/*
+                    if (this.imageScale && this.imageScale != 1) {
+                        frame.x *= this.imageScale;
+                        frame.y *= this.imageScale;
+                        frame.width *= this.imageScale;
+                        frame.height *= this.imageScale;
+                    }
+*/
                     anim['frames'].push(frame);
                 }
             }
@@ -282,6 +287,7 @@ yespix.define('anim', 'image', {
      * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
      * @return {object} Result {x, y, width, height}
      */
+     /*
     getDrawBox: function(absolute) {
         var position = this.getPosition(absolute);
         var frame = this.getFrame();
@@ -293,7 +299,7 @@ yespix.define('anim', 'image', {
             height: frame.height * this.imageScale,
         };
     },
-
+*/
 
     /**
      * Try to draw the gfx entity on a canvas
@@ -357,7 +363,9 @@ yespix.define('anim', 'image', {
             return false;
 
         var frame = this.getFrame();
-        
+        console.log('anim.canDraw : frame = ');
+        console.log(frame);
+
         if (!frame
             || !frame.image
             || !frame.image.element
@@ -388,9 +396,10 @@ yespix.define('anim', 'image', {
         
         this.getContextBox(context, frame);
         
-        console.log(this._box);
-
         context.globalAlpha = this.alpha;
+
+        console.log('anim.drawRender : box = ');
+        console.log(this._box);
 
         context.drawImage(img.element, //image element
             this._box.img.x, // x position on image
@@ -413,8 +422,8 @@ yespix.define('anim', 'image', {
     
     getSpriteCount: function(imageIndex) {
         if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
-        var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
-        var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
+        var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
+        var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
         return cols * rows;
     },
 
@@ -439,7 +448,6 @@ yespix.define('anim', 'image', {
             if (count > globalIndex) return globalIndex;
             globalIndex = globalIndex - count;
         }
-        //        console.log('getSpriteImage :: not found');
         return false;
     }
 

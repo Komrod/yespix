@@ -1,5 +1,7 @@
 yespix.define('rect', 'path', {
 
+    prerender: true,
+    
     init: function() {},
 
     drawPath: function(context) {

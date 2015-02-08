@@ -56,6 +56,9 @@ yespix.define('gfx', {
      */
     rotation: 0,
 
+    width: 0,
+    height: 0,
+
     /**
      * Stores all the boxes (draw, context, img ...)
      * @type {Boolean|object}
@@ -164,11 +167,10 @@ yespix.define('gfx', {
      * Draw the pre-render on a canvas context
      */
     prerenderUse: function(context) {
+        // @todo old code in comment / how does it work ?
+        /*
         var box = this.getDrawBox(false, context);
         
-        //console.log('prerenderUse :: drawBox = ');
-        //console.log(box);
-
         // check if image outside canvas
         if (box.x > context.canvas.clientWidth 
             || box.y > context.canvas.clientHeight
@@ -187,9 +189,6 @@ yespix.define('gfx', {
 
         context.globalAlpha = this.alpha;
         
-        //console.log('prerenderUse :: contextDrawBox = ');
-        //console.log(contextDrawBox);
-
         context.drawImage(this.prerenderCanvas, //image element
             contextDrawBox.img_x, // x position on image
             contextDrawBox.img_y, // y position on image
@@ -201,6 +200,7 @@ yespix.define('gfx', {
             contextDrawBox.context_height // height on canvas
         );
         return true;
+        */
     },
 
     ///////////////////////////////// Box functions ////////////////////////////////
@@ -239,8 +239,8 @@ yespix.define('gfx', {
         return {
             x: position.x,
             y: position.y,
-            width: this.width * this.imageScale,
-            height: this.height * this.imageScale
+            width: this.width,
+            height: this.height
         };
     },
 
@@ -283,18 +283,22 @@ yespix.define('gfx', {
         };
     },
 
-    getContextBox: function(context, img) {
+    getImageBoxDefault: function(imageBox) {
+        box = {
+            x: 0,
+            y: 0,
+            width: imageBox.width,
+            height: imageBox.height
+        }
+        if (imageBox.x) box.x = imageBox.x;
+        if (imageBox.y) box.y = imageBox.y;
+        return box;
+    },
+
+    getContextBox: function(context, imageBox) {
 
         this._box.context = this.getContextBoxDefault();
-
-        if (img) {
-            this._box.img = {
-                x: img.x,
-                y: img.y,
-                width: (img.realWidth ? img.realWidth : img.width) * this.imageScale,
-                height: (img.realHeight ? img.realHeight : img.height) * this.imageScale,    
-            }
-        }
+        if (imageBox) this._box.img = this.getImageBoxDefault(imageBox);
 
         // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
         if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth 
@@ -314,14 +318,14 @@ yespix.define('gfx', {
         }
 
         // get the correct width and height of what will be drawn (usually an image)
-        if (img) {
+        if (imageBox) {
             var scaleX = this._box.context.width / this._box.img.width;
             var scaleY = this._box.context.height / this._box.img.height;
         }
 
         // crop the left
         if (this._box.context.x < 0) {
-            if (img) {
+            if (imageBox) {
                 this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
                 this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
             }
@@ -331,7 +335,7 @@ yespix.define('gfx', {
 
         // crop the top
         if (this._box.context.y < 0) {
-            if (img) {
+            if (imageBox) {
                 this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
                 this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
         }
@@ -342,14 +346,14 @@ yespix.define('gfx', {
         // crop the right
         if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
             var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
-            if (img) this._box.img.width = this._box.img.width - delta / scaleX;
+            if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
             this._box.context.width = this._box.context.width - delta;
         }
 
         // crop the bottom
         if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
             var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
-            if (img) this._box.img.height = this._box.img.height - delta / scaleY;
+            if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
             this._box.context.height = this._box.context.height - delta;
         }
 
@@ -357,7 +361,7 @@ yespix.define('gfx', {
         if (this.flipX) {
             if (this._box.draw.width > 0) {
                 this._box.context.x = -this._box.context.x - this._box.context.width;
-                if (img) {
+                if (imageBox) {
                     if (this._box.img.x == 0) this._box.img.x = this._box.draw.width - this._box.context.width;
                     else this._box.img.x = 0;
                 }
@@ -368,13 +372,12 @@ yespix.define('gfx', {
         if (this.flipY) {
             if (this._box.draw.height > 0) {
                 this._box.context.y = -this._box.context.y - this._box.context.height;
-                if (img) {
+                if (imageBox) {
                     if (this._box.img.y == 0) this._box.img.y = this._box.draw.height - this._box.context.height;
                     else this._box.img.y = 0;
                 }
             }
         }
-        //console.log(this._box.context);
     },
     
 

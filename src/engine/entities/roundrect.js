@@ -1,7 +1,7 @@
 yespix.define('roundrect', 'path', {
 
     borderRadius: 5,
-
+    prerender: true,
     
     init: function() {},
     

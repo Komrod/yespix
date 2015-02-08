@@ -4,7 +4,7 @@ yespix.define('text', 'gfx', {
     textSize: 16,
     textColor: '#000000',
     text: '',
-    prerender: true,
+    prerender: false,
 
     init: function() {
         // change pre-render on change these properties
