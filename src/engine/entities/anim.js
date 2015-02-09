@@ -249,7 +249,7 @@ yespix.define('anim', 'image', {
 
         if (!this.animTime || this.animTime <= now) {
             this.animFrame++;
-
+            this._changed = true;
             if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                 this.animFrame = 0;
                 animEnded = true;
@@ -410,7 +410,7 @@ yespix.define('anim', 'image', {
             context.scale(scaleX, scaleY);
         }
         
-        this.getContextBox(context, frame);
+        if (!this._box.context || !this._box.img) this.getContextBox(context, frame);
         
         context.globalAlpha = this.alpha;
 

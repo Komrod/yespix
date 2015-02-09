@@ -3,7 +3,7 @@
  */
 yespix.define('gfx', {
 
-    _changed: false,
+    _changed: true,
     
     /**
      * True when the entity is ready to be drawn (usually when all assets are loaded)
@@ -106,7 +106,7 @@ yespix.define('gfx', {
             // @todo use an event
             yespix.drawEntitiesSort = true;
         });
-        yespix.listen(this, ['prerender', 'alpha'], function(obj, e) {
+        yespix.listen(this, ['x', 'y', 'prerender', 'alpha', 'rotation', 'snapToPixel', 'width', 'height'], function(obj, e) {
             // @todo use an event
             obj._changed = true;
         });
@@ -145,7 +145,7 @@ yespix.define('gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        this._box = this.getBox(this.prerenderCanvas.context);
+        if (this._changed) this.getBox(this.prerenderCanvas.context);
 
         // save original coordinates
         var drawX = this._box.draw.x,
@@ -222,11 +222,11 @@ yespix.define('gfx', {
      * @return {object} Result {_type: "class", draw: {x, y, width, height}}
      */
     getBox: function(absolute) {
-        var box = {
+        //console.log('gfx.getBox : start');
+        this._box = {
             type: this._class
         };
-        box.draw = this.getDrawBox(absolute);
-        return box;
+        this._box.draw = this.getDrawBox(absolute);
     },
 
     /**
@@ -296,7 +296,8 @@ yespix.define('gfx', {
     },
 
     getContextBox: function(context, imageBox) {
-
+        //console.log('gfx.getContextBox : start');
+        
         this._box.context = this.getContextBoxDefault();
         if (imageBox) this._box.img = this.getImageBoxDefault(imageBox);
 
@@ -393,7 +394,7 @@ yespix.define('gfx', {
         if (!this.canDraw(context)) return this.drawExit(false);
 
         // get the draw box
-        this._box = this.getBox(context);
+        if (this._changed) this.getBox(context);
 
         // if cannot draw from this draw box
         if (!this.canDrawBox(context)) return this.drawExit(false);
