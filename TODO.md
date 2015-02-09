@@ -1,18 +1,18 @@
 
 TODO list:
-- create an object draw box in the entity that merge all the render coordinates
-- put the snapToPixel inside getPosition
-- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
-- update draw box only if something change
+- all draw box, path box, context box ... must be stored in an object inside entity (_box)
+- do not update draw box when the entity is not changed
 - use clearRect to clear faster the canvas
-- center draw path as an option for path entity
-- line in path object must not override box content
+- Z sort function only sort the changed entities
+- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
+- center position with positionAlign ("center left", "top right" ...)
+- path object drawbox must contains line
 - examples and build folders in the root project
 - fps yoyo after pre-render optimization
 - pre render gfx on text
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
-- phone mode: disable keys, fullscreen
+- phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
 - stop and resume time
 - bug: draw debug on chuck
@@ -26,42 +26,36 @@ TODO list:
 - disable key capture on phones
 - Separate the fall down / jump up animation of a character
 
-
+- add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - Make a basic Zombie Sim
-- tag version 0.1.4
 - make a debug panel where you can change variables and see entities
 - fix collision between entities
 - animate properties
 - draw polygon, line, elipse, star
-- tag version 0.1.5
 - draw SVG image
 - rotation
 - parent rotation affects children
 - Make an Arkanoid game
-- tag version 0.1.6
 - Make a Steel Sky game (raiden like)
-- tag version 0.1.7
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
 - function keyCapture() stops the propagation of the pressed key
-- tag version 0.1.8
 - Bunch must concat, splice, push with arrays
 - create temporary class with space, not only with "," like yespix.spawn('rect move')
 - check if all YESPIX classes are fully loaded on first frame
 - Make a Raider game (platform indiana)
-- tag version 0.1.9
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - on actor entity, make walk animation speed progressive
-- tag version 0.2
 - Make the Chuck game
 - slow time
 - make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
 
 
 LATER:
+- line in path object must not override box content // TODO a line box and a fill box
 - the level follow changes the aimed position relative to the entity speed
 - smooth move on aimed position change for the level follow
 - make drawDebugImage(), drawDebugCollision(), drawDebugMove()
@@ -72,6 +66,9 @@ LATER:
 
 
 DONE:
+- lock entity image size 
+- bug: size problem with entity loading multiple images // 2015-02-
+- function imageSelect to change the selected image drawn
 - Make fps average use float values instead of round values
 - pre render gfx on rounded rectangle
 - pre render gfx on rectangle

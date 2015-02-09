@@ -1,24 +1,74 @@
 yespix.define('image', 'gfx', {
+
+    /**
+     * Flip the gfx horizontally if True
+     * @type {Boolean}
+     */
+    flipX: false,
+
+    /**
+     * Flip the gfx vertically if True
+     * @type {Boolean}
+     */
+    flipY: false,
+
+    /**
+     * If true, the entity can be drawn
+     * @type {Boolean}
+     */
     isVisible: true,
 
-    // images
+    /**
+     * List of images
+     * @type {Array}
+     */
     images: [],
 
+    /**
+     * Image object used to draw the render (imageObject.element)
+     * @type {Boolean|object}
+     */
+    imageObject: false,
+
+    /**
+     * Index of selected image to draw, default 0
+     * @type {Number}
+     */
     imageSelected: 0,
 
+    /**
+     * Default parameters for images
+     * @type {Object}
+     */
     imageDefaults: {
-        isInitiated: false, // true if imageInit() was called
+        isInitiated: false,
         isReady: false,
         src: '',
-        element: null,
-        document: yespix.document,
+        element: null
     },
 
+    /**
+     * Lock the image size so it does not change if you select another image with imageSelect()
+     * @type {Boolean}
+     */
+    imageLockSize: false,
+
+    /**
+     * Scale of image from 1 to 100, only work when the image is not initialized yet
+     * @type {Number}
+     */
+    imageScale: 1.0,
+
+
     init: function() {
+
+        yespix.listen(this, ['flipX', 'flipY'], function(obj, e) {
+            // @todo use an event
+            obj._changed = true;
+        });
+
         var entity = this,
             count = 1;
-
-        if (!this.pixelSize) this.pixelSize = 1;
 
         if (yespix.isString(this.images)) this.images = [{
             src: this.images
@@ -34,12 +84,18 @@ yespix.define('image', 'gfx', {
             for (var n in this.imageDefaults) {
                 this.images[t][n] = this.images[t][n] || this.imageDefaults[n];
             }
+
             if (this.images[t].name === '') this.images[t].name = 'image' + count++;
+            this.images[t].index = t;
         }
         this.imageInit();
 
         this.readyFunctions.push(this.checkReadyStateImage);
         this.on('imageReady', this.checkReadyState);
+
+        var index = this.imageSelected;
+        this.imageSelected = -1;
+        this.imageSelect(index);
     },
 
     checkReadyStateImage: function() {
@@ -87,31 +143,45 @@ yespix.define('image', 'gfx', {
         return scaled;
     },
 
+    /**
+     * Search, init and return an image object where image.element is the HTML img element. The image can only
+     * drawn when image.isReady is True
+     * @param  {int|string|object} properties Index, name of the image or properties of the image to search for
+     * @return {[type]}            [description]
+     */
     image: function(properties) {
 
+        // get the image with the index
         if (yespix.isInt(properties))
         {
             if (this.images[properties]) return this.imageInit(this.images[properties]);
             else return null;
-        } else if (properties == undefined)
+        } else 
+        // get the first image (index: 0)
+        if (properties == undefined)
         {
             if (this.images[0]) return this.imageInit(this.images[0]);
             else return null;
-        } else if (typeof properties == 'string') 
+        } else 
+        // if properties is string, it's the name of the image
+        if (typeof properties == 'string') 
         {
             properties = {
                 name: properties
             };
         } 
 
+        // search for the properties in the image list
         var max = Object.keys(properties).length;
-        var count = 0;
         for (var t = 0; t < this.images.length; t++) {
+            var count = 0;
             for (var n in properties) {
                 if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
                 if (count >= max) return this.imageInit(this.images[t]);
             }
         }
+
+        // not found
         return null;
     },
 
@@ -136,17 +206,23 @@ yespix.define('image', 'gfx', {
         image.element = document.createElement('img');
 
         if (image.element) image.element.onload = image.element.onLoad = function() {
-            image.realWidth = this.width;
-            image.realHeight = this.height;
-            image.entity.width = this.width;
-            image.entity.height = this.height;
-            image.isReady = true;
+            image.originalWidth = this.width;
+            image.originalHeight = this.height;
+            image.width = this.width * entity.imageScale;
+            image.height = this.height * entity.imageScale;
 
-            if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
-                image.element = entity.resize(image.element, entity.pixelSize);
-                image.realWidth = this.width * entity.pixelSize;
-                image.realHeight = this.height * entity.pixelSize;
+            if (entity.imageScale != 1) {
+                image.element = entity.resize(image.element, entity.imageScale);
             }
+            if (image.entity.imageSelected == image.index) {
+                image.entity._changed = true;
+                if (!image.entity.imageLockSize) {
+                    image.entity.width = image.width;
+                    image.entity.height = image.height;
+                }
+            }
+
+            image.isReady = true;
 
             entity.trigger('imageReady', {
                 target: image,
@@ -170,71 +246,93 @@ yespix.define('image', 'gfx', {
         return image; //source != '';
     },
 
-    draw: function(context) {
-        if (!this.isVisible) return;
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
+
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
+        var drawBox = {
+            x: position.x,
+            y: position.y,
+            width: this.width,
+            height: this.height
+        };
+        return drawBox;
+    },
+
+    imageSelect: function(properties) {
+        this.imageObject = this.image(properties);
+        if (this.imageObject) {
+            if (this.imageSelected != this.imageObject.index) {
+                this.imageSelected = this.imageObject.index;
+                if (this.imageObject.isReady && !this.imageLockSize) {
+                    this.width = this.imageObject.width;
+                    this.height = this.imageObject.height;
+                }
+            }
+        }
+    },
+
+    /**
+     * Returns true if the entity can be drawn, get this information from basic properties of the entity
+     * @return {bool} True if can be drawn
+     */
+    canDraw: function(context) {
+        //var img = this.image(this.imageSelected);
+        if (!this.isActive 
+            || !this.isVisible 
+            || this.alpha <= 0
+            || !context
+            || !this.imageObject
+            || !this.imageObject.element
+            || !this.imageObject.isReady) 
+            return false;
+
+        return true;
+    },
+
+
+    drawRender: function(context) {
+        if (!this._box.context || !this._box.img) this.getContextBox(context, this.imageObject);
+        
+        if (this._box.img.width === 0
+            || this._box.img.height === 0)
+            return;
+
+        if (this.flipX || this.flipY) {
+            context.save();
+            context.scale( (this.flipX ? -1 : 1), (this.flipY ? -1 : 1) );
         }
 
-        var img = this.image(this.imageSelected);
-
-        if (context && img && img.element && img.isReady) {
-
-            var box = this.getDrawBox();
-            if (this.snapToPixel) {
-                box.x = parseInt(box.x);
-                box.y = parseInt(box.y);
-            }
-
-            // check if image outside canvas
-            if (box.x > context.canvas.clientWidth 
-                || box.y > context.canvas.clientHeight 
-                || box.x + box.width < 0
-                || box.y + box.height < 0)
-                return;
-
-            var contextDrawBox = this.getContextDrawBox(context, img, box);
-
-            if (contextDrawBox.img_width == 0
-                || contextDrawBox.img_height == 0
-                || contextDrawBox.context_width == 0
-                || contextDrawBox.context_height == 0)
-                return;
-
-            //var scaleX = this.flipX ? -1 : 1;
-            //var scaleY = this.flipY ? -1 : 1;
-            context.globalAlpha = this.alpha;
+        context.globalAlpha = this.alpha;
         
-            //console.log(contextDrawBox);
+        context.drawImage(this.imageObject.element, //image element
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
+        );
 
-            context.drawImage(img.element, //image element
-                contextDrawBox.img_x, // x position on image
-                contextDrawBox.img_y, // y position on image
-                contextDrawBox.img_width, // width on image
-                contextDrawBox.img_height, // height on image
-                contextDrawBox.context_x, // x position on canvas
-                contextDrawBox.context_y, // y position on canvas
-                contextDrawBox.context_width, // width on canvas
-                contextDrawBox.context_height // height on canvas
-            );
-            //fuckyou();
-            if (this.debug) {
-                this.drawDebug(context, box);
-            }
+        if (this.flipX || this.flipY) {
+            context.restore();
         }
     },
 
 
 
     drawDebugImage: function(context, drawBox) {
-        var box = drawBox || this.getDrawBox();
+        drawBox = drawBox || this.getDrawBox();
         context.globalAlpha = 1;
         context.fillStyle = '#999999';
         context.font = "10px sans-serif";
-        context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
+        context.fillText("Image: " + this.imageSelected, drawBox.x, drawBox.y - 5);
     }
 
 });

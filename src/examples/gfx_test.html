@@ -10,6 +10,7 @@
     
 	yp.spawn('fps');
 
+
     yp.spawn('rect',
             {
                 x: 50,
@@ -141,7 +142,7 @@
                 }
             });
     
-    for (var t=0; t<600; t=t+1) {
+    for (var t=-200; t<700; t=t+1) {
         yp.spawn('image',
                 {
                     x: t,
@@ -150,6 +151,21 @@
                 });
     }
 
+    var timer = 0;
+    var moveBool = false;
+
+    function switchMove()
+    {
+        if (timer) clearInterval(timer);
+        /*setInterval(function () {
+            moveBool = !moveBool;
+            if (moveBool) yespix.find('.image').prop('y', 250);
+            else yespix.find('.image').prop('y', 300);
+        }, 50);*/
+        setInterval(function () {
+            yespix.find('.image').prop('_changed', true);
+        }, 1);
+    }
 
     function switchDebug(name)
     {
@@ -174,6 +190,7 @@
 
 </script>
 <br/>
+<input value="Move" onClick="switchMove()" href="javascript:void(0)" type="button">
 <input value="Debug" onClick="switchDebug()" href="javascript:void(0)" type="button">
 <input value="Alpha" onClick="switchAlpha();" href="javascript:void(0)" type="button">
 <input value="Position" onClick="switchDebug('Position');" href="javascript:void(0)" type="button">

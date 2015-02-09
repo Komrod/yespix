@@ -1,29 +1,31 @@
 yespix.define('rect', 'path', {
 
+    prerender: true,
+    
     init: function() {},
 
-    drawPath: function(context, contextDrawBox) {
+    drawPath: function(context) {
     },
 
-    drawFill: function(context, contextDrawBox) {
+    drawFill: function(context) {
         context.fillStyle = this.fillColor;
         this.drawAlpha(context, 'fill');
         context.fillRect(
-            contextDrawBox.o_x, // x position on canvas
-            contextDrawBox.o_y, // y position on canvas
-            contextDrawBox.o_width - this.lineWidth, // width on canvas
-            contextDrawBox.o_height - this.lineWidth // height on canvas
+            this._box.path.x, // x position on canvas
+            this._box.path.y, // y position on canvas
+            this._box.path.width, // width on canvas
+            this._box.path.height // height on canvas
         );
     },
 
-    drawLine: function(context, contextDrawBox) {
+    drawLine: function(context) {
         context.lineWidth = this.lineWidth;
         context.strokeStyle = this.lineColor;
         this.drawAlpha(context, 'line');
         context.strokeRect(
-            contextDrawBox.o_x, 
-            contextDrawBox.o_y, 
-            contextDrawBox.o_width - this.lineWidth, 
-            contextDrawBox.o_height - this.lineWidth);
+            this._box.path.x, 
+            this._box.path.y, 
+            this._box.path.width, 
+            this._box.path.height);
     }
 });

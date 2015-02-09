@@ -597,60 +597,66 @@ yespix.fn.hasAncestors = function(classname, ancestors) {
 };
 
 /**
- * Call some entity class functions of ancestors in the context of an entity object. e.g.
+ * Call some entity functions of some classes in the context of an entity object. e.g.
  * @trigger call
  * @param {object} entity Entity instance
  * @param {string|function} fn Function name in a string or function reference to call // @todo
- * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity ancestors as classes list
+ * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity classes as classes list
  * @param {array} params Parameters of the function call
  * @return {array} Array of objects that gives the detailed results of each function
- * @example call(entity, 'test') // call "test" function on every ancestors of the entity
- * @example call(entity, 'test', [1,2,3]) // call "test" function on every ancestors of the entity with parameters 1, 2 and 3
- * @example call(entity, 'test', 'a, b, c') // call "test" function on ancestors "a", "b" and "c"
- * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
+ * @example call(entity, 'test') // call "test" function on every classes of the entity
+ * @example call(entity, 'test', [1,2,3]) // call "test" function on every classes of the entity with parameters 1, 2 and 3
+ * @example call(entity, 'test', 'a, b, c') // call "test" function on classes "a", "b" and "c"
+ * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on classes "a" and "b" with parameters 1 and 2
  */
-yespix.fn.call = function(entity, fn, ancestors, params) {
+yespix.fn.call = function(entity, fn, classes, params) {
 
+    //console.log('yespix.call');
     if (!this.isDefined(entity._class)) return null;
-    if (this.isString(ancestors)) ancestors = ancestors.split(',');
-    else if (ancestors && !params) {
-        params = ancestors;
-        ancestors = [];
+    if (this.isString(classes)) classes = classes.split(',');
+    else if (classes && !params) {
+        params = classes;
+        classes = [];
     }
     params = params || [];
-    ancestors = ancestors || [];
+    classes = classes || [];
 
-    if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
-    else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
+    //console.log('classes = ');
+    //console.log(classes);
+    //console.log('has classes = '+this.hasAncestors(entity._class, classes));
 
+    //if (classes.length > 0 && !this.hasAncestors(entity._class, classes)) return null;
+    //else 
+    if (classes.length == 0) classes = this.entityClasses[entity._class].ancestors;
+    
     var result = [];
-    for (var t = 0; t < ancestors.length; t++) {
-        if (this.entityClasses[ancestors[t]] && this.entityClasses[ancestors[t]].properties[fn] && this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) {
+    for (var t = 0; t < classes.length; t++) {
+        if (this.entityClasses[classes[t]] && this.entityClasses[classes[t]].properties[fn] && this.isFunction(this.entityClasses[classes[t]].properties[fn])) {
             result.push({
-                name: ancestors[t],
+                name: classes[t],
                 status: 'called',
-                result: this.entityClasses[ancestors[t]].properties[fn].apply(entity, params),
+                result: this.entityClasses[classes[t]].properties[fn].apply(entity, params),
                 error: '',
             });
         } else {
             var err = '';
-            if (!this.entityClasses[ancestors[t]]) err = 'Ancestor entity "' + ancestors[t] + '" does not seem to be defined';
-            else if (!this.entityClasses[ancestors[t]].properties[fn]) err = 'Ancestor entity "' + ancestors[t] + '" have no "' + fn + '" function';
-            else if (!this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in ancestor entity "' + ancestors[n] + '"';
+            if (!this.entityClasses[classes[t]]) err = 'Class "' + classes[t] + '" does not seem to be defined';
+            else if (!this.entityClasses[classes[t]].properties[fn]) err = 'Class "' + classes[t] + '" have no "' + fn + '" function';
+            else if (!this.isFunction(this.entityClasses[classes[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in class "' + classes[n] + '"';
             else err = 'Unknown error';
             result.push({
-                name: ancestors[t],
+                name: classes[t],
                 status: 'error',
                 result: null,
                 error: err,
             });
         }
     }
-
+    //console.log('result = '); console.log(result);
     this.trigger('call', {
         entity: entity,
         fn: fn,
-        ancestors: ancestors,
+        classes: classes,
         params: params,
         result: result
     });

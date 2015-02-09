@@ -270,7 +270,16 @@
 
 		        yespix.instanceRemove(this);
 		        return this;
-		    }
+		    },
 
+			call: function(className, fn, params) {
+				if (!yespix.entityClasses[className]) return console.error('entity.call: class "'+className+'" does not exist');
+				if (!yespix.entityClasses[className].properties[fn]) return console.error('entity.call: function "'+fn+'" does not exist in class "'+className+'"');
+				if (!yespix.isFunction(yespix.entityClasses[className].properties[fn])) return console.error('entity.call: property "'+fn+'" is not a function in class "'+className+'"');
+
+				return yespix.entityClasses[className].properties[fn].apply(this, params)
+				//return yespix.call(this, fn, ancestor, params);
+				//yespix.fn.call = function(entity, fn, ancestors, params)				
+			}
 		});
 		yespix.entityRootClassname = 'base';

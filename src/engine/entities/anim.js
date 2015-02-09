@@ -1,4 +1,5 @@
-yespix.define('anim', 'sprite', {
+yespix.define('anim', 'image', {
+
     animDefault: {
         width: 32, // default tile width
         height: 32, // default tile height
@@ -17,6 +18,7 @@ yespix.define('anim', 'sprite', {
         this.on('imageReady', function() {
             this.animFramesInit();
         });
+        this.animSelected = this.animDefault.name;
     },
 
 
@@ -24,6 +26,7 @@ yespix.define('anim', 'sprite', {
      * Array of anim informations:
      * name: Name of the animation
      * imageIndex: Image index of the sprite
+     * frameIndex; Index of the frame
      * imageName: Image name of the sprite
      * image: Image reference
      * width: pixel width
@@ -34,7 +37,7 @@ yespix.define('anim', 'sprite', {
     anims: {},
 
     /**
-     * When all anim frames are ready, animSetup will initiated the frames
+     * When an image is ready, this function will initiated the correspondant frames
      * @return {[type]} [description]
      */
     animFramesInit: function() {
@@ -64,7 +67,6 @@ yespix.define('anim', 'sprite', {
                     anim.isReady = true;
 
                     var maxLine;
-
                     // maximum frame in one line
                     if (anim.frames && anim.frames.length)
                         for (var t = 0; t < anim.frames.length; t++) {
@@ -73,17 +75,15 @@ yespix.define('anim', 'sprite', {
                             // frame initiated and ready
                             if (frame.isReady) continue;
 
-                            if (yespix.isUndefined(frame.index)) frame.index = t;
                             if (yespix.isUndefined(frame.frameIndex)) frame.frameIndex = t;
                             anim.from = anim.from || 0;
 
                             // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                             // so we need to update this variable on each frame
-                            maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
-
+                            maxLine = Math.floor(frame.image.width / frame.width) / this.imageScale;
                             if (maxLine > 0) {
-                                frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
-                                frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
+                                frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
+                                frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
                                 frame.isReady = true;
                             }
                         }
@@ -190,7 +190,14 @@ yespix.define('anim', 'sprite', {
                     if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
                     if (!yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
                     if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
-
+/*
+                    if (this.imageScale && this.imageScale != 1) {
+                        frame.x *= this.imageScale;
+                        frame.y *= this.imageScale;
+                        frame.width *= this.imageScale;
+                        frame.height *= this.imageScale;
+                    }
+*/
                     anim['frames'].push(frame);
                 }
             }
@@ -199,6 +206,7 @@ yespix.define('anim', 'sprite', {
     },
 
     animPlay: function(name, speed, from) {
+
         if (this.animWait) return;
         if (!name) name = this.animDefault.name;
         if (this.animSelected == name) return this;
@@ -227,11 +235,12 @@ yespix.define('anim', 'sprite', {
     },
 
     animStop: function() {
-        //this.
+        // @TODO
     },
 
     animStep: function() {
         if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
+        if (this.anims[this.animSelected].frames.length <= 1) return;
 
         var animEnded = false;
         var now = +new Date();
@@ -240,7 +249,7 @@ yespix.define('anim', 'sprite', {
 
         if (!this.animTime || this.animTime <= now) {
             this.animFrame++;
-
+            this._changed = true;
             if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                 this.animFrame = 0;
                 animEnded = true;
@@ -266,96 +275,193 @@ yespix.define('anim', 'sprite', {
         }
     },
 
-    getFrame: function(animIndex, frameIndex) {
-        animIndex = animIndex || this.animSelected;
-        if (!this.anims[animIndex]) return false;
+    getFrame: function(animName, frameIndex) {
+        animName = animName || this.animSelected;
+        if (!this.anims[animName]) return false;
         frameIndex = frameIndex || this.animFrame;
-        if (!this.anims[animIndex].frames[frameIndex]) return false;
-        return this.anims[animIndex].frames[frameIndex];
+        if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
+        return this.anims[animName].frames[frameIndex];
     },
 
-    getDrawBox: function() {
-        if (this.snapToPixel) {
-            var x = parseInt(this.x);
-            var y = parseInt(this.y);
-        } else {
-            var x = this.x;
-            var y = this.y;
-        }
-        var width = this.width;
-        var height = this.height;
-
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+     
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
         var frame = this.getFrame();
-        //if (yespix.key('a') && !frame) console.log('frame = ');
-        //if (yespix.key('a')) console.log(frame);
-        var type = 'anim';
-        width = frame.width;
-        height = frame.height;
 
         return {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            type: type
+            x: position.x,
+            y: position.y,
+            width: frame.width * this.imageScale,
+            height: frame.height * this.imageScale,
         };
     },
 
+
+    getImageBoxDefault: function(imageBox) {
+        var frame = this.getFrame();
+        box = {
+            x: 0,
+            y: 0,
+            width: frame.width * this.imageScale,
+            height: frame.height * this.imageScale
+        }
+        if (imageBox.x) box.x = imageBox.x;
+        if (imageBox.y) box.y = imageBox.y;
+        return box;
+    },
+
+
+    /**
+     * Try to draw the gfx entity on a canvas
+     * @return {bool} True if drawn
+     */
     draw: function(context) {
-
+        
         this.animStep();
-        if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
-        if (!this.anims[this.animSelected]) return;
 
-        if (!this.isVisible) return;
+        this.call('gfx', 'draw', [context]);
+        /*
+        // get the context
+        context = context || yespix.context;
+        
+        // if cannot draw, exit now
+        if (!this.canDraw(context)) return this.drawExit(false);
 
+        // get the draw box
+        this._box = this.getBox(context);
 
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
+        // if cannot draw from this draw box
+        if (!this.canDrawBox(context)) return this.drawExit(false);
+
+        // pre render on canvas
+        if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+
+            // if changed, update the pre render canvas
+            if (this._changed) this.prerenderUpdate(context);
+
+            // use the pre render canvas
+            this.prerenderUse(context);
+
+            // draw debug
+            if (this.debug) this.drawDebug(context);
+
+            // exit
+            return this.drawExit(true);
         }
 
-        var frame = this.anims[this.animSelected].frames[this.animFrame];
-        var img = frame.image;
+        this.drawRender(context);
 
+        // draw debug
+        if (this.debug) this.drawDebug(context);
+
+        // exit
+        return this.drawExit(true);
+        */
+    },
+
+    /**
+     * Returns true if the entity can be drawn, get this information from basic properties of the entity
+     * @return {bool} True if can be drawn
+     */
+    canDraw: function(context) {
+        // @TODO put this line in init
+        //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+
+        if (!this.anims[this.animSelected]) return false;
+
+        if (!this.isActive 
+            || !this.isVisible 
+            || this.alpha <= 0
+            || !context)
+            return false;
+
+        var frame = this.getFrame();
+
+        if (!frame
+            || !frame.image
+            || !frame.image.element
+            || !frame.image.isReady) 
+            return false;
+
+        return true;
+    },
+
+    drawRender: function(context) {
+
+        // check if image outside canvas
+        if (this._box.draw.x > context.canvas.clientWidth 
+            || this._box.draw.y > context.canvas.clientHeight 
+            || this._box.draw.x + this._box.draw.width < 0
+            || this._box.draw.y + this._box.draw.height < 0)
+            return;
+
+        var frame = this.getFrame();        
+        var img = frame.image;
         var scaleX = frame.flipX ? -1 : 1;
         var scaleY = frame.flipY ? -1 : 1;
-        var position = this.getPosition();
 
-        if (this.snapToPixel) {
-            var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
-            var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
-        } else {
-            var canvasX = position.x * scaleX - frame.flipX * frame.width * this.pixelSize;
-            var canvasY = position.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+        if (frame.flipX || frame.flipY) {
+            context.save();
+            context.scale(scaleX, scaleY);
         }
-        var x = frame.x;
-        var y = frame.y;
+        
+        if (!this._box.context || !this._box.img) this.getContextBox(context, frame);
+        
+        context.globalAlpha = this.alpha;
 
-        if (context && img && img.element && img.isReady) {
+        context.drawImage(img.element, //image element
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
+        );
 
-            if (frame.flipX || frame.flipY) {
-                context.save();
-                context.scale(scaleX, scaleY);
-            }
-            context.globalAlpha = this.alpha;
-            context.drawImage(img.element, //image element
-                x, // x position on image
-                y, // y position on image
-                frame.width * this.pixelSize, // width on image
-                frame.height * this.pixelSize, // height on image
-                canvasX, // x position on canvas
-                canvasY, // y position on canvas
-                frame.width * this.pixelSize, // width on canvas
-                frame.height * this.pixelSize // height on canvas
-            );
-            if (frame.flipX || frame.flipY) {
-                context.restore();
-            }
-            if (this.canDrawDebug()) this.drawDebug(context);
+        if (frame.flipX || frame.flipY) {
+            context.restore();
         }
     },
+
+    
+    ///////////////////////////////// Sprite functions //////////////////////////////////////
+    
+    getSpriteCount: function(imageIndex) {
+        if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+        var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
+        var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
+        return cols * rows;
+    },
+
+    getSpriteImage: function(globalIndex) {
+        var count;
+        if (!this.isReady || !this.images) return false;
+        for (var t = 0; t < this.images.length; t++) {
+            if (!this.images[t] || !this.images[t].isReady) return false;
+            count = this.getSpriteCount(t);
+            if (count > globalIndex) return this.images[t];
+            globalIndex = globalIndex - count;
+        }
+        return false;
+    },
+
+    getSpriteImageIndex: function(globalIndex) {
+        var count;
+        if (!this.isReady || !this.images) return false;
+        for (var t = 0; t < this.images.length; t++) {
+            if (!this.images[t] || !this.images[t].isReady) return false;
+            count = this.getSpriteCount(t);
+            if (count > globalIndex) return globalIndex;
+            globalIndex = globalIndex - count;
+        }
+        return false;
+    }
 
 });

@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-01-30 */
+/*! yespix - v0.1.0 - 2015-02-09 */
 (function(undefined) {
 
     /**
@@ -940,60 +940,66 @@
     };
 
     /**
-     * Call some entity class functions of ancestors in the context of an entity object. e.g.
+     * Call some entity functions of some classes in the context of an entity object. e.g.
      * @trigger call
      * @param {object} entity Entity instance
      * @param {string|function} fn Function name in a string or function reference to call // @todo
-     * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity ancestors as classes list
+     * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity classes as classes list
      * @param {array} params Parameters of the function call
      * @return {array} Array of objects that gives the detailed results of each function
-     * @example call(entity, 'test') // call "test" function on every ancestors of the entity
-     * @example call(entity, 'test', [1,2,3]) // call "test" function on every ancestors of the entity with parameters 1, 2 and 3
-     * @example call(entity, 'test', 'a, b, c') // call "test" function on ancestors "a", "b" and "c"
-     * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
+     * @example call(entity, 'test') // call "test" function on every classes of the entity
+     * @example call(entity, 'test', [1,2,3]) // call "test" function on every classes of the entity with parameters 1, 2 and 3
+     * @example call(entity, 'test', 'a, b, c') // call "test" function on classes "a", "b" and "c"
+     * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on classes "a" and "b" with parameters 1 and 2
      */
-    yespix.fn.call = function(entity, fn, ancestors, params) {
+    yespix.fn.call = function(entity, fn, classes, params) {
 
+        //console.log('yespix.call');
         if (!this.isDefined(entity._class)) return null;
-        if (this.isString(ancestors)) ancestors = ancestors.split(',');
-        else if (ancestors && !params) {
-            params = ancestors;
-            ancestors = [];
+        if (this.isString(classes)) classes = classes.split(',');
+        else if (classes && !params) {
+            params = classes;
+            classes = [];
         }
         params = params || [];
-        ancestors = ancestors || [];
+        classes = classes || [];
 
-        if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
-        else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
+        //console.log('classes = ');
+        //console.log(classes);
+        //console.log('has classes = '+this.hasAncestors(entity._class, classes));
+
+        //if (classes.length > 0 && !this.hasAncestors(entity._class, classes)) return null;
+        //else 
+        if (classes.length == 0) classes = this.entityClasses[entity._class].ancestors;
 
         var result = [];
-        for (var t = 0; t < ancestors.length; t++) {
-            if (this.entityClasses[ancestors[t]] && this.entityClasses[ancestors[t]].properties[fn] && this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) {
+        for (var t = 0; t < classes.length; t++) {
+            if (this.entityClasses[classes[t]] && this.entityClasses[classes[t]].properties[fn] && this.isFunction(this.entityClasses[classes[t]].properties[fn])) {
                 result.push({
-                    name: ancestors[t],
+                    name: classes[t],
                     status: 'called',
-                    result: this.entityClasses[ancestors[t]].properties[fn].apply(entity, params),
+                    result: this.entityClasses[classes[t]].properties[fn].apply(entity, params),
                     error: '',
                 });
             } else {
                 var err = '';
-                if (!this.entityClasses[ancestors[t]]) err = 'Ancestor entity "' + ancestors[t] + '" does not seem to be defined';
-                else if (!this.entityClasses[ancestors[t]].properties[fn]) err = 'Ancestor entity "' + ancestors[t] + '" have no "' + fn + '" function';
-                else if (!this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in ancestor entity "' + ancestors[n] + '"';
+                if (!this.entityClasses[classes[t]]) err = 'Class "' + classes[t] + '" does not seem to be defined';
+                else if (!this.entityClasses[classes[t]].properties[fn]) err = 'Class "' + classes[t] + '" have no "' + fn + '" function';
+                else if (!this.isFunction(this.entityClasses[classes[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in class "' + classes[n] + '"';
                 else err = 'Unknown error';
                 result.push({
-                    name: ancestors[t],
+                    name: classes[t],
                     status: 'error',
                     result: null,
                     error: err,
                 });
             }
         }
-
+        //console.log('result = '); console.log(result);
         this.trigger('call', {
             entity: entity,
             fn: fn,
-            ancestors: ancestors,
+            classes: classes,
             params: params,
             result: result
         });
@@ -2083,6 +2089,44 @@
     };
 
 
+    yespix.fn.quickSort = (function() {
+
+        function partition(array, left, right) {
+            var cmp = array[right - 1],
+                minEnd = left,
+                maxEnd;
+            for (maxEnd = left; maxEnd < right - 1; maxEnd += 1) {
+                if (array[maxEnd] <= cmp) {
+                    swap(array, maxEnd, minEnd);
+                    minEnd += 1;
+                }
+            }
+            swap(array, minEnd, right - 1);
+            return minEnd;
+        }
+
+        function swap(array, i, j) {
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+            return array;
+        }
+
+        function quickSort(array, left, right) {
+            if (left < right) {
+                var p = partition(array, left, right);
+                quickSort(array, left, p);
+                quickSort(array, p + 1, right);
+            }
+            return array;
+        }
+
+        return function(array) {
+            return quickSort(array, 0, array.length);
+        };
+    }());
+
+
     /**
      ***********************************************************************************************************
      ***********************************************************************************************************
@@ -2371,9 +2415,7 @@
 
                 if (yespix.drawEntities)
                     for (var t = 0; t < yespix.drawEntities.length; t++) {
-                        if (yespix.drawEntities[t] && yespix.drawEntities[t].draw) {
-                            yespix.drawEntities[t].draw();
-                        }
+                        yespix.drawEntities[t].draw();
                     }
 
             });
@@ -3067,8 +3109,17 @@
 
                 yespix.instanceRemove(this);
                 return this;
-            }
+            },
 
+            call: function(className, fn, params) {
+                if (!yespix.entityClasses[className]) return console.error('entity.call: class "' + className + '" does not exist');
+                if (!yespix.entityClasses[className].properties[fn]) return console.error('entity.call: function "' + fn + '" does not exist in class "' + className + '"');
+                if (!yespix.isFunction(yespix.entityClasses[className].properties[fn])) return console.error('entity.call: property "' + fn + '" is not a function in class "' + className + '"');
+
+                return yespix.entityClasses[className].properties[fn].apply(this, params)
+                    //return yespix.call(this, fn, ancestor, params);
+                    //yespix.fn.call = function(entity, fn, ancestors, params)				
+            }
         });
         yespix.entityRootClassname = 'base';
 
@@ -3241,7 +3292,8 @@
             init: function() {},
         });
 
-        yespix.define('anim', 'sprite', {
+        yespix.define('anim', 'image', {
+
             animDefault: {
                 width: 32, // default tile width
                 height: 32, // default tile height
@@ -3260,6 +3312,7 @@
                 this.on('imageReady', function() {
                     this.animFramesInit();
                 });
+                this.animSelected = this.animDefault.name;
             },
 
 
@@ -3267,6 +3320,7 @@
              * Array of anim informations:
              * name: Name of the animation
              * imageIndex: Image index of the sprite
+             * frameIndex; Index of the frame
              * imageName: Image name of the sprite
              * image: Image reference
              * width: pixel width
@@ -3277,7 +3331,7 @@
             anims: {},
 
             /**
-             * When all anim frames are ready, animSetup will initiated the frames
+             * When an image is ready, this function will initiated the correspondant frames
              * @return {[type]} [description]
              */
             animFramesInit: function() {
@@ -3307,7 +3361,6 @@
                             anim.isReady = true;
 
                             var maxLine;
-
                             // maximum frame in one line
                             if (anim.frames && anim.frames.length)
                                 for (var t = 0; t < anim.frames.length; t++) {
@@ -3316,17 +3369,15 @@
                                     // frame initiated and ready
                                     if (frame.isReady) continue;
 
-                                    if (yespix.isUndefined(frame.index)) frame.index = t;
                                     if (yespix.isUndefined(frame.frameIndex)) frame.frameIndex = t;
                                     anim.from = anim.from || 0;
 
                                     // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                                     // so we need to update this variable on each frame
-                                    maxLine = Math.floor(frame.image.realWidth / frame.width) / this.pixelSize;
-
+                                    maxLine = Math.floor(frame.image.width / frame.width) / this.imageScale;
                                     if (maxLine > 0) {
-                                        frame.x = (anim.offsetX || 0) * this.pixelSize + (frame.frameIndex + anim.from % maxLine) * frame.width * this.pixelSize;
-                                        frame.y = (anim.offsetY || 0) * this.pixelSize + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.pixelSize;
+                                        frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
+                                        frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
                                         frame.isReady = true;
                                     }
                                 }
@@ -3433,7 +3484,14 @@
                             if (!yespix.isUndefined(anim.imageIndex)) frame.image = this.image(anim.imageIndex);
                             if (!yespix.isUndefined(anim.imageName)) frame.image = this.image(anim.imageName);
                             if (yespix.isUndefined(frame.image)) frame.image = this.image(0);
-
+                            /*
+                                                if (this.imageScale && this.imageScale != 1) {
+                                                    frame.x *= this.imageScale;
+                                                    frame.y *= this.imageScale;
+                                                    frame.width *= this.imageScale;
+                                                    frame.height *= this.imageScale;
+                                                }
+                            */
                             anim['frames'].push(frame);
                         }
                     }
@@ -3442,6 +3500,7 @@
             },
 
             animPlay: function(name, speed, from) {
+
                 if (this.animWait) return;
                 if (!name) name = this.animDefault.name;
                 if (this.animSelected == name) return this;
@@ -3470,11 +3529,12 @@
             },
 
             animStop: function() {
-                //this.
+                // @TODO
             },
 
             animStep: function() {
                 if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
+                if (this.anims[this.animSelected].frames.length <= 1) return;
 
                 var animEnded = false;
                 var now = +new Date();
@@ -3483,7 +3543,7 @@
 
                 if (!this.animTime || this.animTime <= now) {
                     this.animFrame++;
-
+                    this._changed = true;
                     if (this.animFrame >= this.anims[this.animSelected].frames.length) {
                         this.animFrame = 0;
                         animEnded = true;
@@ -3509,112 +3569,198 @@
                 }
             },
 
-            getFrame: function(animIndex, frameIndex) {
-                animIndex = animIndex || this.animSelected;
-                if (!this.anims[animIndex]) return false;
+            getFrame: function(animName, frameIndex) {
+                animName = animName || this.animSelected;
+                if (!this.anims[animName]) return false;
                 frameIndex = frameIndex || this.animFrame;
-                if (!this.anims[animIndex].frames[frameIndex]) return false;
-                return this.anims[animIndex].frames[frameIndex];
+                if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
+                return this.anims[animName].frames[frameIndex];
             },
 
-            getDrawBox: function() {
-                if (this.snapToPixel) {
-                    var x = parseInt(this.x);
-                    var y = parseInt(this.y);
-                } else {
-                    var x = this.x;
-                    var y = this.y;
-                }
-                var width = this.width;
-                var height = this.height;
+            /**
+             * Get the draw box with absolute position or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y, width, height}
+             */
 
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
                 var frame = this.getFrame();
-                //if (yespix.key('a') && !frame) console.log('frame = ');
-                //if (yespix.key('a')) console.log(frame);
-                var type = 'anim';
-                width = frame.width;
-                height = frame.height;
 
                 return {
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: height,
-                    type: type
+                    x: position.x,
+                    y: position.y,
+                    width: frame.width * this.imageScale,
+                    height: frame.height * this.imageScale,
                 };
             },
 
+
+            getImageBoxDefault: function(imageBox) {
+                var frame = this.getFrame();
+                box = {
+                    x: 0,
+                    y: 0,
+                    width: frame.width * this.imageScale,
+                    height: frame.height * this.imageScale
+                }
+                if (imageBox.x) box.x = imageBox.x;
+                if (imageBox.y) box.y = imageBox.y;
+                return box;
+            },
+
+
+            /**
+             * Try to draw the gfx entity on a canvas
+             * @return {bool} True if drawn
+             */
             draw: function(context) {
 
                 this.animStep();
-                if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
-                if (!this.anims[this.animSelected]) return;
 
-                if (!this.isVisible) return;
+                this.call('gfx', 'draw', [context]);
+                /*
+                // get the context
+                context = context || yespix.context;
+        
+                // if cannot draw, exit now
+                if (!this.canDraw(context)) return this.drawExit(false);
 
+                // get the draw box
+                this._box = this.getBox(context);
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
+                // if cannot draw from this draw box
+                if (!this.canDrawBox(context)) return this.drawExit(false);
+
+                // pre render on canvas
+                if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+
+                    // if changed, update the pre render canvas
+                    if (this._changed) this.prerenderUpdate(context);
+
+                    // use the pre render canvas
+                    this.prerenderUse(context);
+
+                    // draw debug
+                    if (this.debug) this.drawDebug(context);
+
+                    // exit
+                    return this.drawExit(true);
                 }
 
-                var frame = this.anims[this.animSelected].frames[this.animFrame];
-                var img = frame.image;
+                this.drawRender(context);
 
+                // draw debug
+                if (this.debug) this.drawDebug(context);
+
+                // exit
+                return this.drawExit(true);
+                */
+            },
+
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                // @TODO put this line in init
+                //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
+
+                if (!this.anims[this.animSelected]) return false;
+
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context)
+                    return false;
+
+                var frame = this.getFrame();
+
+                if (!frame || !frame.image || !frame.image.element || !frame.image.isReady)
+                    return false;
+
+                return true;
+            },
+
+            drawRender: function(context) {
+
+                // check if image outside canvas
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
+                    return;
+
+                var frame = this.getFrame();
+                var img = frame.image;
                 var scaleX = frame.flipX ? -1 : 1;
                 var scaleY = frame.flipY ? -1 : 1;
-                var position = this.getPosition();
 
-                if (this.snapToPixel) {
-                    var canvasX = parseInt(position.x * scaleX - frame.flipX * frame.width * this.pixelSize);
-                    var canvasY = parseInt(position.y * scaleY - frame.flipY * frame.height * this.pixelSize);
-                } else {
-                    var canvasX = position.x * scaleX - frame.flipX * frame.width * this.pixelSize;
-                    var canvasY = position.y * scaleY - frame.flipY * frame.height * this.pixelSize;
+                if (frame.flipX || frame.flipY) {
+                    context.save();
+                    context.scale(scaleX, scaleY);
                 }
-                var x = frame.x;
-                var y = frame.y;
 
-                if (context && img && img.element && img.isReady) {
+                if (!this._box.context || !this._box.img) this.getContextBox(context, frame);
 
-                    if (frame.flipX || frame.flipY) {
-                        context.save();
-                        context.scale(scaleX, scaleY);
-                    }
-                    context.globalAlpha = this.alpha;
-                    context.drawImage(img.element, //image element
-                        x, // x position on image
-                        y, // y position on image
-                        frame.width * this.pixelSize, // width on image
-                        frame.height * this.pixelSize, // height on image
-                        canvasX, // x position on canvas
-                        canvasY, // y position on canvas
-                        frame.width * this.pixelSize, // width on canvas
-                        frame.height * this.pixelSize // height on canvas
-                    );
-                    if (frame.flipX || frame.flipY) {
-                        context.restore();
-                    }
-                    if (this.canDrawDebug()) this.drawDebug(context);
+                context.globalAlpha = this.alpha;
+
+                context.drawImage(img.element, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
+                );
+
+                if (frame.flipX || frame.flipY) {
+                    context.restore();
                 }
             },
+
+
+            ///////////////////////////////// Sprite functions //////////////////////////////////////
+
+            getSpriteCount: function(imageIndex) {
+                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+                var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
+                var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
+                return cols * rows;
+            },
+
+            getSpriteImage: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return this.images[t];
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            },
+
+            getSpriteImageIndex: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return globalIndex;
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            }
 
         });
 
         yespix.define('canvas', {
+
             canvasOptions: null,
             element: null,
             context: null,
             document: null,
 
             init: function(options) {
-                this.create(options);
-            },
-
-            create: function(options) {
                 options = options || {};
+
                 options.document = options.document || yespix.document;
                 options.width = options.width || 800; // @todo default must be set to client width
                 options.height = options.height || 600; // @todo default must be set to client height
@@ -3631,7 +3777,6 @@
                     if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
                     else if (this.document.width) clientWidth = this.document.width;
                     else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
-                    //console.log('width = '+clientWidth+' * '+(parseFloat(options.width.replace('%', '')) / 100));
                     options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
                 }
                 if (yespix.contains(options.height, '%')) {
@@ -3640,26 +3785,33 @@
                     if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight - delta;
                     else if (this.document.height) clientHeight = this.document.height - delta;
                     else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight - delta;
-                    console.log('options.height = ' + clientHeight + ' * ' + (parseFloat(options.height.replace('%', '')) / 100));
                     options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
-                    console.log('options.height = ' + options.height);
                 }
-                //console.log(options);
                 this.canvasOptions = options;
 
+                var canvas = null;
+                if (!options.canvas) canvas = this.create(options);
+                else if (options.canvas) canvas = options.canvas;
+
+                if (canvas) {
+                    if (options.autoAppend) {
+                        var body = this.document.getElementsByTagName("body")[0];
+                        body.appendChild(canvas);
+                    }
+
+                    this.use(canvas, options);
+                    yespix.canvas = canvas;
+                    yespix.context = canvas.getContext('2d');
+                }
+            },
+
+            create: function(options) {
                 var canvas = this.document.createElement('canvas');
                 canvas.id = options.id;
                 canvas.width = options.width;
                 canvas.height = options.height;
-                canvas.className = options.className;
-                for (var n in options.style) canvas.style[n] = options.style[n];
-
-                if (options.autoAppend) {
-                    var body = this.document.getElementsByTagName("body")[0];
-                    body.appendChild(canvas);
-                }
-
-                this.use(canvas, options);
+                canvas.className = options.class;
+                return canvas;
             },
 
 
@@ -3680,7 +3832,6 @@
 
             clear: function() {
                 //			this.context.clearRect(0,0,this.element.width, this.element.height);
-                //if (this.element) 
                 this.element.width = this.element.width;
             },
         });
@@ -3689,6 +3840,7 @@
         yespix.define('circle', 'path', {
 
             circleRadius: 5,
+            prerender: true,
 
             init: function() {
                 yespix.listen(this, ['circleRadius'], function(obj, e) {
@@ -3697,29 +3849,30 @@
 
             },
 
-            drawPath: function(context, contextDrawBox) {
-                //console.log('drawPath');
-                //console.log(contextDrawBox);
+            drawPath: function(context) {
                 context.beginPath();
-                context.arc(contextDrawBox.o_x + this.circleRadius, contextDrawBox.o_y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI, false);
+                context.arc(this._box.path.x + this.circleRadius,
+                    this._box.path.y + this.circleRadius,
+                    this.circleRadius,
+                    0,
+                    2 * Math.PI,
+                    false);
             },
 
-            getDrawBox: function(relative) {
-                var position = this.getPosition(relative);
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
 
                 return {
                     x: position.x,
                     y: position.y,
-                    width: this.circleRadius * 2 + this.lineWidth * 2,
-                    height: this.circleRadius * 2 + this.lineWidth * 2,
-                    type: this._class
+                    width: this.circleRadius * 2 + this.lineWidth,
+                    height: this.circleRadius * 2 + this.lineWidth
                 };
             },
 
-            drawDebugPosition: function(context, drawBox) {
-                //console.log('drawDebugPosition');
-                //console.log(drawBox);
-                var box = drawBox || this.getDrawBox();
+            drawDebugPosition: function(context, box) {
+                box = box || this._box.draw;
+
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#cc3333";
                 context.strokeRect(box.x, box.y, this.circleRadius * 2 + this.lineWidth, this.circleRadius * 2 + this.lineWidth);
@@ -3832,7 +3985,7 @@
 
         });
 
-        yespix.define('fps', 'text', {
+        yespix.define('fps', 'gfx', {
 
             textAlign: 'left', // "left" / "right" / "center"
             textFont: 'sans-serif',
@@ -3870,18 +4023,6 @@
                 this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             },
 
-            canDraw: function() {
-                return this.isVisible && this.alpha > 0;
-            },
-
-            canDrawLine: function() {
-                return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
-            },
-
-            canDrawFill: function() {
-                return this.fillColor != '' && this.fillAlpha > 0;
-            },
-
             drawFill: function(context, box) {
                 context.fillStyle = this.fillColor;
                 context.fillRect(
@@ -3900,7 +4041,7 @@
 
             getDrawBox: function(relative) {
                 var position = this.getPosition(relative);
-                var context = this.getContext();
+                var context = yespix.context;
                 if (!context) return {
                     x: position.x,
                     y: position.y - this.textSize,
@@ -3911,95 +4052,91 @@
 
                 return {
                     x: position.x,
-                    y: position.y - this.textSize,
+                    y: position.y,
                     width: this.width,
                     height: this.height,
                     type: this._class
                 };
             },
 
-            draw: function() {
-                if (!this.isVisible) return;
+            drawRender: function(context) {
 
-                var context = this.getContext();
+                context.globalAlpha = this.alpha;
+                this.getBox();
+                this.drawFill(context);
+                this.drawLine(context);
 
-                if (context) {
-                    context.globalAlpha = this.alpha;
-                    var box = this.getDrawBox();
-                    if (this.canDrawFill()) this.drawFill(context, box);
-                    if (this.canDrawLine()) this.drawLine(context, box);
+                if (this.fpsLastTime == 0) {
+                    this.fpsLastTime = yespix.frameTime;
+                    return;
+                }
 
-                    if (this.fpsLastTime == 0) {
-                        this.fpsLastTime = yespix.frameTime;
-                        return;
-                    }
-
-                    if (this.fpsAverageTime > 0) {
-                        this.fpsAverageFrames++;
-                        this.fpsAverage += yespix.frameTime - this.fpsLastTime;
-                        if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
-                            var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
-                            if (this.fps > 60) fps = 60;
-                            this.fpsAverage = 0;
-                            this.fpsAverageFrames = 0;
-                            this.text = parseInt(fps * 100) / 100;
-                            this.fpsData.shift();
-                            this.fpsData.push(fps);
-                        }
-                        this.fpsLastTime = yespix.frameTime;
-                    } else {
-                        var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                if (this.fpsAverageTime > 0) {
+                    this.fpsAverageFrames++;
+                    this.fpsAverage += yespix.frameTime - this.fpsLastTime;
+                    if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
+                        var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
                         if (this.fps > 60) fps = 60;
-                        this.fpsLastTime = yespix.frameTime;
+                        this.fpsAverage = 0;
+                        this.fpsAverageFrames = 0;
                         this.text = parseInt(fps * 100) / 100;
                         this.fpsData.shift();
                         this.fpsData.push(fps);
                     }
-
-                    var min = max = average = 0;
-                    for (var t = 0; t < 120; t++) {
-                        if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
-                        if (max < this.fpsData[t]) max = this.fpsData[t];
-                        average += this.fpsData[t];
-                    }
-                    average = average / 120;
-
-                    context.lineWidth = this.lineWidth;
-                    context.strokeStyle = this.lineColor;
-                    for (var t = 0; t < 120; t++) {
-                        var scale = 0;
-                        if (max > 0) scale = (this.height - 4) / max;
-                        if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
-                        else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
-                        else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
-                        else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
-                        else context.strokeStyle = this.fpsColors[4];
-
-                        context.beginPath();
-                        context.moveTo(this.x + t + 2, this.y + this.height - 2);
-                        context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
-                        context.stroke();
-                    }
-
-                    // drawing fps
-                    context.fillStyle = this.textColor;
-                    context.font = this.textSize + 'px ' + this.textFont;
-                    context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
-
-                    // drawing min/max
-                    this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
-                    //context.globalAlpha = this.alpha * 0.8;
-                    //context.fillStyle = this.textColor;
-                    //context.font = this.textSize+'px '+this.textFont;
-                    context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
-
-                    // drawing average
-                    this.textAverage = parseInt(average * 100) / 100 + '';
-                    //context.globalAlpha = this.alpha * 0.8;
-                    //context.fillStyle = this.textColor;
-                    //context.font = this.textSize+'px '+this.textFont;
-                    context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+                    this.fpsLastTime = yespix.frameTime;
+                } else {
+                    var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
+                    if (this.fps > 60) fps = 60;
+                    this.fpsLastTime = yespix.frameTime;
+                    this.text = parseInt(fps * 100) / 100;
+                    this.fpsData.shift();
+                    this.fpsData.push(fps);
                 }
+
+                var min = max = average = 0;
+                for (var t = 0; t < 120; t++) {
+                    if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
+                    if (max < this.fpsData[t]) max = this.fpsData[t];
+                    average += this.fpsData[t];
+                }
+                average = average / 120;
+
+                context.lineWidth = this.lineWidth;
+                context.strokeStyle = this.lineColor;
+                for (var t = 0; t < 120; t++) {
+                    var scale = 0;
+                    if (max > 0) scale = (this.height - 4) / max;
+                    if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
+                    else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
+                    else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
+                    else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
+                    else context.strokeStyle = this.fpsColors[4];
+
+                    context.beginPath();
+                    context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                    context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                    context.stroke();
+                }
+
+                // drawing fps
+                context.fillStyle = this.textColor;
+                context.font = this.textSize + 'px ' + this.textFont;
+                context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
+
+                // drawing min/max
+                this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
+                //context.globalAlpha = this.alpha * 0.8;
+                //context.fillStyle = this.textColor;
+                //context.font = this.textSize+'px '+this.textFont;
+                context.fillText(this.textMinMax, this.x + 2, this.y + this.textSize * 2 + 4);
+
+                // drawing average
+                this.textAverage = parseInt(average * 100) / 100 + '';
+                //context.globalAlpha = this.alpha * 0.8;
+                //context.fillStyle = this.textColor;
+                //context.font = this.textSize+'px '+this.textFont;
+                context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+
             },
 
         });
@@ -4009,23 +4146,73 @@
          */
         yespix.define('gfx', {
 
-            _changed: false,
+            _changed: true,
 
-
+            /**
+             * True when the entity is ready to be drawn (usually when all assets are loaded)
+             * @type {Boolean}
+             */
             isReady: false,
+
+            /**
+             * True if the entity must be drawn
+             * @type {Boolean}
+             */
             isVisible: true,
+
+            /**
+             * True if the x/y position values must be rounded to nearest integer
+             * @type {Boolean}
+             */
             snapToPixel: false,
 
+            /**
+             * X position of the gfx.
+             * You should use the getPosition function to get the correct position relative to parent
+             * @type {Number}
+             */
             x: 0,
+
+            /**
+             * Y position of the gfx.
+             * You should use the getPosition function to get the correct position relative to parent
+             * @type {Number}
+             */
             y: 0,
+
+            /**
+             * Z index of the gfx. A higher Z index means the gfx will be drawn at the top
+             * @type {Number}
+             */
             z: 0,
             zGlobal: 0,
+
+            /**
+             * Alpha render of the gfx from 0.0 to 1.0
+             * @type {Number}
+             */
             alpha: 1,
+
+            /**
+             * @TODO
+             * @type {Number}
+             */
             rotation: 0,
 
-            _flipX: false,
-            _flipY: false,
+            width: 0,
+            height: 0,
 
+            /**
+             * Stores all the boxes (draw, context, img ...)
+             * @type {Boolean|object}
+             */
+            _box: false,
+
+
+            /**
+             * Alpha of the debug informations draw on screen, if debug is true
+             * @type {Number}
+             */
             debugAlpha: 1.0,
 
             debugPosition: true,
@@ -4033,23 +4220,38 @@
             debugCollision: true,
             debugMove: true,
 
+            /**
+             * Use pre render on a canvas if True. Can improve speed fot path entity and others
+             * @type {Boolean}
+             */
             prerender: false,
+
+            /**
+             * Store the canvas where the gfx is draw to use it every frame without rewriting it
+             * @type {Boolean}
+             */
             prerenderCanvas: false,
 
-
-
+            /**
+             * Return the files assets
+             * @return {array} Array of string path to the files
+             */
             asset: function() {
                 return [];
             },
 
-            // initilize entity
+            /**
+             * initilize entity
+             */
             init: function() {
 
                 yespix.listen(this, ['z', 'zGlobal'], function(obj, e) {
+                    // @todo use an event
                     yespix.drawEntitiesSort = true;
                 });
-                yespix.listen(this, ['prerender', 'alpha', '_flipX', '_flipY'], function(obj, e) {
-                    if (obj.prerender) obj._changed = true;
+                yespix.listen(this, ['x', 'y', 'prerender', 'alpha', 'rotation', 'snapToPixel', 'width', 'height'], function(obj, e) {
+                    // @todo use an event
+                    obj._changed = true;
                 });
 
                 if (this.prerender) {
@@ -4061,14 +4263,17 @@
 
 
             ///////////////////////////// Pre-render functions /////////////////////////////
-            // Render shape on a canvas and only draw canvas to save time
+
+            // Render entity on a canvas and only draw this canvas to save time
+            // Only enable it when the drawRender function is long (for path entities ...)
+
 
             /**
              * Init the pre-render of the gfx
              */
             prerenderInit: function() {
-                //console.log('prerenderInit');
                 this.prerenderCreate();
+                this.prerenderUpdate();
             },
 
             /**
@@ -4077,82 +4282,56 @@
             prerenderCreate: function() {
                 this.prerenderCanvas = yespix.document.createElement('canvas');
                 this.prerenderCanvas.context = this.prerenderCanvas.getContext('2d');
-
-                this.prerenderUpdate();
             },
 
             /**
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
+                if (this._changed) this.getBox(this.prerenderCanvas.context);
 
-                var drawBox = this.getDrawBox();
+                // save original coordinates
+                var drawX = this._box.draw.x,
+                    drawY = this._box.draw.y;
+                this._box.draw.x = 0;
+                this._box.draw.y = 0;
 
-                //console.log('prerenderUpdate :: drawBox = ');
-                //console.log(drawBox);
+                this.prerenderCanvas.width = this._box.draw.width;
+                this.prerenderCanvas.height = this._box.draw.height;
 
-                this.prerenderCanvas.width = drawBox.width;
-                this.prerenderCanvas.height = drawBox.height;
+                this.drawRender(this.prerenderCanvas.context);
 
-                //console.log('prerenderUpdate :: this.prerenderCanvas = ');
-                //console.log(this.prerenderCanvas);
-
-                //console.log(drawBox);
-                var contextDrawBox = {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: drawBox.width,
-                    img_height: drawBox.height,
-                    context_x: 0,
-                    context_y: 0,
-                    context_width: drawBox.width,
-                    context_height: drawBox.height,
-                    o_x: 0,
-                    o_y: 0,
-                    o_width: drawBox.width,
-                    o_height: drawBox.height
-                };
-
-                //this.prerenderCanvas.context.fillStyle = '#ff0000';
-                //this.prerenderCanvas.context.fillRect(0,0,200,200);
-                //console.log('prerenderUpdate :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+                // set original coordinates
+                this._box.draw.x = drawX;
+                this._box.draw.y = drawY;
             },
 
             /**
              * Draw the pre-render on a canvas context
              */
             prerenderUse: function(context) {
+                // @todo old code in comment / how does it work ?
+                /*
                 var box = this.getDrawBox(false, context);
-
-                //console.log('prerenderUse :: drawBox = ');
-                //console.log(box);
-
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
-
+        
                 // check if image outside canvas
-                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                if (box.x > context.canvas.clientWidth 
+                    || box.y > context.canvas.clientHeight
+                    || box.x + box.width < 0
+                    || box.y + box.height < 0)
                     return false;
 
-                var contextDrawBox = this.getContextDrawBox(context, {
-                    realWidth: box.width,
-                    realHeight: box.height
-                }, box);
+                var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
 
                 // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
+                if (contextDrawBox.img_width == 0
+                    || contextDrawBox.img_height == 0
+                    || contextDrawBox.context_width == 0
+                    || contextDrawBox.context_height == 0)
                     return false;
 
                 context.globalAlpha = this.alpha;
-
-                //console.log('prerenderUse :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
+        
                 context.drawImage(this.prerenderCanvas, //image element
                     contextDrawBox.img_x, // x position on image
                     contextDrawBox.img_y, // y position on image
@@ -4164,9 +4343,10 @@
                     contextDrawBox.context_height // height on canvas
                 );
                 return true;
+                */
             },
 
-            ///////////////////////////////// Main functions ////////////////////////////////
+            ///////////////////////////////// Box functions ////////////////////////////////
 
             /*
             box: {
@@ -4179,147 +4359,262 @@
             */
 
             /**
-             *
+             * Get the position and width/height of an entity and return an object. In this object, it will be added
+             * later some other coordinates (path, context ...)
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {_type: "class", draw: {x, y, width, height}}
              */
-            getBox: function(relative) {
-                var box = {
+            getBox: function(absolute) {
+                //console.log('gfx.getBox : start');
+                this._box = {
                     type: this._class
                 };
-                box.draw = this.getDrawBox(relative);
-                return box;
+                this._box.draw = this.getDrawBox(absolute);
             },
 
-
-            getPosition: function(relative) {
-                if (relative || !this._parent) {
-                    return {
-                        x: this.x,
-                        y: this.y
-                    };
-                } else {
-                    var position = this._parent.getPosition();
-                    //if (yespix.frame < 100) console.log('getPosition :: absolute position x=' + (this.x + position.x) + ', y=' + (this.y + position.y));
-                    if (position) return {
-                        x: this.x + position.x,
-                        y: this.y + position.y
-                    };
-                }
-                return {
-                    x: this.x,
-                    y: this.y
-                };
-            },
-
-            getDrawBox: function(relative) {
-                var position = this.getPosition(relative);
-
+            /**
+             * Get the draw box with absolute position or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y, width, height}
+             */
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
                 return {
                     x: position.x,
                     y: position.y,
                     width: this.width,
-                    height: this.height,
+                    height: this.height
                 };
-            },
-
-            getContextDrawBoxDefault: function(context, img, box) {
-
-                return {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: img.realWidth,
-                    img_height: img.realHeight,
-                    context_x: box.x,
-                    context_y: box.y,
-                    context_width: box.width,
-                    context_height: box.height,
-                    o_x: box.x,
-                    o_y: box.y,
-                    o_width: box.width,
-                    o_height: box.height
-                };
-            },
-
-            getContextDrawBox: function(context, img, box) {
-
-                var contextDrawBox = this.getContextDrawBoxDefault(context, img, box);
-
-                // check if the whole image is inside canvas
-                // as image here cant be entirely outside canvas
-                if (box.x > 0 && box.x + box.width < context.canvas.clientWidth && box.y > 0 && box.y + box.height < context.canvas.clientHeight)
-                    return contextDrawBox;
-
-                // crop the image
-                var scale_x = contextDrawBox.context_width / contextDrawBox.img_width;
-                var scale_y = contextDrawBox.context_height / contextDrawBox.img_height;
-                if (contextDrawBox.context_x < 0) {
-                    contextDrawBox.img_x = contextDrawBox.img_x - contextDrawBox.context_x / scale_x;
-                    contextDrawBox.img_width = contextDrawBox.img_width + contextDrawBox.context_x / scale_x;
-                    contextDrawBox.context_width = contextDrawBox.context_width + contextDrawBox.context_x;
-                    contextDrawBox.context_x = 0;
-                }
-                if (contextDrawBox.context_y < 0) {
-                    contextDrawBox.img_y = contextDrawBox.img_y - contextDrawBox.context_y / scale_y;
-                    contextDrawBox.img_height = contextDrawBox.img_height + contextDrawBox.context_y / scale_y;
-                    contextDrawBox.context_height = contextDrawBox.context_height + contextDrawBox.context_y;
-                    contextDrawBox.context_y = 0;
-                }
-                if (contextDrawBox.context_x + contextDrawBox.context_width > context.canvas.clientWidth) {
-                    var delta = contextDrawBox.context_x + contextDrawBox.context_width - context.canvas.clientWidth;
-                    contextDrawBox.img_width = contextDrawBox.img_width - delta / scale_x;
-                    contextDrawBox.context_width = contextDrawBox.context_width - delta;
-                }
-                if (contextDrawBox.context_y + contextDrawBox.context_height > context.canvas.clientHeight) {
-                    var delta = contextDrawBox.context_y + contextDrawBox.context_height - context.canvas.clientHeight;
-                    contextDrawBox.img_height = contextDrawBox.img_height - delta / scale_y;
-                    contextDrawBox.context_height = contextDrawBox.context_height - delta;
-                }
-                return contextDrawBox;
-
-            },
-
-            getContext: function() {
-                if (this._context) return this._context;
-                var canvas = yespix.find('.canvas')[0];
-                if (canvas) this._context = canvas.context;
-                return this._context;
-            },
-
-            draw: function() {
-                if (!this.isVisible) return;
-
-                var context = this.getContext();
-
-                if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
-                    if (this._changed) {
-                        this.prerenderUpdate();
-                        this._changed = false;
-                    }
-                    this.prerenderUse(context);
-                    if (this.debug) {
-                        this.drawDebug(context, this.getDrawBox());
-                    }
-                    return true;
-                }
-
-                if (context) {
-                    var box = this.getDrawBox();
-                    var getContextDrawBox = this.getContextDrawBox(context, {
-                        realWidth: this.width,
-                        realHeight: this.height
-                    }, box);
-                    this.drawRender(context, getContextDrawBox);
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
-                }
             },
 
             /**
-             *
+             * Get the position absolute or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y}
              */
-            drawRender: function(context, contextDrawBox, img) {},
+            getPosition: function(absolute) {
+                var x = this.x,
+                    y = this.y;
+
+                if (this.snapToPixel) {
+                    x = parseInt(x);
+                    y = parseInt(y);
+                }
+                if (absolute || !this._parent) {
+                    return {
+                        x: x,
+                        y: y
+                    };
+                } else {
+                    var position = this._parent.getPosition();
+                    if (position) return {
+                        x: x + position.x,
+                        y: y + position.y
+                    };
+                }
+                return {
+                    x: x,
+                    y: y
+                };
+            },
+
+            getContextBoxDefault: function(context) {
+                return {
+                    x: this._box.draw.x,
+                    y: this._box.draw.y,
+                    width: this._box.draw.width,
+                    height: this._box.draw.height,
+                };
+            },
+
+            getImageBoxDefault: function(imageBox) {
+                box = {
+                    x: 0,
+                    y: 0,
+                    width: imageBox.width,
+                    height: imageBox.height
+                }
+                if (imageBox.x) box.x = imageBox.x;
+                if (imageBox.y) box.y = imageBox.y;
+                return box;
+            },
+
+            getContextBox: function(context, imageBox) {
+                //console.log('gfx.getContextBox : start');
+
+                this._box.context = this.getContextBoxDefault();
+                if (imageBox) this._box.img = this.getImageBoxDefault(imageBox);
+
+                // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
+                if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight) {
+                    // flip horizontally
+                    if (this.flipX || imageBox.flipX) this._box.context.x = -this._box.context.x - this._box.context.width;
+
+                    // flip vertically
+                    if (this.flipY || imageBox.flipY) this._box.context.y = -this._box.context.y - this._box.context.height;
+
+                    return this._box.context;
+                }
+
+                // get the correct width and height of what will be drawn (usually an image)
+                if (imageBox) {
+                    var scaleX = this._box.context.width / this._box.img.width;
+                    var scaleY = this._box.context.height / this._box.img.height;
+                }
+
+                // crop the left
+                if (this._box.context.x < 0) {
+                    if (imageBox) {
+                        this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
+                        this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
+                    }
+                    this._box.context.width = this._box.context.width + this._box.context.x;
+                    this._box.context.x = 0;
+                }
+
+                // crop the top
+                if (this._box.context.y < 0) {
+                    if (imageBox) {
+                        this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
+                        this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
+                    }
+                    this._box.context.height = this._box.context.height + this._box.context.y;
+                    this._box.context.y = 0;
+                }
+
+                // crop the right
+                if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
+                    var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
+                    if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
+                    this._box.context.width = this._box.context.width - delta;
+                }
+
+                // crop the bottom
+                if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
+                    var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
+                    if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
+                    this._box.context.height = this._box.context.height - delta;
+                }
+
+                // flip horizontally
+                if (this.flipX) {
+                    if (this._box.draw.width > 0) {
+                        this._box.context.x = -this._box.context.x - this._box.context.width;
+                        if (imageBox) {
+                            if (this._box.img.x == 0) this._box.img.x = this._box.draw.width - this._box.context.width;
+                            else this._box.img.x = 0;
+                        }
+                    }
+                }
+
+                // flip vertically
+                if (this.flipY) {
+                    if (this._box.draw.height > 0) {
+                        this._box.context.y = -this._box.context.y - this._box.context.height;
+                        if (imageBox) {
+                            if (this._box.img.y == 0) this._box.img.y = this._box.draw.height - this._box.context.height;
+                            else this._box.img.y = 0;
+                        }
+                    }
+                }
+            },
 
 
+            ///////////////////////////////// Main draw functions ////////////////////////////////
+
+
+            /**
+             * Try to draw the gfx entity on a canvas
+             * @return {bool} True if drawn
+             */
+            draw: function(context) {
+
+                // get the context
+                context = context || yespix.context;
+
+                // if cannot draw, exit now
+                if (!this.canDraw(context)) return this.drawExit(false);
+
+                // get the draw box
+                if (this._changed) this.getBox(context);
+
+                // if cannot draw from this draw box
+                if (!this.canDrawBox(context)) return this.drawExit(false);
+
+                // pre render on canvas
+                if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
+
+                    // if changed, update the pre render canvas
+                    if (this._changed) this.prerenderUpdate(context);
+
+                    // use the pre render canvas
+                    this.prerenderUse(context);
+
+                    // draw debug
+                    if (this.debug) this.drawDebug(context);
+
+                    // exit
+                    return this.drawExit(true);
+                }
+
+                this.drawRender(context);
+
+                // draw debug
+                if (this.debug) this.drawDebug(context);
+
+                // exit
+                return this.drawExit(true);
+            },
+
+            /**
+             * Function called at the end of draw function
+             * @param {bool} isDrawn True if the entity was just drawn on this frame
+             */
+            drawExit: function(isDrawn) {
+                this._changed = false;
+                return isDrawn;
+            },
+
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context)
+                    return false;
+
+                return true;
+            },
+
+
+            /**
+             * Return true if the entity can be drawn on context, get this information from the box coordinates.
+             * @return {bool} True if can be drawn
+             */
+            canDrawBox: function(context) {
+
+                if (this._box.draw.x > context.width || this._box.draw.y > context.height || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
+                    return false;
+                return true;
+            },
+
+
+            /**
+             * Render the entity on the context with coordinates from the box
+             * @param {object} context Context object
+             * @param {object} box Box object with the coordinates
+             */
+            drawRender: function(context) {
+                // Empty. 
+                // Child entities must provide the code to draw something on the 2d context
+            },
+
+            /**
+             * set the alpha for a type of content in the context
+             * @param  {object} context
+             * @param  {string} type Type ("line", "fill" ...)
+             * @param  {bool} doNotUseGlobal
+             */
             drawAlpha: function(context, type, doNotUseGlobal) {
                 if (!type) {
                     context.globalAlpha = this.alpha;
@@ -4334,35 +4629,42 @@
                 }
             },
 
-            canDrawDebug: function(context, box) {
+
+            ///////////////////////////////// Debug functions ////////////////////////////////
+
+
+            canDrawDebug: function(context) {
                 return this.debug;
             },
 
-            canDrawDebugPosition: function(context, box) {
+            canDrawDebugPosition: function(context) {
                 return yespix.isFunction(this.drawDebugPosition) && this.debugPosition;
             },
 
-            canDrawDebugImage: function(context, box) {
+            canDrawDebugImage: function(context) {
                 return yespix.isFunction(this.drawDebugImage) && this.debugImage;
             },
 
-            canDrawDebugCollision: function(context, box) {
+            canDrawDebugCollision: function(context) {
                 return yespix.isFunction(this.drawDebugCollision) && this.debugCollision;
             },
 
-            canDrawDebugMove: function(context, box) {
+            canDrawDebugMove: function(context) {
                 return yespix.isFunction(this.drawDebugMove) && this.debugMove;
             },
 
-            drawDebug: function(context, box) {
+            drawDebug: function(context) {
                 this.drawAlpha(context, 'debug', true);
-                if (this.canDrawDebugPosition(context, box)) this.drawDebugPosition(context, box);
-                if (this.canDrawDebugImage(context, box)) this.drawDebugImage(context, box);
-                if (this.canDrawDebugCollision(context, box)) this.drawDebugCollision(context, box);
-                if (this.canDrawDebugMove(context, box)) this.drawDebugMove(context, box);
+                if (this.canDrawDebugPosition(context)) this.drawDebugPosition(context);
+                if (this.canDrawDebugImage(context)) this.drawDebugImage(context);
+                if (this.canDrawDebugCollision(context)) this.drawDebugCollision(context);
+                if (this.canDrawDebugMove(context)) this.drawDebugMove(context);
             },
 
-            drawDebugPosition: function(context, box) {
+            drawDebugPosition: function(context) {
+
+                var box = this._box.draw;
+
                 context.lineWidth = 0.5;
                 context.strokeStyle = "#cc3333";
                 context.strokeRect(box.x - 0.5, box.y - 0.5, box.width + 1, box.height + 1);
@@ -4380,26 +4682,76 @@
         });
 
         yespix.define('image', 'gfx', {
+
+            /**
+             * Flip the gfx horizontally if True
+             * @type {Boolean}
+             */
+            flipX: false,
+
+            /**
+             * Flip the gfx vertically if True
+             * @type {Boolean}
+             */
+            flipY: false,
+
+            /**
+             * If true, the entity can be drawn
+             * @type {Boolean}
+             */
             isVisible: true,
 
-            // images
+            /**
+             * List of images
+             * @type {Array}
+             */
             images: [],
 
+            /**
+             * Image object used to draw the render (imageObject.element)
+             * @type {Boolean|object}
+             */
+            imageObject: false,
+
+            /**
+             * Index of selected image to draw, default 0
+             * @type {Number}
+             */
             imageSelected: 0,
 
+            /**
+             * Default parameters for images
+             * @type {Object}
+             */
             imageDefaults: {
-                isInitiated: false, // true if imageInit() was called
+                isInitiated: false,
                 isReady: false,
                 src: '',
-                element: null,
-                document: yespix.document,
+                element: null
             },
 
+            /**
+             * Lock the image size so it does not change if you select another image with imageSelect()
+             * @type {Boolean}
+             */
+            imageLockSize: false,
+
+            /**
+             * Scale of image from 1 to 100, only work when the image is not initialized yet
+             * @type {Number}
+             */
+            imageScale: 1.0,
+
+
             init: function() {
+
+                yespix.listen(this, ['flipX', 'flipY'], function(obj, e) {
+                    // @todo use an event
+                    obj._changed = true;
+                });
+
                 var entity = this,
                     count = 1;
-
-                if (!this.pixelSize) this.pixelSize = 1;
 
                 if (yespix.isString(this.images)) this.images = [{
                     src: this.images
@@ -4415,12 +4767,18 @@
                     for (var n in this.imageDefaults) {
                         this.images[t][n] = this.images[t][n] || this.imageDefaults[n];
                     }
+
                     if (this.images[t].name === '') this.images[t].name = 'image' + count++;
+                    this.images[t].index = t;
                 }
                 this.imageInit();
 
                 this.readyFunctions.push(this.checkReadyStateImage);
                 this.on('imageReady', this.checkReadyState);
+
+                var index = this.imageSelected;
+                this.imageSelected = -1;
+                this.imageSelect(index);
             },
 
             checkReadyStateImage: function() {
@@ -4468,28 +4826,42 @@
                 return scaled;
             },
 
+            /**
+             * Search, init and return an image object where image.element is the HTML img element. The image can only
+             * drawn when image.isReady is True
+             * @param  {int|string|object} properties Index, name of the image or properties of the image to search for
+             * @return {[type]}            [description]
+             */
             image: function(properties) {
 
+                // get the image with the index
                 if (yespix.isInt(properties)) {
                     if (this.images[properties]) return this.imageInit(this.images[properties]);
                     else return null;
-                } else if (properties == undefined) {
+                } else
+                // get the first image (index: 0)
+                if (properties == undefined) {
                     if (this.images[0]) return this.imageInit(this.images[0]);
                     else return null;
-                } else if (typeof properties == 'string') {
+                } else
+                // if properties is string, it's the name of the image
+                if (typeof properties == 'string') {
                     properties = {
                         name: properties
                     };
                 }
 
+                // search for the properties in the image list
                 var max = Object.keys(properties).length;
-                var count = 0;
                 for (var t = 0; t < this.images.length; t++) {
+                    var count = 0;
                     for (var n in properties) {
                         if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
                         if (count >= max) return this.imageInit(this.images[t]);
                     }
                 }
+
+                // not found
                 return null;
             },
 
@@ -4514,17 +4886,23 @@
                 image.element = document.createElement('img');
 
                 if (image.element) image.element.onload = image.element.onLoad = function() {
-                    image.realWidth = this.width;
-                    image.realHeight = this.height;
-                    image.entity.width = this.width;
-                    image.entity.height = this.height;
-                    image.isReady = true;
+                    image.originalWidth = this.width;
+                    image.originalHeight = this.height;
+                    image.width = this.width * entity.imageScale;
+                    image.height = this.height * entity.imageScale;
 
-                    if (!yespix.isUndefined(entity.pixelSize) && entity.pixelSize != 1) {
-                        image.element = entity.resize(image.element, entity.pixelSize);
-                        image.realWidth = this.width * entity.pixelSize;
-                        image.realHeight = this.height * entity.pixelSize;
+                    if (entity.imageScale != 1) {
+                        image.element = entity.resize(image.element, entity.imageScale);
                     }
+                    if (image.entity.imageSelected == image.index) {
+                        image.entity._changed = true;
+                        if (!image.entity.imageLockSize) {
+                            image.entity.width = image.width;
+                            image.entity.height = image.height;
+                        }
+                    }
+
+                    image.isReady = true;
 
                     entity.trigger('imageReady', {
                         target: image,
@@ -4548,65 +4926,99 @@
                 return image; //source != '';
             },
 
-            draw: function(context) {
-                if (!this.isVisible) return;
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
+
+            /**
+             * Get the draw box with absolute position or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y, width, height}
+             */
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
+                var drawBox = {
+                    x: position.x,
+                    y: position.y,
+                    width: this.width,
+                    height: this.height
+                };
+                return drawBox;
+            },
+
+            imageSelect: function(properties) {
+                this.imageObject = this.image(properties);
+                if (this.imageObject) {
+                    if (this.imageSelected != this.imageObject.index) {
+                        this.imageSelected = this.imageObject.index;
+                        if (this.imageObject.isReady && !this.imageLockSize) {
+                            this.width = this.imageObject.width;
+                            this.height = this.imageObject.height;
+                        }
+                    }
+                }
+            },
+
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                //var img = this.image(this.imageSelected);
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context || !this.imageObject || !this.imageObject.element || !this.imageObject.isReady)
+                    return false;
+
+                return true;
+            },
+
+
+            drawRender: function(context) {
+                // check if image outside canvas
+                /*
+                if (this._box.draw.x > context.canvas.clientWidth 
+                    || this._box.draw.y > context.canvas.clientHeight 
+                    || this._box.draw.x + this._box.draw.width < 0
+                    || this._box.draw.y + this._box.draw.height < 0)
+                    return;
+                */
+                //var img = this.imageObject; //(this.imageSelected);
+
+                if (!this._box.context || !this._box.img) this.getContextBox(context, this.imageObject);
+
+                if (this._box.img.width == 0 || this._box.img.height == 0)
+                    return;
+
+                //var scaleX = this.flipX ? -1 : 1;
+                //var scaleY = this.flipY ? -1 : 1;
+
+                if (this.flipX || this.flipY) {
+                    context.save();
+                    context.scale((this.flipX ? -1 : 1), (this.flipY ? -1 : 1));
                 }
 
-                var img = this.image(this.imageSelected);
+                context.globalAlpha = this.alpha;
 
-                if (context && img && img.element && img.isReady) {
+                context.drawImage(this.imageObject.element, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
+                );
 
-                    var box = this.getDrawBox();
-                    if (this.snapToPixel) {
-                        box.x = parseInt(box.x);
-                        box.y = parseInt(box.y);
-                    }
-
-                    // check if image outside canvas
-                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
-                        return;
-
-                    var contextDrawBox = this.getContextDrawBox(context, img, box);
-
-                    if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
-                        return;
-
-                    //var scaleX = this.flipX ? -1 : 1;
-                    //var scaleY = this.flipY ? -1 : 1;
-                    context.globalAlpha = this.alpha;
-
-                    //console.log(contextDrawBox);
-
-                    context.drawImage(img.element, //image element
-                        contextDrawBox.img_x, // x position on image
-                        contextDrawBox.img_y, // y position on image
-                        contextDrawBox.img_width, // width on image
-                        contextDrawBox.img_height, // height on image
-                        contextDrawBox.context_x, // x position on canvas
-                        contextDrawBox.context_y, // y position on canvas
-                        contextDrawBox.context_width, // width on canvas
-                        contextDrawBox.context_height // height on canvas
-                    );
-                    //fuckyou();
-                    if (this.debug) {
-                        this.drawDebug(context, box);
-                    }
+                if (this.flipX || this.flipY) {
+                    context.restore();
                 }
             },
 
 
 
             drawDebugImage: function(context, drawBox) {
-                var box = drawBox || this.getDrawBox();
+                drawBox = drawBox || this.getDrawBox();
                 context.globalAlpha = 1;
                 context.fillStyle = '#999999';
                 context.font = "10px sans-serif";
-                context.fillText("Image: " + this.imageSelected, box.x, box.y - 5);
+                context.fillText("Image: " + this.imageSelected, drawBox.x, drawBox.y - 5);
             }
 
         });
@@ -4674,7 +5086,7 @@
                 }
 
                 spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
-                var max = Math.floor(image.realWidth / this.level.levelData.tilewidth);
+                var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
                 var line = Math.floor(spriteIndex / max);
                 var col = spriteIndex - (line * max);
                 this.drawContext.drawImage(image.element, //image element
@@ -4714,50 +5126,75 @@
                 this.ready();
             },
 
-            draw: function(context) {
-                if (!this.isVisible) return;
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !this.canvas || !context || !this.drawContext || !this.isReady)
+                    return false;
 
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
+                return true;
+            },
+
+            /**
+             * Get the position absolute or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y}
+             */
+            getPosition: function(absolute) {
+                var x = this.x,
+                    y = this.y;
+
+                if (this.snapToPixel) {
+                    x = parseInt(x);
+                    y = parseInt(y);
                 }
-                if (context && this.canvas) {
-                    context.globalAlpha = this.alpha * this.level.alpha;
-                    var box = this.getDrawBox();
-                    if (this.layerData.properties.type == 'parallax') {
-                        if (this.layerData.properties.speedX) box.x = box.x * this.layerData.properties.speedX;
-                        if (this.layerData.properties.speedY) box.y = box.y * this.layerData.properties.speedY;
-                    }
 
-                    if (this.level.snapToPixel) {
-                        box.x = parseInt(box.x);
-                        box.y = parseInt(box.y);
-                    }
-
-
-                    // check if image outside canvas
-                    if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
-                        return;
-
-                    var contextDrawBox = this.getContextDrawBox(context, {
-                            realWidth: this.canvas.width,
-                            realHeight: this.canvas.height
-                        },
-                        box);
-
-                    context.drawImage(this.canvas, //image element
-                        contextDrawBox.img_x, // x position on image
-                        contextDrawBox.img_y, // y position on image
-                        contextDrawBox.img_width, // width on image
-                        contextDrawBox.img_height, // height on image
-                        contextDrawBox.context_x, // x position on canvas
-                        contextDrawBox.context_y, // y position on canvas
-                        contextDrawBox.context_width, // width on canvas
-                        contextDrawBox.context_height // height on canvas
-                    );
+                if (this.layerData.properties.type == 'parallax') {
+                    if (this.layerData.properties.speedX) x = x * this.layerData.properties.speedX;
+                    if (this.layerData.properties.speedY) y = y * this.layerData.properties.speedY;
                 }
+
+                if (absolute || !this._parent) {
+                    return {
+                        x: x,
+                        y: y
+                    };
+                } else {
+                    var position = this._parent.getPosition();
+                    if (position) return {
+                        x: x + position.x,
+                        y: y + position.y
+                    };
+                }
+                return {
+                    x: x,
+                    y: y
+                };
+            },
+
+
+            drawRender: function(context) {
+
+                // check if image outside canvas
+                if (this._box.x > context.canvas.clientWidth || this._box.y > context.canvas.clientHeight || this._box.x + this._box.width < 0 || this._box.y + this._box.height < 0)
+                    return;
+
+                context.globalAlpha = this.alpha * this.level.alpha;
+
+                this.getContextBox(context, this.drawContext);
+
+                context.drawImage(this.canvas, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width * this.pixelSize, // width on canvas
+                    this._box.context.height * this.pixelSize // height on canvas
+                );
             },
         });
 
@@ -5263,24 +5700,6 @@
                 });
             },
 
-            /*
-            moveChildren: function(deltaX, deltaY) {
-                var count = 0;
-                if (this._children) count = this._children.length;
-                if (!this._children || this._children.length == 0) return false;
-
-                var t = 0,
-                    length = this._children.length;
-
-                for (; t < length; t++) {
-                    if (this._children[t].isActive) {
-                        if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
-                        this._children[t].x += deltaX;
-                        this._children[t].y += deltaY;
-                    }
-                }
-            },
-            */
             applyGravity: function() {
                 if (!yespix.gravity) return false;
                 if (!this.isOnGround && yespix.gravity) {
@@ -5294,176 +5713,155 @@
 
         yespix.define('path', 'gfx', {
 
-            lineWidth: 0,
-            lineColor: '',
+            lineWidth: 1,
+            lineColor: '#000000',
             lineAlpha: 1.0,
 
-            fillColor: '',
+            fillColor: '#ffffff',
             fillAlpha: 1.0,
 
             isVisible: true,
+
+            prerender: false,
+
 
             init: function() {
 
             },
 
-            getDrawBox: function(relative) {
-                var position = this.getPosition(relative);
+
+            /**
+             * Get the position and width in an object. In this object, it will be added later some other coordinates (path, context ...)
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {_type: "class", draw: {x, y, width, height}}
+             */
+            getBox: function(absolute) {
+                this._box = {
+                    type: this._class
+                };
+                this._box.draw = this.getDrawBox(absolute);
+                this._box.path = this.getPathBox();
+                return this._box;
+            },
+
+            /**
+             * Get the draw box with absolute position or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y, width, height}
+             */
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
 
                 return {
                     x: position.x,
                     y: position.y,
                     width: this.width + this.lineWidth,
                     height: this.height + this.lineWidth,
-                    type: this._class
                 };
             },
 
-            getContextDrawBoxDefault: function(context, img, box) {
-
+            getPathBox: function() {
                 return {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: img.realWidth,
-                    img_height: img.realHeight,
-                    context_x: box.x,
-                    context_y: box.y,
-                    context_width: box.width,
-                    context_height: box.height,
-                    o_x: box.x + this.lineWidth / 2,
-                    o_y: box.y + this.lineWidth / 2,
-                    o_width: box.width,
-                    o_height: box.height
+                    x: this._box.draw.x + this.lineWidth / 2,
+                    y: this._box.draw.y + this.lineWidth / 2,
+                    width: this.width,
+                    height: this.height
                 };
             },
 
-            canDraw: function(context, contextDrawBox) {
-                if (contextDrawBox.o_x > context.canvas.clientWidth || contextDrawBox.o_y > context.canvas.clientHeight || contextDrawBox.o_x + contextDrawBox.o_width < 0 || contextDrawBox.o_y + contextDrawBox.o_height < 0)
-                    return false;
-
-                return this.isVisible && this.alpha > 0;
-            },
-
-            canDrawPath: function(context, contextDrawBox) {
+            canDrawPath: function(context) {
                 return true;
             },
 
-            drawPath: function(context, contextDrawBox) {
+            drawPath: function(context) {
                 context.beginPath();
             },
 
-            canDrawLine: function(context, contextDrawBox) {
+            canDrawLine: function(context) {
                 return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
             },
 
-            drawLine: function(context, contextDrawBox) {
+            drawLine: function(context) {
                 this.drawAlpha(context, 'line');
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
                 context.stroke();
             },
 
-            canDrawFill: function(context, contextDrawBox) {
+            canDrawFill: function(context) {
                 return this.fillColor != '' && this.fillAlpha > 0;
             },
 
-            drawFill: function(context, contextDrawBox) {
+            drawFill: function(context) {
                 this.drawAlpha(context, 'fill');
                 context.fillStyle = this.fillColor;
                 context.fill();
             },
 
-            drawRender: function(context, contextDrawBox, img) {
-                //console.log('path.drawRender :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                if (this.canDrawPath(context, contextDrawBox)) {
-                    this.drawPath(context, contextDrawBox);
-                    if (this.canDrawFill(context, contextDrawBox)) this.drawFill(context, contextDrawBox);
-                    if (this.canDrawLine(context, contextDrawBox)) this.drawLine(context, contextDrawBox);
+            drawRender: function(context) {
+                if (this.canDrawPath(context)) {
+                    this.drawPath(context);
+                    if (this.canDrawFill(context)) this.drawFill(context);
+                    if (this.canDrawLine(context)) this.drawLine(context);
                 }
             },
+
 
             /**
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
-                var drawBox = this.getDrawBox(false, this._context);
+                this.getBox(this.prerenderCanvas.context);
 
-                //console.log('path.prerenderUpdate :: drawBox = ');
-                //console.log(drawBox);
+                // save original coordinates
+                var drawX = this._box.draw.x,
+                    drawY = this._box.draw.y,
+                    pathX = this._box.path.x,
+                    pathY = this._box.path.y;
 
-                this.prerenderCanvas.width = drawBox.width;
-                this.prerenderCanvas.height = drawBox.height;
+                this._box.draw.x = 0;
+                this._box.draw.y = 0;
+                this._box.path.x = this.lineWidth / 2;
+                this._box.path.y = this.lineWidth / 2;
 
-                //this.prerenderCanvas.context.fillStyle = '#FF0000';
-                //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
+                this.prerenderCanvas.width = this._box.draw.width;
+                this.prerenderCanvas.height = this._box.draw.height;
 
-                //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
-                //console.log(this.prerenderCanvas);
+                this.drawRender(this.prerenderCanvas.context);
 
-                var contextDrawBox = {
-                    img_x: 0,
-                    img_y: 0,
-                    img_width: drawBox.width,
-                    img_height: drawBox.height,
-                    context_x: 0,
-                    context_y: 0,
-                    context_width: drawBox.width,
-                    context_height: drawBox.height,
-                    o_x: this.lineWidth / 2,
-                    o_y: this.lineWidth / 2,
-                    o_width: drawBox.width,
-                    o_height: drawBox.height
-                };
-
-                //console.log('path.prerenderUpdate :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+                // set original coordinates
+                this._box.draw.x = drawX;
+                this._box.draw.y = drawY;
+                this._box.path.x = pathX;
+                this._box.path.y = pathY;
             },
 
             /**
              * Draw the pre-render on a canvas context
              */
             prerenderUse: function(context) {
-                var box = this.getDrawBox(false, context);
-
-                //console.log('prerenderUse :: drawBox = ');
-                //console.log(box);
-
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
 
                 // check if image outside canvas
-                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return false;
 
-                var contextDrawBox = this.getContextDrawBox(context, {
-                    realWidth: box.width,
-                    realHeight: box.height
-                }, box);
+                if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
                 // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
+                if (this._box.context.width <= 0 || this._box.context.height <= 0)
                     return false;
 
                 context.globalAlpha = this.alpha;
 
-                /*console.log('prerenderUse :: contextDrawBox = ');
-                console.log(contextDrawBox);*/
-
                 context.drawImage(this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height // height on canvas
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
                 );
                 return true;
             },
@@ -5625,37 +6023,39 @@
 
         yespix.define('rect', 'path', {
 
+            prerender: true,
+
             init: function() {},
 
-            drawPath: function(context, contextDrawBox) {},
+            drawPath: function(context) {},
 
-            drawFill: function(context, contextDrawBox) {
+            drawFill: function(context) {
                 context.fillStyle = this.fillColor;
                 this.drawAlpha(context, 'fill');
                 context.fillRect(
-                    contextDrawBox.o_x, // x position on canvas
-                    contextDrawBox.o_y, // y position on canvas
-                    contextDrawBox.o_width - this.lineWidth, // width on canvas
-                    contextDrawBox.o_height - this.lineWidth // height on canvas
+                    this._box.path.x, // x position on canvas
+                    this._box.path.y, // y position on canvas
+                    this._box.path.width, // width on canvas
+                    this._box.path.height // height on canvas
                 );
             },
 
-            drawLine: function(context, contextDrawBox) {
+            drawLine: function(context) {
                 context.lineWidth = this.lineWidth;
                 context.strokeStyle = this.lineColor;
                 this.drawAlpha(context, 'line');
                 context.strokeRect(
-                    contextDrawBox.o_x,
-                    contextDrawBox.o_y,
-                    contextDrawBox.o_width - this.lineWidth,
-                    contextDrawBox.o_height - this.lineWidth);
+                    this._box.path.x,
+                    this._box.path.y,
+                    this._box.path.width,
+                    this._box.path.height);
             }
         });
 
-        yespix.define('roundrect', 'rect', {
+        yespix.define('roundrect', 'path', {
 
             borderRadius: 5,
-
+            prerender: true,
 
             init: function() {},
 
@@ -5665,35 +6065,19 @@
                 return this.width / 2;
             },
 
-            drawPath: function(context, contextDrawBox) {
+            drawPath: function(context) {
                 var radius = this.getBorderRadius();
                 context.beginPath();
 
-                contextDrawBox.o_width = contextDrawBox.o_width - this.lineWidth;
-                contextDrawBox.o_height = contextDrawBox.o_height - this.lineWidth;
-
-                context.moveTo(contextDrawBox.o_x + radius, contextDrawBox.o_y);
-                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y);
-                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y, contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + radius);
-                context.lineTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height - radius);
-                context.quadraticCurveTo(contextDrawBox.o_x + contextDrawBox.o_width, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x + contextDrawBox.o_width - radius, contextDrawBox.o_y + contextDrawBox.o_height);
-                context.lineTo(contextDrawBox.o_x + radius, contextDrawBox.o_y + contextDrawBox.o_height);
-                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height, contextDrawBox.o_x, contextDrawBox.o_y + contextDrawBox.o_height - radius);
-                context.lineTo(contextDrawBox.o_x, contextDrawBox.o_y + radius);
-                context.quadraticCurveTo(contextDrawBox.o_x, contextDrawBox.o_y, contextDrawBox.o_x + radius, contextDrawBox.o_y);
-            },
-
-            drawLine: function(context, box) {
-                this.drawAlpha(context, 'line');
-                if (context.strokeStyle != this.lineColor) context.strokeStyle = this.lineColor;
-                if (context.lineWidth != this.lineWidth) context.lineWidth = this.lineWidth;
-                context.stroke();
-            },
-
-            drawFill: function(context, box) {
-                this.drawAlpha(context, 'fill');
-                if (context.fillStyle != this.fillColor) context.fillStyle = this.fillColor;
-                context.fill();
+                context.moveTo(this._box.path.x + radius, this._box.path.y);
+                context.lineTo(this._box.path.x + this._box.path.width - radius, this._box.path.y);
+                context.quadraticCurveTo(this._box.path.x + this._box.path.width, this._box.path.y, this._box.path.x + this._box.path.width, this._box.path.y + radius);
+                context.lineTo(this._box.path.x + this._box.path.width, this._box.path.y + this._box.path.height - radius);
+                context.quadraticCurveTo(this._box.path.x + this._box.path.width, this._box.path.y + this._box.path.height, this._box.path.x + this._box.path.width - radius, this._box.path.y + this._box.path.height);
+                context.lineTo(this._box.path.x + radius, this._box.path.y + this._box.path.height);
+                context.quadraticCurveTo(this._box.path.x, this._box.path.y + this._box.path.height, this._box.path.x, this._box.path.y + this._box.path.height - radius);
+                context.lineTo(this._box.path.x, this._box.path.y + radius);
+                context.quadraticCurveTo(this._box.path.x, this._box.path.y, this._box.path.x + radius, this._box.path.y);
             },
 
         });
@@ -6010,52 +6394,13 @@
             },
         });
 
-        yespix.define('sprite', 'image', {
-
-            spriteWidth: 32,
-            spriteHeight: 32,
-
-            getSpriteCount: function(imageIndex) {
-                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
-                var cols = Math.floor(this.images[imageIndex].realWidth / this.spriteWidth);
-                var rows = Math.floor(this.images[imageIndex].realHeight / this.spriteHeight);
-                return cols * rows;
-            },
-
-            getSpriteImage: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return this.images[t];
-                    globalIndex = globalIndex - count;
-                }
-                return false;
-            },
-
-            getSpriteImageIndex: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return globalIndex;
-                    globalIndex = globalIndex - count;
-                }
-                //        console.log('getSpriteImage :: not found');
-                return false;
-            }
-
-        });
-
         yespix.define('text', 'gfx', {
             textAlign: 'left', // "left" / "right" / "center"
             textFont: 'sans-serif',
             textSize: 16,
             textColor: '#000000',
             text: '',
-            prerender: true,
+            prerender: false,
 
             init: function() {
                 // change pre-render on change these properties
@@ -6069,80 +6414,46 @@
              * Draw pre-render for text, change y position on canvas context
              */
             prerenderUse: function(context) {
-                var box = this.getDrawBox(false, context);
-                if (this.snapToPixel) {
-                    box.x = parseInt(box.x);
-                    box.y = parseInt(box.y);
-                }
 
                 // check if image outside canvas
-                if (box.x > context.canvas.clientWidth || box.y > context.canvas.clientHeight || box.x + box.width < 0 || box.y + box.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return;
 
-                var contextDrawBox = this.getContextDrawBox(context, {
-                    realWidth: box.width,
-                    realHeight: box.height
-                }, box);
+                this.getContextBox(context, this.prerenderCanvas);
 
-                //console.log('text.prerenderUse :: drawBox = ');
-                //console.log(box);
-
-                //console.log('text.prerenderUse :: contextDrawBox = ');
-                //console.log(contextDrawBox);
-
-                // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0 || contextDrawBox.img_height == 0 || contextDrawBox.context_width == 0 || contextDrawBox.context_height == 0)
-                    return;
+                if (this._box.context.width <= 0 || this._box.context.height <= 0)
+                    return false;
 
                 context.globalAlpha = this.alpha;
 
-                //console.log('text.prerenderUse :: prerenderCanvas = ');
-                //console.log(this.prerenderCanvas);
-
-                //console.log('text.prerenderUse :: context = ');
-                //console.log(context);
-                /*console.log(this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y + box.height, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height);*/
-
-                context.drawImage(
-                    this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height // height on canvas
+                context.drawImage(this.prerenderCanvas, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
                 );
                 return true;
             },
 
 
-            getDrawBox: function(relative, context) {
-                var position = this.getPosition(relative);
-                if (!context) {
-                    if (this.prerender) context = this.prerenderCanvas.context;
-                    else context = this.getContext();
-                }
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
 
-                if (!context) {
+                this._context = this._context || yespix.context || this.document.createElement('canvas');
+
+                if (!this._context) {
                     return {
                         x: position.x,
                         y: position.y,
                         width: 0,
-                        height: 0,
-                        type: this._class
+                        height: 0
                     };
                 }
-                var size = context.measureText(this.text);
+                var size = this._context.measureText(this.text);
                 var height = Math.ceil(yespix.getFontHeight(this.font));
                 var width = Math.ceil(size.width);
 
@@ -6150,17 +6461,16 @@
                     x: position.x,
                     y: position.y,
                     width: width * 2,
-                    height: height * 2,
-                    type: this._class
+                    height: height * 2
                 };
             },
 
 
-            drawRender: function(context, contextDrawBox) {
+            drawRender: function(context) {
                 context.globalAlpha = this.alpha;
                 context.fillStyle = this.textColor;
                 context.font = this.textSize + 'px ' + this.textFont;
-                context.fillText(this.text, contextDrawBox.o_x, contextDrawBox.o_y + this.textSize);
+                context.fillText(this.text, this._box.draw.x, this._box.draw.y + this.textSize);
             }
 
         });

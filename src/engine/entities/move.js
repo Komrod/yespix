@@ -61,24 +61,6 @@ yespix.define('move', {
         });
     },
 
-    /*
-    moveChildren: function(deltaX, deltaY) {
-        var count = 0;
-        if (this._children) count = this._children.length;
-        if (!this._children || this._children.length == 0) return false;
-
-        var t = 0,
-            length = this._children.length;
-
-        for (; t < length; t++) {
-            if (this._children[t].isActive) {
-                if (yespix.key('a')) console.log('moveChildren :: move children t=' + t + ', name=' + this._children[t].name);
-                this._children[t].x += deltaX;
-                this._children[t].y += deltaY;
-            }
-        }
-    },
-    */
     applyGravity: function() {
         if (!yespix.gravity) return false;
         if (!this.isOnGround && yespix.gravity) {

@@ -1,183 +1,160 @@
 
 yespix.define('path', 'gfx', {
 
-    lineWidth: 0,
-    lineColor: '',
+    lineWidth: 1,
+    lineColor: '#000000',
     lineAlpha: 1.0,
 
-    fillColor: '',
+    fillColor: '#ffffff',
     fillAlpha: 1.0,
 
     isVisible: true,
+
+    prerender: false,
+
 
     init: function() {
 
     },
 
-    getDrawBox: function(relative) {
-        var position = this.getPosition(relative);
+
+    /**
+     * Get the position and width in an object. In this object, it will be added later some other coordinates (path, context ...)
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {_type: "class", draw: {x, y, width, height}}
+     */
+    getBox: function(absolute) {
+        this._box = {
+            type: this._class
+        };
+        this._box.draw = this.getDrawBox(absolute);
+        this._box.path = this.getPathBox();
+        return this._box;
+    },
+
+    /**
+     * Get the draw box with absolute position or relative to the parent entity
+     * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+     * @return {object} Result {x, y, width, height}
+     */
+    getDrawBox: function(absolute) {
+        var position = this.getPosition(absolute);
 
         return {
             x: position.x,
             y: position.y,
             width: this.width + this.lineWidth,
             height: this.height + this.lineWidth,
-            type: this._class
         };
     },
 
-    getContextDrawBoxDefault: function(context, img, box) {
-        
+    getPathBox: function() {
         return {
-            img_x: 0,
-            img_y: 0,
-            img_width: img.realWidth,
-            img_height: img.realHeight,
-            context_x: box.x,
-            context_y: box.y,
-            context_width: box.width,
-            context_height: box.height,
-            o_x: box.x + this.lineWidth / 2,
-            o_y: box.y + this.lineWidth / 2,
-            o_width: box.width,
-            o_height: box.height
+            x: this._box.draw.x + this.lineWidth / 2,
+            y: this._box.draw.y + this.lineWidth / 2,
+            width: this.width,
+            height: this.height
         };
     },
 
-    canDraw: function(context, contextDrawBox) {
-        if (contextDrawBox.o_x > context.canvas.clientWidth 
-            || contextDrawBox.o_y > context.canvas.clientHeight 
-            || contextDrawBox.o_x + contextDrawBox.o_width < 0
-            || contextDrawBox.o_y + contextDrawBox.o_height < 0)
-            return false;
-        
-        return this.isVisible && this.alpha > 0;
-    },
-
-    canDrawPath: function(context, contextDrawBox) {
+    canDrawPath: function(context) {
         return true;
     },
 
-    drawPath: function(context, contextDrawBox) {
+    drawPath: function(context) {
         context.beginPath();
     },
 
-    canDrawLine: function(context, contextDrawBox) {
+    canDrawLine: function(context) {
         return this.lineWidth > 0 && this.lineColor != '' && this.lineAlpha > 0;
     },
 
-    drawLine: function(context, contextDrawBox) {
+    drawLine: function(context) {
         this.drawAlpha(context, 'line');
         context.lineWidth = this.lineWidth;
         context.strokeStyle = this.lineColor;
         context.stroke();
     },
 
-    canDrawFill: function(context, contextDrawBox) {
+    canDrawFill: function(context) {
         return this.fillColor != '' && this.fillAlpha > 0;
     },
 
-    drawFill: function(context, contextDrawBox) {
+    drawFill: function(context) {
         this.drawAlpha(context, 'fill');
         context.fillStyle = this.fillColor;
         context.fill();
     },
 
-    drawRender: function(context, contextDrawBox, img) {
-        //console.log('path.drawRender :: contextDrawBox = ');
-        //console.log(contextDrawBox);
-
-        if (this.canDrawPath(context, contextDrawBox))
+    drawRender: function(context) {
+        if (this.canDrawPath(context))
         {
-            this.drawPath(context, contextDrawBox);
-            if (this.canDrawFill(context, contextDrawBox)) this.drawFill(context, contextDrawBox);
-            if (this.canDrawLine(context, contextDrawBox)) this.drawLine(context, contextDrawBox);
+            this.drawPath(context);
+            if (this.canDrawFill(context)) this.drawFill(context);
+            if (this.canDrawLine(context)) this.drawLine(context);
         }
     },
+
 
     /**
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        var drawBox = this.getDrawBox(false, this._context);
+        this.getBox(this.prerenderCanvas.context);
 
-        //console.log('path.prerenderUpdate :: drawBox = ');
-        //console.log(drawBox);
-
-        this.prerenderCanvas.width = drawBox.width;
-        this.prerenderCanvas.height = drawBox.height;
-
-        //this.prerenderCanvas.context.fillStyle = '#FF0000';
-        //this.prerenderCanvas.context.fillRect(0, 0, 200, 200);
-
-        //console.log('path.prerenderUpdate :: this.prerenderCanvas = ');
-        //console.log(this.prerenderCanvas);
-
-        var contextDrawBox = {
-            img_x: 0,
-            img_y: 0,
-            img_width: drawBox.width,
-            img_height: drawBox.height,
-            context_x: 0,
-            context_y: 0,
-            context_width: drawBox.width,
-            context_height: drawBox.height,
-            o_x: this.lineWidth / 2,
-            o_y: this.lineWidth / 2,
-            o_width: drawBox.width,
-            o_height: drawBox.height
-            };
-
-        //console.log('path.prerenderUpdate :: contextDrawBox = ');
-        //console.log(contextDrawBox);
+        // save original coordinates
+        var drawX = this._box.draw.x,
+            drawY = this._box.draw.y,
+            pathX = this._box.path.x,
+            pathY = this._box.path.y;
         
-        this.drawRender(this.prerenderCanvas.context, contextDrawBox);
+        this._box.draw.x = 0;
+        this._box.draw.y = 0;
+        this._box.path.x = this.lineWidth / 2;
+        this._box.path.y = this.lineWidth / 2;
+
+        this.prerenderCanvas.width = this._box.draw.width;
+        this.prerenderCanvas.height = this._box.draw.height;
+
+        this.drawRender(this.prerenderCanvas.context);
+
+        // set original coordinates
+        this._box.draw.x = drawX;
+        this._box.draw.y = drawY;
+        this._box.path.x = pathX;
+        this._box.path.y = pathY;
     },
 
     /**
      * Draw the pre-render on a canvas context
      */
     prerenderUse: function(context) {
-        var box = this.getDrawBox(false, context);
-        
-        //console.log('prerenderUse :: drawBox = ');
-        //console.log(box);
-
-        if (this.snapToPixel) {
-            box.x = parseInt(box.x);
-            box.y = parseInt(box.y);
-        }
 
         // check if image outside canvas
-        if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight 
-            || box.x + box.width < 0
-            || box.y + box.height < 0)
+        if (this._box.draw.x > context.canvas.clientWidth 
+            || this._box.draw.y > context.canvas.clientHeight 
+            || this._box.draw.x + this._box.draw.width < 0
+            || this._box.draw.y + this._box.draw.height < 0)
             return false;
 
-        var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
+        if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
         // check if the contextDrawBox is flat
-        if (contextDrawBox.img_width == 0
-            || contextDrawBox.img_height == 0
-            || contextDrawBox.context_width == 0
-            || contextDrawBox.context_height == 0)
+        if (this._box.context.width <= 0
+            || this._box.context.height <= 0)
             return false;
 
         context.globalAlpha = this.alpha;
         
-        /*console.log('prerenderUse :: contextDrawBox = ');
-        console.log(contextDrawBox);*/
-
         context.drawImage(this.prerenderCanvas, //image element
-            contextDrawBox.img_x, // x position on image
-            contextDrawBox.img_y, // y position on image
-            contextDrawBox.img_width, // width on image
-            contextDrawBox.img_height, // height on image
-            contextDrawBox.context_x, // x position on canvas
-            contextDrawBox.context_y, // y position on canvas
-            contextDrawBox.context_width, // width on canvas
-            contextDrawBox.context_height // height on canvas
+            this._box.img.x, // x position on image
+            this._box.img.y, // y position on image
+            this._box.img.width, // width on image
+            this._box.img.height, // height on image
+            this._box.context.x, // x position on canvas
+            this._box.context.y, // y position on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
         );
         return true;
     },
