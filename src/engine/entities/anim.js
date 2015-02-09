@@ -240,6 +240,7 @@ yespix.define('anim', 'image', {
 
     animStep: function() {
         if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
+        if (this.anims[this.animSelected].frames.length <= 1) return;
 
         var animEnded = false;
         var now = +new Date();
@@ -278,7 +279,7 @@ yespix.define('anim', 'image', {
         animName = animName || this.animSelected;
         if (!this.anims[animName]) return false;
         frameIndex = frameIndex || this.animFrame;
-        if (!this.anims[animName].frames[frameIndex]) return false;
+        if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
         return this.anims[animName].frames[frameIndex];
     },
 
@@ -287,7 +288,7 @@ yespix.define('anim', 'image', {
      * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
      * @return {object} Result {x, y, width, height}
      */
-     /*
+     
     getDrawBox: function(absolute) {
         var position = this.getPosition(absolute);
         var frame = this.getFrame();
@@ -299,7 +300,21 @@ yespix.define('anim', 'image', {
             height: frame.height * this.imageScale,
         };
     },
-*/
+
+
+    getImageBoxDefault: function(imageBox) {
+        var frame = this.getFrame();
+        box = {
+            x: 0,
+            y: 0,
+            width: frame.width * this.imageScale,
+            height: frame.height * this.imageScale
+        }
+        if (imageBox.x) box.x = imageBox.x;
+        if (imageBox.y) box.y = imageBox.y;
+        return box;
+    },
+
 
     /**
      * Try to draw the gfx entity on a canvas
@@ -309,6 +324,8 @@ yespix.define('anim', 'image', {
         
         this.animStep();
 
+        this.call('gfx', 'draw', [context]);
+        /*
         // get the context
         context = context || yespix.context;
         
@@ -344,6 +361,7 @@ yespix.define('anim', 'image', {
 
         // exit
         return this.drawExit(true);
+        */
     },
 
     /**
@@ -363,8 +381,6 @@ yespix.define('anim', 'image', {
             return false;
 
         var frame = this.getFrame();
-        console.log('anim.canDraw : frame = ');
-        console.log(frame);
 
         if (!frame
             || !frame.image
@@ -397,9 +413,6 @@ yespix.define('anim', 'image', {
         this.getContextBox(context, frame);
         
         context.globalAlpha = this.alpha;
-
-        console.log('anim.drawRender : box = ');
-        console.log(this._box);
 
         context.drawImage(img.element, //image element
             this._box.img.x, // x position on image

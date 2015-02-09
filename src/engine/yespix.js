@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-07 */
+/*! yespix - v0.1.0 - 2015-02-09 */
 (function(undefined) {
 
     /**
@@ -940,60 +940,66 @@
     };
 
     /**
-     * Call some entity class functions of ancestors in the context of an entity object. e.g.
+     * Call some entity functions of some classes in the context of an entity object. e.g.
      * @trigger call
      * @param {object} entity Entity instance
      * @param {string|function} fn Function name in a string or function reference to call // @todo
-     * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity ancestors as classes list
+     * @param {string} classes List of entity classes in a string and separated with ",". By default, the function use the entity classes as classes list
      * @param {array} params Parameters of the function call
      * @return {array} Array of objects that gives the detailed results of each function
-     * @example call(entity, 'test') // call "test" function on every ancestors of the entity
-     * @example call(entity, 'test', [1,2,3]) // call "test" function on every ancestors of the entity with parameters 1, 2 and 3
-     * @example call(entity, 'test', 'a, b, c') // call "test" function on ancestors "a", "b" and "c"
-     * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on ancestors "a" and "b" with parameters 1 and 2
+     * @example call(entity, 'test') // call "test" function on every classes of the entity
+     * @example call(entity, 'test', [1,2,3]) // call "test" function on every classes of the entity with parameters 1, 2 and 3
+     * @example call(entity, 'test', 'a, b, c') // call "test" function on classes "a", "b" and "c"
+     * @example call(entity, 'test', 'a, b', [1, 2]) // call "test" function on classes "a" and "b" with parameters 1 and 2
      */
-    yespix.fn.call = function(entity, fn, ancestors, params) {
+    yespix.fn.call = function(entity, fn, classes, params) {
 
+        //console.log('yespix.call');
         if (!this.isDefined(entity._class)) return null;
-        if (this.isString(ancestors)) ancestors = ancestors.split(',');
-        else if (ancestors && !params) {
-            params = ancestors;
-            ancestors = [];
+        if (this.isString(classes)) classes = classes.split(',');
+        else if (classes && !params) {
+            params = classes;
+            classes = [];
         }
         params = params || [];
-        ancestors = ancestors || [];
+        classes = classes || [];
 
-        if (ancestors.length > 0 && !this.hasAncestors(entity._class, ancestors)) return null;
-        else if (ancestors.length == 0) ancestors = this.entityClasses[entity._class].ancestors;
+        //console.log('classes = ');
+        //console.log(classes);
+        //console.log('has classes = '+this.hasAncestors(entity._class, classes));
+
+        //if (classes.length > 0 && !this.hasAncestors(entity._class, classes)) return null;
+        //else 
+        if (classes.length == 0) classes = this.entityClasses[entity._class].ancestors;
 
         var result = [];
-        for (var t = 0; t < ancestors.length; t++) {
-            if (this.entityClasses[ancestors[t]] && this.entityClasses[ancestors[t]].properties[fn] && this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) {
+        for (var t = 0; t < classes.length; t++) {
+            if (this.entityClasses[classes[t]] && this.entityClasses[classes[t]].properties[fn] && this.isFunction(this.entityClasses[classes[t]].properties[fn])) {
                 result.push({
-                    name: ancestors[t],
+                    name: classes[t],
                     status: 'called',
-                    result: this.entityClasses[ancestors[t]].properties[fn].apply(entity, params),
+                    result: this.entityClasses[classes[t]].properties[fn].apply(entity, params),
                     error: '',
                 });
             } else {
                 var err = '';
-                if (!this.entityClasses[ancestors[t]]) err = 'Ancestor entity "' + ancestors[t] + '" does not seem to be defined';
-                else if (!this.entityClasses[ancestors[t]].properties[fn]) err = 'Ancestor entity "' + ancestors[t] + '" have no "' + fn + '" function';
-                else if (!this.isFunction(this.entityClasses[ancestors[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in ancestor entity "' + ancestors[n] + '"';
+                if (!this.entityClasses[classes[t]]) err = 'Class "' + classes[t] + '" does not seem to be defined';
+                else if (!this.entityClasses[classes[t]].properties[fn]) err = 'Class "' + classes[t] + '" have no "' + fn + '" function';
+                else if (!this.isFunction(this.entityClasses[classes[t]].properties[fn])) err = 'Property "' + fn + '" is not a function in class "' + classes[n] + '"';
                 else err = 'Unknown error';
                 result.push({
-                    name: ancestors[t],
+                    name: classes[t],
                     status: 'error',
                     result: null,
                     error: err,
                 });
             }
         }
-
+        //console.log('result = '); console.log(result);
         this.trigger('call', {
             entity: entity,
             fn: fn,
-            ancestors: ancestors,
+            classes: classes,
             params: params,
             result: result
         });
@@ -3103,8 +3109,17 @@
 
                 yespix.instanceRemove(this);
                 return this;
-            }
+            },
 
+            call: function(className, fn, params) {
+                if (!yespix.entityClasses[className]) return console.error('entity.call: class "' + className + '" does not exist');
+                if (!yespix.entityClasses[className].properties[fn]) return console.error('entity.call: function "' + fn + '" does not exist in class "' + className + '"');
+                if (!yespix.isFunction(yespix.entityClasses[className].properties[fn])) return console.error('entity.call: property "' + fn + '" is not a function in class "' + className + '"');
+
+                return yespix.entityClasses[className].properties[fn].apply(this, params)
+                    //return yespix.call(this, fn, ancestor, params);
+                    //yespix.fn.call = function(entity, fn, ancestors, params)				
+            }
         });
         yespix.entityRootClassname = 'base';
 
@@ -3519,6 +3534,7 @@
 
             animStep: function() {
                 if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
+                if (this.anims[this.animSelected].frames.length <= 1) return;
 
                 var animEnded = false;
                 var now = +new Date();
@@ -3557,7 +3573,7 @@
                 animName = animName || this.animSelected;
                 if (!this.anims[animName]) return false;
                 frameIndex = frameIndex || this.animFrame;
-                if (!this.anims[animName].frames[frameIndex]) return false;
+                if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
                 return this.anims[animName].frames[frameIndex];
             },
 
@@ -3566,19 +3582,33 @@
              * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
              * @return {object} Result {x, y, width, height}
              */
-            /*
-    getDrawBox: function(absolute) {
-        var position = this.getPosition(absolute);
-        var frame = this.getFrame();
 
-        return {
-            x: position.x,
-            y: position.y,
-            width: frame.width * this.imageScale,
-            height: frame.height * this.imageScale,
-        };
-    },
-*/
+            getDrawBox: function(absolute) {
+                var position = this.getPosition(absolute);
+                var frame = this.getFrame();
+
+                return {
+                    x: position.x,
+                    y: position.y,
+                    width: frame.width * this.imageScale,
+                    height: frame.height * this.imageScale,
+                };
+            },
+
+
+            getImageBoxDefault: function(imageBox) {
+                var frame = this.getFrame();
+                box = {
+                    x: 0,
+                    y: 0,
+                    width: frame.width * this.imageScale,
+                    height: frame.height * this.imageScale
+                }
+                if (imageBox.x) box.x = imageBox.x;
+                if (imageBox.y) box.y = imageBox.y;
+                return box;
+            },
+
 
             /**
              * Try to draw the gfx entity on a canvas
@@ -3588,9 +3618,11 @@
 
                 this.animStep();
 
+                this.call('gfx', 'draw', [context]);
+                /*
                 // get the context
                 context = context || yespix.context;
-
+        
                 // if cannot draw, exit now
                 if (!this.canDraw(context)) return this.drawExit(false);
 
@@ -3623,6 +3655,7 @@
 
                 // exit
                 return this.drawExit(true);
+                */
             },
 
             /**
@@ -3639,8 +3672,6 @@
                     return false;
 
                 var frame = this.getFrame();
-                console.log('anim.canDraw : frame = ');
-                console.log(frame);
 
                 if (!frame || !frame.image || !frame.image.element || !frame.image.isReady)
                     return false;
@@ -3667,9 +3698,6 @@
                 this.getContextBox(context, frame);
 
                 context.globalAlpha = this.alpha;
-
-                console.log('anim.drawRender : box = ');
-                console.log(this._box);
 
                 context.drawImage(img.element, //image element
                     this._box.img.x, // x position on image
@@ -4419,14 +4447,10 @@
                 // check if the whole draw box is inside canvas, as here it cant be entirely outside canvas
                 if (this._box.draw.x >= 0 && this._box.draw.x + this._box.draw.width < context.canvas.clientWidth && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight) {
                     // flip horizontally
-                    if (this.flipX) {
-                        this._box.context.x = -this._box.context.x - this._box.context.width;
-                    }
+                    if (this.flipX || imageBox.flipX) this._box.context.x = -this._box.context.x - this._box.context.width;
 
                     // flip vertically
-                    if (this.flipY) {
-                        this._box.context.y = -this._box.context.y - this._box.context.height;
-                    }
+                    if (this.flipY || imageBox.flipY) this._box.context.y = -this._box.context.y - this._box.context.height;
 
                     return this._box.context;
                 }
@@ -4855,19 +4879,18 @@
                 image.element = document.createElement('img');
 
                 if (image.element) image.element.onload = image.element.onLoad = function() {
-                    image.realWidth = this.width;
-                    image.realHeight = this.height;
+                    image.originalWidth = this.width;
+                    image.originalHeight = this.height;
+                    image.width = this.width * entity.imageScale;
+                    image.height = this.height * entity.imageScale;
 
                     if (entity.imageScale != 1) {
                         image.element = entity.resize(image.element, entity.imageScale);
-                        image.width = this.width * entity.imageScale;
-                        image.height = this.height * entity.imageScale;
                     }
-                    console.log('imageInit : ' + image.entity.imageSelected + ' == ' + image.index);
                     if (image.entity.imageSelected == image.index) {
                         if (!image.entity.imageLockSize) {
-                            image.entity.width = this.width * entity.imageScale;
-                            image.entity.height = this.height * entity.imageScale;
+                            image.entity.width = image.width;
+                            image.entity.height = image.height;
                         }
                     }
 
@@ -5072,7 +5095,7 @@
                 }
 
                 spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
-                var max = Math.floor(image.realWidth / this.level.levelData.tilewidth);
+                var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
                 var line = Math.floor(spriteIndex / max);
                 var col = spriteIndex - (line * max);
                 this.drawContext.drawImage(image.element, //image element

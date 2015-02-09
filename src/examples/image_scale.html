@@ -6,8 +6,10 @@
 <body style="background-color: #456;">
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: {width: 600, height: 600}, fps: 1});
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
     
+    yp.spawn('fps');
+
     for (var t= 1; t<=10; t++) {
         yp.spawn('image', {
             x: 25, 

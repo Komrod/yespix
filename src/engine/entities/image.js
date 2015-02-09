@@ -200,19 +200,18 @@ yespix.define('image', 'gfx', {
         image.element = document.createElement('img');
 
         if (image.element) image.element.onload = image.element.onLoad = function() {
-            image.realWidth = this.width;
-            image.realHeight = this.height;
+            image.originalWidth = this.width;
+            image.originalHeight = this.height;
+            image.width = this.width * entity.imageScale;
+            image.height = this.height * entity.imageScale;
 
             if (entity.imageScale != 1) {
                 image.element = entity.resize(image.element, entity.imageScale);
-                image.width = this.width * entity.imageScale;
-                image.height = this.height * entity.imageScale;
             }
-            console.log('imageInit : '+image.entity.imageSelected+' == '+image.index);
             if (image.entity.imageSelected == image.index) {
                 if (!image.entity.imageLockSize) {
-                    image.entity.width = this.width * entity.imageScale;
-                    image.entity.height = this.height * entity.imageScale;
+                    image.entity.width = image.width;
+                    image.entity.height = image.height;
                 }
             }
 
@@ -321,7 +320,7 @@ yespix.define('image', 'gfx', {
         var img = this.image(this.imageSelected);
 
         this.getContextBox(context, img);
-
+        
         if (this._box.img.width == 0
             || this._box.img.height == 0)
             return;

@@ -305,14 +305,10 @@ yespix.define('gfx', {
             && this._box.draw.y >= 0 && this._box.draw.y + this._box.draw.height < context.canvas.clientHeight )
         {
             // flip horizontally
-            if (this.flipX) {
-                this._box.context.x = -this._box.context.x - this._box.context.width;
-            }
+            if (this.flipX || imageBox.flipX) this._box.context.x = -this._box.context.x - this._box.context.width;
 
             // flip vertically
-            if (this.flipY) {
-                this._box.context.y = -this._box.context.y - this._box.context.height;
-            }
+            if (this.flipY || imageBox.flipY) this._box.context.y = -this._box.context.y - this._box.context.height;
 
             return this._box.context;
         }

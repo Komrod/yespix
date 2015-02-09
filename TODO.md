@@ -1,10 +1,11 @@
 
 TODO list:
 - all draw box, path box, context box ... must be stored in an object inside entity (_box)
+- do not update draw box when the entity is not changed
 - use clearRect to clear faster the canvas
 - Z sort function only sort the changed entities
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
-- center draw path
+- center position with positionAlign ("center left", "top right" ...)
 - path object drawbox must contains line
 - examples and build folders in the root project
 - fps yoyo after pre-render optimization

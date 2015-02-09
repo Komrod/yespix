@@ -6,12 +6,12 @@
 <body style="background-color: #456;">
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: {width: 600, height: 600}, fps: 1});
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
     
     yp.spawn('fps');
-
-	yp.spawn('anim', {
-        x: 100, 
+    
+    yp.spawn('anim', {
+        x: 50, 
         y: 100,
         images: 'chuck/player.png',
         animDefault:
@@ -24,10 +24,81 @@
         anims: {
             'walk': {
                 from: 24,
-                length: 8,
+                length: 8
+            },
+        },
+        imageScale: 1,
+        debug: true
+    });
+    
+    yp.spawn('anim', {
+        x: 100, 
+        y: 100,
+        images: 'chuck/player.png',
+        animDefault:
+        {
+            width: 32,      
+            height: 40,
+            name: 'idle',
+            duration: 100,
+        },
+        anims: {
+            'idle': {
+                length: 7
             },
         },
         imageScale: 2,
+        debug: true
+    });
+    
+    yp.spawn('anim', {
+        x: 200, 
+        y: 100,
+        images: 'chuck/player.png',
+        animDefault:
+        {
+            width: 32,
+            height: 40,
+            name: 'punchleft',
+            duration: 100,
+        },
+        anims: {
+            'punchright': {
+                from: 8,
+                length: 5
+            },
+            'punchleft': {
+                extendsFrom: 'punchright',
+                flipX: true
+            },
+        },
+        imageScale: 3,
+        debug: true
+    });
+    
+    yp.spawn('anim', {
+        x: 300, 
+        y: 100,
+        images: 'chuck/player.png',
+        animDefault:
+        {
+            width: 32,
+            height: 40,
+            name: 'punchleft',
+            duration: 100,
+        },
+        anims: {
+            'punchright': {
+                from: 8,
+                length: 5
+            },
+            'punchleft': {
+                extendsFrom: 'punchright',
+                flipX: true,
+                flipY: true
+            },
+        },
+        imageScale: 3,
         debug: true
     });
     
