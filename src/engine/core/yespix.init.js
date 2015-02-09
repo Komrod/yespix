@@ -44,6 +44,11 @@ yespix.fn.init = function(options) {
     // initialise the data
     this.data = {
 
+        // font height
+        fontHeight: {
+
+        },
+
         // collision map of the entities
         collisionMap: {
 
@@ -294,15 +299,9 @@ yespix.fn.init = function(options) {
     start(options);
 
 
-
+    
     // init functions for input keys 
     yespix.on('exitFrame', function(e) {
-        // delete old keypressed
-        /*
-				if (this.data.key.pressed && this.data.key.pressed.old) delete this.data.key.pressed.old;
-				if (this.data.key.up && this.data.key.up.old) delete this.data.key.up.old;
-				if (this.data.key.down && this.data.key.down.old) delete this.data.key.down.old;
-				*/
         // save current keypressed as old keypressed and delete current keypressed
         this.data.key.pressed = {
             //	old: this.data.key.pressed
@@ -405,7 +404,7 @@ yespix.fn.init = function(options) {
         // triggers on YESPIX engine
         yespix.trigger(e.type, e);
     };
-
+    
 
 
 

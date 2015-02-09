@@ -6,9 +6,10 @@
 <body style="background-color: #456;">
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: true, fps: 60});
+	var yp = yespix({canvas: {width: 600, height: 400}, fps: 60});
     
-	
+	yp.spawn('fps');
+
     yp.spawn('rect',
             {
                 x: 50,
@@ -102,7 +103,6 @@
                 fillColor: '#19D1FF',
             });
     
-    
     yp.spawn('image',
             {
                 x: 200,
@@ -140,8 +140,17 @@
                     },
                 }
             });
-
     
+    for (var t=0; t<600; t=t+1) {
+        yp.spawn('image',
+                {
+                    x: t,
+                    y: 300,
+                    images: 'zardoz/image/zardoz_small.png'
+                });
+    }
+
+
     function switchDebug(name)
     {
         name = name || '';

@@ -1,15 +1,28 @@
 
 TODO list:
+- create an object draw box in the entity that merge all the render coordinates
+- put the snapToPixel inside getPosition
+- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
+- update draw box only if something change
+- use clearRect to clear faster the canvas
+- center draw path as an option for path entity
+- line in path object must not override box content
+- examples and build folders in the root project
+- fps yoyo after pre-render optimization
+- pre render gfx on text
+- fix position of followed entity in the center of entity
+- key remanence (for jump)
+- phone mode: disable keys, fullscreen
 - calculate vector from a position to another position
 - stop and resume time
-- Bug: draw debug on chuck
-- Make movement relative to time, not frame
+- bug: draw debug on chuck
+- make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
 - draw text based on image
 - typewritter: text showing letter by letter with sound
-- panel
-- button
+- container entity
+- button entity
 - disable key capture on phones
 - Separate the fall down / jump up animation of a character
 
@@ -59,6 +72,13 @@ LATER:
 
 
 DONE:
+- Make fps average use float values instead of round values
+- pre render gfx on rounded rectangle
+- pre render gfx on rectangle
+- pre render gfx on circle
+- pre render gfx on text
+- bug: invalid index on draw image
+- optimize: only call getDrawBox once per entity
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
 - create entitiesReady function to check if all entities are ready // 2014-11-07

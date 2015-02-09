@@ -7,7 +7,7 @@
 <script type="text/javascript">
 
 	
-	var yp = yespix({canvas: {width: 600, height: 600}, fps: 50});
+	var yp = yespix({canvas: {width: 600, height: 600}, fps: 30});
 	
 	yp.define('simactor', 'circle, move, collision',
 	{
@@ -203,13 +203,15 @@
 		});
 	}
 
-	for (var t=0; t<75; t++)
+	for (var t=0; t<175; t++)
 	{
 		yespix.spawn('human', {
 			x: yespix.randFloat(0,590),
 			y: yespix.randFloat(0,590)
 		});
 	}
+
+	yp.spawn('fps', {x: 10, y: 20});
 
 	//yp.find().prop({alpha: 0.1});
 
