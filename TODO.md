@@ -64,6 +64,7 @@ LATER:
 
 
 DONE:
+- bug: cant draw spawned anim after image is in cache 
 - use cache when load the same image
 - all draw box, path box, context box ... must be stored in an object inside entity (_box)
 - do not update draw box when the entity is not changed

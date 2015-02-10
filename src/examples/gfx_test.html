@@ -188,7 +188,7 @@
             });
 
     var z = 100;
-    for (var x=0; x<700; x++) {
+    /*for (var x=0; x<700; x++) {
         for (var y=300; y<302; y++) {
             z++;
             yp.spawn('anim',
@@ -227,11 +227,39 @@
                         text: "This is a text",
                         textColor: '#19D1FF',
                     });*/
-        }
-    }
+    //    }
+    //}
 
     var timer = 0;
     var moveBool = false;
+
+    setTimeout(function() {
+        console.log('spawned');
+        yp.spawn('anim',
+                {
+                    x: 50,
+                    y: 200,
+                    z: 1000,
+                    images: 'chuck/player.png',
+                    imageScale: 4,
+                    animDefault:
+                    {
+                        width: 32,
+                        height: 40,
+                        name: 'walk',
+                        duration: 150,
+                    },
+                    anims:
+                    {
+                        walk:
+                        {
+                            from: 24,
+                            length: 8,
+                        },
+                    }
+                });
+
+    }, 3000);
 
     function switchMove()
     {

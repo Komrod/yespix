@@ -3421,6 +3421,7 @@
                                 }
                             }
                         }
+
                     }
                 }
             },
@@ -3572,8 +3573,6 @@
                 if (!this.animObject || !this.animObject.frames) return;
                 if (this.animObject.frames.length <= 1) return;
 
-                //console.log('anim.animStep: id='+this._id+', animFrame = ', this.animFrame);
-                //var animEnded = false;
                 var now = +new Date();
 
                 if (!this.animTime || isNaN(this.animTime)) this.animTime = now;
@@ -4964,13 +4963,12 @@
                         if (nextImage) image = nextImage;
                         image.originalWidth = this.width;
                         image.originalHeight = this.height;
-                        image.width = this.width * image.entity.imageScale;
-                        image.height = this.height * image.entity.imageScale;
-
+                        image.width = image.element.width * image.entity.imageScale;
+                        image.height = image.element.height * image.entity.imageScale;
                         if (image.entity.imageScale != 1) {
                             var newElement = yespix.getCache('img:' + image.src + ':' + image.entity.imageScale);
                             if (!newElement) {
-                                image.element = entity.resize(image.element, image.entity.imageScale);
+                                image.element = image.entity.resize(image.element, image.entity.imageScale);
                                 yespix.setCache('img:' + image.src + ':' + image.entity.imageScale, image.element);
                             } else {
                                 image.element = newElement;
@@ -4984,6 +4982,7 @@
                             }
                         }
 
+                        image.element.isReady = true;
                         image.isReady = true;
 
                         image.entity.trigger('imageReady', {
@@ -5003,7 +5002,7 @@
                         image.changeSource(image.src);
                     }
                 } else {
-                    if (image.isReady) {
+                    if (image.element.isReady) {
                         image.element.onload.apply(this, [null, image]);
                     } else {
                         var cache = yespix.getCache('img:' + image.src + ':1:list');

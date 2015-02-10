@@ -222,13 +222,12 @@ yespix.define('image', 'gfx', {
                 if (nextImage) image = nextImage;
                 image.originalWidth = this.width;
                 image.originalHeight = this.height;
-                image.width = this.width * image.entity.imageScale;
-                image.height = this.height * image.entity.imageScale;
-
+                image.width = image.element.width * image.entity.imageScale;
+                image.height = image.element.height * image.entity.imageScale;
                 if (image.entity.imageScale != 1) {
                     var newElement = yespix.getCache('img:'+image.src+':'+image.entity.imageScale);
                     if (!newElement) {
-                        image.element = entity.resize(image.element, image.entity.imageScale);
+                        image.element = image.entity.resize(image.element, image.entity.imageScale);
                         yespix.setCache('img:'+image.src+':'+image.entity.imageScale, image.element);
                     } else {
                         image.element = newElement;
@@ -242,6 +241,7 @@ yespix.define('image', 'gfx', {
                     }
                 }
 
+                image.element.isReady = true;
                 image.isReady = true;
 
                 image.entity.trigger('imageReady', {
@@ -262,7 +262,7 @@ yespix.define('image', 'gfx', {
             }
         }
         else {
-            if (image.isReady) {
+            if (image.element.isReady) {
                 image.element.onload.apply(this, [null, image]);
             } else {
                 var cache = yespix.getCache('img:'+image.src+':1:list');

@@ -116,6 +116,7 @@ yespix.define('anim', 'image', {
                         }
                     }
                 }
+
             }
         }
     },
@@ -267,8 +268,6 @@ yespix.define('anim', 'image', {
         if (!this.animObject || !this.animObject.frames) return;
         if (this.animObject.frames.length <= 1) return;
 
-        //console.log('anim.animStep: id='+this._id+', animFrame = ', this.animFrame);
-        //var animEnded = false;
         var now = +new Date();
 
         if (!this.animTime || isNaN(this.animTime)) this.animTime = now;
