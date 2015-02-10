@@ -43,6 +43,9 @@ yespix.fn.init = function(options) {
 
     // initialise the data
     this.data = {
+        sharedCache: {
+
+        },
 
         // font height
         fontHeight: {
