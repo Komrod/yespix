@@ -203,33 +203,8 @@ yespix.define('image', 'gfx', {
         image.isReady = false;
         image.isInitiated = true;
         image.entity = entity;
-        image.element = document.createElement('img');
 
-        if (image.element) image.element.onload = image.element.onLoad = function() {
-            image.originalWidth = this.width;
-            image.originalHeight = this.height;
-            image.width = this.width * entity.imageScale;
-            image.height = this.height * entity.imageScale;
-
-            if (entity.imageScale != 1) {
-                image.element = entity.resize(image.element, entity.imageScale);
-            }
-            if (image.entity.imageSelected == image.index) {
-                image.entity._changed = true;
-                if (!image.entity.imageLockSize) {
-                    image.entity.width = image.width;
-                    image.entity.height = image.height;
-                }
-            }
-
-            image.isReady = true;
-
-            entity.trigger('imageReady', {
-                target: image,
-            });
-
-            delete this.onload;
-        };
+        image.element = yespix.getCache('img:'+image.src+':'+this.imageScale);
 
         // add source to the image element
         image.changeSource = function(source) {
@@ -237,10 +212,62 @@ yespix.define('image', 'gfx', {
             entity.trigger('change');
             return true;
         };
+        
+        if (!image.element) {
+            //console.log('image.imageInit: cache empty');
+            image.element = document.createElement('img');
+            yespix.setCache('img:'+image.src+':'+this.imageScale, image.element);
 
-        if (image.src !== undefined && image.src !== '') {
-            image.changeSource(image.src);
+            // set the onload event for image element
+            image.element.onload = image.element.onLoad = function(e, nextImage) {
+                if (nextImage) image = nextImage;
+                //console.log('image.imageInit: image onload id='+image.entity._id+', nextImage='+nextImage);
+                image.originalWidth = this.width;
+                image.originalHeight = this.height;
+                image.width = this.width * entity.imageScale;
+                image.height = this.height * entity.imageScale;
+
+                if (entity.imageScale != 1) {
+                    image.element = entity.resize(image.element, entity.imageScale);
+                }
+                if (image.entity.imageSelected == image.index) {
+                    image.entity._changed = true;
+                    if (!image.entity.imageLockSize) {
+                        image.entity.width = image.width;
+                        image.entity.height = image.height;
+                    }
+                }
+
+                image.isReady = true;
+
+                image.entity.trigger('imageReady', {
+                    target: image,
+                });
+                
+                var list = yespix.getCache('img:'+image.src+':'+image.entity.imageScale+':list');
+                //console.log('list = '+list);
+                if (list && list.length > 0) {
+                    var nextImage = list.shift();
+                    this.onload.apply(this, [e, nextImage]);
+                }
+                
+                //delete this.onload;
+            };
+
+            if (image.src !== undefined && image.src !== '') {
+                image.changeSource(image.src);
+            }
         }
+        else {
+
+            //console.log('image.imageInit: cache loaded');
+            var cache = yespix.getCache('img:'+image.src+':'+this.imageScale+':list');
+            if (!cache) yespix.setCache('img:'+image.src+':'+this.imageScale+':list', [image]);
+            else cache.push(image);
+            //console.log('image.imageInit: count list = '+yespix.getCache('img:'+image.src+':'+this.imageScale+':list').length);
+        }
+
+
 
 
         return image; //source != '';
