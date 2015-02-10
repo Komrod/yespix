@@ -1,7 +1,5 @@
 
 TODO list:
-- all draw box, path box, context box ... must be stored in an object inside entity (_box)
-- do not update draw box when the entity is not changed
 - use clearRect to clear faster the canvas
 - Z sort function only sort the changed entities
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
@@ -66,6 +64,9 @@ LATER:
 
 
 DONE:
+- use cache when load the same image
+- all draw box, path box, context box ... must be stored in an object inside entity (_box)
+- do not update draw box when the entity is not changed
 - lock entity image size 
 - bug: size problem with entity loading multiple images // 2015-02-
 - function imageSelect to change the selected image drawn
