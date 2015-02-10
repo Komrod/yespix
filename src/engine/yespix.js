@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-09 */
+/*! yespix - v0.1.0 - 2015-02-10 */
 (function(undefined) {
 
     /**
@@ -2126,6 +2126,14 @@
         };
     }());
 
+    yespix.fn.getCache = function(name) {
+        return this.data.sharedCache[name];
+    };
+
+    yespix.fn.setCache = function(name, value) {
+        this.data.sharedCache[name] = value;
+    };
+
 
     /**
      ***********************************************************************************************************
@@ -2172,6 +2180,9 @@
 
         // initialise the data
         this.data = {
+            sharedCache: {
+
+            },
 
             // font height
             fontHeight: {
@@ -3297,22 +3308,28 @@
             animDefault: {
                 width: 32, // default tile width
                 height: 32, // default tile height
-                name: '', // default animation name to run
+                name: 'default', // default animation name to run
                 duration: 200,
             },
 
             animSelected: '',
+            animObject: false,
+
             animFrame: 0,
+            animFrameObject: false,
+
             animSpeed: 1,
-            animWait: false,
+            //animWait: false,
             animNext: '',
+
+            animTime: 0,
 
             init: function() {
                 this.animInit();
                 this.on('imageReady', function() {
                     this.animFramesInit();
                 });
-                this.animSelected = this.animDefault.name;
+                this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
             },
 
 
@@ -3335,7 +3352,6 @@
              * @return {[type]} [description]
              */
             animFramesInit: function() {
-
                 // check every animation
                 for (var name in this.anims) {
                     var anim = this.anims[name];
@@ -3357,6 +3373,7 @@
 
                         // If all the images are ready, we must complete the frame objects
                         if (ready) {
+
                             // animation is ready
                             anim.isReady = true;
 
@@ -3420,7 +3437,7 @@
                     // init the default animation
                     if (anim.isDefault) {
                         this.animDefault['name'] = name;
-                        if (!this.animSelected) this.animSelected = name;
+                        if (!this.animObject) this.animSelect(name); // if (!this.animSelected) this.animSelected = name;
                     }
 
                     if (anim.extendsFrom) {
@@ -3501,9 +3518,9 @@
 
             animPlay: function(name, speed, from) {
 
-                if (this.animWait) return;
+                //if (this.animWait) return;
                 if (!name) name = this.animDefault.name;
-                if (this.animSelected == name) return this;
+                if (this.animSelected === name) return this;
                 if (!this.anims[name]) return null;
 
                 from = from || 0;
@@ -3511,64 +3528,87 @@
                 var frame = this.anims[name].frames[from];
                 if (!frame) return null;
 
-                this.animSelected = name;
-                this.animFrame = from;
+                this.animSelect(name); // this.animSelected = name;
+                this.frameSelect(from); //this.animFrame = from;
                 this.animSpeed = speed;
                 this.animTime = +new Date() + frame.duration * speed;
 
                 this.trigger('animStart', {
                     name: this.animSelected,
-                    frame: this.animFrame
+                    anim: this.animObject,
+                    frame: this.animFrame,
+                    frameObject: this.animFrameObject
                 });
                 this.trigger('animFrame', {
                     name: this.animSelected,
-                    frame: this.animFrame
+                    anim: this.animObject,
+                    frame: this.animFrame,
+                    frameObject: this.animFrameObject
                 });
 
                 return this;
             },
+
+            animSelect: function(animName) {
+                if (this.anims[animName]) {
+                    this.animSelected = animName;
+                    this.animObject = this.anims[animName];
+                }
+            },
+
+            frameSelect: function(frameIndex) {
+                if (this.animObject && this.animObject.frames[frameIndex]) {
+                    this.animFrame = frameIndex;
+                    this.animFrameObject = this.animObject.frames[frameIndex];
+                }
+            },
+
 
             animStop: function() {
                 // @TODO
             },
 
             animStep: function() {
-                if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
-                if (this.anims[this.animSelected].frames.length <= 1) return;
+                if (!this.animObject || !this.animObject.frames) return;
+                if (this.animObject.frames.length <= 1) return;
 
-                var animEnded = false;
+                //console.log('anim.animStep: id='+this._id+', animFrame = ', this.animFrame);
+                //var animEnded = false;
                 var now = +new Date();
 
                 if (!this.animTime || isNaN(this.animTime)) this.animTime = now;
 
                 if (!this.animTime || this.animTime <= now) {
-                    this.animFrame++;
-                    this._changed = true;
-                    if (this.animFrame >= this.anims[this.animSelected].frames.length) {
-                        this.animFrame = 0;
-                        animEnded = true;
+                    if (this.animFrame + 1 === this.animObject.frames.length) {
+                        this.frameSelect(0);
+                    } else {
+                        this.frameSelect(this.animFrame + 1); // this.animFrame++;
                     }
+                    this._changed = true;
 
                     this.trigger('animFrame', {
                         name: this.animSelected,
                         frame: this.animFrame
                     });
 
-                    var frame = this.anims[this.animSelected].frames[this.animFrame];
-                    this.animTime = +new Date() + frame.duration * this.animSpeed;
-                    if (animEnded) {
+                    //var frame = this.animObject.frames[this.animFrame];
+                    this.animTime = +new Date() + this.animFrameObject.duration * this.animSpeed;
+
+                    // check if animation was restarted
+                    if (this.animFrame === 0) {
                         this.trigger('animEnd', {
                             name: this.animSelected,
                             frame: this.animFrame
                         });
-                        this.animWait = false;
-                        if (this.animNext && this.animNext != '') {
+                        //this.animWait = false;
+                        if (this.animNext && this.animNext !== '') {
                             this.animPlay(this.animNext);
                         }
                     }
                 }
             },
 
+            /*
             getFrame: function(animName, frameIndex) {
                 animName = animName || this.animSelected;
                 if (!this.anims[animName]) return false;
@@ -3576,6 +3616,7 @@
                 if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
                 return this.anims[animName].frames[frameIndex];
             },
+            */
 
             /**
              * Get the draw box with absolute position or relative to the parent entity
@@ -3585,27 +3626,27 @@
 
             getDrawBox: function(absolute) {
                 var position = this.getPosition(absolute);
-                var frame = this.getFrame();
+                //var frame = this.getFrame();
 
                 return {
                     x: position.x,
                     y: position.y,
-                    width: frame.width * this.imageScale,
-                    height: frame.height * this.imageScale,
+                    width: this.animFrameObject.width * this.imageScale,
+                    height: this.animFrameObject.height * this.imageScale,
                 };
             },
 
 
             getImageBoxDefault: function(imageBox) {
-                var frame = this.getFrame();
+                //var frame = this.getFrame();
                 box = {
-                    x: 0,
-                    y: 0,
-                    width: frame.width * this.imageScale,
-                    height: frame.height * this.imageScale
-                }
-                if (imageBox.x) box.x = imageBox.x;
-                if (imageBox.y) box.y = imageBox.y;
+                        x: (imageBox.x ? imageBox.x : 0),
+                        y: (imageBox.y ? imageBox.y : 0),
+                        width: this.animFrameObject.width * this.imageScale,
+                        height: this.animFrameObject.height * this.imageScale
+                    }
+                    //if (imageBox.x) box.x = imageBox.x;
+                    //if (imageBox.y) box.y = imageBox.y;
                 return box;
             },
 
@@ -3666,40 +3707,39 @@
                 // @TODO put this line in init
                 //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
 
-                if (!this.anims[this.animSelected]) return false;
+                if (!this.animObject) return false;
 
                 if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context)
                     return false;
 
-                var frame = this.getFrame();
+                //var frame = this.getFrame();
 
-                if (!frame || !frame.image || !frame.image.element || !frame.image.isReady)
+                if (!this.animFrameObject || !this.animFrameObject.image || !this.animFrameObject.image.element || !this.animFrameObject.image.isReady)
                     return false;
 
                 return true;
             },
 
             drawRender: function(context) {
-
                 // check if image outside canvas
                 if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
                     return;
 
-                var frame = this.getFrame();
-                var img = frame.image;
-                var scaleX = frame.flipX ? -1 : 1;
-                var scaleY = frame.flipY ? -1 : 1;
+                //var frame = this.getFrame();        
+                //var img = this.animFrameObject.image;
+                //var scaleX = this.animFrameObject.flipX ? -1 : 1;
+                //var scaleY = this.animFrameObject.flipY ? -1 : 1;
 
-                if (frame.flipX || frame.flipY) {
+                if (this.animFrameObject.flipX || this.animFrameObject.flipY) {
                     context.save();
-                    context.scale(scaleX, scaleY);
+                    context.scale((this.animFrameObject.flipX ? -1 : 1), (this.animFrameObject.flipY ? -1 : 1));
                 }
 
-                if (!this._box.context || !this._box.img) this.getContextBox(context, frame);
+                if (!this._box.context || !this._box.img) this.getContextBox(context, this.animFrameObject);
 
                 context.globalAlpha = this.alpha;
 
-                context.drawImage(img.element, //image element
+                context.drawImage(this.animFrameObject.image.element, //image element
                     this._box.img.x, // x position on image
                     this._box.img.y, // y position on image
                     this._box.img.width, // width on image
@@ -3710,7 +3750,7 @@
                     this._box.context.height // height on canvas
                 );
 
-                if (frame.flipX || frame.flipY) {
+                if (this.animFrameObject.flipX || this.animFrameObject.flipY) {
                     context.restore();
                 }
             },
@@ -4014,6 +4054,8 @@
 
             fpsData: [],
 
+            fpsOnlyStats: false,
+
             width: 124,
             height: 50,
 
@@ -4074,7 +4116,7 @@
                 if (this.fpsAverageTime > 0) {
                     this.fpsAverageFrames++;
                     this.fpsAverage += yespix.frameTime - this.fpsLastTime;
-                    if (this.fpsAverage > this.fpsAverageTime && this.fpsAverageFrames > 0) {
+                    if ((this.fpsAverage > this.fpsAverageTime) && this.fpsAverageFrames > 0) {
                         var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
                         if (this.fps > 60) fps = 60;
                         this.fpsAverage = 0;
@@ -4083,6 +4125,7 @@
                         this.fpsData.shift();
                         this.fpsData.push(fps);
                     }
+                    this.fpsMs = yespix.frameTime - this.fpsLastTime;
                     this.fpsLastTime = yespix.frameTime;
                 } else {
                     var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
@@ -4093,38 +4136,47 @@
                     this.fpsData.push(fps);
                 }
 
-                var min = max = average = 0;
+                var min = 0,
+                    max = 0,
+                    average = 0,
+                    count = 0;
+
                 for (var t = 0; t < 120; t++) {
                     if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
                     if (max < this.fpsData[t]) max = this.fpsData[t];
-                    average += this.fpsData[t];
+                    if (this.fpsData[t] > 0) {
+                        average += this.fpsData[t];
+                        count++;
+                    }
                 }
-                average = average / 120;
+                average = average / count;
 
-                context.lineWidth = this.lineWidth;
-                context.strokeStyle = this.lineColor;
-                for (var t = 0; t < 120; t++) {
-                    var scale = 0;
-                    if (max > 0) scale = (this.height - 4) / max;
-                    if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
-                    else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
-                    else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
-                    else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
-                    else context.strokeStyle = this.fpsColors[4];
+                if (!this.fpsOnlyStats) {
+                    context.lineWidth = this.lineWidth;
+                    context.strokeStyle = this.lineColor;
+                    for (var t = 0; t < 120; t++) {
+                        var scale = 0;
+                        if (max > 0) scale = (this.height - 4) / max;
+                        if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
+                        else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
+                        else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
+                        else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
+                        else context.strokeStyle = this.fpsColors[4];
 
-                    context.beginPath();
-                    context.moveTo(this.x + t + 2, this.y + this.height - 2);
-                    context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
-                    context.stroke();
+                        context.beginPath();
+                        context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                        context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                        context.stroke();
+                    }
                 }
 
                 // drawing fps
                 context.fillStyle = this.textColor;
                 context.font = this.textSize + 'px ' + this.textFont;
-                context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
+                context.fillText(this.text + ' fps', this.x + 2, this.y + this.textSize + 2);
 
                 // drawing min/max
-                this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
+                this.textMinMax = 'from ' + (parseInt(min * 10) / 10) + ' to ' + (parseInt(max * 10) / 10) + ' fps';
                 //context.globalAlpha = this.alpha * 0.8;
                 //context.fillStyle = this.textColor;
                 //context.font = this.textSize+'px '+this.textFont;
@@ -4135,7 +4187,14 @@
                 //context.globalAlpha = this.alpha * 0.8;
                 //context.fillStyle = this.textColor;
                 //context.font = this.textSize+'px '+this.textFont;
-                context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+                context.fillText(this.textAverage + ' fps avg', this.x + 2, this.y + this.textSize * 3 + 6);
+
+                // ms
+                this.textMs = this.fpsMs; //parseInt(average * 100) / 100 + '';
+                //context.globalAlpha = this.alpha * 0.8;
+                //context.fillStyle = this.textColor;
+                //context.font = this.textSize+'px '+this.textFont;
+                context.fillText(this.textMs + ' ms', this.x + 2, this.y + this.textSize * 4 + 8);
 
             },
 
@@ -4288,16 +4347,19 @@
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
-                if (this._changed) this.getBox(this.prerenderCanvas.context);
-
+                if (this._changed) {
+                    this.getBox(this.prerenderCanvas.context);
+                }
                 // save original coordinates
                 var drawX = this._box.draw.x,
                     drawY = this._box.draw.y;
                 this._box.draw.x = 0;
                 this._box.draw.y = 0;
 
-                this.prerenderCanvas.width = this._box.draw.width;
-                this.prerenderCanvas.height = this._box.draw.height;
+                if (this._changed) {
+                    this.prerenderCanvas.width = this._box.draw.width;
+                    this.prerenderCanvas.height = this._box.draw.height;
+                }
 
                 this.drawRender(this.prerenderCanvas.context);
 
@@ -4365,7 +4427,7 @@
              * @return {object} Result {_type: "class", draw: {x, y, width, height}}
              */
             getBox: function(absolute) {
-                //console.log('gfx.getBox : start');
+                //console.log('gfx.getBox: start '+this._class);
                 this._box = {
                     type: this._class
                 };
@@ -4456,46 +4518,46 @@
                     return this._box.context;
                 }
 
-                // get the correct width and height of what will be drawn (usually an image)
+                // get the correct width and height of what will be drawn (usually for an image)
                 if (imageBox) {
                     var scaleX = this._box.context.width / this._box.img.width;
                     var scaleY = this._box.context.height / this._box.img.height;
                 }
+                /*
+                        // crop the left
+                        if (this._box.context.x < 0) {
+                            if (imageBox) {
+                                this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
+                                this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
+                            }
+                            this._box.context.width = this._box.context.width + this._box.context.x;
+                            this._box.context.x = 0;
+                        }
 
-                // crop the left
-                if (this._box.context.x < 0) {
-                    if (imageBox) {
-                        this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
-                        this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
-                    }
-                    this._box.context.width = this._box.context.width + this._box.context.x;
-                    this._box.context.x = 0;
-                }
+                        // crop the top
+                        if (this._box.context.y < 0) {
+                            if (imageBox) {
+                                this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
+                                this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
+                        }
+                            this._box.context.height = this._box.context.height + this._box.context.y;
+                            this._box.context.y = 0;
+                        }
 
-                // crop the top
-                if (this._box.context.y < 0) {
-                    if (imageBox) {
-                        this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
-                        this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
-                    }
-                    this._box.context.height = this._box.context.height + this._box.context.y;
-                    this._box.context.y = 0;
-                }
+                        // crop the right
+                        if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
+                            var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
+                            if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
+                            this._box.context.width = this._box.context.width - delta;
+                        }
 
-                // crop the right
-                if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
-                    var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
-                    if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
-                    this._box.context.width = this._box.context.width - delta;
-                }
-
-                // crop the bottom
-                if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
-                    var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
-                    if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
-                    this._box.context.height = this._box.context.height - delta;
-                }
-
+                        // crop the bottom
+                        if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
+                            var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
+                            if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
+                            this._box.context.height = this._box.context.height - delta;
+                        }
+                */
                 // flip horizontally
                 if (this.flipX) {
                     if (this._box.draw.width > 0) {
@@ -4528,7 +4590,7 @@
              * @return {bool} True if drawn
              */
             draw: function(context) {
-
+                //if (this._changed) console.log('gfx.draw: '+this._class+' _changed');
                 // get the context
                 context = context || yespix.context;
 
@@ -4883,33 +4945,8 @@
                 image.isReady = false;
                 image.isInitiated = true;
                 image.entity = entity;
-                image.element = document.createElement('img');
 
-                if (image.element) image.element.onload = image.element.onLoad = function() {
-                    image.originalWidth = this.width;
-                    image.originalHeight = this.height;
-                    image.width = this.width * entity.imageScale;
-                    image.height = this.height * entity.imageScale;
-
-                    if (entity.imageScale != 1) {
-                        image.element = entity.resize(image.element, entity.imageScale);
-                    }
-                    if (image.entity.imageSelected == image.index) {
-                        image.entity._changed = true;
-                        if (!image.entity.imageLockSize) {
-                            image.entity.width = image.width;
-                            image.entity.height = image.height;
-                        }
-                    }
-
-                    image.isReady = true;
-
-                    entity.trigger('imageReady', {
-                        target: image,
-                    });
-
-                    delete this.onload;
-                };
+                image.element = yespix.getCache('img:' + image.src + ':1');
 
                 // add source to the image element
                 image.changeSource = function(source) {
@@ -4918,10 +4955,62 @@
                     return true;
                 };
 
-                if (image.src !== undefined && image.src !== '') {
-                    image.changeSource(image.src);
-                }
+                if (!image.element) {
+                    image.element = document.createElement('img');
+                    yespix.setCache('img:' + image.src + ':1', image.element);
 
+                    // set the onload event for image element
+                    image.element.onload = image.element.onLoad = function(e, nextImage) {
+                        if (nextImage) image = nextImage;
+                        image.originalWidth = this.width;
+                        image.originalHeight = this.height;
+                        image.width = this.width * image.entity.imageScale;
+                        image.height = this.height * image.entity.imageScale;
+
+                        if (image.entity.imageScale != 1) {
+                            var newElement = yespix.getCache('img:' + image.src + ':' + image.entity.imageScale);
+                            if (!newElement) {
+                                image.element = entity.resize(image.element, image.entity.imageScale);
+                                yespix.setCache('img:' + image.src + ':' + image.entity.imageScale, image.element);
+                            } else {
+                                image.element = newElement;
+                            }
+                        }
+                        if (image.entity.imageSelected == image.index) {
+                            image.entity._changed = true;
+                            if (!image.entity.imageLockSize) {
+                                image.entity.width = image.width;
+                                image.entity.height = image.height;
+                            }
+                        }
+
+                        image.isReady = true;
+
+                        image.entity.trigger('imageReady', {
+                            target: image,
+                        });
+
+                        var list = yespix.getCache('img:' + image.src + ':1:list');
+                        if (list && list.length > 0) {
+                            var nextImage = list.shift();
+                            this.onload.apply(this, [e, nextImage]);
+                        }
+
+                        //delete this.onload;
+                    };
+
+                    if (image.src !== undefined && image.src !== '') {
+                        image.changeSource(image.src);
+                    }
+                } else {
+                    if (image.isReady) {
+                        image.element.onload.apply(this, [null, image]);
+                    } else {
+                        var cache = yespix.getCache('img:' + image.src + ':1:list');
+                        if (!cache) yespix.setCache('img:' + image.src + ':1:list', [image]);
+                        else cache.push(image);
+                    }
+                }
 
                 return image; //source != '';
             },
@@ -4970,23 +5059,10 @@
 
 
             drawRender: function(context) {
-                // check if image outside canvas
-                /*
-                if (this._box.draw.x > context.canvas.clientWidth 
-                    || this._box.draw.y > context.canvas.clientHeight 
-                    || this._box.draw.x + this._box.draw.width < 0
-                    || this._box.draw.y + this._box.draw.height < 0)
-                    return;
-                */
-                //var img = this.imageObject; //(this.imageSelected);
-
                 if (!this._box.context || !this._box.img) this.getContextBox(context, this.imageObject);
 
-                if (this._box.img.width == 0 || this._box.img.height == 0)
+                if (this._box.img.width === 0 || this._box.img.height === 0)
                     return;
-
-                //var scaleX = this.flipX ? -1 : 1;
-                //var scaleY = this.flipY ? -1 : 1;
 
                 if (this.flipX || this.flipY) {
                     context.save();
@@ -6400,7 +6476,7 @@
             textSize: 16,
             textColor: '#000000',
             text: '',
-            prerender: false,
+            prerender: true,
 
             init: function() {
                 // change pre-render on change these properties
@@ -6414,15 +6490,22 @@
              * Draw pre-render for text, change y position on canvas context
              */
             prerenderUse: function(context) {
-
+                /*
                 // check if image outside canvas
-                if (this._box.draw.x > context.canvas.clientWidth || this._box.draw.y > context.canvas.clientHeight || this._box.draw.x + this._box.draw.width < 0 || this._box.draw.y + this._box.draw.height < 0)
+                if (this._box.draw.x > context.canvas.clientWidth 
+                    || this._box.draw.y > context.canvas.clientHeight 
+                    || this._box.draw.x + this._box.draw.width < 0
+                    || this._box.draw.y + this._box.draw.height < 0)
                     return;
+                */
 
-                this.getContextBox(context, this.prerenderCanvas);
+                if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
-                if (this._box.context.width <= 0 || this._box.context.height <= 0)
+                /*
+                if (this._box.context.width <= 0
+                    || this._box.context.height <= 0)
                     return false;
+                */
 
                 context.globalAlpha = this.alpha;
 
@@ -6441,27 +6524,28 @@
 
 
             getDrawBox: function(absolute) {
+                //console.log('text.getDrawBox');
                 var position = this.getPosition(absolute);
 
                 this._context = this._context || yespix.context || this.document.createElement('canvas');
 
-                if (!this._context) {
+                /*if (!this._context) {
                     return {
                         x: position.x,
                         y: position.y,
                         width: 0,
                         height: 0
                     };
-                }
-                var size = this._context.measureText(this.text);
-                var height = Math.ceil(yespix.getFontHeight(this.font));
-                var width = Math.ceil(size.width);
+                }*/
+                //var size = this._context.measureText(this.text);
+                //var height = Math.ceil(yespix.getFontHeight(this.font));
+                //var width = Math.ceil(size.width);
 
                 return {
                     x: position.x,
                     y: position.y,
-                    width: width * 2,
-                    height: height * 2
+                    width: Math.ceil(this._context.measureText(this.text).width) * 2,
+                    height: Math.ceil(yespix.getFontHeight(this.font)) * 2
                 };
             },
 

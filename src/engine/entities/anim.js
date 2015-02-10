@@ -3,7 +3,7 @@ yespix.define('anim', 'image', {
     animDefault: {
         width: 32, // default tile width
         height: 32, // default tile height
-        name: '', // default animation name to run
+        name: 'default', // default animation name to run
         duration: 200,
     },
 
@@ -47,7 +47,6 @@ yespix.define('anim', 'image', {
      * @return {[type]} [description]
      */
     animFramesInit: function() {
-        //console.log('anim.animFramesInit : id='+this._id);
         // check every animation
         for (var name in this.anims) {
             var anim = this.anims[name];
@@ -69,7 +68,6 @@ yespix.define('anim', 'image', {
 
                 // If all the images are ready, we must complete the frame objects
                 if (ready) {
-                    //console.log('anim.animFramesInit : id='+this._id+', animation is ready');
 
                     // animation is ready
                     anim.isReady = true;
@@ -89,8 +87,6 @@ yespix.define('anim', 'image', {
                             // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                             // so we need to update this variable on each frame
                             maxLine = Math.floor(frame.image.width / frame.width) / this.imageScale;
-                            //console.log('anim.animFramesInit : id='+this._id+', maxLine = '+maxLine);
-                            //console.log('anim.animFramesInit : id='+this._id+', frame.image = ', frame.image);
                             if (maxLine > 0) {
                                 frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
                                 frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
@@ -120,7 +116,6 @@ yespix.define('anim', 'image', {
                         }
                     }
                 }
-                //else console.log('anim.animFramesInit : id='+this._id+', animation NOT ready');
             }
         }
     },
@@ -229,11 +224,10 @@ yespix.define('anim', 'image', {
         if (!frame) return null;
 
         this.animSelect(name); // this.animSelected = name;
-
         this.frameSelect(from); //this.animFrame = from;
         this.animSpeed = speed;
         this.animTime = +new Date() + frame.duration * speed;
-
+        
         this.trigger('animStart', {
             name: this.animSelected,
             anim: this.animObject,
@@ -246,7 +240,7 @@ yespix.define('anim', 'image', {
             frame: this.animFrame,
             frameObject: this.animFrameObject
         });
-
+        
         return this;
     },
 
@@ -341,13 +335,13 @@ yespix.define('anim', 'image', {
     getImageBoxDefault: function(imageBox) {
         //var frame = this.getFrame();
         box = {
-            x: 0,
-            y: 0,
+            x: (imageBox.x ? imageBox.x : 0),
+            y: (imageBox.y ? imageBox.y : 0),
             width: this.animFrameObject.width * this.imageScale,
             height: this.animFrameObject.height * this.imageScale
         }
-        if (imageBox.x) box.x = imageBox.x;
-        if (imageBox.y) box.y = imageBox.y;
+        //if (imageBox.x) box.x = imageBox.x;
+        //if (imageBox.y) box.y = imageBox.y;
         return box;
     },
 
@@ -446,7 +440,6 @@ yespix.define('anim', 'image', {
         }
         
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.animFrameObject);
-        //console.log('anim.drawRender: id='+this._id+', animFrameObject=', this.animFrameObject);
         
         context.globalAlpha = this.alpha;
 

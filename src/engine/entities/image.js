@@ -204,7 +204,7 @@ yespix.define('image', 'gfx', {
         image.isInitiated = true;
         image.entity = entity;
 
-        image.element = yespix.getCache('img:'+image.src+':'+this.imageScale);
+        image.element = yespix.getCache('img:'+image.src+':1');
 
         // add source to the image element
         image.changeSource = function(source) {
@@ -214,21 +214,25 @@ yespix.define('image', 'gfx', {
         };
         
         if (!image.element) {
-            //console.log('image.imageInit: cache empty');
             image.element = document.createElement('img');
-            yespix.setCache('img:'+image.src+':'+this.imageScale, image.element);
+            yespix.setCache('img:'+image.src+':1', image.element);
 
             // set the onload event for image element
             image.element.onload = image.element.onLoad = function(e, nextImage) {
                 if (nextImage) image = nextImage;
-                //console.log('image.imageInit: image onload id='+image.entity._id+', nextImage='+nextImage);
                 image.originalWidth = this.width;
                 image.originalHeight = this.height;
-                image.width = this.width * entity.imageScale;
-                image.height = this.height * entity.imageScale;
+                image.width = this.width * image.entity.imageScale;
+                image.height = this.height * image.entity.imageScale;
 
-                if (entity.imageScale != 1) {
-                    image.element = entity.resize(image.element, entity.imageScale);
+                if (image.entity.imageScale != 1) {
+                    var newElement = yespix.getCache('img:'+image.src+':'+image.entity.imageScale);
+                    if (!newElement) {
+                        image.element = entity.resize(image.element, image.entity.imageScale);
+                        yespix.setCache('img:'+image.src+':'+image.entity.imageScale, image.element);
+                    } else {
+                        image.element = newElement;
+                    }
                 }
                 if (image.entity.imageSelected == image.index) {
                     image.entity._changed = true;
@@ -244,8 +248,7 @@ yespix.define('image', 'gfx', {
                     target: image,
                 });
                 
-                var list = yespix.getCache('img:'+image.src+':'+image.entity.imageScale+':list');
-                //console.log('list = '+list);
+                var list = yespix.getCache('img:'+image.src+':1:list');
                 if (list && list.length > 0) {
                     var nextImage = list.shift();
                     this.onload.apply(this, [e, nextImage]);
@@ -259,16 +262,14 @@ yespix.define('image', 'gfx', {
             }
         }
         else {
-
-            //console.log('image.imageInit: cache loaded');
-            var cache = yespix.getCache('img:'+image.src+':'+this.imageScale+':list');
-            if (!cache) yespix.setCache('img:'+image.src+':'+this.imageScale+':list', [image]);
-            else cache.push(image);
-            //console.log('image.imageInit: count list = '+yespix.getCache('img:'+image.src+':'+this.imageScale+':list').length);
+            if (image.isReady) {
+                image.element.onload.apply(this, [null, image]);
+            } else {
+                var cache = yespix.getCache('img:'+image.src+':1:list');
+                if (!cache) yespix.setCache('img:'+image.src+':1:list', [image]);
+                else cache.push(image);
+            }
         }
-
-
-
 
         return image; //source != '';
     },
