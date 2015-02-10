@@ -8,17 +8,23 @@ yespix.define('anim', 'image', {
     },
 
     animSelected: '',
-    animFrame: 0,
-    animSpeed: 1,
-    animWait: false,
-    animNext: '',
+    animObject: false,
 
+    animFrame: 0,
+    animFrameObject: false,
+
+    animSpeed: 1,
+    //animWait: false,
+    animNext: '',
+    
+    animTime: 0,
+    
     init: function() {
         this.animInit();
         this.on('imageReady', function() {
             this.animFramesInit();
         });
-        this.animSelected = this.animDefault.name;
+        this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
     },
 
 
@@ -41,7 +47,7 @@ yespix.define('anim', 'image', {
      * @return {[type]} [description]
      */
     animFramesInit: function() {
-
+        //console.log('anim.animFramesInit : id='+this._id);
         // check every animation
         for (var name in this.anims) {
             var anim = this.anims[name];
@@ -63,6 +69,8 @@ yespix.define('anim', 'image', {
 
                 // If all the images are ready, we must complete the frame objects
                 if (ready) {
+                    //console.log('anim.animFramesInit : id='+this._id+', animation is ready');
+
                     // animation is ready
                     anim.isReady = true;
 
@@ -81,6 +89,8 @@ yespix.define('anim', 'image', {
                             // process maximum number of frames in one line for this frame and image. Each frame can have its own image
                             // so we need to update this variable on each frame
                             maxLine = Math.floor(frame.image.width / frame.width) / this.imageScale;
+                            //console.log('anim.animFramesInit : id='+this._id+', maxLine = '+maxLine);
+                            //console.log('anim.animFramesInit : id='+this._id+', frame.image = ', frame.image);
                             if (maxLine > 0) {
                                 frame.x = (anim.offsetX || 0) * this.imageScale + (frame.frameIndex + anim.from % maxLine) * frame.width * this.imageScale;
                                 frame.y = (anim.offsetY || 0) * this.imageScale + Math.floor((frame.frameIndex + anim.from) / maxLine) * frame.height * this.imageScale;
@@ -110,6 +120,7 @@ yespix.define('anim', 'image', {
                         }
                     }
                 }
+                //else console.log('anim.animFramesInit : id='+this._id+', animation NOT ready');
             }
         }
     },
@@ -126,7 +137,7 @@ yespix.define('anim', 'image', {
             // init the default animation
             if (anim.isDefault) {
                 this.animDefault['name'] = name;
-                if (!this.animSelected) this.animSelected = name;
+                if (!this.animObject) this.animSelect(name); // if (!this.animSelected) this.animSelected = name;
             }
 
             if (anim.extendsFrom) {
@@ -207,9 +218,9 @@ yespix.define('anim', 'image', {
 
     animPlay: function(name, speed, from) {
 
-        if (this.animWait) return;
+        //if (this.animWait) return;
         if (!name) name = this.animDefault.name;
-        if (this.animSelected == name) return this;
+        if (this.animSelected === name) return this;
         if (!this.anims[name]) return null;
 
         from = from || 0;
@@ -217,64 +228,88 @@ yespix.define('anim', 'image', {
         var frame = this.anims[name].frames[from];
         if (!frame) return null;
 
-        this.animSelected = name;
-        this.animFrame = from;
+        this.animSelect(name); // this.animSelected = name;
+
+        this.frameSelect(from); //this.animFrame = from;
         this.animSpeed = speed;
         this.animTime = +new Date() + frame.duration * speed;
 
         this.trigger('animStart', {
             name: this.animSelected,
-            frame: this.animFrame
+            anim: this.animObject,
+            frame: this.animFrame,
+            frameObject: this.animFrameObject
         });
         this.trigger('animFrame', {
             name: this.animSelected,
-            frame: this.animFrame
+            anim: this.animObject,
+            frame: this.animFrame,
+            frameObject: this.animFrameObject
         });
 
         return this;
     },
+
+    animSelect: function(animName) {
+        if (this.anims[animName]) {
+            this.animSelected = animName;
+            this.animObject = this.anims[animName];
+        }
+    },
+
+    frameSelect: function(frameIndex) {
+        if (this.animObject && this.animObject.frames[frameIndex]) {
+            this.animFrame = frameIndex;
+            this.animFrameObject = this.animObject.frames[frameIndex];
+        }
+    },
+
 
     animStop: function() {
         // @TODO
     },
 
     animStep: function() {
-        if (!this.anims[this.animSelected] || !this.anims[this.animSelected].frames) return;
-        if (this.anims[this.animSelected].frames.length <= 1) return;
+        if (!this.animObject || !this.animObject.frames) return;
+        if (this.animObject.frames.length <= 1) return;
 
-        var animEnded = false;
+        //console.log('anim.animStep: id='+this._id+', animFrame = ', this.animFrame);
+        //var animEnded = false;
         var now = +new Date();
 
         if (!this.animTime || isNaN(this.animTime)) this.animTime = now;
 
         if (!this.animTime || this.animTime <= now) {
-            this.animFrame++;
-            this._changed = true;
-            if (this.animFrame >= this.anims[this.animSelected].frames.length) {
-                this.animFrame = 0;
-                animEnded = true;
+            if (this.animFrame+1 === this.animObject.frames.length) {
+                this.frameSelect(0);
+            } else {
+                this.frameSelect(this.animFrame+1); // this.animFrame++;
             }
+            this._changed = true;
 
             this.trigger('animFrame', {
                 name: this.animSelected,
                 frame: this.animFrame
             });
 
-            var frame = this.anims[this.animSelected].frames[this.animFrame];
-            this.animTime = +new Date() + frame.duration * this.animSpeed;
-            if (animEnded) {
+            //var frame = this.animObject.frames[this.animFrame];
+            this.animTime = +new Date() + this.animFrameObject.duration * this.animSpeed;
+
+            // check if animation was restarted
+            if (this.animFrame === 0) {
                 this.trigger('animEnd', {
                     name: this.animSelected,
                     frame: this.animFrame
                 });
-                this.animWait = false;
-                if (this.animNext && this.animNext != '') {
+                //this.animWait = false;
+                if (this.animNext && this.animNext !== '') {
                     this.animPlay(this.animNext);
                 }
             }
         }
     },
 
+    /*
     getFrame: function(animName, frameIndex) {
         animName = animName || this.animSelected;
         if (!this.anims[animName]) return false;
@@ -282,7 +317,8 @@ yespix.define('anim', 'image', {
         if (!this.anims[animName].frames || !this.anims[animName].frames[frameIndex]) return false;
         return this.anims[animName].frames[frameIndex];
     },
-
+    */
+   
     /**
      * Get the draw box with absolute position or relative to the parent entity
      * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
@@ -291,24 +327,24 @@ yespix.define('anim', 'image', {
      
     getDrawBox: function(absolute) {
         var position = this.getPosition(absolute);
-        var frame = this.getFrame();
+        //var frame = this.getFrame();
 
         return {
             x: position.x,
             y: position.y,
-            width: frame.width * this.imageScale,
-            height: frame.height * this.imageScale,
+            width: this.animFrameObject.width * this.imageScale,
+            height: this.animFrameObject.height * this.imageScale,
         };
     },
 
 
     getImageBoxDefault: function(imageBox) {
-        var frame = this.getFrame();
+        //var frame = this.getFrame();
         box = {
             x: 0,
             y: 0,
-            width: frame.width * this.imageScale,
-            height: frame.height * this.imageScale
+            width: this.animFrameObject.width * this.imageScale,
+            height: this.animFrameObject.height * this.imageScale
         }
         if (imageBox.x) box.x = imageBox.x;
         if (imageBox.y) box.y = imageBox.y;
@@ -372,7 +408,7 @@ yespix.define('anim', 'image', {
         // @TODO put this line in init
         //if (!this.anims[this.animSelected]) this.animSelected = this.animDefault['name'];
 
-        if (!this.anims[this.animSelected]) return false;
+        if (!this.animObject) return false;
 
         if (!this.isActive 
             || !this.isVisible 
@@ -380,19 +416,18 @@ yespix.define('anim', 'image', {
             || !context)
             return false;
 
-        var frame = this.getFrame();
+        //var frame = this.getFrame();
 
-        if (!frame
-            || !frame.image
-            || !frame.image.element
-            || !frame.image.isReady) 
+        if (!this.animFrameObject
+            || !this.animFrameObject.image
+            || !this.animFrameObject.image.element
+            || !this.animFrameObject.image.isReady) 
             return false;
 
         return true;
     },
 
     drawRender: function(context) {
-
         // check if image outside canvas
         if (this._box.draw.x > context.canvas.clientWidth 
             || this._box.draw.y > context.canvas.clientHeight 
@@ -400,21 +435,22 @@ yespix.define('anim', 'image', {
             || this._box.draw.y + this._box.draw.height < 0)
             return;
 
-        var frame = this.getFrame();        
-        var img = frame.image;
-        var scaleX = frame.flipX ? -1 : 1;
-        var scaleY = frame.flipY ? -1 : 1;
+        //var frame = this.getFrame();        
+        //var img = this.animFrameObject.image;
+        //var scaleX = this.animFrameObject.flipX ? -1 : 1;
+        //var scaleY = this.animFrameObject.flipY ? -1 : 1;
 
-        if (frame.flipX || frame.flipY) {
+        if (this.animFrameObject.flipX || this.animFrameObject.flipY) {
             context.save();
-            context.scale(scaleX, scaleY);
+            context.scale( (this.animFrameObject.flipX ? -1 : 1), (this.animFrameObject.flipY ? -1 : 1) );
         }
         
-        if (!this._box.context || !this._box.img) this.getContextBox(context, frame);
+        if (!this._box.context || !this._box.img) this.getContextBox(context, this.animFrameObject);
+        //console.log('anim.drawRender: id='+this._id+', animFrameObject=', this.animFrameObject);
         
         context.globalAlpha = this.alpha;
 
-        context.drawImage(img.element, //image element
+        context.drawImage(this.animFrameObject.image.element, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image
             this._box.img.width, // width on image
@@ -425,7 +461,7 @@ yespix.define('anim', 'image', {
             this._box.context.height // height on canvas
         );
 
-        if (frame.flipX || frame.flipY) {
+        if (this.animFrameObject.flipX || this.animFrameObject.flipY) {
             context.restore();
         }
     },
