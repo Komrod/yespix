@@ -332,3 +332,11 @@ yespix.fn.quickSort = (function () {
     };
 }());
 
+yespix.fn.getCache = function(name) {
+    return this.data.sharedCache[name];
+};
+
+yespix.fn.setCache = function(name, value) {
+    this.data.sharedCache[name] = value;
+};
+
