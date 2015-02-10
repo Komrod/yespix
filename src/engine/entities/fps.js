@@ -27,6 +27,8 @@ yespix.define('fps', 'gfx', {
 
     fpsData: [],
 
+    fpsOnlyStats: false,
+
     width: 124,
     height: 50,
 
@@ -89,7 +91,7 @@ yespix.define('fps', 'gfx', {
         {
             this.fpsAverageFrames++;
             this.fpsAverage += yespix.frameTime - this.fpsLastTime;
-            if (this.fpsAverage>this.fpsAverageTime && this.fpsAverageFrames > 0)
+            if ((this.fpsAverage>this.fpsAverageTime) && this.fpsAverageFrames > 0)
             {
                 var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
                 if (this.fps > 60) fps = 60;
@@ -99,6 +101,7 @@ yespix.define('fps', 'gfx', {
                 this.fpsData.shift();
                 this.fpsData.push(fps);
             }
+            this.fpsMs = yespix.frameTime - this.fpsLastTime;
             this.fpsLastTime = yespix.frameTime;
         } else
         {
@@ -110,38 +113,47 @@ yespix.define('fps', 'gfx', {
             this.fpsData.push(fps);
         }
 
-        var min = max = average = 0;
+        var min = 0,
+            max = 0,
+            average = 0,
+            count = 0;
+
         for (var t=0; t<120; t++) {
             if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
             if (max < this.fpsData[t]) max = this.fpsData[t];
-            average += this.fpsData[t];
+            if (this.fpsData[t] > 0) {
+                average += this.fpsData[t];
+                count++;
+            }
         }
-        average = average / 120;
+        average = average / count;
 
-        context.lineWidth = this.lineWidth;
-        context.strokeStyle = this.lineColor;
-        for (var t=0; t<120; t++) {
-            var scale = 0;
-            if (max > 0) scale = (this.height - 4) / max;
-            if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
-            else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
-            else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
-            else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
-            else context.strokeStyle = this.fpsColors[4];
+        if (!this.fpsOnlyStats) {
+            context.lineWidth = this.lineWidth;
+            context.strokeStyle = this.lineColor;
+            for (var t=0; t<120; t++) {
+                var scale = 0;
+                if (max > 0) scale = (this.height - 4) / max;
+                if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
+                else if (this.fpsData[t] < 10) context.strokeStyle = this.fpsColors[1];
+                else if (this.fpsData[t] < 20) context.strokeStyle = this.fpsColors[2];
+                else if (this.fpsData[t] < 30) context.strokeStyle = this.fpsColors[3];
+                else context.strokeStyle = this.fpsColors[4];
 
-            context.beginPath();
-            context.moveTo(this.x + t + 2, this.y + this.height - 2);
-            context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
-            context.stroke();
+                context.beginPath();
+                context.moveTo(this.x + t + 2, this.y + this.height - 2);
+                context.lineTo(this.x + t + 2, this.y + this.height - 3 - this.fpsData[t] * scale);
+                context.stroke();
+            }
         }
 
         // drawing fps
         context.fillStyle = this.textColor;
         context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.text, this.x + 2, this.y + this.textSize + 2);
+        context.fillText(this.text + ' fps', this.x + 2, this.y + this.textSize + 2);
 
         // drawing min/max
-        this.textMinMax = '(' + (parseInt(min * 10) / 10) + '-' + (parseInt(max * 10) / 10) + ')';
+        this.textMinMax = 'from ' + (parseInt(min * 10) / 10) + ' to ' + (parseInt(max * 10) / 10) + ' fps';
         //context.globalAlpha = this.alpha * 0.8;
         //context.fillStyle = this.textColor;
         //context.font = this.textSize+'px '+this.textFont;
@@ -152,7 +164,14 @@ yespix.define('fps', 'gfx', {
         //context.globalAlpha = this.alpha * 0.8;
         //context.fillStyle = this.textColor;
         //context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.textAverage, this.x + 2, this.y + this.textSize * 3 + 6);
+        context.fillText(this.textAverage+' fps avg', this.x + 2, this.y + this.textSize * 3 + 6);
+
+        // ms
+        this.textMs = this.fpsMs; //parseInt(average * 100) / 100 + '';
+        //context.globalAlpha = this.alpha * 0.8;
+        //context.fillStyle = this.textColor;
+        //context.font = this.textSize+'px '+this.textFont;
+        context.fillText(this.textMs+' ms', this.x + 2, this.y + this.textSize * 4 + 8);
 
     },
 
