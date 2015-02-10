@@ -145,16 +145,19 @@ yespix.define('gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        if (this._changed) this.getBox(this.prerenderCanvas.context);
-
+        if (this._changed) {
+            this.getBox(this.prerenderCanvas.context);
+        }
         // save original coordinates
         var drawX = this._box.draw.x,
             drawY = this._box.draw.y;
         this._box.draw.x = 0;
         this._box.draw.y = 0;
 
-        this.prerenderCanvas.width = this._box.draw.width;
-        this.prerenderCanvas.height = this._box.draw.height;
+        if (this._changed) {
+            this.prerenderCanvas.width = this._box.draw.width;
+            this.prerenderCanvas.height = this._box.draw.height;
+        }
 
         this.drawRender(this.prerenderCanvas.context);
 
@@ -222,7 +225,7 @@ yespix.define('gfx', {
      * @return {object} Result {_type: "class", draw: {x, y, width, height}}
      */
     getBox: function(absolute) {
-        //console.log('gfx.getBox : start');
+        //console.log('gfx.getBox: start '+this._class);
         this._box = {
             type: this._class
         };
@@ -314,12 +317,12 @@ yespix.define('gfx', {
             return this._box.context;
         }
 
-        // get the correct width and height of what will be drawn (usually an image)
+        // get the correct width and height of what will be drawn (usually for an image)
         if (imageBox) {
             var scaleX = this._box.context.width / this._box.img.width;
             var scaleY = this._box.context.height / this._box.img.height;
         }
-
+/*
         // crop the left
         if (this._box.context.x < 0) {
             if (imageBox) {
@@ -353,7 +356,7 @@ yespix.define('gfx', {
             if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
             this._box.context.height = this._box.context.height - delta;
         }
-
+*/
         // flip horizontally
         if (this.flipX) {
             if (this._box.draw.width > 0) {
@@ -386,7 +389,7 @@ yespix.define('gfx', {
      * @return {bool} True if drawn
      */
     draw: function(context) {
-
+        //if (this._changed) console.log('gfx.draw: '+this._class+' _changed');
         // get the context
         context = context || yespix.context;
         
