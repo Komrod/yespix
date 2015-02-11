@@ -1,5 +1,6 @@
 
 TODO list:
+- optimize: use typed arrays when possible
 - use clearRect to clear faster the canvas
 - Z sort function only sort the changed entities
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
