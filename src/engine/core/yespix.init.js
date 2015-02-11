@@ -254,6 +254,8 @@ yespix.fn.init = function(options) {
 
         if (options['canvas']) yespix.spawn('canvas', options.canvas);
         if (options['fps']) yespix.setFps(options.fps);
+        
+        // @TODO this should be in the collision entity
         this.collisionSize = options['collisionSize'];
 
         if (yespix.isArray(yespix.entityInstances['/gfx'])) {
@@ -280,16 +282,22 @@ yespix.fn.init = function(options) {
             // change the drawEntities because some entity instances have been added or removed
             if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                 yespix.drawEntities = yespix.entityInstances['/gfx'];
-                if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
+                if (yespix.drawEntities)
+                {
+                    yespix.drawEntities = yespix.drawEntities.sort(compare);
+                    console.log('sort #1');
+                }
                 yespix.drawEntitiesChange = false;
             } else if (yespix.drawEntitiesSort) {
                 yespix.drawEntities = yespix.drawEntities.sort(compare);
+                console.log('sort #2');
                 yespix.drawEntitiesSort = false;
             }
 
             if (yespix.drawEntities)
-                for (var t = 0; t < yespix.drawEntities.length; t++) {
-                    yespix.drawEntities[t].draw();
+                var count = yespix.drawEntities.length;
+                for (var t = 0; t < count; t++) {
+                    yespix.drawEntities[t].draw(yespix.context);
                 }
 
         });

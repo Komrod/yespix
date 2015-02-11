@@ -163,13 +163,13 @@ yespix.define('image', 'gfx', {
             else return null;
         } else 
         // get the first image (index: 0)
-        if (properties == undefined)
+        if (properties === undefined)
         {
             if (this.images[0]) return this.imageInit(this.images[0]);
             else return null;
         } else 
         // if properties is string, it's the name of the image
-        if (typeof properties == 'string') 
+        if (typeof properties === 'string') 
         {
             properties = {
                 name: properties
@@ -181,7 +181,7 @@ yespix.define('image', 'gfx', {
         for (var t = 0; t < this.images.length; t++) {
             var count = 0;
             for (var n in properties) {
-                if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
+                if (this.images[t][n] !== undefined && properties[n] === this.images[t][n]) count++;
                 if (count >= max) return this.imageInit(this.images[t]);
             }
         }
@@ -194,7 +194,7 @@ yespix.define('image', 'gfx', {
         var entity = this;
 
         // no image, init all the images
-        if (image == undefined) {
+        if (image === undefined) {
             for (var t = 0; t < this.images.length; t++) {
                 this.imageInit(this.images[t]);
             }
@@ -238,7 +238,7 @@ yespix.define('image', 'gfx', {
                         image.element = newElement;
                     }
                 }
-                if (image.entity.imageSelected == image.index) {
+                if (image.entity.imageSelected === image.index) {
                     image.entity._changed = true;
                     if (!image.entity.imageLockSize) {
                         image.entity.width = image.width;

@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-10 */
+/*! yespix - v0.1.0 - 2015-02-11 */
 (function(undefined) {
 
     /**
@@ -2391,6 +2391,8 @@
 
             if (options['canvas']) yespix.spawn('canvas', options.canvas);
             if (options['fps']) yespix.setFps(options.fps);
+
+            // @TODO this should be in the collision entity
             this.collisionSize = options['collisionSize'];
 
             if (yespix.isArray(yespix.entityInstances['/gfx'])) {
@@ -2417,17 +2419,22 @@
                 // change the drawEntities because some entity instances have been added or removed
                 if (yespix.drawEntitiesChange || !yespix.drawEntities) {
                     yespix.drawEntities = yespix.entityInstances['/gfx'];
-                    if (yespix.drawEntities) yespix.drawEntities = yespix.drawEntities.sort(compare);
+                    if (yespix.drawEntities) {
+                        yespix.drawEntities = yespix.drawEntities.sort(compare);
+                        console.log('sort #1');
+                    }
                     yespix.drawEntitiesChange = false;
                 } else if (yespix.drawEntitiesSort) {
                     yespix.drawEntities = yespix.drawEntities.sort(compare);
+                    console.log('sort #2');
                     yespix.drawEntitiesSort = false;
                 }
 
                 if (yespix.drawEntities)
-                    for (var t = 0; t < yespix.drawEntities.length; t++) {
-                        yespix.drawEntities[t].draw();
-                    }
+                    var count = yespix.drawEntities.length;
+                for (var t = 0; t < count; t++) {
+                    yespix.drawEntities[t].draw(yespix.context);
+                }
 
             });
             options['init']();
@@ -2780,7 +2787,7 @@
         var yespix = this;
         this.frameTick = function() {
             yespix.timerStep();
-            if (yespix.frameTick) yespix.frameRequest.call(window, yespix.frameTick);
+            yespix.frameRequest.call(window, yespix.frameTick);
         };
 
         // clear collision 
@@ -2807,7 +2814,7 @@
     };
 
     yespix.fn.timerStep = function() {
-        var loops = 0;
+        var loops = false;
         this.frameTime = +new Date();
         if (this.frameTime - this.frameTickNext > 60 * this.frameMs) {
             this.frameTickNext = this.frameTime - this.frameMs;
@@ -2818,12 +2825,13 @@
                 frameIndex: this.frameIndex
             });
 
-            this.collisionClear();
-            var list = this.find('/collision');
-            if (list.length > 0) list.collisionOccupy().collision();
-
+            if (this.collisionEnabled) {
+                this.collisionClear();
+                var list = this.find('/collision');
+                if (list.length > 0) list.collisionOccupy().collision();
+            }
             this.frameTickNext += this.frameMs;
-            loops++;
+            loops = true;
         }
         if (loops) {
             this.trigger("draw", {
@@ -4370,42 +4378,7 @@
             /**
              * Draw the pre-render on a canvas context
              */
-            prerenderUse: function(context) {
-                // @todo old code in comment / how does it work ?
-                /*
-                var box = this.getDrawBox(false, context);
-        
-                // check if image outside canvas
-                if (box.x > context.canvas.clientWidth 
-                    || box.y > context.canvas.clientHeight
-                    || box.x + box.width < 0
-                    || box.y + box.height < 0)
-                    return false;
-
-                var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
-
-                // check if the contextDrawBox is flat
-                if (contextDrawBox.img_width == 0
-                    || contextDrawBox.img_height == 0
-                    || contextDrawBox.context_width == 0
-                    || contextDrawBox.context_height == 0)
-                    return false;
-
-                context.globalAlpha = this.alpha;
-        
-                context.drawImage(this.prerenderCanvas, //image element
-                    contextDrawBox.img_x, // x position on image
-                    contextDrawBox.img_y, // y position on image
-                    contextDrawBox.img_width, // width on image
-                    contextDrawBox.img_height, // height on image
-                    contextDrawBox.context_x, // x position on canvas
-                    contextDrawBox.context_y, // y position on canvas
-                    contextDrawBox.context_width, // width on canvas
-                    contextDrawBox.context_height // height on canvas
-                );
-                return true;
-                */
-            },
+            prerenderUse: function(context) {},
 
             ///////////////////////////////// Box functions ////////////////////////////////
 
@@ -4522,47 +4495,47 @@
                     var scaleX = this._box.context.width / this._box.img.width;
                     var scaleY = this._box.context.height / this._box.img.height;
                 }
-                /*
-                        // crop the left
-                        if (this._box.context.x < 0) {
-                            if (imageBox) {
-                                this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
-                                this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
-                            }
-                            this._box.context.width = this._box.context.width + this._box.context.x;
-                            this._box.context.x = 0;
-                        }
 
-                        // crop the top
-                        if (this._box.context.y < 0) {
-                            if (imageBox) {
-                                this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
-                                this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
-                        }
-                            this._box.context.height = this._box.context.height + this._box.context.y;
-                            this._box.context.y = 0;
-                        }
+                // crop the left
+                if (this._box.context.x < 0) {
+                    if (imageBox) {
+                        this._box.img.x = this._box.img.x - this._box.context.x / scaleX;
+                        this._box.img.width = this._box.img.width + this._box.context.x / scaleX;
+                    }
+                    this._box.context.width = this._box.context.width + this._box.context.x;
+                    this._box.context.x = 0;
+                }
 
-                        // crop the right
-                        if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
-                            var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
-                            if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
-                            this._box.context.width = this._box.context.width - delta;
-                        }
+                // crop the top
+                if (this._box.context.y < 0) {
+                    if (imageBox) {
+                        this._box.img.y = this._box.img.y - this._box.context.y / scaleY;
+                        this._box.img.height = this._box.img.height + this._box.context.y / scaleY;
+                    }
+                    this._box.context.height = this._box.context.height + this._box.context.y;
+                    this._box.context.y = 0;
+                }
 
-                        // crop the bottom
-                        if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
-                            var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
-                            if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
-                            this._box.context.height = this._box.context.height - delta;
-                        }
-                */
+                // crop the right
+                if (this._box.context.x + this._box.context.width > context.canvas.clientWidth) {
+                    var delta = this._box.context.x + this._box.context.width - context.canvas.clientWidth;
+                    if (imageBox) this._box.img.width = this._box.img.width - delta / scaleX;
+                    this._box.context.width = this._box.context.width - delta;
+                }
+
+                // crop the bottom
+                if (this._box.context.y + this._box.context.height > context.canvas.clientHeight) {
+                    var delta = this._box.context.y + this._box.context.height - context.canvas.clientHeight;
+                    if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
+                    this._box.context.height = this._box.context.height - delta;
+                }
+
                 // flip horizontally
                 if (this.flipX) {
                     if (this._box.draw.width > 0) {
                         this._box.context.x = -this._box.context.x - this._box.context.width;
                         if (imageBox) {
-                            if (this._box.img.x == 0) this._box.img.x = this._box.draw.width - this._box.context.width;
+                            if (this._box.img.x === 0) this._box.img.x = this._box.draw.width - this._box.context.width;
                             else this._box.img.x = 0;
                         }
                     }
@@ -4573,7 +4546,7 @@
                     if (this._box.draw.height > 0) {
                         this._box.context.y = -this._box.context.y - this._box.context.height;
                         if (imageBox) {
-                            if (this._box.img.y == 0) this._box.img.y = this._box.draw.height - this._box.context.height;
+                            if (this._box.img.y === 0) this._box.img.y = this._box.draw.height - this._box.context.height;
                             else this._box.img.y = 0;
                         }
                     }
@@ -4803,6 +4776,11 @@
              */
             imageScale: 1.0,
 
+            /**
+             * Source file of the image
+             * @type {String}
+             */
+            src: '',
 
             init: function() {
 
@@ -4901,12 +4879,12 @@
                     else return null;
                 } else
                 // get the first image (index: 0)
-                if (properties == undefined) {
+                if (properties === undefined) {
                     if (this.images[0]) return this.imageInit(this.images[0]);
                     else return null;
                 } else
                 // if properties is string, it's the name of the image
-                if (typeof properties == 'string') {
+                if (typeof properties === 'string') {
                     properties = {
                         name: properties
                     };
@@ -4917,7 +4895,7 @@
                 for (var t = 0; t < this.images.length; t++) {
                     var count = 0;
                     for (var n in properties) {
-                        if (this.images[t][n] !== undefined && properties[n] == this.images[t][n]) count++;
+                        if (this.images[t][n] !== undefined && properties[n] === this.images[t][n]) count++;
                         if (count >= max) return this.imageInit(this.images[t]);
                     }
                 }
@@ -4930,7 +4908,7 @@
                 var entity = this;
 
                 // no image, init all the images
-                if (image == undefined) {
+                if (image === undefined) {
                     for (var t = 0; t < this.images.length; t++) {
                         this.imageInit(this.images[t]);
                     }
@@ -4974,7 +4952,7 @@
                                 image.element = newElement;
                             }
                         }
-                        if (image.entity.imageSelected == image.index) {
+                        if (image.entity.imageSelected === image.index) {
                             image.entity._changed = true;
                             if (!image.entity.imageLockSize) {
                                 image.entity.width = image.width;

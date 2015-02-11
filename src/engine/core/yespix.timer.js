@@ -33,7 +33,7 @@ yespix.fn.timerStart = function() {
     var yespix = this;
     this.frameTick = function() {
         yespix.timerStep();
-        if (yespix.frameTick) yespix.frameRequest.call(window, yespix.frameTick);
+        yespix.frameRequest.call(window, yespix.frameTick);
     };
 
     // clear collision 
@@ -60,7 +60,7 @@ yespix.fn.timerStop = function() {
 };
 
 yespix.fn.timerStep = function() {
-    var loops = 0;
+    var loops = false;
     this.frameTime = +new Date();
     if (this.frameTime - this.frameTickNext > 60 * this.frameMs) {
         this.frameTickNext = this.frameTime - this.frameMs;
@@ -71,12 +71,14 @@ yespix.fn.timerStep = function() {
             frameIndex: this.frameIndex
         });
 
-        this.collisionClear();
-        var list = this.find('/collision');
-        if (list.length > 0) list.collisionOccupy().collision();
-
+        if (this.collisionEnabled)
+        {
+            this.collisionClear();
+            var list = this.find('/collision');
+            if (list.length > 0) list.collisionOccupy().collision();
+        }
         this.frameTickNext += this.frameMs;
-        loops++;
+        loops = true;
     }
     if (loops) {
         this.trigger("draw", {

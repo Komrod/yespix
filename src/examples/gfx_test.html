@@ -140,139 +140,19 @@
                     },
                 }
             });
-    
-    yp.spawn('anim',
-            {
-                x: 400,
-                y: 50,
-                images: 'chuck/player.png',
-                imageScale: 2,
-                animDefault:
+        
+    for (var x=0; x<600; x=x+1) {
+        for (var y=200; y<204; y=y+1) {
+            yp.spawn('image',
                 {
-                    width: 32,
-                    height: 40,
-                    name: 'walk',
-                    duration: 150,
-                },
-                anims:
-                {
-                    walk:
-                    {
-                        from: 24,
-                        length: 8,
-                    },
-                }
-            });
-    
-    yp.spawn('anim',
-            {
-                x: 450,
-                y: 50,
-                images: 'chuck/player.png',
-                imageScale: 3,
-                animDefault:
-                {
-                    width: 32,
-                    height: 40,
-                    name: 'walk',
-                    duration: 150,
-                },
-                anims:
-                {
-                    walk:
-                    {
-                        from: 24,
-                        length: 8,
-                    },
-                }
-            });
-
-    var z = 100;
-    /*for (var x=0; x<700; x++) {
-        for (var y=300; y<302; y++) {
-            z++;
-            yp.spawn('anim',
-                    {
-                        x: x,
-                        y: y,
-                        z: z,
-                        images: 'chuck/player.png',
-                        imageScale: 1,
-                        animDefault:
-                        {
-                            width: 32,
-                            height: 40,
-                            name: 'walk',
-                            duration: 150,
-                        },
-                        anims:
-                        {
-                            walk:
-                            {
-                                from: 24,
-                                length: 8,
-                            },
-                        }
-                    });
-            /*yp.spawn('image',
-                    {
-                        x: x,
-                        y: y,
-                        images: 'zardoz/image/zardoz_small.png'
-                    });*/
-            /*yp.spawn('text',
-                    {
-                        x: x,
-                        y: y,
-                        text: "This is a text",
-                        textColor: '#19D1FF',
-                    });*/
-    //    }
-    //}
-
-    var timer = 0;
-    var moveBool = false;
-
-    setTimeout(function() {
-        console.log('spawned');
-        yp.spawn('anim',
-                {
-                    x: 50,
-                    y: 200,
-                    z: 1000,
-                    images: 'chuck/player.png',
-                    imageScale: 4,
-                    animDefault:
-                    {
-                        width: 32,
-                        height: 40,
-                        name: 'walk',
-                        duration: 150,
-                    },
-                    anims:
-                    {
-                        walk:
-                        {
-                            from: 24,
-                            length: 8,
-                        },
-                    }
+                    x: x,
+                    y: y,
+                    images: 'zardoz/image/zardoz_small.png',
+                    imageScale: 4
                 });
-
-    }, 3000);
-
-    function switchMove()
-    {
-        if (timer) clearInterval(timer);
-        /*setInterval(function () {
-            moveBool = !moveBool;
-            if (moveBool) yespix.find('.image').prop('y', 250);
-            else yespix.find('.image').prop('y', 300);
-        }, 50);*/
-        timer = setInterval(function () {
-            yespix.find().prop('_changed', true);
-        }, 10);
+        }
     }
+
 
     function switchDebug(name)
     {

@@ -170,40 +170,6 @@ yespix.define('gfx', {
      * Draw the pre-render on a canvas context
      */
     prerenderUse: function(context) {
-        // @todo old code in comment / how does it work ?
-        /*
-        var box = this.getDrawBox(false, context);
-        
-        // check if image outside canvas
-        if (box.x > context.canvas.clientWidth 
-            || box.y > context.canvas.clientHeight
-            || box.x + box.width < 0
-            || box.y + box.height < 0)
-            return false;
-
-        var contextDrawBox = this.getContextDrawBox(context, {realWidth: box.width, realHeight: box.height}, box);
-
-        // check if the contextDrawBox is flat
-        if (contextDrawBox.img_width == 0
-            || contextDrawBox.img_height == 0
-            || contextDrawBox.context_width == 0
-            || contextDrawBox.context_height == 0)
-            return false;
-
-        context.globalAlpha = this.alpha;
-        
-        context.drawImage(this.prerenderCanvas, //image element
-            contextDrawBox.img_x, // x position on image
-            contextDrawBox.img_y, // y position on image
-            contextDrawBox.img_width, // width on image
-            contextDrawBox.img_height, // height on image
-            contextDrawBox.context_x, // x position on canvas
-            contextDrawBox.context_y, // y position on canvas
-            contextDrawBox.context_width, // width on canvas
-            contextDrawBox.context_height // height on canvas
-        );
-        return true;
-        */
     },
 
     ///////////////////////////////// Box functions ////////////////////////////////
@@ -322,7 +288,7 @@ yespix.define('gfx', {
             var scaleX = this._box.context.width / this._box.img.width;
             var scaleY = this._box.context.height / this._box.img.height;
         }
-/*
+
         // crop the left
         if (this._box.context.x < 0) {
             if (imageBox) {
@@ -356,13 +322,13 @@ yespix.define('gfx', {
             if (imageBox) this._box.img.height = this._box.img.height - delta / scaleY;
             this._box.context.height = this._box.context.height - delta;
         }
-*/
+
         // flip horizontally
         if (this.flipX) {
             if (this._box.draw.width > 0) {
                 this._box.context.x = -this._box.context.x - this._box.context.width;
                 if (imageBox) {
-                    if (this._box.img.x == 0) this._box.img.x = this._box.draw.width - this._box.context.width;
+                    if (this._box.img.x === 0) this._box.img.x = this._box.draw.width - this._box.context.width;
                     else this._box.img.x = 0;
                 }
             }
@@ -373,7 +339,7 @@ yespix.define('gfx', {
             if (this._box.draw.height > 0) {
                 this._box.context.y = -this._box.context.y - this._box.context.height;
                 if (imageBox) {
-                    if (this._box.img.y == 0) this._box.img.y = this._box.draw.height - this._box.context.height;
+                    if (this._box.img.y === 0) this._box.img.y = this._box.draw.height - this._box.context.height;
                     else this._box.img.y = 0;
                 }
             }
