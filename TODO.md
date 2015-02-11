@@ -1,6 +1,15 @@
 
 TODO list:
 - optimize: use typed arrays when possible
+- optimize: remove dictionnary mode on entities (remove delete)
+- optimize: try to use fixed length arrays (using new Array(1000))
+- optimize: dont add up properties to class (build mixed class as a separate class)
+- optimize: dont add more than 30 properties to a class
+- optimize: dont change type of a property (use null)
+- optimize: dont change the return type of a function
+- optimize: see https://www.youtube.com/watch?v=XAqIpGU8ZZk at 33min
+- optimize: add the collision box to _box
+
 - use clearRect to clear faster the canvas
 - Z sort function only sort the changed entities
 - use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
@@ -27,7 +36,6 @@ TODO list:
 
 - add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- Make a basic Zombie Sim
 - make a debug panel where you can change variables and see entities
 - fix collision between entities
 - animate properties
@@ -35,8 +43,6 @@ TODO list:
 - draw SVG image
 - rotation
 - parent rotation affects children
-- Make an Arkanoid game
-- Make a Steel Sky game (raiden like)
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
@@ -48,9 +54,13 @@ TODO list:
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - on actor entity, make walk animation speed progressive
-- Make the Chuck game
 - slow time
-- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
+
+- debug pong game
+- make a basic Zombie Sim
+- make an Arkanoid game
+- make a Steel Sky game (raiden like)
+- make the Chuck game
 
 
 LATER:
@@ -83,6 +93,7 @@ DONE:
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
 - create entitiesReady function to check if all entities are ready // 2014-11-07
 - make drawDebug(), drawDebugPosition()
+- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
 - fix follow reset when level is not ready // 2014-08-04
 - auto attach every entity with childAdd() to the current level
 - actor2w disociate speed and direction // 2014-07-28
