@@ -40,7 +40,7 @@ yespix.define('levelLayer', 'gfx', {
 
     drawTile: function(spriteIndex, cellX, cellY) {
         var image, imageIndex;
-//console.log('levelLayer: drawTile: ', spriteIndex, cellX, cellY);
+
         for (var t = 0; t < this.level.tilesets.images.length; t++) {
             if (!this.level.tilesets.images[t].isReady) {
                 console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
@@ -64,7 +64,7 @@ yespix.define('levelLayer', 'gfx', {
         var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
-        
+
         this.drawContext.drawImage(image.element, //image element
             col * this.layerData.tilewidth, // x position on image
             line * this.layerData.tilewidth, // y position on image
@@ -145,6 +145,12 @@ yespix.define('levelLayer', 'gfx', {
             };
         } else {
             var position = this._parent.getPosition();
+
+            if (this.layerData.properties.type == 'parallax') {
+                if (this.layerData.properties.speedX) position.x = position.x * this.layerData.properties.speedX;
+                if (this.layerData.properties.speedY) position.y = position.y * this.layerData.properties.speedY;
+            }
+
             if (position) return {
                 x: x + position.x,
                 y: y + position.y

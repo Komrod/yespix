@@ -17,29 +17,18 @@ yespix.define('collision', {
         return false;
     },
 
-    collisionBox: function(relative) {
+    collisionBox: function(absolute) {
 
-        var pos = this.getPosition(relative);
+        var pos = this.getPosition(absolute);
 
-        if (yespix.isUndefined(this.imageScale)) {
-            return {
-                x: pos.x + this.colOffsetX,
-                y: pos.y + this.colOffsetY,
-                width: this.colWidth,
-                height: this.colHeight,
-                offsetX: this.colOffsetX,
-                offsetY: this.colOffsetY,
-            };
-        } else {
-            return {
-                x: pos.x + this.colOffsetX * this.imageScale,
-                y: pos.y + this.colOffsetY * this.imageScale,
-                width: this.colWidth * this.imageScale,
-                height: this.colHeight * this.imageScale,
-                offsetX: this.colOffsetX * this.imageScale,
-                offsetY: this.colOffsetY * this.imageScale,
-            };
-        }
+        return {
+            x: pos.x + this.colOffsetX * this.imageScale,
+            y: pos.y + this.colOffsetY * this.imageScale,
+            width: this.colWidth * this.imageScale,
+            height: this.colHeight * this.imageScale,
+            offsetX: this.colOffsetX * this.imageScale,
+            offsetY: this.colOffsetY * this.imageScale,
+        };
     },
 
     collision: function() {
@@ -78,12 +67,12 @@ yespix.define('collision', {
 
     drawDebugCollision: function(context, drawBox) {
         if (this.collisionBox) {
-            var box = drawBox || this.collisionBox();
+            drawBox = drawBox || this.collisionBox();
             context.globalAlpha = 1;
-            context.lineWidth = 0.5;
+            context.lineWidth = 2;
             context.strokeStyle = "#000099";
             // @TODO draw a better debug collision
-            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+            context.strokeRect(drawBox.x - 0.5, drawBox.y - 0.5, drawBox.width + 1, drawBox.height + 1);
             //} else {
             //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.imageScale + 1 * scaleX, box.height * this.imageScale + 1 * scaleY);
             //}

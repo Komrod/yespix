@@ -3682,7 +3682,7 @@
                 if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
                     // if changed, update the pre render canvas
-                    if (this._changed) this.prerenderUpdate(context);
+                    if (this.getChanged()) this.prerenderUpdate(context);
 
                     // use the pre render canvas
                     this.prerenderUse(context);
@@ -3919,29 +3919,18 @@
                 return false;
             },
 
-            collisionBox: function(relative) {
+            collisionBox: function(absolute) {
 
-                var pos = this.getPosition(relative);
+                var pos = this.getPosition(absolute);
 
-                if (yespix.isUndefined(this.imageScale)) {
-                    return {
-                        x: pos.x + this.colOffsetX,
-                        y: pos.y + this.colOffsetY,
-                        width: this.colWidth,
-                        height: this.colHeight,
-                        offsetX: this.colOffsetX,
-                        offsetY: this.colOffsetY,
-                    };
-                } else {
-                    return {
-                        x: pos.x + this.colOffsetX * this.imageScale,
-                        y: pos.y + this.colOffsetY * this.imageScale,
-                        width: this.colWidth * this.imageScale,
-                        height: this.colHeight * this.imageScale,
-                        offsetX: this.colOffsetX * this.imageScale,
-                        offsetY: this.colOffsetY * this.imageScale,
-                    };
-                }
+                return {
+                    x: pos.x + this.colOffsetX * this.imageScale,
+                    y: pos.y + this.colOffsetY * this.imageScale,
+                    width: this.colWidth * this.imageScale,
+                    height: this.colHeight * this.imageScale,
+                    offsetX: this.colOffsetX * this.imageScale,
+                    offsetY: this.colOffsetY * this.imageScale,
+                };
             },
 
             collision: function() {
@@ -3980,12 +3969,12 @@
 
             drawDebugCollision: function(context, drawBox) {
                 if (this.collisionBox) {
-                    var box = drawBox || this.collisionBox();
+                    drawBox = drawBox || this.collisionBox();
                     context.globalAlpha = 1;
-                    context.lineWidth = 0.5;
+                    context.lineWidth = 2;
                     context.strokeStyle = "#000099";
                     // @TODO draw a better debug collision
-                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                    context.strokeRect(drawBox.x - 0.5, drawBox.y - 0.5, drawBox.width + 1, drawBox.height + 1);
                     //} else {
                     //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.imageScale + 1 * scaleX, box.height * this.imageScale + 1 * scaleY);
                     //}
@@ -4051,8 +4040,8 @@
                 context.strokeRect(this.x, this.y, this.width, this.height);
             },
 
-            getDrawBox: function(relative) {
-                var position = this.getPosition(relative);
+            getDrawBox: function() {
+                var position = this.getPosition(true);
                 var context = yespix.context;
                 if (!context) return {
                     x: position.x,
@@ -4175,6 +4164,11 @@
          */
         yespix.define('gfx', {
 
+            /**
+             * True if the entity has changed since the last draw. To get the value and check if the parent
+             * has changed, use getChanged()
+             * @type {Boolean}
+             */
             _changed: true,
 
             /**
@@ -4317,8 +4311,8 @@
              * Update the canvas for the prerender
              */
             prerenderUpdate: function() {
-                if (this._changed) {
-                    this.getBox(this.prerenderCanvas.context);
+                if (this.getChanged()) {
+                    this.getBox(false);
                 }
                 // save original coordinates
                 var drawX = this._box.draw.x,
@@ -4326,7 +4320,7 @@
                 this._box.draw.x = 0;
                 this._box.draw.y = 0;
 
-                if (this._changed) {
+                if (this.getChanged()) {
                     this.prerenderCanvas.width = this._box.draw.width;
                     this.prerenderCanvas.height = this._box.draw.height;
                 }
@@ -4519,13 +4513,18 @@
 
             ///////////////////////////////// Main draw functions ////////////////////////////////
 
+            getChanged: function() {
+                if (this._changed) return true;
+                if (this._parent) return this._parent.getChanged();
+                return false;
+            },
 
             /**
              * Try to draw the gfx entity on a canvas
              * @return {bool} True if drawn
              */
             draw: function(context) {
-                //if (this._changed) console.log('gfx.draw: '+this._class+' _changed');
+                //if (this.getChanged()) console.log('gfx.draw: '+this._class+' getChanged()');
                 // get the context
                 context = context || yespix.context;
 
@@ -4533,7 +4532,7 @@
                 if (!this.canDraw(context)) return this.drawExit(false);
 
                 // get the draw box
-                if (this._changed) this.getBox(context);
+                if (this.getChanged()) this.getBox(false);
 
                 // if cannot draw from this draw box
                 if (!this.canDrawBox(context)) return this.drawExit(false);
@@ -4542,7 +4541,7 @@
                 if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
                     // if changed, update the pre render canvas
-                    if (this._changed) this.prerenderUpdate(context);
+                    if (this.getChanged()) this.prerenderUpdate(context);
 
                     // use the pre render canvas
                     this.prerenderUse(context);
@@ -4568,6 +4567,12 @@
              * @param {bool} isDrawn True if the entity was just drawn on this frame
              */
             drawExit: function(isDrawn) {
+                if (this._changed && this._children) {
+                    var count = this._children.length;
+                    for (var t = 0; t < count; t++) {
+                        this._children[t]._changed = true;
+                    }
+                }
                 this._changed = false;
                 return isDrawn;
             },
@@ -5087,6 +5092,7 @@
             },
 
             block: function(cellX, cellY) {
+                console.log('block: cellX=' + cellX + ', cellY=' + cellY);
                 if (cellX < 0 || cellY < 0) return false;
                 if (cellX >= this.levelData.width || cellY >= this.levelData.height) return false;
 
@@ -5101,9 +5107,11 @@
             },
 
             collisionRight: function(entity, box, cellX, cellY) {
-                //console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
+                console.log('collisionRight :: cellX: ' + cellX + ', cellY: ' + cellY);
                 this.hit(cellX, cellY, 'right', entity.speedX);
+                console.log('old x=' + entity.x);
                 entity.x = cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
+                console.log('new x=' + entity.x);
                 entity.speedX = 0;
             },
 
@@ -5147,10 +5155,12 @@
 
                 if (entity.speedX > 0) {
                     // check every collision on the right
-                    var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
+                    console.log('box #1 = ', box);
+                    var cellRight = Math.floor((box.x + box.width + box.offsetX) / this.levelData.tilewidth);
 
                     // cellNext is the final cell on the right of the entity
-                    var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+                    var cellNext = Math.floor((box.x + box.width + box.offsetX + entity.speedX) / this.levelData.tilewidth);
+                    console.log('cellRight = ' + cellRight + ', cellNext=' + cellNext);
 
                     if (cellNext > cellRight) {
 
@@ -5159,6 +5169,8 @@
                         var cellTop = Math.floor(box.y / this.levelData.tileheight);
                         var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                         var stopped = false;
+                        console.log('=========================');
+                        console.log('box #1 = ', box);
                         for (var x = cellRight; x <= cellNext; x++) {
                             for (var y = cellTop; y <= cellBottom; y++) {
                                 if (this.block(x, y)) {
@@ -5265,6 +5277,8 @@
                 if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
                     var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
                     var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
+                    console.log('=========================');
+                    console.log('box #2 = ', box);
                     if (this.block(cellRight, cellTop)) {
                         this.collisionUp(entity, box, cellRight, cellTop);
                         this.collisionRight(entity, box, cellRight, cellTop);
@@ -5272,6 +5286,8 @@
                 } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
                     var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
                     var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
+                    console.log('=========================');
+                    console.log('box #3 = ', box);
                     if (this.block(cellRight, cellBottom)) {
                         //this.collisionDown(entity, box, cellRight, cellBottom);
                         this.collisionRight(entity, box, cellRight, cellBottom);
@@ -5461,7 +5477,10 @@
             followEntity: function(entity, context) {
                 if (!context) context = yespix.context;
                 var delta = this.followEntityDelta(entity, context);
-                if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+                if (delta) {
+                    this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+                    if (delta.x !== 0 || delta.y !== 0) this._changed = true;
+                }
             },
 
             unfollow: function() {
@@ -5514,7 +5533,7 @@
 
             drawTile: function(spriteIndex, cellX, cellY) {
                 var image, imageIndex;
-                //console.log('levelLayer: drawTile: ', spriteIndex, cellX, cellY);
+
                 for (var t = 0; t < this.level.tilesets.images.length; t++) {
                     if (!this.level.tilesets.images[t].isReady) {
                         console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
@@ -5614,6 +5633,12 @@
                     };
                 } else {
                     var position = this._parent.getPosition();
+
+                    if (this.layerData.properties.type == 'parallax') {
+                        if (this.layerData.properties.speedX) position.x = position.x * this.layerData.properties.speedX;
+                        if (this.layerData.properties.speedY) position.y = position.y * this.layerData.properties.speedY;
+                    }
+
                     if (position) return {
                         x: x + position.x,
                         y: y + position.y

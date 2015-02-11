@@ -54,8 +54,8 @@ yespix.define('fps', 'gfx', {
         context.strokeRect(this.x, this.y, this.width, this.height);
     },
 
-    getDrawBox: function(relative) {
-        var position = this.getPosition(relative);
+    getDrawBox: function() {
+        var position = this.getPosition(true);
         var context = yespix.context;
         if (!context) return {
             x: position.x,

@@ -3,6 +3,11 @@
  */
 yespix.define('gfx', {
 
+    /**
+     * True if the entity has changed since the last draw. To get the value and check if the parent
+     * has changed, use getChanged()
+     * @type {Boolean}
+     */
     _changed: true,
     
     /**
@@ -145,8 +150,8 @@ yespix.define('gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        if (this._changed) {
-            this.getBox(this.prerenderCanvas.context);
+        if (this.getChanged()) {
+            this.getBox(false);
         }
         // save original coordinates
         var drawX = this._box.draw.x,
@@ -154,7 +159,7 @@ yespix.define('gfx', {
         this._box.draw.x = 0;
         this._box.draw.y = 0;
 
-        if (this._changed) {
+        if (this.getChanged()) {
             this.prerenderCanvas.width = this._box.draw.width;
             this.prerenderCanvas.height = this._box.draw.height;
         }
@@ -349,13 +354,18 @@ yespix.define('gfx', {
 
     ///////////////////////////////// Main draw functions ////////////////////////////////
 
+    getChanged: function() {
+        if (this._changed) return true;
+        if (this._parent) return this._parent.getChanged();
+        return false;
+    },
 
     /**
      * Try to draw the gfx entity on a canvas
      * @return {bool} True if drawn
      */
     draw: function(context) {
-        //if (this._changed) console.log('gfx.draw: '+this._class+' _changed');
+        //if (this.getChanged()) console.log('gfx.draw: '+this._class+' getChanged()');
         // get the context
         context = context || yespix.context;
         
@@ -363,7 +373,7 @@ yespix.define('gfx', {
         if (!this.canDraw(context)) return this.drawExit(false);
 
         // get the draw box
-        if (this._changed) this.getBox(context);
+        if (this.getChanged()) this.getBox(false);
 
         // if cannot draw from this draw box
         if (!this.canDrawBox(context)) return this.drawExit(false);
@@ -372,7 +382,7 @@ yespix.define('gfx', {
         if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
             // if changed, update the pre render canvas
-            if (this._changed) this.prerenderUpdate(context);
+            if (this.getChanged()) this.prerenderUpdate(context);
 
             // use the pre render canvas
             this.prerenderUse(context);
@@ -398,6 +408,12 @@ yespix.define('gfx', {
      * @param {bool} isDrawn True if the entity was just drawn on this frame
      */
     drawExit: function(isDrawn) {
+        if (this._changed && this._children) {
+            var count = this._children.length;
+            for (var t=0; t<count; t++) {
+                this._children[t]._changed = true;
+            }
+        }
         this._changed = false;
         return isDrawn;
     },

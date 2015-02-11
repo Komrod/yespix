@@ -48,6 +48,7 @@ yespix.define('level', 'gfx,move', {
     },
 
     block: function(cellX, cellY) {
+console.log('block: cellX='+cellX+', cellY='+cellY);
         if (cellX < 0 || cellY < 0) return false;
         if (cellX >= this.levelData.width || cellY >= this.levelData.height) return false;
 
@@ -62,9 +63,11 @@ yespix.define('level', 'gfx,move', {
     },
 
     collisionRight: function(entity, box, cellX, cellY) {
-        //console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
+console.log('collisionRight :: cellX: '+cellX+', cellY: '+cellY);
         this.hit(cellX, cellY, 'right', entity.speedX);
+        console.log('old x='+entity.x);
         entity.x = cellX * this.levelData.tilewidth - 0.0001 - box.offsetX - box.width;
+        console.log('new x='+entity.x);
         entity.speedX = 0;
     },
 
@@ -108,10 +111,12 @@ yespix.define('level', 'gfx,move', {
 
         if (entity.speedX > 0) {
             // check every collision on the right
-            var cellRight = Math.floor((box.x + box.width) / this.levelData.tilewidth);
+console.log('box #1 = ', box);
+            var cellRight = Math.floor((box.x + box.width + box.offsetX) / this.levelData.tilewidth);
 
             // cellNext is the final cell on the right of the entity
-            var cellNext = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
+            var cellNext = Math.floor((box.x + box.width + box.offsetX + entity.speedX) / this.levelData.tilewidth);
+console.log('cellRight = '+cellRight+', cellNext='+cellNext);
 
             if (cellNext > cellRight) {
 
@@ -120,6 +125,8 @@ yespix.define('level', 'gfx,move', {
                 var cellTop = Math.floor(box.y / this.levelData.tileheight);
                 var cellBottom = Math.floor((box.y + box.height) / this.levelData.tileheight);
                 var stopped = false;
+console.log('=========================');            
+console.log('box #1 = ', box);
                 for (var x = cellRight; x <= cellNext; x++) {
                     for (var y = cellTop; y <= cellBottom; y++) {
                         if (this.block(x, y)) {
@@ -226,6 +233,8 @@ yespix.define('level', 'gfx,move', {
         if (!up && !right && entity.speedX > 0 && entity.speedY < 0) {
             var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
             var cellTop = Math.floor((box.y + entity.speedY) / this.levelData.tileheight);
+console.log('=========================');            
+console.log('box #2 = ', box);
             if (this.block(cellRight, cellTop)) {
                 this.collisionUp(entity, box, cellRight, cellTop);
                 this.collisionRight(entity, box, cellRight, cellTop);
@@ -233,6 +242,8 @@ yespix.define('level', 'gfx,move', {
         } else if (!down && !right && entity.speedX > 0 && entity.speedY > 0) {
             var cellRight = Math.floor((box.x + box.width + entity.speedX) / this.levelData.tilewidth);
             var cellBottom = Math.floor((box.y + box.height + entity.speedY) / this.levelData.tileheight);
+console.log('=========================');            
+console.log('box #3 = ', box);
             if (this.block(cellRight, cellBottom)) {
                 //this.collisionDown(entity, box, cellRight, cellBottom);
                 this.collisionRight(entity, box, cellRight, cellBottom);
@@ -422,7 +433,10 @@ yespix.define('level', 'gfx,move', {
     followEntity: function(entity, context) {
         if (!context) context = yespix.context;
         var delta = this.followEntityDelta(entity, context);
-        if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+        if (delta) {
+            this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
+            if (delta.x !== 0 || delta.y !== 0) this._changed = true;
+        }
     },
 
     unfollow: function() {

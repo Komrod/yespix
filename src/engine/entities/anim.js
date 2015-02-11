@@ -371,7 +371,7 @@ yespix.define('anim', 'image', {
         if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
             // if changed, update the pre render canvas
-            if (this._changed) this.prerenderUpdate(context);
+            if (this.getChanged()) this.prerenderUpdate(context);
 
             // use the pre render canvas
             this.prerenderUse(context);
