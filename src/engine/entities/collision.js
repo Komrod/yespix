@@ -22,8 +22,8 @@ yespix.define('collision', {
         var pos = this.getPosition(absolute);
 
         return {
-            x: pos.x + this.colOffsetX * this.imageScale,
-            y: pos.y + this.colOffsetY * this.imageScale,
+            x: pos.floatX + this.colOffsetX * this.imageScale,
+            y: pos.floatY + this.colOffsetY * this.imageScale,
             width: this.colWidth * this.imageScale,
             height: this.colHeight * this.imageScale,
             offsetX: this.colOffsetX * this.imageScale,
@@ -67,7 +67,7 @@ yespix.define('collision', {
 
     drawDebugCollision: function(context, drawBox) {
         if (this.collisionBox) {
-            drawBox = drawBox || this.collisionBox();
+            drawBox = this.collisionBox(false);
             context.globalAlpha = 1;
             context.lineWidth = 2;
             context.strokeStyle = "#000099";

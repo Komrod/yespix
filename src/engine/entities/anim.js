@@ -422,12 +422,13 @@ yespix.define('anim', 'image', {
 
     drawRender: function(context) {
         // check if image outside canvas
+        /*
         if (this._box.draw.x > context.canvas.clientWidth 
             || this._box.draw.y > context.canvas.clientHeight 
             || this._box.draw.x + this._box.draw.width < 0
             || this._box.draw.y + this._box.draw.height < 0)
             return;
-
+        */
         //var frame = this.getFrame();        
         //var img = this.animFrameObject.image;
         //var scaleX = this.animFrameObject.flipX ? -1 : 1;
@@ -457,5 +458,13 @@ yespix.define('anim', 'image', {
             context.restore();
         }
     },
+
+    drawDebugImage: function(context, drawBox) {
+        drawBox = drawBox || this.getDrawBox();
+        context.globalAlpha = 1;
+        context.fillStyle = '#999999';
+        context.font = "10px sans-serif";
+        context.fillText("Image: " + this.imageSelected + ' / ' + this.animFrame, drawBox.x, drawBox.y - 5);
+    }
 
 });

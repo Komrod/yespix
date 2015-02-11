@@ -141,11 +141,12 @@ yespix.define('levelLayer', 'gfx', {
         if (absolute || !this._parent) {
             return {
                 x: x,
-                y: y
+                y: y,
+                floatX: this.x,
+                floatY: this.y
             };
         } else {
             var position = this._parent.getPosition();
-
             if (this.layerData.properties.type == 'parallax') {
                 if (this.layerData.properties.speedX) position.x = position.x * this.layerData.properties.speedX;
                 if (this.layerData.properties.speedY) position.y = position.y * this.layerData.properties.speedY;
@@ -153,12 +154,16 @@ yespix.define('levelLayer', 'gfx', {
 
             if (position) return {
                 x: x + position.x,
-                y: y + position.y
+                y: y + position.y,
+                floatX: this.x,
+                floatY: this.y
             };
         }
         return {
             x: x,
-            y: y
+            y: y,
+            floatX: this.x,
+            floatY: this.y
         };
     },
 

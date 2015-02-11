@@ -231,20 +231,29 @@ yespix.define('gfx', {
             y = parseInt(y);
         }
         if (absolute || !this._parent) {
+//if (this._class == 'chuck') console.log('getPosition: absolute');
+//if (debug && yespix.randInt(0,100) == 0) console.log('getPosition: absolute = '+absolute+' this = ', this);
             return {
                 x: x,
-                y: y
+                y: y,
+                floatX: this.x,
+                floatY: this.y
             };
         } else {
             var position = this._parent.getPosition();
+//if (debug && yespix.randInt(0,100) == 0) console.log('getPosition: parent relative, absolute = '+absolute+' this = ', this);
             if (position) return {
                 x: x + position.x,
-                y: y + position.y
+                y: y + position.y,
+                floatX: this.x + position.x,
+                floatY: this.y + position.y
             };
         }
         return {
             x: x,
-            y: y
+            y: y,
+            floatX: this.x,
+            floatY: this.y
         };
     },
 
@@ -408,13 +417,14 @@ yespix.define('gfx', {
      * @param {bool} isDrawn True if the entity was just drawn on this frame
      */
     drawExit: function(isDrawn) {
+        /*
         if (this._changed && this._children) {
             var count = this._children.length;
             for (var t=0; t<count; t++) {
                 this._children[t]._changed = true;
             }
         }
-        this._changed = false;
+        this._changed = false;*/
         return isDrawn;
     },
 
@@ -439,8 +449,8 @@ yespix.define('gfx', {
      */
     canDrawBox: function(context) {
         
-        if (this._box.draw.x > context.width
-            || this._box.draw.y > context.height
+        if (this._box.draw.x >= context.canvas.clientWidth
+            || this._box.draw.y >= context.canvas.clientHeight
             || this._box.draw.x + this._box.draw.width < 0
             || this._box.draw.y + this._box.draw.height < 0
             )
