@@ -59,6 +59,11 @@ yespix.define('image', 'gfx', {
      */
     imageScale: 1.0,
 
+    /**
+     * Source file of the image
+     * @type {String}
+     */
+    src: '',
 
     init: function() {
 
