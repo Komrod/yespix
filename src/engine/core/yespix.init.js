@@ -39,7 +39,7 @@ yespix.fn.init = function(options) {
     });
 
     // current version of the engine
-    this.version = "0.13.1";
+    this.version = "0.0.14.1";
 
     // initialise the data
     this.data = {
@@ -285,12 +285,10 @@ yespix.fn.init = function(options) {
                 if (yespix.drawEntities)
                 {
                     yespix.drawEntities = yespix.drawEntities.sort(compare);
-                    console.log('sort #1');
                 }
                 yespix.drawEntitiesChange = false;
             } else if (yespix.drawEntitiesSort) {
                 yespix.drawEntities = yespix.drawEntities.sort(compare);
-                console.log('sort #2');
                 yespix.drawEntitiesSort = false;
             }
 
