@@ -3760,40 +3760,6 @@
                 }
             },
 
-
-            ///////////////////////////////// Sprite functions //////////////////////////////////////
-
-            getSpriteCount: function(imageIndex) {
-                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
-                var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
-                var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
-                return cols * rows;
-            },
-
-            getSpriteImage: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return this.images[t];
-                    globalIndex = globalIndex - count;
-                }
-                return false;
-            },
-
-            getSpriteImageIndex: function(globalIndex) {
-                var count;
-                if (!this.isReady || !this.images) return false;
-                for (var t = 0; t < this.images.length; t++) {
-                    if (!this.images[t] || !this.images[t].isReady) return false;
-                    count = this.getSpriteCount(t);
-                    if (count > globalIndex) return globalIndex;
-                    globalIndex = globalIndex - count;
-                }
-                return false;
-            }
-
         });
 
         yespix.define('canvas', {
@@ -3957,7 +3923,7 @@
 
                 var pos = this.getPosition(relative);
 
-                if (yespix.isUndefined(this.pixelSize)) {
+                if (yespix.isUndefined(this.imageScale)) {
                     return {
                         x: pos.x + this.colOffsetX,
                         y: pos.y + this.colOffsetY,
@@ -3968,12 +3934,12 @@
                     };
                 } else {
                     return {
-                        x: pos.x + this.colOffsetX * this.pixelSize,
-                        y: pos.y + this.colOffsetY * this.pixelSize,
-                        width: this.colWidth * this.pixelSize,
-                        height: this.colHeight * this.pixelSize,
-                        offsetX: this.colOffsetX * this.pixelSize,
-                        offsetY: this.colOffsetY * this.pixelSize,
+                        x: pos.x + this.colOffsetX * this.imageScale,
+                        y: pos.y + this.colOffsetY * this.imageScale,
+                        width: this.colWidth * this.imageScale,
+                        height: this.colHeight * this.imageScale,
+                        offsetX: this.colOffsetX * this.imageScale,
+                        offsetY: this.colOffsetY * this.imageScale,
                     };
                 }
             },
@@ -4019,10 +3985,9 @@
                     context.lineWidth = 0.5;
                     context.strokeStyle = "#000099";
                     // @TODO draw a better debug collision
-                    //if (yespix.isUndefined()) {
-                    //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+                    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
                     //} else {
-                    //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+                    //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.imageScale + 1 * scaleX, box.height * this.imageScale + 1 * scaleY);
                     //}
                 }
             }
@@ -5074,181 +5039,6 @@
 
         });
 
-        yespix.define('layer', 'gfx', {
-
-            isVisible: true,
-
-            isReady: false,
-
-            canvas: null,
-            drawContext: null,
-
-            layerData: null,
-
-            level: null,
-
-            create: function() {
-
-            },
-
-            setLevel: function(level) {
-                this.level = level;
-            },
-
-            load: function(layerData) {
-                this.layerData = layerData;
-                this.update();
-            },
-
-            update: function() {
-                if (!this.layerData) return false;
-
-                this.canvas = document.createElement('canvas');
-                this.drawContext = this.canvas.getContext('2d');
-
-                this.width = this.layerData.width * this.layerData.tilewidth;
-                this.height = this.layerData.height * this.layerData.tilewidth;
-                if (this.layerData.properties.z) this.z = this.layerData.properties.z;
-                if (this.layerData.opacity) this.alpha = this.layerData.opacity;
-                this.canvas.width = this.width;
-                this.canvas.height = this.height;
-            },
-
-            drawTile: function(spriteIndex, cellX, cellY) {
-                var image, imageIndex;
-
-                for (var t = 0; t < this.level.tilesets.images.length; t++) {
-                    if (!this.level.tilesets.images[t].isReady) {
-                        console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
-                        return false;
-                    }
-                }
-
-                image = this.level.tilesets.getSpriteImage(spriteIndex);
-
-                if (!image) {
-                    console.error('layer::drawTile :: no image found for spriteIndex ' + spriteIndex);
-                    return false;
-                }
-
-                if (!image.isReady) {
-                    console.error('layer::drawTile :: image of the tileset is not ready');
-                    return false;
-                }
-
-                spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
-                var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
-                var line = Math.floor(spriteIndex / max);
-                var col = spriteIndex - (line * max);
-                this.drawContext.drawImage(image.element, //image element
-                    col * this.layerData.tilewidth, // x position on image
-                    line * this.layerData.tilewidth, // y position on image
-                    this.layerData.tilewidth, // width on image
-                    this.layerData.tilewidth, // height on image
-                    cellX * this.layerData.tilewidth, // x position on canvas
-                    cellY * this.layerData.tilewidth, // y position on canvas
-                    this.layerData.tilewidth, // width on canvas
-                    this.layerData.tilewidth // height on canvas
-                );
-            },
-
-            clear: function() {
-                if (this.canvas) this.canvas.width = this.canvas.width;
-            },
-
-
-            make: function() {
-                this.clear();
-                if (!this.layerData || !this.level) return;
-
-                var index = 0;
-
-                for (var y = 0; y < this.layerData.height; y++) {
-                    for (var x = 0; x < this.layerData.width; x++) {
-                        if (this.layerData && this.layerData.data) {
-                            var spriteIndex = this.layerData.data[index] - 1;
-                            if (spriteIndex >= 0) {
-                                this.drawTile(spriteIndex, x, y);
-                            }
-                        }
-                        index++;
-                    }
-                }
-                this.ready();
-            },
-
-            /**
-             * Returns true if the entity can be drawn, get this information from basic properties of the entity
-             * @return {bool} True if can be drawn
-             */
-            canDraw: function(context) {
-                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !this.canvas || !context || !this.drawContext || !this.isReady)
-                    return false;
-
-                return true;
-            },
-
-            /**
-             * Get the position absolute or relative to the parent entity
-             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
-             * @return {object} Result {x, y}
-             */
-            getPosition: function(absolute) {
-                var x = this.x,
-                    y = this.y;
-
-                if (this.snapToPixel) {
-                    x = parseInt(x);
-                    y = parseInt(y);
-                }
-
-                if (this.layerData.properties.type == 'parallax') {
-                    if (this.layerData.properties.speedX) x = x * this.layerData.properties.speedX;
-                    if (this.layerData.properties.speedY) y = y * this.layerData.properties.speedY;
-                }
-
-                if (absolute || !this._parent) {
-                    return {
-                        x: x,
-                        y: y
-                    };
-                } else {
-                    var position = this._parent.getPosition();
-                    if (position) return {
-                        x: x + position.x,
-                        y: y + position.y
-                    };
-                }
-                return {
-                    x: x,
-                    y: y
-                };
-            },
-
-
-            drawRender: function(context) {
-
-                // check if image outside canvas
-                if (this._box.x > context.canvas.clientWidth || this._box.y > context.canvas.clientHeight || this._box.x + this._box.width < 0 || this._box.y + this._box.height < 0)
-                    return;
-
-                context.globalAlpha = this.alpha * this.level.alpha;
-
-                this.getContextBox(context, this.drawContext);
-
-                context.drawImage(this.canvas, //image element
-                    this._box.img.x, // x position on image
-                    this._box.img.y, // y position on image
-                    this._box.img.width, // width on image
-                    this._box.img.height, // height on image
-                    this._box.context.x, // x position on canvas
-                    this._box.context.y, // y position on canvas
-                    this._box.context.width * this.pixelSize, // width on canvas
-                    this._box.context.height * this.pixelSize // height on canvas
-                );
-            },
-        });
-
         yespix.define('level', 'gfx,move', {
             levelData: null,
             levelCollision: [],
@@ -5541,13 +5331,13 @@
                 yespix.load(src, {
                     'complete': function(e) {
                         var entity = e.entity;
-                        var pixelSize = 1;
-                        if (entity.pixelSize && entity.pixelSize > 0) pixelSize = entity.pixelSize;
+                        var imageScale = 1;
+                        if (entity.imageScale && entity.imageScale > 0) imageScale = entity.imageScale;
 
                         entity.levelData = JSON.parse(e.content);
 
-                        entity.levelData.tilewidth = entity.levelData.tilewidth * entity.pixelSize;
-                        entity.levelData.tileheight = entity.levelData.tileheight * entity.pixelSize;
+                        entity.levelData.tilewidth = entity.levelData.tilewidth * imageScale;
+                        entity.levelData.tileheight = entity.levelData.tileheight * imageScale;
 
                         entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                         entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
@@ -5565,13 +5355,16 @@
                                 images.push(entity.levelDir + entity.levelData.tilesets[t].image);
                             }
                             entity.tilesets = yespix.spawn(
-                                'sprite', {
+                                'levelSprite', {
                                     registerInstance: false,
                                     images: images,
-                                    pixelSize: pixelSize,
+                                    imageScale: imageScale,
                                     spriteWidth: entity.levelData.tilewidth,
                                     spriteHeight: entity.levelData.tileheight
                                 });
+
+                            //console.log('level load complete: tilesets = ', entity.tilesets);
+
                             entity.tilesets.on('imageReady', function() {
                                 entity.tilesetsReady();
                                 yespix.level = entity;
@@ -5599,7 +5392,7 @@
                 var count = this.levelData.layers.length;
 
                 for (var t = 0; t < count; t++) {
-                    layer = yespix.spawn('layer');
+                    layer = yespix.spawn('levelLayer');
                     this.childAdd(layer);
                     layer.setLevel(this);
 
@@ -5651,12 +5444,8 @@
             },
 
             followEntityDelta: function(entity, context) {
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+                if (!context) context = yespix.context;
+
                 var boxEntity = entity.getDrawBox(true);
                 var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
                 var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;
@@ -5670,12 +5459,7 @@
             },
 
             followEntity: function(entity, context) {
-                if (!context) {
-                    if (!this._context) {
-                        this.getContext();
-                        if (this._context) context = this._context;
-                    } else context = this._context;
-                }
+                if (!context) context = yespix.context;
                 var delta = this.followEntityDelta(entity, context);
                 if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
             },
@@ -5685,6 +5469,229 @@
                 this.moveStop();
             },
 
+
+        });
+
+        yespix.define('levelLayer', 'gfx', {
+
+            isVisible: true,
+
+            isReady: false,
+
+            canvas: null,
+            drawContext: null,
+
+            layerData: null,
+
+            level: null,
+
+            create: function() {
+
+            },
+
+            setLevel: function(level) {
+                this.level = level;
+            },
+
+            load: function(layerData) {
+                this.layerData = layerData;
+                this.update();
+            },
+
+            update: function() {
+                if (!this.layerData) return false;
+
+                this.canvas = document.createElement('canvas');
+                this.drawContext = this.canvas.getContext('2d');
+
+                this.width = this.layerData.width * this.layerData.tilewidth;
+                this.height = this.layerData.height * this.layerData.tilewidth;
+                if (this.layerData.properties.z) this.z = this.layerData.properties.z;
+                if (this.layerData.opacity) this.alpha = this.layerData.opacity;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            },
+
+            drawTile: function(spriteIndex, cellX, cellY) {
+                var image, imageIndex;
+                //console.log('levelLayer: drawTile: ', spriteIndex, cellX, cellY);
+                for (var t = 0; t < this.level.tilesets.images.length; t++) {
+                    if (!this.level.tilesets.images[t].isReady) {
+                        console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
+                        return false;
+                    }
+                }
+
+                image = this.level.tilesets.getSpriteImage(spriteIndex);
+
+                if (!image) {
+                    console.error('layer::drawTile :: no image found for spriteIndex ' + spriteIndex);
+                    return false;
+                }
+
+                if (!image.isReady) {
+                    console.error('layer::drawTile :: image of the tileset is not ready');
+                    return false;
+                }
+
+                spriteIndex = this.level.tilesets.getSpriteImageIndex(spriteIndex);
+                var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
+                var line = Math.floor(spriteIndex / max);
+                var col = spriteIndex - (line * max);
+
+                this.drawContext.drawImage(image.element, //image element
+                    col * this.layerData.tilewidth, // x position on image
+                    line * this.layerData.tilewidth, // y position on image
+                    this.layerData.tilewidth, // width on image
+                    this.layerData.tilewidth, // height on image
+                    cellX * this.layerData.tilewidth, // x position on canvas
+                    cellY * this.layerData.tilewidth, // y position on canvas
+                    this.layerData.tilewidth, // width on canvas
+                    this.layerData.tilewidth // height on canvas
+                );
+                return true;
+            },
+
+            clear: function() {
+                if (this.canvas) this.canvas.width = this.canvas.width;
+            },
+
+
+            make: function() {
+                this.clear();
+                if (!this.layerData || !this.level) return;
+
+                var index = 0;
+
+                for (var y = 0; y < this.layerData.height; y++) {
+                    for (var x = 0; x < this.layerData.width; x++) {
+                        if (this.layerData && this.layerData.data) {
+                            var spriteIndex = this.layerData.data[index] - 1;
+                            if (spriteIndex >= 0) {
+                                if (!this.drawTile(spriteIndex, x, y)) break;;
+                            }
+                        }
+                        index++;
+                    }
+                }
+                this.ready();
+            },
+
+            /**
+             * Returns true if the entity can be drawn, get this information from basic properties of the entity
+             * @return {bool} True if can be drawn
+             */
+            canDraw: function(context) {
+                if (!this.isActive || !this.isVisible || this.alpha <= 0 || !this.canvas || !context || !this.drawContext || !this.isReady)
+                    return false;
+
+                return true;
+            },
+
+            /**
+             * Get the position absolute or relative to the parent entity
+             * @param  {bool} absolute If true, just get entity x and y. If false, get the position relative to the parent
+             * @return {object} Result {x, y}
+             */
+            getPosition: function(absolute) {
+                var x = this.x,
+                    y = this.y;
+
+                if (this.snapToPixel) {
+                    x = parseInt(x);
+                    y = parseInt(y);
+                }
+
+                if (this.layerData.properties.type == 'parallax') {
+                    if (this.layerData.properties.speedX) x = x * this.layerData.properties.speedX;
+                    if (this.layerData.properties.speedY) y = y * this.layerData.properties.speedY;
+                }
+
+                if (absolute || !this._parent) {
+                    return {
+                        x: x,
+                        y: y
+                    };
+                } else {
+                    var position = this._parent.getPosition();
+                    if (position) return {
+                        x: x + position.x,
+                        y: y + position.y
+                    };
+                }
+                return {
+                    x: x,
+                    y: y
+                };
+            },
+
+
+            drawRender: function(context) {
+                //console.log('levelLayer: drawRender: context='+context);
+                // check if image outside canvas
+                /*
+                if (this._box.x > context.canvas.clientWidth 
+                    || this._box.y > context.canvas.clientHeight 
+                    || this._box.x + this._box.width < 0
+                    || this._box.y + this._box.height < 0)
+                    return;
+                */
+                context.globalAlpha = this.alpha * this.level.alpha;
+
+                this.getContextBox(context, this.canvas);
+
+                //console.log('levelLayer: drawRender: _box = ', this._box, this.canvas);
+                context.drawImage(this.canvas, //image element
+                    this._box.img.x, // x position on image
+                    this._box.img.y, // y position on image
+                    this._box.img.width, // width on image
+                    this._box.img.height, // height on image
+                    this._box.context.x, // x position on canvas
+                    this._box.context.y, // y position on canvas
+                    this._box.context.width, // width on canvas
+                    this._box.context.height // height on canvas
+                );
+            },
+        });
+
+        yespix.define('levelSprite', 'image', {
+
+            ///////////////////////////////// Sprite functions //////////////////////////////////////
+
+            getSpriteCount: function(imageIndex) {
+                //console.log('getSpriteCount: imageIndex='+imageIndex+', image=', this.images[imageIndex]);        
+                if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
+                var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
+                var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
+                //console.log('getSpriteCount: cols='+cols+', rows='+rows);        
+                return cols * rows;
+            },
+
+            getSpriteImage: function(globalIndex) {
+                //console.log('getSpriteImage: globalIndex='+globalIndex+', this.images=', this.images);
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    //console.log('getSpriteImage: count = '+count);            
+                    if (count > globalIndex) return this.images[t];
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            },
+
+            getSpriteImageIndex: function(globalIndex) {
+                var count;
+                if (!this.isReady || !this.images) return false;
+                for (var t = 0; t < this.images.length; t++) {
+                    if (!this.images[t] || !this.images[t].isReady) return false;
+                    count = this.getSpriteCount(t);
+                    if (count > globalIndex) return globalIndex;
+                    globalIndex = globalIndex - count;
+                }
+                return false;
+            }
 
         });
 

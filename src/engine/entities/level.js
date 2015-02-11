@@ -292,13 +292,13 @@ yespix.define('level', 'gfx,move', {
         yespix.load(src, {
             'complete': function(e) {
                 var entity = e.entity;
-                var pixelSize = 1;
-                if (entity.pixelSize && entity.pixelSize > 0) pixelSize = entity.pixelSize;
+                var imageScale = 1;
+                if (entity.imageScale && entity.imageScale > 0) imageScale = entity.imageScale;
 
                 entity.levelData = JSON.parse(e.content);
 
-                entity.levelData.tilewidth = entity.levelData.tilewidth * entity.pixelSize;
-                entity.levelData.tileheight = entity.levelData.tileheight * entity.pixelSize;
+                entity.levelData.tilewidth = entity.levelData.tilewidth * imageScale;
+                entity.levelData.tileheight = entity.levelData.tileheight * imageScale;
 
                 entity.canvas.width = entity.levelData.width * entity.levelData.tilewidth;
                 entity.canvas.height = entity.levelData.height * entity.levelData.tileheight;
@@ -316,13 +316,16 @@ yespix.define('level', 'gfx,move', {
                         images.push(entity.levelDir + entity.levelData.tilesets[t].image);
                     }
                     entity.tilesets = yespix.spawn(
-                        'sprite', {
+                        'levelSprite', {
                             registerInstance: false,
                             images: images,
-                            pixelSize: pixelSize,
+                            imageScale: imageScale,
                             spriteWidth: entity.levelData.tilewidth,
                             spriteHeight: entity.levelData.tileheight
                         });
+                    
+                    //console.log('level load complete: tilesets = ', entity.tilesets);
+
                     entity.tilesets.on('imageReady', function() {
                         entity.tilesetsReady();
                         yespix.level = entity;
@@ -350,7 +353,7 @@ yespix.define('level', 'gfx,move', {
         var count = this.levelData.layers.length;
 
         for (var t = 0; t < count; t++) {
-            layer = yespix.spawn('layer');
+            layer = yespix.spawn('levelLayer');
             this.childAdd(layer);
             layer.setLevel(this);
 
@@ -402,12 +405,8 @@ yespix.define('level', 'gfx,move', {
     },
 
     followEntityDelta: function(entity, context) {
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+        if (!context) context = yespix.context;
+
         var boxEntity = entity.getDrawBox(true);
         var centerX = context.canvas.width * this.followOptions.positionX - boxEntity.width / 2;
         var centerY = context.canvas.height * this.followOptions.positionY - boxEntity.height / 2;
@@ -421,12 +420,7 @@ yespix.define('level', 'gfx,move', {
     },
 
     followEntity: function(entity, context) {
-        if (!context) {
-            if (!this._context) {
-                this.getContext();
-                if (this._context) context = this._context;
-            } else context = this._context;
-        }
+        if (!context) context = yespix.context;
         var delta = this.followEntityDelta(entity, context);
         if (delta) this.moveTo(this.x + delta.x * this.followOptions.speedX, this.y + delta.y * this.followOptions.speedY);
     },

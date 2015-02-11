@@ -1,4 +1,4 @@
-yespix.define('layer', 'gfx', {
+yespix.define('levelLayer', 'gfx', {
 
     isVisible: true,
 
@@ -40,7 +40,7 @@ yespix.define('layer', 'gfx', {
 
     drawTile: function(spriteIndex, cellX, cellY) {
         var image, imageIndex;
-
+//console.log('levelLayer: drawTile: ', spriteIndex, cellX, cellY);
         for (var t = 0; t < this.level.tilesets.images.length; t++) {
             if (!this.level.tilesets.images[t].isReady) {
                 console.error('layer::drawTile :: image [' + t + '] of the tileset is not ready');
@@ -64,6 +64,7 @@ yespix.define('layer', 'gfx', {
         var max = Math.floor(image.originalWidth / this.level.levelData.tilewidth);
         var line = Math.floor(spriteIndex / max);
         var col = spriteIndex - (line * max);
+        
         this.drawContext.drawImage(image.element, //image element
             col * this.layerData.tilewidth, // x position on image
             line * this.layerData.tilewidth, // y position on image
@@ -74,6 +75,7 @@ yespix.define('layer', 'gfx', {
             this.layerData.tilewidth, // width on canvas
             this.layerData.tilewidth // height on canvas
         );
+        return true;
     },
 
     clear: function() {
@@ -92,7 +94,7 @@ yespix.define('layer', 'gfx', {
                 if (this.layerData && this.layerData.data) {
                     var spriteIndex = this.layerData.data[index] - 1;
                     if (spriteIndex >= 0) {
-                        this.drawTile(spriteIndex, x, y);
+                        if (!this.drawTile(spriteIndex, x, y)) break;;
                     }
                 }
                 index++;
@@ -112,7 +114,7 @@ yespix.define('layer', 'gfx', {
             || !this.canvas
             || !context
             || !this.drawContext
-            || !this.isReady) 
+            || !this.isReady)
             return false;
 
         return true;
@@ -156,18 +158,20 @@ yespix.define('layer', 'gfx', {
 
 
     drawRender: function(context) {
-
+//console.log('levelLayer: drawRender: context='+context);
         // check if image outside canvas
+        /*
         if (this._box.x > context.canvas.clientWidth 
             || this._box.y > context.canvas.clientHeight 
             || this._box.x + this._box.width < 0
             || this._box.y + this._box.height < 0)
             return;
-
+        */
         context.globalAlpha = this.alpha * this.level.alpha;
 
-        this.getContextBox(context, this.drawContext);
+        this.getContextBox(context, this.canvas);
 
+//console.log('levelLayer: drawRender: _box = ', this._box, this.canvas);
         context.drawImage(this.canvas, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image
@@ -175,8 +179,8 @@ yespix.define('layer', 'gfx', {
             this._box.img.height, // height on image
             this._box.context.x, // x position on canvas
             this._box.context.y, // y position on canvas
-            this._box.context.width * this.pixelSize, // width on canvas
-            this._box.context.height * this.pixelSize // height on canvas
+            this._box.context.width, // width on canvas
+            this._box.context.height // height on canvas
         );
     },
 });

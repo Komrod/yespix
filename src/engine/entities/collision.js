@@ -21,7 +21,7 @@ yespix.define('collision', {
 
         var pos = this.getPosition(relative);
 
-        if (yespix.isUndefined(this.pixelSize)) {
+        if (yespix.isUndefined(this.imageScale)) {
             return {
                 x: pos.x + this.colOffsetX,
                 y: pos.y + this.colOffsetY,
@@ -32,12 +32,12 @@ yespix.define('collision', {
             };
         } else {
             return {
-                x: pos.x + this.colOffsetX * this.pixelSize,
-                y: pos.y + this.colOffsetY * this.pixelSize,
-                width: this.colWidth * this.pixelSize,
-                height: this.colHeight * this.pixelSize,
-                offsetX: this.colOffsetX * this.pixelSize,
-                offsetY: this.colOffsetY * this.pixelSize,
+                x: pos.x + this.colOffsetX * this.imageScale,
+                y: pos.y + this.colOffsetY * this.imageScale,
+                width: this.colWidth * this.imageScale,
+                height: this.colHeight * this.imageScale,
+                offsetX: this.colOffsetX * this.imageScale,
+                offsetY: this.colOffsetY * this.imageScale,
             };
         }
     },
@@ -83,10 +83,9 @@ yespix.define('collision', {
             context.lineWidth = 0.5;
             context.strokeStyle = "#000099";
             // @TODO draw a better debug collision
-            //if (yespix.isUndefined()) {
-            //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
+            context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width + 1 * scaleX, box.height + 1 * scaleY);
             //} else {
-            //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.pixelSize + 1 * scaleX, box.height * this.pixelSize + 1 * scaleY);
+            //    context.strokeRect(box.x - 0.5 * scaleX, box.y - 0.5 * scaleY, box.width * this.imageScale + 1 * scaleX, box.height * this.imageScale + 1 * scaleY);
             //}
         }
     }
