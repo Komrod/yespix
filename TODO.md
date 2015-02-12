@@ -9,21 +9,17 @@ TODO list:
 - optimize: dont change the return type of a function
 - optimize: see https://www.youtube.com/watch?v=XAqIpGU8ZZk at 33min
 - optimize: add the collision box to _box
+- optimize: use clearRect to clear faster the canvas
+- optimize: Z sort function only sort the changed entities
+- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 
-- use clearRect to clear faster the canvas
-- Z sort function only sort the changed entities
-- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - center position with positionAlign ("center left", "top right" ...)
-- path object drawbox must contains line
 - examples and build folders in the root project
-- fps yoyo after pre-render optimization
-- pre render gfx on text
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
 - phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
 - stop and resume time
-- bug: draw debug on chuck
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
@@ -75,12 +71,13 @@ LATER:
 
 
 DONE:
+- bug: draw debug on chuck
 - bug: cant draw spawned anim after image is in cache 
 - use cache when load the same image
 - all draw box, path box, context box ... must be stored in an object inside entity (_box)
 - do not update draw box when the entity is not changed
 - lock entity image size 
-- bug: size problem with entity loading multiple images // 2015-02-
+- bug: size problem with entity loading multiple images // 2015-02-05
 - function imageSelect to change the selected image drawn
 - Make fps average use float values instead of round values
 - pre render gfx on rounded rectangle
@@ -88,6 +85,7 @@ DONE:
 - pre render gfx on circle
 - pre render gfx on text
 - bug: invalid index on draw image
+- path object drawbox must contains line
 - optimize: only call getDrawBox once per entity
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
