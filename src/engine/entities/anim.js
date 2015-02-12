@@ -14,7 +14,7 @@ yespix.define('anim', 'image', {
     animFrameObject: false,
 
     animSpeed: 1,
-    //animWait: false,
+    animWait: false,
     animNext: '',
     
     animTime: 0,
@@ -213,8 +213,7 @@ yespix.define('anim', 'image', {
     },
 
     animPlay: function(name, speed, from) {
-
-        //if (this.animWait) return;
+        if (this.animWait) return;
         if (!name) name = this.animDefault.name;
         if (this.animSelected === name) return this;
         if (!this.anims[name]) return null;
@@ -294,7 +293,7 @@ yespix.define('anim', 'image', {
                     name: this.animSelected,
                     frame: this.animFrame
                 });
-                //this.animWait = false;
+                this.animWait = false;
                 if (this.animNext && this.animNext !== '') {
                     this.animPlay(this.animNext);
                 }

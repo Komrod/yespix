@@ -3333,7 +3333,7 @@
             animFrameObject: false,
 
             animSpeed: 1,
-            //animWait: false,
+            animWait: false,
             animNext: '',
 
             animTime: 0,
@@ -3532,8 +3532,7 @@
             },
 
             animPlay: function(name, speed, from) {
-
-                //if (this.animWait) return;
+                if (this.animWait) return;
                 if (!name) name = this.animDefault.name;
                 if (this.animSelected === name) return this;
                 if (!this.anims[name]) return null;
@@ -3613,7 +3612,7 @@
                             name: this.animSelected,
                             frame: this.animFrame
                         });
-                        //this.animWait = false;
+                        this.animWait = false;
                         if (this.animNext && this.animNext !== '') {
                             this.animPlay(this.animNext);
                         }
