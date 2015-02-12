@@ -100,7 +100,7 @@ yespix.define('path', 'gfx', {
      * Update the canvas for the prerender
      */
     prerenderUpdate: function() {
-        this.getBox(this.prerenderCanvas.context);
+        this.getBox(false);
 
         // save original coordinates
         var drawX = this._box.draw.x,
@@ -131,12 +131,13 @@ yespix.define('path', 'gfx', {
     prerenderUse: function(context) {
 
         // check if image outside canvas
+        /*
         if (this._box.draw.x > context.canvas.clientWidth 
             || this._box.draw.y > context.canvas.clientHeight 
             || this._box.draw.x + this._box.draw.width < 0
             || this._box.draw.y + this._box.draw.height < 0)
             return false;
-
+        */
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
         // check if the contextDrawBox is flat

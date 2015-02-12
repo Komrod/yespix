@@ -331,8 +331,8 @@ yespix.define('image', 'gfx', {
     drawRender: function(context) {
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.imageObject);
         
-        if (this._box.img.width === 0
-            || this._box.img.height === 0)
+        if (this._box.img.width == 0
+            || this._box.img.height == 0)
             return;
 
         if (this.flipX || this.flipY) {
@@ -341,7 +341,6 @@ yespix.define('image', 'gfx', {
         }
 
         context.globalAlpha = this.alpha;
-        
         context.drawImage(this.imageObject.element, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image

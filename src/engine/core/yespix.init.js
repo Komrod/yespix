@@ -309,6 +309,14 @@ yespix.fn.init = function(options) {
     
     // init functions for input keys 
     yespix.on('exitFrame', function(e) {
+
+        // reset changed gfx entities
+        var drawEntities = yespix.entityInstances['/gfx'];
+        var count = yespix.drawEntities.length;
+        for (var t = 0; t < count; t++) {
+            yespix.drawEntities[t]._changed = false;
+        }
+
         // save current keypressed as old keypressed and delete current keypressed
         this.data.key.pressed = {
             //	old: this.data.key.pressed

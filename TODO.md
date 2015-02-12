@@ -1,20 +1,25 @@
 
 TODO list:
 - optimize: use typed arrays when possible
-- use clearRect to clear faster the canvas
-- Z sort function only sort the changed entities
-- use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
+- optimize: remove dictionnary mode on entities (remove delete)
+- optimize: try to use fixed length arrays (using new Array(1000))
+- optimize: dont add up properties to class (build mixed class as a separate class)
+- optimize: dont add more than 30 properties to a class
+- optimize: dont change type of a property (use null)
+- optimize: dont change the return type of a function
+- optimize: see https://www.youtube.com/watch?v=XAqIpGU8ZZk at 33min
+- optimize: add the collision box to _box
+- optimize: use clearRect to clear faster the canvas
+- optimize: Z sort function only sort the changed entities
+- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
+
 - center position with positionAlign ("center left", "top right" ...)
-- path object drawbox must contains line
 - examples and build folders in the root project
-- fps yoyo after pre-render optimization
-- pre render gfx on text
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
 - phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
 - stop and resume time
-- bug: draw debug on chuck
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
@@ -27,7 +32,6 @@ TODO list:
 
 - add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- Make a basic Zombie Sim
 - make a debug panel where you can change variables and see entities
 - fix collision between entities
 - animate properties
@@ -35,8 +39,6 @@ TODO list:
 - draw SVG image
 - rotation
 - parent rotation affects children
-- Make an Arkanoid game
-- Make a Steel Sky game (raiden like)
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
@@ -48,9 +50,13 @@ TODO list:
 - Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - on actor entity, make walk animation speed progressive
-- Make the Chuck game
 - slow time
-- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
+
+- debug pong game
+- make a basic Zombie Sim
+- make an Arkanoid game
+- make a Steel Sky game (raiden like)
+- make the Chuck game
 
 
 LATER:
@@ -65,12 +71,13 @@ LATER:
 
 
 DONE:
+- bug: draw debug on chuck
 - bug: cant draw spawned anim after image is in cache 
 - use cache when load the same image
 - all draw box, path box, context box ... must be stored in an object inside entity (_box)
 - do not update draw box when the entity is not changed
 - lock entity image size 
-- bug: size problem with entity loading multiple images // 2015-02-
+- bug: size problem with entity loading multiple images // 2015-02-05
 - function imageSelect to change the selected image drawn
 - Make fps average use float values instead of round values
 - pre render gfx on rounded rectangle
@@ -78,11 +85,13 @@ DONE:
 - pre render gfx on circle
 - pre render gfx on text
 - bug: invalid index on draw image
+- path object drawbox must contains line
 - optimize: only call getDrawBox once per entity
 - limit image draw to visible canvas when an image try to draw partially outside the canvas
 - Adapt canvas size on phones relative to screen size (width and hight to 100%) // 2015-01-20
 - create entitiesReady function to check if all entities are ready // 2014-11-07
 - make drawDebug(), drawDebugPosition()
+- make function to get different boxes: getDrawBox() getPathBox() getDebugBox()
 - fix follow reset when level is not ready // 2014-08-04
 - auto attach every entity with childAdd() to the current level
 - actor2w disociate speed and direction // 2014-07-28

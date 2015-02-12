@@ -14,7 +14,7 @@ yespix.define('anim', 'image', {
     animFrameObject: false,
 
     animSpeed: 1,
-    //animWait: false,
+    animWait: false,
     animNext: '',
     
     animTime: 0,
@@ -213,8 +213,7 @@ yespix.define('anim', 'image', {
     },
 
     animPlay: function(name, speed, from) {
-
-        //if (this.animWait) return;
+        if (this.animWait) return;
         if (!name) name = this.animDefault.name;
         if (this.animSelected === name) return this;
         if (!this.anims[name]) return null;
@@ -294,7 +293,7 @@ yespix.define('anim', 'image', {
                     name: this.animSelected,
                     frame: this.animFrame
                 });
-                //this.animWait = false;
+                this.animWait = false;
                 if (this.animNext && this.animNext !== '') {
                     this.animPlay(this.animNext);
                 }
@@ -371,7 +370,7 @@ yespix.define('anim', 'image', {
         if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
             // if changed, update the pre render canvas
-            if (this._changed) this.prerenderUpdate(context);
+            if (this.getChanged()) this.prerenderUpdate(context);
 
             // use the pre render canvas
             this.prerenderUse(context);
@@ -422,12 +421,13 @@ yespix.define('anim', 'image', {
 
     drawRender: function(context) {
         // check if image outside canvas
+        /*
         if (this._box.draw.x > context.canvas.clientWidth 
             || this._box.draw.y > context.canvas.clientHeight 
             || this._box.draw.x + this._box.draw.width < 0
             || this._box.draw.y + this._box.draw.height < 0)
             return;
-
+        */
         //var frame = this.getFrame();        
         //var img = this.animFrameObject.image;
         //var scaleX = this.animFrameObject.flipX ? -1 : 1;
@@ -458,38 +458,12 @@ yespix.define('anim', 'image', {
         }
     },
 
-    
-    ///////////////////////////////// Sprite functions //////////////////////////////////////
-    
-    getSpriteCount: function(imageIndex) {
-        if (!this.isReady || !this.images[imageIndex] || !this.images[imageIndex].isReady) return false;
-        var cols = Math.floor(this.images[imageIndex].width / this.spriteWidth);
-        var rows = Math.floor(this.images[imageIndex].height / this.spriteHeight);
-        return cols * rows;
-    },
-
-    getSpriteImage: function(globalIndex) {
-        var count;
-        if (!this.isReady || !this.images) return false;
-        for (var t = 0; t < this.images.length; t++) {
-            if (!this.images[t] || !this.images[t].isReady) return false;
-            count = this.getSpriteCount(t);
-            if (count > globalIndex) return this.images[t];
-            globalIndex = globalIndex - count;
-        }
-        return false;
-    },
-
-    getSpriteImageIndex: function(globalIndex) {
-        var count;
-        if (!this.isReady || !this.images) return false;
-        for (var t = 0; t < this.images.length; t++) {
-            if (!this.images[t] || !this.images[t].isReady) return false;
-            count = this.getSpriteCount(t);
-            if (count > globalIndex) return globalIndex;
-            globalIndex = globalIndex - count;
-        }
-        return false;
+    drawDebugImage: function(context, drawBox) {
+        drawBox = drawBox || this.getDrawBox();
+        context.globalAlpha = 1;
+        context.fillStyle = '#999999';
+        context.font = "10px sans-serif";
+        context.fillText("Image: " + this.imageSelected + ' / ' + this.animFrame, drawBox.x, drawBox.y - 5);
     }
 
 });

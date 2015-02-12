@@ -23,12 +23,12 @@
 	yp.define('chuck', 'player2w',
 	{
 		images: 'chuck/player.png',
-		pixelSize: 3,
+		imageScale: 3,
 		colOffsetX: 10,
 		colOffsetY: 10,
 		colWidth: 12,
 		colHeight: 29,
-		//debug: true,
+		debug: true,
 		actorSpeed: 1,
 		actorSpeedJump: 10,
 		playerSpawnOnFloor: true,
@@ -169,7 +169,7 @@
     
 	yp.gravity = { y: 22 };
 
-	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, pixelSize: 1, snapToPixel: true})
+	var mylevel = yp.spawn('level', {name: 'level test', x: 0, y: 0, imageScale: 1, snapToPixel: true})
 		.load('chuck/test.json');
 	
 	
@@ -338,7 +338,7 @@
 
 	yp.spawn('fps', {x: 5, y: 5});
 
-	//mylevel.follow(mychuck, {resetOnStart: true});
+	mylevel.follow(mychuck, {resetOnStart: true});
 
 
 </script></body>
