@@ -3,8 +3,8 @@ yespix.define('player2w', 'actor2w', {
     actorKeys: {
         left: 'left',
         right: 'right',
-        attack: 'x',
-        jump: ' ',
+        attack: 'space',
+        jump: 'up',
     },
 
     actorAnims: {
@@ -23,9 +23,10 @@ yespix.define('player2w', 'actor2w', {
         'airleft': 'airleft',
         'airright': 'airright',
 
-        'attackleft': 'punch1left',
-        'attackright': 'punch1right',
+        'attackleft': 'attackleft',
+        'attackright': 'attackright',
     },
+
     playerSpawnOnFloor: false,
     playerAirFriction: 0.02,
     playerGroundFriction: 0.13,
@@ -132,13 +133,10 @@ yespix.define('player2w', 'actor2w', {
             if (move == '') move = this.actorMove['default'] + this.actorDirection;
             else move = move + this.actorDirection;
             this.animNext = this.actorAnims[move];
-
-
+//console.log('this.animWait='+this.animWait+', this.isAttacking='+this.isAttacking+', move='+move+', this.animNext='+this.animNext);
             if (this.animWait || this.isAttacking) return;
-
-
             this.animPlay(this.actorAnims[move]);
-            //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
+//console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
 
         }, this, yespix);
     },

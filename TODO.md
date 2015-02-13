@@ -12,11 +12,12 @@ TODO list:
 - optimize: use clearRect to clear faster the canvas
 - optimize: Z sort function only sort the changed entities
 - optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
-
+- optimize: tiled levelLayer to fix the drawImage speed on phone
 - center position with positionAlign ("center left", "top right" ...)
 - examples and build folders in the root project
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
+- disable key capture on phones
 - phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
 - stop and resume time
@@ -27,7 +28,6 @@ TODO list:
 - typewritter: text showing letter by letter with sound
 - container entity
 - button entity
-- disable key capture on phones
 - Separate the fall down / jump up animation of a character
 
 - add a setImageScale function

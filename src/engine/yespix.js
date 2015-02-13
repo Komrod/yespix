@@ -1,4 +1,4 @@
-/*! yespix - v0.1.0 - 2015-02-12 */
+/*! yespix - v0.1.0 - 2015-02-13 */
 (function(undefined) {
 
     /**
@@ -3343,7 +3343,7 @@
                 this.on('imageReady', function() {
                     this.animFramesInit();
                 });
-                this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
+                //this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
             },
 
 
@@ -3584,7 +3584,7 @@
 
             animStep: function() {
                 if (!this.animObject || !this.animObject.frames) return;
-                if (this.animObject.frames.length <= 1) return;
+                //if (this.animObject.frames.length <= 1) return;
 
                 var now = +new Date();
 
@@ -3605,7 +3605,6 @@
 
                     //var frame = this.animObject.frames[this.animFrame];
                     this.animTime = +new Date() + this.animFrameObject.duration * this.animSpeed;
-
                     // check if animation was restarted
                     if (this.animFrame === 0) {
                         this.trigger('animEnd', {
@@ -5981,8 +5980,8 @@
             actorKeys: {
                 left: 'left',
                 right: 'right',
-                attack: 'x',
-                jump: ' ',
+                attack: 'space',
+                jump: 'up',
             },
 
             actorAnims: {
@@ -6001,9 +6000,10 @@
                 'airleft': 'airleft',
                 'airright': 'airright',
 
-                'attackleft': 'punch1left',
-                'attackright': 'punch1right',
+                'attackleft': 'attackleft',
+                'attackright': 'attackright',
             },
+
             playerSpawnOnFloor: false,
             playerAirFriction: 0.02,
             playerGroundFriction: 0.13,
@@ -6103,11 +6103,8 @@
                     if (move == '') move = this.actorMove['default'] + this.actorDirection;
                     else move = move + this.actorDirection;
                     this.animNext = this.actorAnims[move];
-
-
+                    //console.log('this.animWait='+this.animWait+', this.isAttacking='+this.isAttacking+', move='+move+', this.animNext='+this.animNext);
                     if (this.animWait || this.isAttacking) return;
-
-
                     this.animPlay(this.actorAnims[move]);
                     //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
 
