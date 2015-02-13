@@ -24,7 +24,7 @@ yespix.define('anim', 'image', {
         this.on('imageReady', function() {
             this.animFramesInit();
         });
-        this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
+        //this.animSelect(this.animDefault.name); //this.animSelected = this.animDefault.name;
     },
 
 
@@ -265,7 +265,7 @@ yespix.define('anim', 'image', {
 
     animStep: function() {
         if (!this.animObject || !this.animObject.frames) return;
-        if (this.animObject.frames.length <= 1) return;
+        //if (this.animObject.frames.length <= 1) return;
 
         var now = +new Date();
 
@@ -286,7 +286,6 @@ yespix.define('anim', 'image', {
 
             //var frame = this.animObject.frames[this.animFrame];
             this.animTime = +new Date() + this.animFrameObject.duration * this.animSpeed;
-
             // check if animation was restarted
             if (this.animFrame === 0) {
                 this.trigger('animEnd', {
