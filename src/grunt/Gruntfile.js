@@ -104,13 +104,13 @@ module.exports = function(grunt) {
                     //'../engine/core/*.js',
 
                     // classes
-                    '../engine/class/Position.js',
+                    '../engine/class/Position2d.js',
+                    '../engine/class/Speed2d.js',
 
                     // entities
                     '../engine/template/entities_start.js',
                     '../engine/entity/base.js',
                     '../engine/entity/gfx.js',
-                    //'../engine/entities/*.js',
                     '../engine/template/entities_end.js',
                     
                     '../engine/template/core_end.js',

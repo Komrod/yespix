@@ -321,10 +321,10 @@ yespix.fn.quickSort = (function () {
 
 
 yespix.fn.getCache = function(name) {
-    return this.data.sharedCache[name];
+    return this.cache[name];
 };
 
 yespix.fn.setCache = function(name, value) {
-    this.data.sharedCache[name] = value;
+    this.cache[name] = value;
 };
 
