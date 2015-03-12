@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
     /**
-     * List of pgrunt packages
+     * List of grunt packages
      */
     var packages = [
         'grunt-contrib-uglify',
@@ -52,7 +52,11 @@ module.exports = function(grunt) {
             out: {
                 src: [
                       '../engine/core/*.js',
-                      '../engine/entities/*.js'
+                      '../engine/core/**/*.js',
+                      '../engine/entity/*.js',
+                      '../engine/entity/**/*.js',
+                      '../engine/class/*.js',
+                      '../engine/class/**/*.js'
                 ]
             }
         },
@@ -61,14 +65,15 @@ module.exports = function(grunt) {
         {
             all: {
                 src : [
-                    '../engine/core/*.js',
-                    '../engine/entities/*.js',
-                    '../engine/yespix.js'
+                    '../engine/core/**/*.js',
+                    '../engine/entity/**/*.js',
+                    '../engine/class/**/*.js',
+                    '../../build/yespix.js'
                     ]
             },
             yp: {
                 src : [
-                    '../engine/yespix.js'
+                    '../../build/yespix.js'
                     ]
             }
         },
@@ -79,7 +84,7 @@ module.exports = function(grunt) {
                 force: true,
             },
             build: {
-                src: ['../engine/yespix.min.js', '../engine/yespix.js'],
+                src: ['../../build/yespix.min.js', '../../build/yespix.js'],
             }
         },
 
@@ -92,16 +97,25 @@ module.exports = function(grunt) {
                 src: [
                     // core
                     '../engine/template/core_start.js',
-                    '../engine/core/*.js',
+
+                    '../engine/core/general.js',
+                    '../engine/core/entity.js',
+                    '../engine/core/init.js',
+                    //'../engine/core/*.js',
+
+                    // classes
+                    '../engine/class/Position.js',
 
                     // entities
                     '../engine/template/entities_start.js',
-                    '../engine/entities/*.js',
+                    '../engine/entity/base.js',
+                    '../engine/entity/gfx.js',
+                    //'../engine/entities/*.js',
                     '../engine/template/entities_end.js',
                     
                     '../engine/template/core_end.js',
                 ],
-                dest: '../engine/yespix.js',
+                dest: '../../build/yespix.js',
                 nonull: true,
             }
         },
@@ -110,14 +124,21 @@ module.exports = function(grunt) {
         uglify: {
             minify: {
                 files: [{
-                    '../engine/yespix.min.js': '../engine/yespix.js'
+                    '../../build/yespix.min.js': '../../build/yespix.js'
                 }]
             }
         },
 
         watch: {
             scripts: {
-                files: ['../engine/core/*.js', '../engine/entities/*.js'],
+                files: [
+                    '../engine/core/*.js', 
+                    '../engine/core/**/*.js', 
+                    '../engine/entity/*.js',
+                    '../engine/entity/**/*.js',
+                    '../engine/class/*.js',
+                    '../engine/class/**/*.js'
+                    ],
                 tasks: ['default'],
                 options: {
                     spawn: false,

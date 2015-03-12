@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="../build/yespix.js"></script>
+	</head>
+	<body style="background-color: #456;">
+		<script type="text/javascript">
+	
+	var yp = yespix();
+console.log('yespix initiated :: class = ', yp.class);
+	var object = new yp.class.gfx ({
+		position: {
+			x: 0,
+			y: 0,
+			z: 100
+		},
+		varString: "yes thank you",
+		varInt: 12,
+		varFloat: 0.3,
+		varObject: new Object()
+	});
+
+console.log('object = ', object);
+
+	/*
+	yp.spawn('rect, actor2w',
+	{
+		x: 50,
+		y: 50,
+		width: 50,
+		height: 50,
+		rectColor: '#19D1FF',
+		
+	});
+	*/
+
+		</script>
+
+	</body>
+</html>

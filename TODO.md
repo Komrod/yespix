@@ -1,5 +1,9 @@
 
 TODO list:
+- make a position class
+- make an image class
+- make a sound class
+- new event system to easily remove events and entities
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
 - optimize: try to use fixed length arrays (using new Array(1000))
@@ -71,6 +75,9 @@ LATER:
 
 
 DONE:
+- init function must be called only once
+- do an inherit and extend system
+v0.1.0.0
 - bug: draw debug on chuck
 - bug: cant draw spawned anim after image is in cache 
 - use cache when load the same image
@@ -172,7 +179,6 @@ CANCELED:
 
 
 PENDING:
-- do real js classes with prototype for entity classes
 - do a partial draw for each gfx entities
 - prerender canvas for the partial draw
 - function xload which try to execute an action depending the extension of the loaded file (execute a .js script, add .css file to document ...)

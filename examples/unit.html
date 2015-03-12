@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Unit test</title>
+	<script type="text/javascript" src="yespix/engine.js"></script>
+	<style>
+		body
+		{
+			font-family: Verdana;
+			font-size: 14px;
+		}
+		
+		#content
+		{
+			margin: 10px;
+			padding: 10px;
+			border: 10px dotted #e0e0e0;
+			width: 700px;
+			height: 500px;
+			float:left;
+		}
+
+		#text
+		{
+			margin: 10px;
+			padding: 10px;
+			border: 1px dotted #e0e0e0;
+			width: 300px;
+			height: 500px;
+			float:left;
+		}
+	</style>
+</head>
+<body>
+<script type="text/javascript">
+
+	// init the YESPIX engine
+	var yp = yespix({
+		debug: true,
+	});
+
+	function test(url)
+	{
+		document.getElementById('content').innerHTML = '';
+		document.getElementById('text').innerHTML = '';
+		yp.addjs('resource/test/'+url);
+	}
+
+	
+</script>
+	<h1>YESPIX engine unit test I</h1>
+
+	LOAD: <button onclick="test('load/simple.js');">Simple</button> <button onclick="test('load/functions.js');">Functions</button> <button onclick="test('load/callback.js');">Callback</button> 
+	<button onclick="test('load/success.js');">Success</button> <button onclick="test('load/error.js');">Error</button> <button onclick="test('load/multiple.js');">Multiple</button> 
+	<button onclick="test('load/allcomplete.js');">All complete</button> <button onclick="test('load/progress.js');">Progress</button> <button onclick="test('load/skip.js');">Skip</button> 
+	<button onclick="test('load/urloptions.js');">URL options</button>
+	<br/>
+	
+	CSS: <button onclick="test('css/simple.js');">Simple</button> <button onclick="test('css/callback.js');">Callback</button> <button onclick="test('css/big.js');">Big</button> 
+	<button onclick="test('css/multiple.js');">Multiple</button> <button onclick="test('css/multiplex100.js');">Multiple x100</button> <button onclick="test('css/allcomplete.js');">All complete</button> 
+	<button onclick="test('css/error.js');">Error</button> <button onclick="test('css/progress.js');">Progress</button> <button onclick="test('css/skip.js');">Skip</button> 
+	<button onclick="test('css/urloptions.js');">URL options</button>
+	<br/>
+	
+	YESPIX init: <button onclick="test('init/justrun.js');">Just run</button> <button onclick="test('init/canvas.js');">Canvas basic</button> <button onclick="test('init/canvasoptions.js');">Canvas options</button> 
+	<button onclick="test('css/canvasmultiple.js');">Multiple canvas</button> 
+	
+	<br/>
+
+	<div id="content">
+	</div>
+	<div id="text">
+	</div>
+</body>
+</html>

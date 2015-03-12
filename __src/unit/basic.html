@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="qunit.js"></script>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+test( "Engine simple run", function() {
+	console.log('');
+	var yp = yespix();
+	ok( yp && yp.isObject && yp.isObject(yp), "Passed!" );
+});
+
+	</script>
+</body>
+</html>
