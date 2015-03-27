@@ -95,24 +95,26 @@ module.exports = function(grunt) {
                     banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
                 },
                 src: [
-                    // core
+                    // core start
                     '../engine/template/core_start.js',
 
-                    '../engine/core/general.js',
-                    '../engine/core/entity.js',
-                    '../engine/core/init.js',
-                    //'../engine/core/*.js',
+                    // core
+                    '../engine/core/*.js',
 
                     // classes
-                    '../engine/class/Position2d.js',
-                    '../engine/class/Speed2d.js',
+                    '../engine/class/*.js',
+
+                    // entities start
+                    '../engine/template/entities_start.js',
 
                     // entities
-                    '../engine/template/entities_start.js',
                     '../engine/entity/base.js',
                     '../engine/entity/gfx.js',
+
+                    // entities end
                     '../engine/template/entities_end.js',
                     
+                    // core end
                     '../engine/template/core_end.js',
                 ],
                 dest: '../../build/yespix.js',
