@@ -7,17 +7,19 @@
 		<script type="text/javascript">
 	
 	var yp = yespix();
+	var mainCanvas = yp.createCanvas(true);
+	var manager = new GfxManager(mainCanvas);
+
 	var object = new yp.class.gfx ({
 		position: {
 			x: 50,
 //			y: 60,
 			z: 70
-		},
-		varString: "yes thank you",
-		varInt: 12,
-		varFloat: 0.3,
-		varObject: new Object()
+		}
 	});
+
+	manager.add(object);
+	manager.draw();
 
 console.log('object = ', object);
 

@@ -95,14 +95,15 @@ module.exports = function(grunt) {
                     banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
                 },
                 src: [
+
+                    // classes
+                    '../engine/class/*.js',
+
                     // core start
                     '../engine/template/core_start.js',
 
                     // core
                     '../engine/core/*.js',
-
-                    // classes
-                    '../engine/class/*.js',
 
                     // entities start
                     '../engine/template/entities_start.js',
@@ -110,12 +111,13 @@ module.exports = function(grunt) {
                     // entities
                     '../engine/entity/base.js',
                     '../engine/entity/gfx.js',
+                    '../engine/entity/canvas.js',
 
                     // entities end
                     '../engine/template/entities_end.js',
                     
                     // core end
-                    '../engine/template/core_end.js',
+                    '../engine/template/core_end.js', 
                 ],
                 dest: '../../build/yespix.js',
                 nonull: true,

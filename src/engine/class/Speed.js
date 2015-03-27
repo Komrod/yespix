@@ -9,6 +9,7 @@ function Speed(options, entity) {
 }
 
 Speed.prototype.to = function(speed) {
+	if (!speed) return;
     if (speed.x || speed.x === 0) this.x = speed.x;
     if (speed.y || speed.y === 0) this.y = speed.y;
 }
