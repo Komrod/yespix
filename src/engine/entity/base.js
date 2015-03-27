@@ -22,6 +22,7 @@
 		     */
 		    init: function(options) {
 		    	this.options = options;
+
 		        return true;
 		    },
 

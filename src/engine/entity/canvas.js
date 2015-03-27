@@ -1,86 +1,89 @@
 yespix.define('canvas', {
+
+    inheritClass: 'base',
     
-    canvasOptions: null,
     element: null,
-    context: null,
+
+    aspect: null,
+
     document: null,
+    window: null,
+
+    defaultOptions: {
+        autoAppend: true,
+        width: 640,
+        height: 480
+    },
 
     init: function(options) {
         options = options || {};
+    
+        options.width = options.width || 0;
+        options.height = options.height || 0;
 
-        options.document = options.document || yespix.document;
-        options.width = options.width || 800; // @todo default must be set to client width
-        options.height = options.height || 600; // @todo default must be set to client height
-        options.style = options.style || {};
-        options.id = options.id || 'canvas' + this._id;
-        options.class = options.class || '';
-        options.autoAppend = options.autoAppend || true;
-
-        this.document = options.document;
+        this.document = options.document || yespix.document;
+        this.window = options.window || yespix.window;
 
         // apply relative width and height
-        if (yespix.contains(options.width, '%'))
-        {
-            var clientWidth = 800;
-            if (this.document.body && this.document.body.clientWidth) clientWidth = this.document.body.clientWidth;
-            else if (this.document.width) clientWidth = this.document.width;
-            else if (this.document.documentElement && this.document.documentElement.clientWidth) clientWidth = this.document.documentElement.clientWidth;
-            options.width = clientWidth * parseFloat(options.width.replace('%', '')) / 100;
+        if (yespix.contains(options.width, '%') || yespix.contains(options.height, '%')) {
+            if (yespix.contains(options.width, '%')) {
+                var defaultWidth = this.window.innerWidth
+                    || this.document.documentElement.clientWidth
+                    || this.document.body.clientWidth;
+                options.width = defaultWidth * parseFloat(width.replace('%', '')) / 100;
+            }
+            if (yespix.contains(options.height, '%')) {
+                var defaultHeight = this.window.innerWidth
+                    || this.document.documentElement.clientHeight
+                    || this.document.body.clientHeight;
+                options.height = defaultHeight * parseFloat(height.replace('%', '')) / 100;
+            }
         }
-        if (yespix.contains(options.height, '%'))
-        {
-            var clientHeight = 600;
-            var delta = 4;
-            if (this.document.body && this.document.body.clientHeight) clientHeight = this.document.body.clientHeight - delta;
-            else if (this.document.height) clientHeight = this.document.height - delta;
-            else if (this.document.documentElement && this.document.documentElement.clientHeight) clientHeight = this.document.documentElement.clientHeight - delta;
-            options.height = clientHeight * parseFloat(options.height.replace('%', '')) / 100;
-        }
-        this.canvasOptions = options;
 
-        var canvas = null;
-        if (!options.canvas) canvas = this.create(options);
-        else if (options.canvas) canvas = options.canvas;
+        options.className = options.className || '';
+        options.id = options.id || '';
+
+        this.aspect = new Aspect();
+
+        this.element = options.canvas || this.create(options);
         
         if (canvas) {
-            if (options.autoAppend) {
-                var body = this.document.getElementsByTagName("body")[0];
-                body.appendChild(canvas);
-            }
-
-            this.use(canvas, options);
-            yespix.canvas = canvas;
-            yespix.context = canvas.getContext('2d');
+            if (options.autoAppend) this.append();
         }
     },
 
-    create: function(options) {
+    append: function(htmlElement) {
+        if (!this.element) return false;
+
+        if (!htmlElement) htmlElement = this.document.getElementsByTagName("body")[0];
+        htmlElement.appendChild(this.element);
+
+        return true;
+    },
+
+    change: function(type, object) {
+        if (yespix.isUndefined(type)) {
+            return aspect.isChanged;
+        } else if (type == 'aspect') {
+            if (object.width || object.width === 0) this.element.width = object.width;
+            if (object.height || object.height === 0) this.element.height = object.height;
+        }
+    },
+
+    create: function() {
         var canvas = this.document.createElement('canvas');
-        canvas.id = options.id;
-        canvas.width = options.width;
-        canvas.height = options.height;
-        canvas.className = options.class;
+        canvas.id = this.options.id;
+        canvas.width = this.aspect.width;
+        canvas.height = this.aspect.height;
+        canvas.className = this.options.className;
         return canvas;
     },
 
-
-    use: function(canvasElement, options) {
-        options = options || {};
-        options.backgroundColor = options.backgroundColor || '#ffffff';
-        options.clearOnEnterFrame = options.clearOnEnterFrame || true;
-
-        this.element = canvasElement;
-        this.context = this.element.getContext('2d');
-
-        var canvas = this;
-
-        if (options.clearOnEnterFrame) yespix.on('enterFrame', function() {
-            canvas.clear();
-        });
-    },
-
     clear: function() {
-        //			this.context.clearRect(0,0,this.element.width, this.element.height);
         this.element.width = this.element.width;
     },
+
+    getElement: function() {
+        return this.element;
+    }
 });
