@@ -108,13 +108,7 @@ yespix.define('levelLayer', 'gfx', {
      * @return {bool} True if can be drawn
      */
     canDraw: function(context) {
-        if (!this.isActive 
-            || !this.isVisible 
-            || this.alpha <= 0
-            || !this.canvas
-            || !context
-            || !this.drawContext
-            || !this.isReady)
+        if (!this.isActive || !this.isVisible || this.alpha <= 0 || !this.canvas || !context || !this.drawContext || !this.isReady)
             return false;
 
         return true;
@@ -126,7 +120,8 @@ yespix.define('levelLayer', 'gfx', {
      * @return {object} Result {x, y}
      */
     getPosition: function(absolute) {
-        var x = this.x, y = this.y;
+        var x = this.x,
+            y = this.y;
 
         if (this.snapToPixel) {
             x = parseInt(x);
@@ -169,7 +164,7 @@ yespix.define('levelLayer', 'gfx', {
 
 
     drawRender: function(context) {
-//console.log('levelLayer: drawRender: context='+context);
+        //console.log('levelLayer: drawRender: context='+context);
         // check if image outside canvas
         /*
         if (this._box.x > context.canvas.clientWidth 
@@ -182,7 +177,7 @@ yespix.define('levelLayer', 'gfx', {
 
         this.getContextBox(context, this.canvas);
 
-//console.log('levelLayer: drawRender: _box = ', this._box, this.canvas);
+        //console.log('levelLayer: drawRender: _box = ', this._box, this.canvas);
         context.drawImage(this.canvas, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image

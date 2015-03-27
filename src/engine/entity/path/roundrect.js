@@ -2,15 +2,15 @@ yespix.define('roundrect', 'path', {
 
     borderRadius: 5,
     prerender: true,
-    
+
     init: function() {},
-    
+
     getBorderRadius: function() {
         if (this.width >= this.borderRadius * 2 || this.height >= this.borderRadius * 2) return this.borderRadius;
         if (this.height < this.width) return this.height / 2;
         return this.width / 2;
     },
-    
+
     drawPath: function(context) {
         var radius = this.getBorderRadius();
         context.beginPath();
@@ -25,5 +25,5 @@ yespix.define('roundrect', 'path', {
         context.lineTo(this._box.path.x, this._box.path.y + radius);
         context.quadraticCurveTo(this._box.path.x, this._box.path.y, this._box.path.x + radius, this._box.path.y);
     },
-    
+
 });

@@ -19,10 +19,8 @@ yespix.define('level', 'gfx,move', {
 
     init: function() {
         this.readyFunctions.push(this.checkReadyStateLevel);
-        yespix.on('spawn', function(e)
-        {
-            if (e.entity._class != 'level' && !e.entity.hasAncestors('level') && e.entity._parent == null)
-            {
+        yespix.on('spawn', function(e) {
+            if (e.entity._class != 'level' && !e.entity.hasAncestors('level') && e.entity._parent == null) {
                 this.childAdd(e.entity);
             }
         }, this, yespix);
@@ -322,7 +320,7 @@ yespix.define('level', 'gfx,move', {
                             spriteWidth: entity.levelData.tilewidth,
                             spriteHeight: entity.levelData.tileheight
                         });
-                    
+
                     //console.log('level load complete: tilesets = ', entity.tilesets);
 
                     entity.tilesets.on('imageReady', function() {

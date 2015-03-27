@@ -23,7 +23,7 @@ yespix.define('fps', 'gfx', {
     fpsAverageFrames: 0,
     fpsAverage: 0,
 
-    fpsColors: ['#ffffff', '#FF0000', '#FF8C00', '#F9F900','#5EFC32'],
+    fpsColors: ['#ffffff', '#FF0000', '#FF8C00', '#F9F900', '#5EFC32'],
 
     fpsData: [],
 
@@ -33,7 +33,7 @@ yespix.define('fps', 'gfx', {
     height: 50,
 
     z: 1000000,
-    
+
     init: function() {
         this.fpsData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     },
@@ -73,7 +73,7 @@ yespix.define('fps', 'gfx', {
             type: this._class
         };
     },
-    
+
     drawRender: function(context) {
 
         context.globalAlpha = this.alpha;
@@ -81,18 +81,15 @@ yespix.define('fps', 'gfx', {
         this.drawFill(context);
         this.drawLine(context);
 
-        if (this.fpsLastTime == 0)
-        {
+        if (this.fpsLastTime == 0) {
             this.fpsLastTime = yespix.frameTime;
             return;
         }
-        
-        if (this.fpsAverageTime > 0)
-        {
+
+        if (this.fpsAverageTime > 0) {
             this.fpsAverageFrames++;
             this.fpsAverage += yespix.frameTime - this.fpsLastTime;
-            if ((this.fpsAverage>this.fpsAverageTime) && this.fpsAverageFrames > 0)
-            {
+            if ((this.fpsAverage > this.fpsAverageTime) && this.fpsAverageFrames > 0) {
                 var fps = 1 / (this.fpsAverage / this.fpsAverageFrames / 1000);
                 if (this.fps > 60) fps = 60;
                 this.fpsAverage = 0;
@@ -103,8 +100,7 @@ yespix.define('fps', 'gfx', {
             }
             this.fpsMs = yespix.frameTime - this.fpsLastTime;
             this.fpsLastTime = yespix.frameTime;
-        } else
-        {
+        } else {
             var fps = 1 / ((yespix.frameTime - this.fpsLastTime) / 1000);
             if (this.fps > 60) fps = 60;
             this.fpsLastTime = yespix.frameTime;
@@ -118,7 +114,7 @@ yespix.define('fps', 'gfx', {
             average = 0,
             count = 0;
 
-        for (var t=0; t<120; t++) {
+        for (var t = 0; t < 120; t++) {
             if (min > this.fpsData[t] || min == 0) min = this.fpsData[t];
             if (max < this.fpsData[t]) max = this.fpsData[t];
             if (this.fpsData[t] > 0) {
@@ -131,7 +127,7 @@ yespix.define('fps', 'gfx', {
         if (!this.fpsOnlyStats) {
             context.lineWidth = this.lineWidth;
             context.strokeStyle = this.lineColor;
-            for (var t=0; t<120; t++) {
+            for (var t = 0; t < 120; t++) {
                 var scale = 0;
                 if (max > 0) scale = (this.height - 4) / max;
                 if (this.fpsData[t] <= 0) context.strokeStyle = this.fpsColors[0];
@@ -149,7 +145,7 @@ yespix.define('fps', 'gfx', {
 
         // drawing fps
         context.fillStyle = this.textColor;
-        context.font = this.textSize+'px '+this.textFont;
+        context.font = this.textSize + 'px ' + this.textFont;
         context.fillText(this.text + ' fps', this.x + 2, this.y + this.textSize + 2);
 
         // drawing min/max
@@ -164,14 +160,14 @@ yespix.define('fps', 'gfx', {
         //context.globalAlpha = this.alpha * 0.8;
         //context.fillStyle = this.textColor;
         //context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.textAverage+' fps avg', this.x + 2, this.y + this.textSize * 3 + 6);
+        context.fillText(this.textAverage + ' fps avg', this.x + 2, this.y + this.textSize * 3 + 6);
 
         // ms
         this.textMs = this.fpsMs; //parseInt(average * 100) / 100 + '';
         //context.globalAlpha = this.alpha * 0.8;
         //context.fillStyle = this.textColor;
         //context.font = this.textSize+'px '+this.textFont;
-        context.fillText(this.textMs+' ms', this.x + 2, this.y + this.textSize * 4 + 8);
+        context.fillText(this.textMs + ' ms', this.x + 2, this.y + this.textSize * 4 + 8);
 
     },
 

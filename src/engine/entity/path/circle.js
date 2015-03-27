@@ -1,4 +1,3 @@
-
 yespix.define('circle', 'path', {
 
     circleRadius: 5,
@@ -13,11 +12,11 @@ yespix.define('circle', 'path', {
 
     drawPath: function(context) {
         context.beginPath();
-        context.arc(this._box.path.x + this.circleRadius, 
-            this._box.path.y + this.circleRadius, 
-            this.circleRadius, 
-            0, 
-            2 * Math.PI, 
+        context.arc(this._box.path.x + this.circleRadius,
+            this._box.path.y + this.circleRadius,
+            this.circleRadius,
+            0,
+            2 * Math.PI,
             false);
     },
 

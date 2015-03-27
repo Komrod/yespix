@@ -207,7 +207,7 @@ yespix.fn.getType = function(obj) {
  * @method contains
  */
 yespix.fn.contains = function(str, search) {
-    return (str+'').indexOf(search) > -1;
+    return (str + '').indexOf(search) > -1;
 };
 
 
@@ -223,7 +223,7 @@ yespix.fn.inArray = function(arr, value) {
 
 yespix.fn.each = function(array, fn, args) {
     var i;
-    
+
     if (!this.isArray(array)) array = [].slice.call(array);
     var length = array.length;
     args = args || [];
@@ -281,7 +281,7 @@ yespix.fn.getFontHeight = function(fontStyle) {
 };
 
 
-yespix.fn.quickSort = (function () {
+yespix.fn.quickSort = (function() {
 
     function partition(array, left, right) {
         var cmp = array[right - 1],
@@ -313,7 +313,7 @@ yespix.fn.quickSort = (function () {
         return array;
     }
 
-    return function (array) {
+    return function(array) {
         return quickSort(array, 0, array.length);
     };
 }());
@@ -327,4 +327,3 @@ yespix.fn.getCache = function(name) {
 yespix.fn.setCache = function(name, value) {
     this.cache[name] = value;
 };
-

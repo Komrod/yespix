@@ -157,24 +157,21 @@ yespix.define('image', 'gfx', {
     image: function(properties) {
 
         // get the image with the index
-        if (yespix.isInt(properties))
-        {
+        if (yespix.isInt(properties)) {
             if (this.images[properties]) return this.imageInit(this.images[properties]);
             else return null;
-        } else 
+        } else
         // get the first image (index: 0)
-        if (properties === undefined)
-        {
+        if (properties === undefined) {
             if (this.images[0]) return this.imageInit(this.images[0]);
             else return null;
-        } else 
+        } else
         // if properties is string, it's the name of the image
-        if (typeof properties === 'string') 
-        {
+        if (typeof properties === 'string') {
             properties = {
                 name: properties
             };
-        } 
+        }
 
         // search for the properties in the image list
         var max = Object.keys(properties).length;
@@ -209,7 +206,7 @@ yespix.define('image', 'gfx', {
         image.isInitiated = true;
         image.entity = entity;
 
-        image.element = yespix.getCache('img:'+image.src+':1');
+        image.element = yespix.getCache('img:' + image.src + ':1');
 
         // add source to the image element
         image.changeSource = function(source) {
@@ -217,10 +214,10 @@ yespix.define('image', 'gfx', {
             entity.trigger('change');
             return true;
         };
-        
+
         if (!image.element) {
             image.element = document.createElement('img');
-            yespix.setCache('img:'+image.src+':1', image.element);
+            yespix.setCache('img:' + image.src + ':1', image.element);
 
             // set the onload event for image element
             image.element.onload = image.element.onLoad = function(e, nextImage) {
@@ -230,10 +227,10 @@ yespix.define('image', 'gfx', {
                 image.width = image.element.width * image.entity.imageScale;
                 image.height = image.element.height * image.entity.imageScale;
                 if (image.entity.imageScale != 1) {
-                    var newElement = yespix.getCache('img:'+image.src+':'+image.entity.imageScale);
+                    var newElement = yespix.getCache('img:' + image.src + ':' + image.entity.imageScale);
                     if (!newElement) {
                         image.element = image.entity.resize(image.element, image.entity.imageScale);
-                        yespix.setCache('img:'+image.src+':'+image.entity.imageScale, image.element);
+                        yespix.setCache('img:' + image.src + ':' + image.entity.imageScale, image.element);
                     } else {
                         image.element = newElement;
                     }
@@ -252,26 +249,25 @@ yespix.define('image', 'gfx', {
                 image.entity.trigger('imageReady', {
                     target: image,
                 });
-                
-                var list = yespix.getCache('img:'+image.src+':1:list');
+
+                var list = yespix.getCache('img:' + image.src + ':1:list');
                 if (list && list.length > 0) {
                     var nextImage = list.shift();
                     this.onload.apply(this, [e, nextImage]);
                 }
-                
+
                 //delete this.onload;
             };
 
             if (image.src !== undefined && image.src !== '') {
                 image.changeSource(image.src);
             }
-        }
-        else {
+        } else {
             if (image.element.isReady) {
                 image.element.onload.apply(this, [null, image]);
             } else {
-                var cache = yespix.getCache('img:'+image.src+':1:list');
-                if (!cache) yespix.setCache('img:'+image.src+':1:list', [image]);
+                var cache = yespix.getCache('img:' + image.src + ':1:list');
+                if (!cache) yespix.setCache('img:' + image.src + ':1:list', [image]);
                 else cache.push(image);
             }
         }
@@ -315,13 +311,7 @@ yespix.define('image', 'gfx', {
      */
     canDraw: function(context) {
         //var img = this.image(this.imageSelected);
-        if (!this.isActive 
-            || !this.isVisible 
-            || this.alpha <= 0
-            || !context
-            || !this.imageObject
-            || !this.imageObject.element
-            || !this.imageObject.isReady) 
+        if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context || !this.imageObject || !this.imageObject.element || !this.imageObject.isReady)
             return false;
 
         return true;
@@ -330,14 +320,13 @@ yespix.define('image', 'gfx', {
 
     drawRender: function(context) {
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.imageObject);
-        
-        if (this._box.img.width == 0
-            || this._box.img.height == 0)
+
+        if (this._box.img.width == 0 || this._box.img.height == 0)
             return;
 
         if (this.flipX || this.flipY) {
             context.save();
-            context.scale( (this.flipX ? -1 : 1), (this.flipY ? -1 : 1) );
+            context.scale((this.flipX ? -1 : 1), (this.flipY ? -1 : 1));
         }
 
         context.globalAlpha = this.alpha;

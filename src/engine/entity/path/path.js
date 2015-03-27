@@ -1,4 +1,3 @@
-
 yespix.define('path', 'gfx', {
 
     lineWidth: 1,
@@ -87,8 +86,7 @@ yespix.define('path', 'gfx', {
     },
 
     drawRender: function(context) {
-        if (this.canDrawPath(context))
-        {
+        if (this.canDrawPath(context)) {
             this.drawPath(context);
             if (this.canDrawFill(context)) this.drawFill(context);
             if (this.canDrawLine(context)) this.drawLine(context);
@@ -107,7 +105,7 @@ yespix.define('path', 'gfx', {
             drawY = this._box.draw.y,
             pathX = this._box.path.x,
             pathY = this._box.path.y;
-        
+
         this._box.draw.x = 0;
         this._box.draw.y = 0;
         this._box.path.x = this.lineWidth / 2;
@@ -141,12 +139,11 @@ yespix.define('path', 'gfx', {
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
         // check if the contextDrawBox is flat
-        if (this._box.context.width <= 0
-            || this._box.context.height <= 0)
+        if (this._box.context.width <= 0 || this._box.context.height <= 0)
             return false;
 
         context.globalAlpha = this.alpha;
-        
+
         context.drawImage(this.prerenderCanvas, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image

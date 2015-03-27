@@ -1,7 +1,7 @@
 yespix.define('canvas', {
 
     inheritClass: 'base',
-    
+
     element: null,
 
     aspect: null,
@@ -9,15 +9,18 @@ yespix.define('canvas', {
     document: null,
     window: null,
 
-    defaultOptions: {
-        autoAppend: true,
-        width: 640,
-        height: 480
-    },
-
     init: function(options) {
-        options = options || {};
-    
+        // call ancestor class function
+        this.super(options);
+
+        // init options
+        if (options === true) options = {
+            autoAppend: true,
+            width: 640,
+            height: 480
+        };
+        else options = options || {};
+
         options.width = options.width || 0;
         options.height = options.height || 0;
 
@@ -27,27 +30,27 @@ yespix.define('canvas', {
         // apply relative width and height
         if (yespix.contains(options.width, '%') || yespix.contains(options.height, '%')) {
             if (yespix.contains(options.width, '%')) {
-                var defaultWidth = this.window.innerWidth
-                    || this.document.documentElement.clientWidth
-                    || this.document.body.clientWidth;
+                var defaultWidth = this.window.innerWidth || this.document.documentElement.clientWidth || this.document.body.clientWidth;
                 options.width = defaultWidth * parseFloat(width.replace('%', '')) / 100;
             }
             if (yespix.contains(options.height, '%')) {
-                var defaultHeight = this.window.innerWidth
-                    || this.document.documentElement.clientHeight
-                    || this.document.body.clientHeight;
+                var defaultHeight = this.window.innerWidth || this.document.documentElement.clientHeight || this.document.body.clientHeight;
                 options.height = defaultHeight * parseFloat(height.replace('%', '')) / 100;
             }
         }
 
+        // more init
         options.className = options.className || '';
         options.id = options.id || '';
 
+        // create aspect
         this.aspect = new Aspect();
 
+        // create element
         this.element = options.canvas || this.create(options);
-        
-        if (canvas) {
+
+        // append
+        if (this.element) {
             if (options.autoAppend) this.append();
         }
     },

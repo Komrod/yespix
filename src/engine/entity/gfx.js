@@ -10,10 +10,10 @@ yespix.define('gfx', {
 
     init: function(options) {
         this.super(options);
-        this.position = new Position(this.options.position);
-        this.aspect = new Aspect(this.options.aspect);
-        this.box = new Box();
-        this.draw = new Draw(this.options.draw);
+
+        this.position = new Position(this.options.position, this);
+        this.aspect = new Aspect(this.options.aspect, this);
+        this.boundary = {};
     },
 
     getChanged: function() {
@@ -29,7 +29,7 @@ yespix.define('gfx', {
     draw: function(context) {
         // get the context
         context = context || yespix.context;
-        
+
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
 
@@ -70,9 +70,7 @@ yespix.define('gfx', {
      * @return {bool} True if can be drawn
      */
     canDraw: function(context) {
-        if (!this.isVisible 
-            || this.aspect.alpha <= 0
-            || !context) 
+        if (!this.isVisible || this.aspect.alpha <= 0 || !context)
             return false;
 
         return true;
@@ -84,12 +82,8 @@ yespix.define('gfx', {
      * @return {bool} True if can be drawn
      */
     canDrawBox: function(context) {
-        
-        if (this.box.draw.x >= context.canvas.clientWidth
-            || this.box.draw.y >= context.canvas.clientHeight
-            || this.box.draw.x + this.box.draw.width < 0
-            || this.box.draw.y + this.box.draw.height < 0
-            )
+
+        if (this.box.draw.x >= context.canvas.clientWidth || this.box.draw.y >= context.canvas.clientHeight || this.box.draw.x + this.box.draw.width < 0 || this.box.draw.y + this.box.draw.height < 0)
             return false;
         return true;
     },
@@ -106,5 +100,13 @@ yespix.define('gfx', {
     },
 
 
-});
+    getBoundaryDraw: function() {
+        if (this.boundary.draw) return this.boundary.draw;
+    },
 
+    getBoundaryCollision: function() {
+        if (this.boundary.collision) return this.boundary.collision;
+    },
+
+
+});

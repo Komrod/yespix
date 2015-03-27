@@ -21,8 +21,7 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(options) {
-		    	this.options = options;
-
+		        this.options = options;
 		        return true;
 		    },
 

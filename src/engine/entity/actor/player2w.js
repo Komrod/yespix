@@ -34,25 +34,21 @@ yespix.define('player2w', 'actor2w', {
     init: function() {
         var player = this;
         //console.log(yespix);
-        if (this.playerSpawnOnFloor)
-        {
+        if (this.playerSpawnOnFloor) {
             console.log('playerSpawnOnFloor');
-            if (yespix.level && yespix.level.isReady)
-            {
+            if (yespix.level && yespix.level.isReady) {
                 console.log('level already set');
                 if (player.isReady) {
                     console.log('player is ready #1');
                     player.playerFindGround();
-                } else
-                {
+                } else {
                     console.log('player is ready #1');
                     yespix.entitiesReady([player, yespix.level], function(entities) {
                         console.log('both ready #1');
                         player.playerFindGround();
                     });
                 }
-            } else
-            {
+            } else {
                 console.log('level not set');
                 yespix.on('entityReady', function(e) {
                     console.log('entityReady :: e = ', e);
@@ -62,8 +58,7 @@ yespix.define('player2w', 'actor2w', {
                     if (player.isReady) {
                         console.log('player is ready #2');
                         player.playerFindGround();
-                    } else
-                    {
+                    } else {
                         console.log('player is not ready #2');
                         yespix.entitiesReady([player, yespix.level], function(entities) {
                             console.log('both ready #2');
@@ -77,12 +72,10 @@ yespix.define('player2w', 'actor2w', {
         yespix.on('enterFrame', function() {
             var move = '';
 
-            if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right))
-            {
+            if (this.actorMove.left && yespix.key(this.actorKeys.left) && !yespix.key(this.actorKeys.right)) {
                 this.actorDirection = 'left';
                 this.accelX = -this.actorSpeed;
-            } else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) 
-            {
+            } else if (this.actorMove.right && yespix.key(this.actorKeys.right) && !yespix.key(this.actorKeys.left)) {
                 this.actorDirection = 'right';
                 this.accelX = this.actorSpeed;
             } else this.accelX = 0;
@@ -133,10 +126,10 @@ yespix.define('player2w', 'actor2w', {
             if (move == '') move = this.actorMove['default'] + this.actorDirection;
             else move = move + this.actorDirection;
             this.animNext = this.actorAnims[move];
-//console.log('this.animWait='+this.animWait+', this.isAttacking='+this.isAttacking+', move='+move+', this.animNext='+this.animNext);
+            //console.log('this.animWait='+this.animWait+', this.isAttacking='+this.isAttacking+', move='+move+', this.animNext='+this.animNext);
             if (this.animWait || this.isAttacking) return;
             this.animPlay(this.actorAnims[move]);
-//console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
+            //console.log('move = '+move+', anim = '+this.actorAnims[move]+', actorAnim = '+this.actorAnims[this.actorAnims[move]]);
 
         }, this, yespix);
     },

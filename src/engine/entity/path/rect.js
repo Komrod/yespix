@@ -1,11 +1,10 @@
 yespix.define('rect', 'path', {
 
     prerender: true,
-    
+
     init: function() {},
 
-    drawPath: function(context) {
-    },
+    drawPath: function(context) {},
 
     drawFill: function(context) {
         context.fillStyle = this.fillColor;
@@ -23,9 +22,9 @@ yespix.define('rect', 'path', {
         context.strokeStyle = this.lineColor;
         this.drawAlpha(context, 'line');
         context.strokeRect(
-            this._box.path.x, 
-            this._box.path.y, 
-            this._box.path.width, 
+            this._box.path.x,
+            this._box.path.y,
+            this._box.path.width,
             this._box.path.height);
     }
 });

@@ -7,21 +7,20 @@
 
 Function.prototype.extend = function() {
     var destination = this.prototype || this;
-    for (var i=0; i<arguments.length; i++)
+    for (var i = 0; i < arguments.length; i++)
         for (var key in arguments[i])
-            if (arguments[i].hasOwnProperty(key))
-            {
+            if (arguments[i].hasOwnProperty(key)) {
                 destination[key] = arguments[i][key];
                 destination[key]._methodName = key;
             }
 }
 
-Function.prototype.inherit = function (parent) {
-    var d = {}, 
+Function.prototype.inherit = function(parent) {
+    var d = {},
         p = this.prototype;
     Function.extend.apply(p, [parent.prototype]);
     this.prototype.constructor = parent;
-    
+
     for (var methodName in p) {
         p[methodName]._methodName = methodName;
     }
@@ -89,6 +88,3 @@ yespix.fn.define = function(name, properties) { //, inheritClass, extendClasses)
 
     return this.class[name];
 };
-
-
-

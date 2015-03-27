@@ -71,8 +71,7 @@ yespix.fn.timerStep = function() {
             frameIndex: this.frameIndex
         });
 
-        if (this.collisionEnabled)
-        {
+        if (this.collisionEnabled) {
             this.collisionClear();
             var list = this.find('/collision');
             if (list.length > 0) list.collisionOccupy().collision();

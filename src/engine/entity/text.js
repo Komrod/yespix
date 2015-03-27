@@ -26,7 +26,7 @@ yespix.define('text', 'gfx', {
             || this._box.draw.y + this._box.draw.height < 0)
             return;
         */
-       
+
         if (!this._box.context || !this._box.img) this.getContextBox(context, this.prerenderCanvas);
 
         /*
@@ -34,9 +34,9 @@ yespix.define('text', 'gfx', {
             || this._box.context.height <= 0)
             return false;
         */
-       
+
         context.globalAlpha = this.alpha;
-    
+
         context.drawImage(this.prerenderCanvas, //image element
             this._box.img.x, // x position on image
             this._box.img.y, // y position on image
@@ -81,7 +81,7 @@ yespix.define('text', 'gfx', {
     drawRender: function(context) {
         context.globalAlpha = this.alpha;
         context.fillStyle = this.textColor;
-        context.font = this.textSize+'px '+this.textFont;
+        context.font = this.textSize + 'px ' + this.textFont;
         context.fillText(this.text, this._box.draw.x, this._box.draw.y + this.textSize);
     }
 

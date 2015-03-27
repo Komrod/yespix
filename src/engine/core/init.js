@@ -16,9 +16,9 @@ yespix.fn.init = function(options) {
     // store the options
     this.options = options || {};
 
-    
+
     this.class = {};
-    
+
     if (this.options['init']) this.options['init']();
 
 
