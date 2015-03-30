@@ -5,17 +5,24 @@ yespix.define('gfx', {
     inheritClass: 'base',
 
     position: null,
+    aspect: null,
 
     isVisible: true,
+    prerender: null,
 
     init: function(options) {
         this.super(options);
 
-        this.position = new Position(this.options.position, this);
-        this.aspect = new Aspect(this.options.aspect, this);
+        this.position = new Position(this.options.position || {}, this);
+        this.aspect = new Aspect(this.options.aspect || {}, this);
         this.boundary = {};
+        this.isVisible = this.options.isVisible || true;
     },
 
+    /**
+     * Return True if something has changed (position, aspect ...)
+     * @return {bool} 
+     */
     getChanged: function() {
         if (this.position && this.position.isChanged) return true;
         if (this.aspect && this.aspect.isChanged) return true;
@@ -23,21 +30,22 @@ yespix.define('gfx', {
     },
 
     /**
-     * Try to draw the gfx entity on a canvas
+     * Try to draw the gfx entity on a context
      * @return {bool} True if drawn
      */
     draw: function(context) {
-        // get the context
-        context = context || yespix.context;
-
+console.log('gfx::draw : context = ', context);
+console.log('gfx::draw : this = ', this);
+console.log('gfx::draw : this.canDraw(context) = ', this.canDraw(context));
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
 
+//console.log('gfx::draw : this.getChanged() = ', this.getChanged());
         // get the draw box
-        if (this.getChanged()) this.getBox(false);
+        //if (this.getChanged()) this.getBoundary(false);
 
         // if cannot draw from this draw box
-        if (!this.canDrawBox(context)) return false;
+        //if (!this.canDrawBox(context)) return false;
 
         // pre render on canvas
         /*if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
@@ -70,7 +78,7 @@ yespix.define('gfx', {
      * @return {bool} True if can be drawn
      */
     canDraw: function(context) {
-        if (!this.isVisible || this.aspect.alpha <= 0 || !context)
+        if (!context || !this.isVisible || this.aspect.alpha <= 0)
             return false;
 
         return true;
@@ -81,13 +89,14 @@ yespix.define('gfx', {
      * Return true if the entity can be drawn on context, get this information from the box coordinates.
      * @return {bool} True if can be drawn
      */
-    canDrawBox: function(context) {
+    /*
+    canDrawBoundaryDraw: function(context) {
 
         if (this.box.draw.x >= context.canvas.clientWidth || this.box.draw.y >= context.canvas.clientHeight || this.box.draw.x + this.box.draw.width < 0 || this.box.draw.y + this.box.draw.height < 0)
             return false;
         return true;
     },
-
+    */
 
     /**
      * Render the entity on the context with coordinates from the box
@@ -102,6 +111,11 @@ yespix.define('gfx', {
 
     getBoundaryDraw: function() {
         if (this.boundary.draw) return this.boundary.draw;
+
+        this.boundary.draw = {
+
+        };
+        return this.boundary.draw;
     },
 
     getBoundaryCollision: function() {

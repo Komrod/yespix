@@ -24,6 +24,7 @@
             // process the options
             this.init(options);
 
+            window.yespix = this;
             //this.trigger('ready');
         }
 

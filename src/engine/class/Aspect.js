@@ -1,3 +1,4 @@
+
 function Aspect(options, entity) {
 
     options = options || {};

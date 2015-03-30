@@ -6,22 +6,32 @@
 	<body style="background-color: #456;">
 		<script type="text/javascript">
 	
-	var yp = yespix();
-	var mainCanvas = yp.createCanvas(true);
-	var manager = new GfxManager(mainCanvas);
+	// init yespix engine
+	yespix();
 
-	var object = new yp.class.gfx ({
+	// create gfx manager
+	var manager = new GfxManager(true);
+
+	// create an object to draw
+	var object = new yespix.class.rect ({
 		position: {
 			x: 50,
 //			y: 60,
 			z: 70
+		},
+		aspect: {
+			alpha: 0.5
 		}
 	});
 
+	// add to manager
 	manager.add(object);
+
+	// draw everything
 	manager.draw();
 
-console.log('object = ', object);
+
+	console.log('object = ', object);
 
 	/*
 	yp.spawn('rect, actor2w',
