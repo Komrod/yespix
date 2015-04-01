@@ -5,9 +5,6 @@ yespix.define('path', {
     path: null,
     prerender: null,
 
-    isVisible: true,
-
-
     init: function(options) {
         this.super(options);
         this.path = new Path(this.options.path || {}, this);

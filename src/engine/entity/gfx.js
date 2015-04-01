@@ -11,12 +11,13 @@ yespix.define('gfx', {
     prerender: null,
 
     init: function(options) {
+console.log('gfx:init');
         this.super(options);
 
         this.position = new Position(this.options.position || {}, this);
         this.aspect = new Aspect(this.options.aspect || {}, this);
         this.boundary = {};
-        this.isVisible = this.options.isVisible || true;
+        // this.isVisible = this.options.isVisible || true;
     },
 
     /**
@@ -34,9 +35,6 @@ yespix.define('gfx', {
      * @return {bool} True if drawn
      */
     draw: function(context) {
-console.log('gfx::draw : context = ', context);
-console.log('gfx::draw : this = ', this);
-console.log('gfx::draw : this.canDraw(context) = ', this.canDraw(context));
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
 

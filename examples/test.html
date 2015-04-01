@@ -12,8 +12,11 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
+console.log('');
+console.log('create an object');
+console.log('');
 	// create an object to draw
-	var object = new yespix.class.rect ({
+	var object = new yespix.class.gfx ({
 		position: {
 			x: 50,
 //			y: 60,
@@ -23,15 +26,19 @@
 			alpha: 0.5
 		}
 	});
+console.log('');
+console.log('object created');
+console.log('');
 
 	// add to manager
 	manager.add(object);
 
-	// draw everything
+	// draw every entity in the manager
 	manager.draw();
 
 
 	console.log('object = ', object);
+	console.log('object.isVisible = ', object.isVisible);
 
 	/*
 	yp.spawn('rect, actor2w',
