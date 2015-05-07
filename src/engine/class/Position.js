@@ -13,7 +13,7 @@ function Position(options, entity) {
     this.entity = entity;
 }
 
-Position.prototype.to = function(pos) {
+Position.prototype.set = function(pos) {
     if (pos.x || pos.x === 0) this.x = pos.x;
     if (pos.y || pos.y === 0) this.y = pos.y;
     if (pos.z || pos.z === 0) {

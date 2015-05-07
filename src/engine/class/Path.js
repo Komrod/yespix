@@ -15,7 +15,7 @@ function Path(options, entity) {
     this.entity = entity;
 }
 
-Path.prototype.to = function(aspect) {
+Path.prototype.set = function(aspect) {
     if (aspect.alpha || aspect.alpha === 0) this.alpha = aspect.alpha;
     if (aspect.width || aspect.width === 0) this.width = aspect.width;
     if (aspect.height || aspect.height === 0) this.height = aspect.height;

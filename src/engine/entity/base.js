@@ -21,7 +21,6 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(options) {
-console.log('base:init');
 		        this.options = options || {};
 		        return true;
 		    },
