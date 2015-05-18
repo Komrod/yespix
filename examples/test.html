@@ -3,32 +3,27 @@
 	<head>
 		<script type="text/javascript" src="../build/yespix.js"></script>
 	</head>
-	<body style="background-color: #456;">
+	<body style="background-color: #123;">
 		<script type="text/javascript">
 	
 	// init yespix engine
 	yespix();
 
 	// create gfx manager
-	var manager = new GfxManager(true);
+	//var manager = new GfxManager(true);
 
-console.log('');
-console.log('create an object');
-console.log('');
 	// create an object to draw
 	var object = new yespix.class.gfx ({
 		position: {
 			x: 50,
-//			y: 60,
+			y: 60,
 			z: 70
 		},
 		aspect: {
 			alpha: 0.5
 		}
 	});
-console.log('');
-console.log('object created');
-console.log('');
+console.log('object = ', object);
 
 	// add to manager
 	manager.add(object);
@@ -36,9 +31,6 @@ console.log('');
 	// draw every entity in the manager
 	manager.draw();
 
-
-	console.log('object = ', object);
-	console.log('object.isVisible = ', object.isVisible);
 
 	/*
 	yp.spawn('rect, actor2w',

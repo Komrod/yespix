@@ -7,8 +7,6 @@
 
 		    ///////////////////////////////// Main functions ////////////////////////////////
 
-		    options: null,
-
 		    /**
 		     * Return the array of assets used for the entity.
 		     */
@@ -21,7 +19,6 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(options) {
-		        this.options = options || {};
 		        return true;
 		    },
 

@@ -14,12 +14,15 @@ yespix.define('canvas', {
         this.super(options);
 
         // init options
-        if (options === true) options = {
-            autoAppend: true,
-            width: 640,
-            height: 480
-        };
-        else options = options || {};
+        if (options === true) {
+            options = {
+                autoAppend: true,
+                width: 640,
+                height: 480
+            };
+        } else {
+            options = options || {};
+        }
 
         options.width = options.width || 0;
         options.height = options.height || 0;
@@ -73,12 +76,16 @@ yespix.define('canvas', {
         }
     },
 
-    create: function() {
+    create: function(options) {
         var canvas = this.document.createElement('canvas');
-        canvas.id = this.options.id;
-        canvas.width = this.aspect.width;
-        canvas.height = this.aspect.height;
-        canvas.className = this.options.className;
+        if (this.aspect) {
+            canvas.width = this.aspect.width;
+            canvas.height = this.aspect.height;
+        }
+        if (options) {
+            if (options.id) canvas.id = options.id;
+            if (options.className) canvas.className = options.className;
+        }
         return canvas;
     },
 

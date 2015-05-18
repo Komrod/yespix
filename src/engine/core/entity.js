@@ -1,3 +1,5 @@
+
+
 /**
  ************************************************************************************************************
  ************************************************************************************************************
@@ -14,6 +16,7 @@ Function.prototype.extend = function() {
                 destination[key]._methodName = key;
             }
 }
+
 
 Function.prototype.inherit = function(parent) {
     var d = {},
@@ -91,10 +94,10 @@ yespix.fn.define = function(name, properties) { //, inheritClass, extendClasses)
         }
 
 //console.log('define: instance prototype = ', this.prototype);
-console.log('define: instance = ', this);
-console.log('define: name = ', name);
-if (this.instanceInitiated) console.log('define: this.instanceInitiated[name] = ', this.instanceInitiated[name]);
-else console.log('define: this.instanceInitiated = ', null);
+//console.log('define: instance = ', this);
+//console.log('define: name = ', name);
+//if (this.instanceInitiated) console.log('define: this.instanceInitiated[name] = ', this.instanceInitiated[name]);
+//else console.log('define: this.instanceInitiated = ', null);
         // dont init if we already did
         if (this.instanceInitiated) { // && this.instanceInitiated[name]) {
 //console.log('define: dont fire init, this.instanceInitiated = ', this.instanceInitiated);
@@ -106,10 +109,11 @@ else console.log('define: this.instanceInitiated = ', null);
 
         // init if function exists
         if (this.init) {
-//console.log('define: execute init');
+console.log('define: name = '+name+': execute init');
             this.init.apply(this, arguments);
         }
 //console.log('define: instance end, name = ', name);        
+console.log('define: end instance = ', this);
     };
 
     this.class[name].properties = properties;
@@ -126,6 +130,6 @@ else console.log('define: this.instanceInitiated = ', null);
         }
     }
 
-console.log('define: end properties = ', properties);
+//console.log('define: end properties = ', properties);
     return this.class[name];
 };

@@ -401,7 +401,7 @@ yespix.define('anim', 'image', {
 
         if (!this.animObject) return false;
 
-        if (!this.isActive || !this.isVisible || this.alpha <= 0 || !context)
+        if (!this.isActive || (this.aspect && (!this.aspect.isVisible || this.aspect.alpha <= 0)) || !context)
             return false;
 
         //var frame = this.getFrame();
