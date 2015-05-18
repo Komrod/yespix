@@ -109,11 +109,11 @@ yespix.fn.define = function(name, properties) { //, inheritClass, extendClasses)
 
         // init if function exists
         if (this.init) {
-console.log('define: name = '+name+': execute init');
+//console.log('define: name = '+name+': execute init');
             this.init.apply(this, arguments);
         }
 //console.log('define: instance end, name = ', name);        
-console.log('define: end instance = ', this);
+//console.log('define: end instance = ', this);
     };
 
     this.class[name].properties = properties;

@@ -36,10 +36,10 @@ yespix.define('gfx', {
      * @return {bool} True if drawn
      */
     draw: function(context) {
+console.log('gfx::draw : this = ', this);
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
 
-//console.log('gfx::draw : this = ', this);
 //console.log('gfx::draw : this.getChanged() = ', this.getChanged());
         // get the draw box
         //if (this.getChanged()) this.getBoundary(false);
@@ -78,9 +78,10 @@ yespix.define('gfx', {
      * @return {bool} True if can be drawn
      */
     canDraw: function(context) {
-        if (!context || (this.aspect && (!this.aspect.isVisible || this.aspect.alpha <= 0)))
+        if (!context || (this.aspect && (!this.aspect.isVisible || this.aspect.alpha <= 0))) {
+console.log('gfx::canDraw : return false');
             return false;
-
+        }
         return true;
     },
 
