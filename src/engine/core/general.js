@@ -29,9 +29,30 @@ yespix.fn.randInt = function(min, max) {
  */
 yespix.fn.clone = function(obj) {
     var temp = new obj.constructor();
-    for (var n in obj)
-        if (obj != obj[n]) temp[n] = obj[n];
+    for (var n in obj) {
+        if (obj != obj[n]) {
+            temp[n] = obj[n];
+        }
+    }
     return temp;
+};
+
+/**
+ * Copy source properties into dest object. Properties in varDefault are used as default values.
+ * @method clone
+ *
+ */
+yespix.fn.copy = function(source, dest, varDefault) {
+    for (var n in source) {
+        dest[n] = source[n];
+    }
+    if (varDefault) {
+        for (var n in varDefault) {
+            if (this.isUndefined(dest[n])) {
+                dest[n] = varDefault[n];
+            }
+        }
+    }
 };
 
 /**
@@ -42,8 +63,12 @@ yespix.fn.unique = function(arr) {
         i,
         l = arr.length,
         r = [];
-    for (i = 0; i < l; i++) o[arr[i]] = arr[i];
-    for (i in o) r.push(o[i]);
+    for (i = 0; i < l; i++) {
+        o[arr[i]] = arr[i];
+    }
+    for (i in o) {
+        r.push(o[i]);
+    }
     return r;
 };
 
@@ -52,7 +77,9 @@ yespix.fn.unique = function(arr) {
  */
 yespix.fn.getExtension = function(str) {
     var ext = str.split('.').pop();
-    if (ext == str) return '';
+    if (ext == str) {
+        return '';
+    }
     return ext;
 };
 
@@ -319,11 +346,12 @@ yespix.fn.quickSort = (function() {
 }());
 
 
-
 yespix.fn.getCache = function(name) {
     return this.cache[name];
 };
 
+
 yespix.fn.setCache = function(name, value) {
     this.cache[name] = value;
 };
+

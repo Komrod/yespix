@@ -9,16 +9,13 @@ yespix.define('gfx', {
     //prerender: null,
 
     init: function(options) {
-//console.log('gfx:init');
-        this.super(options);
+        options = options || {};
+        options.position = new Position(options.position || {}, this);
+        options.aspect = new Aspect(options.aspect || {}, this);
+        options.boundary = options.boundary || {};
+        options.prerender = options.prerender || {};
 
-//console.log('gfx:init : this.options = ', this.options);
-//console.log('gfx:init : set position ...');
-        this.position = new Position(options.position || {}, this);
-//console.log('gfx:init : position = ', this.position);
-        this.aspect = new Aspect(options.aspect || {}, this);
-        this.boundary = {};
-        this.prerender = {};
+        this.super(options);
     },
 
     /**
@@ -36,7 +33,7 @@ yespix.define('gfx', {
      * @return {bool} True if drawn
      */
     draw: function(context) {
-console.log('gfx::draw : this = ', this);
+//console.log('gfx::draw : this = ', this);
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
 
@@ -78,10 +75,11 @@ console.log('gfx::draw : this = ', this);
      * @return {bool} True if can be drawn
      */
     canDraw: function(context) {
-        if (!context || (this.aspect && (!this.aspect.isVisible || this.aspect.alpha <= 0))) {
-console.log('gfx::canDraw : return false');
+        if (!context || !this.aspect || !this.aspect.isVisible || this.aspect.alpha <= 0) {
+//console.log('gfx::canDraw : return false');
             return false;
         }
+//console.log('gfx::canDraw : return true');
         return true;
     },
 

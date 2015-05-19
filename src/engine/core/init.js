@@ -11,7 +11,7 @@
 yespix.fn.init = function(options) {
 
     // current version of the engine
-    this.version = "0.0.14.0";
+    this.version = "0.0.14";
 
     // store the options
     this.options = options || {};

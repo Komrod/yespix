@@ -1,3 +1,4 @@
+		
 		/**
 		 ************************************************************************************************************
 		 * @class entity.base
@@ -19,7 +20,16 @@
 		     * the entity and each ancestor classes
 		     */
 		    init: function(options) {
+		        options = options || {};
+			    yespix.copy(options, this);
 		        return true;
+		    },
+
+		    /**
+		     * Event: some properties of the entity have changed
+		     */
+		    event: function(event) {
+		    	return true;
 		    },
 
 		});

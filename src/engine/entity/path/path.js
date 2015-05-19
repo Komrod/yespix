@@ -2,12 +2,10 @@ yespix.define('path', {
 
     inheritClass: 'gfx',
 
-    path: null,
-    prerender: null,
-
     init: function(options) {
+        options = options || {};
+        options.path = new Path(options.path || {}, this);
         this.super(options);
-        this.path = new Path(options.path || {}, this);
     },
 
     /**

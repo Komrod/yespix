@@ -8,6 +8,11 @@ yespix.define('rect', {
     },
 
     drawRender: function(context) {
-console.log('rect:drawRender');
+    	if (this.path) {
+    		this.path.reset(context);
+    		this.path.draw();
+    		this.path.line();
+    		this.path.fill();
+    	}
     }
 });

@@ -18,7 +18,6 @@ function GfxManager(canvas, list) {
 
 
 GfxManager.prototype.setCanvas = function(canvas) {
-console.log('setCanvas : canvas = ', canvas);
 	this.canvas = canvas;
 	if (this.canvas) {
 		this.context = this.canvas.getContext('2d');
@@ -34,7 +33,7 @@ GfxManager.prototype.draw = function() {
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
-    	this.list[t].draw(this.canvas)
+    	this.list[t].draw(this.canvas);
     }
 }
 
