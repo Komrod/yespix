@@ -62,6 +62,8 @@ Path.prototype.drawFill = function(context) {
 
 
 Path.prototype.draw = function(context) {
+    if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
+
     switch (this.type) {
         case 'rect':
             if (this.getBorderRadius() > 0) {
@@ -86,8 +88,6 @@ Path.prototype.draw = function(context) {
 
 Path.prototype.drawRect = function(context) {
 
-    if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
-
     // draw path
     context.beginPath();
     context.rect(this.entity.position.x, this.entity.position.y, this.entity.aspect.width, this.entity.aspect.height);
@@ -105,8 +105,6 @@ Path.prototype.drawRect = function(context) {
 
 
 Path.prototype.drawRectRadius = function(context) {
-
-    if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
 
     var radius = this.getBorderRadius();
 
@@ -136,8 +134,6 @@ Path.prototype.drawRectRadius = function(context) {
 
 Path.prototype.drawCircle = function(context) {
 
-    if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
-
     // draw path
     context.beginPath();
     var radius = this.entity.aspect.width / 2;
@@ -156,8 +152,6 @@ Path.prototype.drawCircle = function(context) {
 
 
 Path.prototype.drawEllipse = function(context) {
-
-    if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
 
     // draw path
     context.beginPath();
