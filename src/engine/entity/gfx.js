@@ -13,7 +13,8 @@ yespix.define('gfx', {
         options.position = new Position(options.position || {}, this);
         options.aspect = new Aspect(options.aspect || {}, this);
         options.boundary = options.boundary || {};
-        options.prerender = options.prerender || {};
+        options.prerender = options.prerender || null;
+        options.manager = options.manager || null;
 
         this.super(options);
     },
@@ -104,7 +105,7 @@ yespix.define('gfx', {
      */
     drawRender: function(context) {
         // Empty. 
-        // Child entities must provide the code to draw something on the 2d context
+        // Child entities must provide the code to draw something on the context
     },
 
 
@@ -121,5 +122,22 @@ yespix.define('gfx', {
         if (this.boundary.collision) return this.boundary.collision;
     },
 
+    /**
+     * Event: some properties of the entity have changed
+     */
+    event: function(event) {
+console.log(this);
+console.log(event);
+        if (!this.manager) return;
+        switch (event.type+':'+event.fromClass) {
+            case 'change:position':
+                if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {
+console.log('OK');
+                    this.manager.isZSorted = false;
+                }
+                break;
+        }
+        return true;
+    },
 
 });

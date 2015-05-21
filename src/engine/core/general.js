@@ -310,12 +310,11 @@ yespix.fn.getFontHeight = function(fontStyle) {
 
 yespix.fn.quickSort = (function() {
 
-    function partition(array, left, right) {
-        var cmp = array[right - 1],
-            minEnd = left,
+    function partition(array, left, right, compare) {
+        var minEnd = left,
             maxEnd;
         for (maxEnd = left; maxEnd < right - 1; maxEnd += 1) {
-            if (array[maxEnd] <= cmp) {
+            if (compare(array[maxEnd], array[right - 1])) {
                 swap(array, maxEnd, minEnd);
                 minEnd += 1;
             }
@@ -331,17 +330,17 @@ yespix.fn.quickSort = (function() {
         return array;
     }
 
-    function quickSort(array, left, right) {
+    function quickSort(array, left, right, compare) {
         if (left < right) {
-            var p = partition(array, left, right);
-            quickSort(array, left, p);
-            quickSort(array, p + 1, right);
+            var p = partition(array, left, right, compare);
+            quickSort(array, left, p, compare);
+            quickSort(array, p + 1, right, compare);
         }
         return array;
     }
 
-    return function(array) {
-        return quickSort(array, 0, array.length);
+    return function(array, compare) {
+        return quickSort(array, 0, array.length, compare);
     };
 }());
 

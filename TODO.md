@@ -1,6 +1,5 @@
 
 TODO list:
-- make a position class
 - make an image class
 - make a sound class
 - new event system to easily remove events and entities
@@ -75,6 +74,9 @@ LATER:
 
 
 DONE:
+- rectangle, rounded, circle
+- make a position class
+- new engine
 - init function must be called only once
 - do an inherit and extend system
 v0.1.0.0

@@ -18,4 +18,10 @@ yespix.define('path', {
         return false;
     },
 
+    drawRender: function(context) {
+        if (this.path) {
+            this.path.draw(context);
+        }
+    }
+
 });

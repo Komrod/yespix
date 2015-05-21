@@ -1,27 +1,39 @@
+
 function Position(options, entity) {
 
     options = options || {};
+    if (entity) this.entity = entity;
 
-    this.x = options.x || 0;
-    this.y = options.y || 0;
-    this.z = options.z || 0;
-    this.globalZ = options.globalZ || 0;
-    this.rotation = options.rotation || 0;
-    this.isChanged = true;
+
+    var varDefault = {
+        x: 1,
+        y: '#000000',
+        z: 1.0,
+        globalZ: 'center', // @TODO
+
+        rotation: 0,
+    };
+
     this.isZSorted = false;
-
-    this.entity = entity;
+    this.set(options, varDefault);
 }
 
-Position.prototype.set = function(pos) {
-    if (pos.x || pos.x === 0) this.x = pos.x;
-    if (pos.y || pos.y === 0) this.y = pos.y;
-    if (pos.z || pos.z === 0) {
-        this.z = pos.z;
+
+Position.prototype.set = function(options, varDefault) {
+    if (!yespix.isUndefined(options.z) && options.z != this.z
+        || !yespix.isUndefined(options.globalZ) && options.globalZ != this.globalZ)
+    {
         this.isZSorted = false;
     }
-    if (pos.globalZ || pos.globalZ === 0) {
-        this.globalZ = pos.globalZ;
-        this.isZSorted = false;
-    }
+    yespix.copy(options, this, varDefault);
+    this.isChanged = true;
+    this.entity.event(
+        {
+            type: 'change',
+            entity: this.entity,
+            from: this,
+            fromClass: 'position',
+            properties: options
+        }
+    );
 }

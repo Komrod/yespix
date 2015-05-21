@@ -13,7 +13,7 @@ function GfxManager(canvas, list) {
 	// set the list
     this.list = list || [];
 
-    this.zSorted = false;
+    this.isZSorted = false;
 }
 
 
@@ -28,19 +28,21 @@ GfxManager.prototype.setCanvas = function(canvas) {
 
 
 GfxManager.prototype.draw = function() {
+	if (!this.context) return;
 
-    if (!this.zSorted) this.sort();
+    if (!this.isZSorted) this.sort();
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
-    	this.list[t].draw(this.canvas);
+    	this.list[t].draw(this.context);
     }
 }
 
 
 GfxManager.prototype.add = function(entity) {
+	entity.manager = this;
     this.list.push(entity);
-    this.zSorted = false;
+    this.isZSorted = false;
     return this.list.length - 1;
 }
 
@@ -55,6 +57,12 @@ GfxManager.prototype.destroy = function(entity) {
 
 
 GfxManager.prototype.sort = function() {
-
-    this.zSorted = true;
+	yespix.quickSort(this.list, function(a, b) {
+		if (a.position && b.position && a.position.z < b.position.z) {
+			return true;
+		}
+		return false;
+	});
+    this.isZSorted = true;
 }
+

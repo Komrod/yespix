@@ -23,6 +23,7 @@ Aspect.prototype.set = function(options, varDefault) {
         {
             type: 'change',
             from: this,
+            fromClass: 'aspect',
             entity: this.entity,
             properties: options
         }

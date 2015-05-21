@@ -1,35 +1,59 @@
-		
-		/**
-		 ************************************************************************************************************
-		 * @class entity.base
-		 */
 
-		yespix.define('base', {
 
-		    ///////////////////////////////// Main functions ////////////////////////////////
+/**
+ ************************************************************************************************************
+ * @class entity.base
+ */
 
-		    /**
-		     * Return the array of assets used for the entity.
-		     */
-		    assets: function() {
-		        return [];
-		    },
 
-		    /**
-		     * Initilize the entity object. The original code of the function is called for the class name of
-		     * the entity and each ancestor classes
-		     */
-		    init: function(options) {
-		        options = options || {};
-			    yespix.copy(options, this);
-		        return true;
-		    },
+yespix.define('base', {
 
-		    /**
-		     * Event: some properties of the entity have changed
-		     */
-		    event: function(event) {
-		    	return true;
-		    },
+    
+    ///////////////////////////////// Main functions ////////////////////////////////
 
-		});
+    
+    /**
+     * Return the array of assets used for the entity.
+     */
+    assets: function() {
+        return [];
+    },
+
+    
+    /**
+     * Initilize the entity object. The original code of the function is called for the class name of
+     * the entity and each ancestor classes
+     */
+    init: function(options) {
+        options = options || {};
+	    yespix.copy(options, this);
+        return true;
+    },
+
+    
+    set: function(properties) {
+    	for (n in properties) {
+console.log('n='+n);
+    		if (yespix.isObject(this[n]) && yespix.isObject(properties[n])) {
+    			if (yespix.isFunction(this[n].set)) {
+console.log('using object SET');
+					this[n].set(properties[n]);
+    			} else {
+    				yespix.copy(properties[n], this[n]);
+    			}
+    		} else {
+    			this[n] = properties[n];
+    		}
+    	}
+    },
+
+
+    /**
+     * Event: some properties of the entity have changed
+     */
+    event: function(event) {
+    	return true;
+    },
+
+});
+
