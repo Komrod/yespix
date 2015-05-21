@@ -14,155 +14,28 @@
 
 
 	// create an object to draw
-	var object = new yespix.class.path ({
+	var object = new yespix.class.text ({
 		position: {
 			x: 30,
 			y: 30,
 			z: 90
 		},
 		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
+			alpha: 1.0,
+			width: 150,
 		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#345'
+		text: {
+			content: 'Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte...',
+			wrapped: true
 		}
 	});
-	manager.add(object);
 
-	// create an object to draw
-	var object = new yespix.class.path ({
-		position: {
-			x: 10,
-			y: 10,
-			z: 70
-		},
-		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
-		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#123'
-		}
-	});
+	// add it to manager
 	manager.add(object);
-
-	// create an object to draw
-	var object = new yespix.class.path ({
-		position: {
-			x: 20,
-			y: 20,
-			z: 80
-		},
-		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
-		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#234'
-		}
-	});
-	manager.add(object);
-
-	// create an object to draw
-	var object = new yespix.class.path ({
-		position: {
-			x: 50,
-			y: 50,
-			z: 110
-		},
-		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
-		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#678'
-		}
-	});
-	manager.add(object);
-
-	// create an object to draw
-	var object = new yespix.class.path ({
-		position: {
-			x: 40,
-			y: 40,
-			z: 100
-		},
-		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
-		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#567'
-		}
-	});
-	manager.add(object);
-
-	// create an object to draw
-	var object = new yespix.class.path ({
-		position: {
-			x: 0,
-			y: 0,
-			z: 10
-		},
-		aspect: {
-			width: 50,
-			height: 50,
-			alpha: 1.0
-		},
-		path: {
-			type: 'rect',
-			lineColor: '#000',
-			lineWidth: 2,
-			fillColor: '#012'
-		}
-	});
-	manager.add(object);
-
 
 	// draw every entity in the manager
 	manager.draw();
 
-	object.set({
-		position: {
-			z: 1000
-		}
-	});
-
-	// draw every entity in the manager
-	manager.draw();
-
-	/*
-	yp.spawn('rect, actor2w',
-	{
-		x: 50,
-		y: 50,
-		width: 50,
-		height: 50,
-		rectColor: '#19D1FF',
-		
-	});
-	*/
 		</script>
 
 	</body>

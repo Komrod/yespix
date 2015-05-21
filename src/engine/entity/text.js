@@ -1,3 +1,5 @@
+
+
 yespix.define('text', {
     inheritClass: 'gfx',
 
@@ -9,9 +11,11 @@ yespix.define('text', {
 
 
     drawRender: function(context) {
+console.log('text:drawRender : ', this);
         if (this.text) {
             this.text.draw(context);
         }
     }
 
 });
+

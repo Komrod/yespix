@@ -1,5 +1,6 @@
 
 TODO list:
+- Text
 - make an image class
 - make a sound class
 - new event system to easily remove events and entities
@@ -16,8 +17,7 @@ TODO list:
 - optimize: Z sort function only sort the changed entities
 - optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - optimize: tiled levelLayer to fix the drawImage speed on phone
-- center position with positionAlign ("center left", "top right" ...)
-- examples and build folders in the root project
+- center position with position.align ("center left", "top right" ...)
 - fix position of followed entity in the center of entity
 - key remanence (for jump)
 - disable key capture on phones
@@ -27,7 +27,7 @@ TODO list:
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
-- draw text based on image
+- draw text based on image for characters
 - typewritter: text showing letter by letter with sound
 - container entity
 - button entity
@@ -74,8 +74,9 @@ LATER:
 
 
 DONE:
-- rectangle, rounded, circle
+- rectangle, rounded rectangle, circle, ellipse
 - make a position class
+- examples and build folders in the root project
 - new engine
 - init function must be called only once
 - do an inherit and extend system

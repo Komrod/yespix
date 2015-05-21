@@ -33,10 +33,8 @@ yespix.define('base', {
     
     set: function(properties) {
     	for (n in properties) {
-console.log('n='+n);
     		if (yespix.isObject(this[n]) && yespix.isObject(properties[n])) {
     			if (yespix.isFunction(this[n].set)) {
-console.log('using object SET');
 					this[n].set(properties[n]);
     			} else {
     				yespix.copy(properties[n], this[n]);
