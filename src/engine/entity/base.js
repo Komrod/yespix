@@ -50,6 +50,7 @@ yespix.define('base', {
      * Event: some properties of the entity have changed
      */
     event: function(event) {
+    	if (this.manager) this.manager.event(event);
     	return true;
     },
 

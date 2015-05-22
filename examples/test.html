@@ -6,36 +6,44 @@
 	<body style="background-color: #789;">
 		<script type="text/javascript">
 	
+
 	// init yespix engine
 	yespix();
 
 	// create gfx manager
 	var manager = new GfxManager(true);
 
-
 	// create an object to draw
-	var object = new yespix.class.text ({
+	var options = {
 		position: {
-			x: 30,
-			y: 30,
+			x: 0,
+			y: 0,
 			z: 90
 		},
-		aspect: {
-			alpha: 1.0,
-			width: 150,
-		},
-		text: {
-			content: 'Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte, Ceci est un texte...',
-			wrapped: true
+		image: {
+			src: 'zardoz/image/sean.png'
 		}
-	});
+	};
 
-	// add it to manager
-	manager.add(object);
+	for (var t=0; t<2; t++) {
+		options.position.x = t;
+		options.position.y = t;
+		var object = new yespix.class.image(options);
+
+		// add it to manager
+		manager.add(object);
+	}
+	
+
 
 	// draw every entity in the manager
-	manager.draw();
+	manager.when('ready', function() {
+console.log('-------------------------------------');
+console.log('ready');
+		manager.draw();
+	});
 
+	console.log('manager = ', manager);
 		</script>
 
 	</body>

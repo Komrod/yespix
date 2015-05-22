@@ -7,15 +7,15 @@ yespix.define('text', {
         options = options || {};
         options.text = new Text(options.text || {}, this);
         this.super(options);
+
+        this.isReady = true;
     },
 
 
     drawRender: function(context) {
-console.log('text:drawRender : ', this);
         if (this.text) {
             this.text.draw(context);
         }
     }
-
 });
 

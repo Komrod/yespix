@@ -114,6 +114,7 @@ module.exports = function(grunt) {
                     '../engine/entity/canvas.js',
                     '../engine/entity/path.js',
                     '../engine/entity/text.js',
+                    '../engine/entity/image.js',
 
                     // entities end
                     '../engine/template/entities_end.js',

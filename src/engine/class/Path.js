@@ -36,14 +36,14 @@ Path.prototype.set = function(options, varDefault) {
             properties: options
         }
     );
-}
+};
 
 
 Path.prototype.getBorderRadius = function() {
     if (this.entity.aspect.width >= this.borderRadius * 2 || this.entity.aspect.height >= this.borderRadius * 2) return this.borderRadius;
     if (this.entity.aspect.height < this.entity.aspect.width) return this.entity.aspect.height / 2;
     return this.entity.aspect.width / 2;
-}
+};
 
 
 Path.prototype.drawLine = function(context) {
@@ -51,14 +51,14 @@ Path.prototype.drawLine = function(context) {
     context.lineWidth = this.lineWidth;
     context.strokeStyle = this.lineColor;
     context.stroke();
-}
+};
 
 
 Path.prototype.drawFill = function(context) {
     context.globalAlpha = this.entity.aspect.alpha * this.fillAlpha;
     context.fillStyle = this.fillColor;
     context.fill();
-}
+};
 
 
 Path.prototype.draw = function(context) {
@@ -83,7 +83,7 @@ Path.prototype.draw = function(context) {
             this.drawPolygon(context);
             break;
     }
-}
+};
 
 
 Path.prototype.drawRect = function(context) {
@@ -101,7 +101,7 @@ Path.prototype.drawRect = function(context) {
     if (this.fillColor != '') {
         this.drawFill(context);
     }
-}
+};
 
 
 Path.prototype.drawRectRadius = function(context) {
@@ -129,7 +129,7 @@ Path.prototype.drawRectRadius = function(context) {
     if (this.fillColor != '') {
         this.drawFill(context);
     }
-}
+};
 
 
 Path.prototype.drawCircle = function(context) {
@@ -148,7 +148,7 @@ Path.prototype.drawCircle = function(context) {
     if (this.fillColor != '') {
         this.drawFill(context);
     }
-}
+};
 
 
 Path.prototype.drawEllipse = function(context) {
@@ -168,5 +168,5 @@ Path.prototype.drawEllipse = function(context) {
     if (this.fillColor != '') {
         this.drawFill(context);
     }
-}
+};
 

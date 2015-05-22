@@ -1,8 +1,11 @@
 
 TODO list:
-- Text
-- make an image class
+- bug: multiple image entities does not show
+- multiple images for an entity
 - make a sound class
+- make a sprite sheet class
+- make an animation class
+
 - new event system to easily remove events and entities
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
@@ -74,10 +77,15 @@ LATER:
 
 
 DONE:
+- make an image class
+- Text, wrapped text
 - rectangle, rounded rectangle, circle, ellipse
 - make a position class
 - examples and build folders in the root project
 - new engine
+
+
+OLD_DONE:
 - init function must be called only once
 - do an inherit and extend system
 v0.1.0.0
@@ -177,7 +185,7 @@ v0.1.0.0
 
 
 CANCELED:
-- create a sprite entity from anim enity // anim is doing the trick
+- create a sprite entity from anim entity // anim is doing the trick
 - override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 
 

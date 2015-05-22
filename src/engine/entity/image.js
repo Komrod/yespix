@@ -1,13 +1,11 @@
-yespix.define('path', {
+yespix.define('image', {
 
     inheritClass: 'gfx',
 
     init: function(options) {
         options = options || {};
-        options.path = new Path(options.path || {}, this);
+        options.image = new Image(options.image || {}, this);
         this.super(options);
-
-        this.isReady = true;
     },
 
     /**
@@ -16,14 +14,18 @@ yespix.define('path', {
      */
     getChanged: function() {
         if (this.super()) return true;
-        if (this.path && this.path.isChanged) return true;
+        if (this.image && this.image.isChanged) return true;
         return false;
     },
 
     drawRender: function(context) {
-        if (this.path) {
-            this.path.draw(context);
+        if (this.image) {
+            this.image.draw(context);
         }
-    }
+    },
 
+    event: function(event) {
+
+        this.super(event);
+    }
 });
