@@ -354,3 +354,21 @@ yespix.fn.setCache = function(name, value) {
     this.cache[name] = value;
 };
 
+yespix.fn.async = function(fn, parameters, callback) {
+    setTimeout(function() {
+        if (yespix.isArray(parameters)) {
+            if (yespix.isFunction(callback)) {
+                callback(fn.apply(this, parameters));
+            } else {
+                fn.apply(this, parameters);
+            }
+        } else {
+            if (yespix.isFunction(callback)) {
+                callback(fn());
+            } else {
+                fn();
+            }
+        }
+    }, 0);
+};
+
