@@ -54,5 +54,10 @@ yespix.define('base', {
     	return true;
     },
 
+
+    assets: function() {
+        return [];
+    },
+    
 });
 

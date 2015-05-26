@@ -2,13 +2,6 @@ yespix.define('canvas', {
 
     inheritClass: 'base',
 
-    element: null,
-
-    aspect: null,
-
-    document: null,
-    window: null,
-
     init: function(options) {
         // call ancestor class function
         this.super(options);

@@ -13,6 +13,18 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
+	var loader = new Loader({}, [
+		'unit/image/moons.png',
+/*		'zardoz/image/clouds_01.png',
+		'zardoz/image/clouds_02.png',
+		'zardoz/image/dust_01.png',
+		'zardoz/image/dust_02.png',*/
+		]);
+	loader.execute();
+
+	console.log('loader = ', loader);
+
+/*	
 	// create an object to draw
 	var options = {
 		position: {
@@ -25,25 +37,22 @@
 		}
 	};
 
-	for (var t=0; t<2; t++) {
+	for (var t=0; t<600; t++) {
 		options.position.x = t;
 		options.position.y = t;
-		var object = new yespix.class.image(options);
-
 		// add it to manager
-		manager.add(object);
+		manager.add(new yespix.class.image(options));
 	}
 	
 
 
 	// draw every entity in the manager
 	manager.when('ready', function() {
-console.log('-------------------------------------');
-console.log('ready');
 		manager.draw();
 	});
 
 	console.log('manager = ', manager);
+*/
 		</script>
 
 	</body>

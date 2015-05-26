@@ -3,9 +3,10 @@ yespix.define('image', {
     inheritClass: 'gfx',
 
     init: function(options) {
-        options = options || {};
-        options.image = new Image(options.image || {}, this);
+        var options = options || {};
         this.super(options);
+        this.image = new Image(options.image || {}, this);
+
     },
 
     /**
@@ -27,5 +28,13 @@ yespix.define('image', {
     event: function(event) {
 
         this.super(event);
-    }
+    },
+
+    assets: function() {
+        var list = this.super();
+        if (this.image && this.image.src) list.concat([this.image.src]);
+        return list;
+    },
+
 });
+

@@ -10,15 +10,17 @@ yespix.define('gfx', {
 
     init: function(options) {
         options = options || {};
-        options.position = new Position(options.position || {}, this);
-        options.aspect = new Aspect(options.aspect || {}, this);
-        options.boundary = options.boundary || {};
-        options.prerender = options.prerender || null;
-        options.manager = options.manager || null;
 
         this.super(options);
 
         this.isReady = false;
+        
+        this.position = new Position(options.position || {}, this);
+        this.aspect = new Aspect(options.aspect || {}, this);
+        this.boundary = options.boundary || {};
+        this.prerender = options.prerender || null;
+        this.manager = options.manager || null;
+
     },
 
     /**
@@ -128,9 +130,6 @@ yespix.define('gfx', {
      * Event: some properties of the entity have changed
      */
     event: function(event) {
-console.log('gfx::event : fromClass = '+event.fromClass+', type = '+event.type);
-console.log('gfx::event : this = ', this);
-console.log('gfx::event : event = ', event);
         if (!this.manager) return;
         switch (event.type+':'+event.fromClass) {
             case 'change:position':

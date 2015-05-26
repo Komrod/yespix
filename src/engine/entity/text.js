@@ -5,8 +5,8 @@ yespix.define('text', {
 
     init: function(options) {
         options = options || {};
-        options.text = new Text(options.text || {}, this);
         this.super(options);
+        this.text = new Text(options.text || {}, this);
 
         this.isReady = true;
     },

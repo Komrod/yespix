@@ -1,9 +1,11 @@
 
 TODO list:
-- bug: multiple image entities does not show
+- make a Loader class
 - multiple images for an entity
+- scaled image
 - make a sound class
 - make a sprite sheet class
+- make the main loop possible
 - make an animation class
 
 - new event system to easily remove events and entities
@@ -77,6 +79,7 @@ LATER:
 
 
 DONE:
+- bug: multiple image entities does not show
 - make an image class
 - Text, wrapped text
 - rectangle, rounded rectangle, circle, ellipse

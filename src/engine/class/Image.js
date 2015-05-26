@@ -15,6 +15,7 @@ function Image(options, entity) {
 
         scale: 1.0, // original loading scale of the image
         element: null, // img element
+        elements: [], // list of img elements
         changeSize: true // change the size of the entity each time an image is used / changed
     };
 
@@ -78,55 +79,69 @@ Image.prototype.resize = function(img, scale) {
 
 
 Image.prototype.load = function(src) {
-console.log('Image::load : start');
     if (!src) {
-console.log('Image::load : no src');
         return true;
     }
-
-console.log('Image::load : src = '+this.src);
-console.log('Image::load : this = ', this);
     this.element = yespix.getCache('img:'+src+':1');
-    if (this.element) return true;
-
+    if (this.element) {
+        this.element.entities.push(this.entity);
+        if (this.element.isReady) {
+            this.ready();
+        }
+        return true;
+    }
     this.element = document.createElement('img');
-    yespix.setCache('img:'+this.src+':1', this.element);
-
-    var image = this;
+    this.element.entities = new Array();
+    this.element.entities.push(this.entity);
+    yespix.setCache('img:'+src+':1', this.element);
 
     // set the onload event for image element
     this.element.onload = function(e) {
-        image.entity.isLoading = image.isLoading = false;
-        image.entity.isReady = image.isReady = true;
-        if (image.entity.aspect) {
-            image.entity.aspect.width = this.width;
-            image.entity.aspect.height = this.height;
+        this.isLoading = false;
+        this.isReady = true;
+        var len = this.entities.length;
+        for (var t=0; t<len; t++) {
+            this.entities[t].image.ready();
         }
-        image.entity.event(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'image',
-                entity: image.entity
-            }
-        );
     };
 
-    this.entity.isLoading = image.isLoading = true;
-    this.entity.isReady = image.isReady = false;
-
-    this.element.src = this.src;
+    this.element.isLoading = true;
+    this.element.isReady = false;
+    this.isLoading = true;
+    this.isReady = false;
+    this.entity.isReady = false;
+    this.element.src = src;
 };
 
+Image.prototype.ready = function(entity) {
+    this.isLoading = false;
+    this.isReady = true;
+    if (this.entity.image == this) {
+        this.entity.isReady = true;
+    }
+    this.element.isLoading = false;
+    this.element.isReady = true;
+
+    if (this.entity.aspect) {
+        this.entity.aspect.width = this.element.width;
+        this.entity.aspect.height = this.element.height;
+    }
+    this.entity.event(
+        {
+            type: 'ready',
+            from: this,
+            fromClass: 'image',
+            entity: this.entity
+        }
+    );
+};
 
 
 Image.prototype.draw = function(context) {
     if (!this.isReady) {
-console.log('Not ready: src "' + this.src + '"');
         return false;
     }
 
-console.log('Image:draw : this = ', this);
     if (this.flipX || this.flipY) {
         context.save();
         context.scale( (this.flipX ? -1 : 1), (this.flipY ? -1 : 1) );

@@ -248,6 +248,7 @@ yespix.fn.inArray = function(arr, value) {
     return (arr.indexOf(value) != -1);
 };
 
+
 yespix.fn.each = function(array, fn, args) {
     var i;
 
@@ -353,6 +354,12 @@ yespix.fn.getCache = function(name) {
 yespix.fn.setCache = function(name, value) {
     this.cache[name] = value;
 };
+
+
+yespix.fn.rmCache = function(name) {
+    delete(this.cache[name]);
+};
+
 
 yespix.fn.async = function(fn, parameters, callback) {
     setTimeout(function() {
