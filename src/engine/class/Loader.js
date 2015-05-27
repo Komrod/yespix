@@ -5,11 +5,10 @@ function Loader(options, files) {
     // init the options
     options = options || {};
 
-    this.complete = options['complete'] || function() {};
-    this.error = options['error'] || function() {};
-    this.progress = options['progress'] || function() {};
-    this.skip = options['skip'] || function() {};
-    this.success = options['success'] || function() {};
+    this.complete = options['complete'] || function(event) {};
+    this.error = options['error'] || function(event) {};
+    this.progress = options['progress'] || function(event) {};
+    this.success = options['success'] || function(event) {};
 
     this.maxDownload = options['maxDownload'] || 0;
 
@@ -53,9 +52,9 @@ Loader.prototype.execute = function() {
     };
 
     for (; index < len; index++) {
-        if (!this.files[0]) continue;
+        if (!this.files[index]) continue;
         
-        var src = this.files[0];
+        var src = this.files[index];
 
         if (!this.fileStats[src] // src URL not previously loaded
             || !this.fileStats[src].state // src URL has no state 
@@ -65,8 +64,8 @@ Loader.prototype.execute = function() {
             this.fileStats[src] = {
                 state: 'pending',
                 loaded: 0,
+                total: 0,
                 progress: 0,
-                size: 0,
                 done: false,
                 lengthComputable: false,
                 src: src
@@ -90,7 +89,7 @@ Loader.prototype.xmlhttp = function(src) {
             try {
                 client = new ActiveXObject(names[i]);
                 break;
-            } catch (e) {}
+            } catch (event) {}
         }
         // cancel load, nothing will work
         if (!client) {
@@ -101,79 +100,53 @@ Loader.prototype.xmlhttp = function(src) {
 
     
     client.src = src;
-    client.stat = this.fileStats[src];
-
-    client.progress = function(event) {
-console.log('progress: this = ', this);
-        event.src = this.src;
-        event.stat = this.stat;
-console.log('progress: avant: event = ', event);
-
-        // check if the event.stat is already finished and do not call progress anymore
-        if (event.stat.done) {
-            event.size = event.stat.size;
-            event.totalSize = event.stat.size;
-            event.loaded = event.stat.loaded;
-            event.progress = event.stat.progress;
-console.log('progress: apres: event = ', event);
-            return event;
-        }
-
-
-        if (!event.stat.lengthComputable && !event.lengthComputable) {
-            // the event.stat did not start download and we dont know its size
-            event.stat.state = 'pending';
-            event.stat.loaded = 0;
-            event.stat.progress = 0;
-            event.stat.size = 0;
-            event.stat.lengthComputable = false;
-        } else {
-            // process progress for the event.stat
-            event.stat.lengthComputable = true;
-            if (event.stat.loaded < event.loaded) event.stat.loaded = event.loaded;
-            if (event.stat.size < event.totalSize) event.stat.size = eevent.totalSize;
-            if (event.stat.size > 0) event.stat.progress = parseInt(event.stat.loaded / event.stat.size * 10000) / 100;
-            else event.stat.progress = 100;
-            if (event.stat.progress > 100) event.stat.progress = 100;
-            if (event.stat.progress == 100) event.stat.state = 'loaded';
-            else event.stat.state = 'processing';
-        }
-
-        var newEvent = {
-            size: event.stat.size,
-            loaded: event.stat.loaded,
-            progress: event.stat.progress,
-            lengthComputable: event.stat.lengthComputable,
-            state: event.stat.state,
-            src: event.stat.src,
-            stat: event.stat,
-            //                    entity: options['entity'],
-        };
-
-console.log('progress: apres: newEvent = ', newEvent);
-        return newEvent;
-
-    };
-
-
+    client.fileStat = this.fileStats[src];
+    client.loader = this;
     client.onreadystatechange = this.onreadystatechange;
 
+    client.addEventListener('progress', function(event) {
+        if (!this.fileStat.done) {
+            if (!event.lengthComputable) {
+                // pending
+                if (this.fileStat) this.fileStat.state = 'pending';
+                event.state = 'pending';
 
-    client.addEventListener('progress', function(e) {
-console.log('addEventListener:progress : this.stat = ', this.stat);
-        if (!this.stat.done) {
-            var newEvent = this.progress(e);
+                this.fileStat.loaded = 0;
+                this.fileStat.total = 0;
+                this.fileStat.progress = 0;
+
+                if (this.loader.progress) this.loader.progress(event);
+            } else {
+                if (event.total == event.loaded) {
+                    // completed
+                    if (this.fileStat) this.fileStat.state = 'loaded'
+                    event.state = 'loaded';
+                    this.fileStat.loaded = event.loaded;
+                    this.fileStat.total = event.total;
+                    this.fileStat.progress = 100;
+                    this.fileStat.done = true;
+                    if (this.loader.progress) this.loader.progress(event);
+                    if (this.loader.complete) this.loader.complete(event);
+                    if (this.loader.success) this.loader.success(event);
+                } else {
+                    // in progress
+                    if (this.fileStat) this.fileStat.state = 'inprogress'
+                    event.state = 'inprogress';
+                    this.fileStat.loaded = event.loaded;
+                    this.fileStat.total = event.total;
+                    this.fileStat.progress = ((event.loaded * 10000) / event.total) / 100;
+                    if (this.loader.progress) this.loader.progress(event);
+                }
+            }
         }
     }, false);
 
     client.open('GET', src);
     client.send('');
-console.log('addEventListener:progress : client = ', client);
 };
 
 
 Loader.prototype.onreadystatechange = function(event) {
-console.log('onreadystatechange: avant: event = ', event);
     
     // currently downloading
     event.src = this.src;
@@ -181,40 +154,74 @@ console.log('onreadystatechange: avant: event = ', event);
     // check the state
     var state = this.readyState || event.type;
 
-    // process the progress of the file
-    var newEvent = this.progress(event);
-    var newEvent = this.progress.call(this, event);
-    var newEvent = this.progress.apply(this, [event]);
-console.log('onreadystatechange: this = ', this);
-console.log('onreadystatechange: this.progress = ', this.progress);
-console.log('onreadystatechange: newEvent = ', newEvent);
-console.log('onreadystatechange: state = '+state);
-
     // The event "onreadystatechange" can be triggered by browsers several times with the same state. To check if the
-    // file has already been processed, check the value of file.done
-    if (!newEvent.stat.done && (/load|loaded|complete/i.test(state) || state == 4)) {
+    // file has already been processed, check the value of fileStat.done
+    if (!this.fileStat.done && (/load|loaded|complete|error/i.test(state) || state == 4)) {
         // the file is complete, might also returned an error.
         // we do not put the content in the memory because it would take too much space for big files
-        newEvent.content = this.responseText;
-
-        newEvent.src = this.src;
-        newEvent.status = this.status;
-        newEvent.stat.done = true;
+        this.fileStat.done = true;
 
         // exclude error HTML status 400 & 500
         if (this.status >= 400) { // @todo this do not handle other error codes like 310 ...
-            newEvent.state = newEvent.stat.state = 'error';
+            event.state = 'error';
+            event.loaded = 0;
+            event.progress = 0;
+            event.total = this.fileStat.total;
 
-console.log('onreadystatechange: apres: newEvent = ', newEvent);
-console.log('onreadystatechange: apres: this = ', this);
+            this.fileStat.state = 'error';
+            this.fileStat.loaded = 0;
+            this.fileStat.progress = 0;
+
+            if (this.loader.error) this.loaded.error(event);
             return;
         }
 
-        // executes success and complete functions
-        newEvent.state = file.state = 'loaded';
+        // success and complete
+        event.state = 'loaded';
+        event.loaded = this.fileStat.loaded;
+        event.progress = 100;
+        
+        this.fileStat.state = 'loaded';
+        this.fileStat.progress = 100;
+
+        if (this.loader.progress) this.loader.progress(event);
+        if (this.loader.complete) this.loader.complete(event);
+        if (this.loader.success) this.loader.success(event);
     }
-console.log('onreadystatechange: apres: newEvent = ', newEvent);
-console.log('onreadystatechange: apres: this = ', this);
 };
 
+
+Loader.prototype.update = function() {
+    var index = 0;
+    var len = this.files.length;
+
+    this.globalStats = {
+        loaded: 0,
+        progress: 0,
+        size: 0,
+        allComplete: false,
+        allSuccess: false,
+        errorCount: 0,
+        downloadCount: 0,
+    };
+    
+    if (len > 0) {
+        this.globalStats.allComplete = true;
+    }
+
+    for (; index < len; index++) {
+        if (!this.files[index]) continue;
+        
+        var src = this.files[index];
+        if (this.fileStats[src]) {
+
+            if (this.fileStats[src].state == 'pending')  {
+                this.globalStats.allComplete = false;
+            }
+            
+        } else {
+
+        }
+    }
+};
 

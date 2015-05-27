@@ -13,7 +13,20 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
-	var loader = new Loader({}, [
+	var loader = new Loader({
+		error: function(event) {
+			console.log('error: event = ', event);
+		},
+		success: function(event) {
+			console.log('success: event = ', event);
+		},
+		complete: function(event) {
+			console.log('complete: event = ', event);
+		},
+		progress: function(event) {
+			console.log('progress: event = ', event);
+		},
+	}, [
 		'unit/image/moons.png',
 /*		'zardoz/image/clouds_01.png',
 		'zardoz/image/clouds_02.png',
