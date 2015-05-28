@@ -81,7 +81,10 @@ Image.prototype.resize = function(img, scale) {
 Image.prototype.load = function(src) {
     if (!src) {
         return true;
+    } else if (yespix.isArray(src)) {
+        src = src[0];
     }
+    
     this.element = yespix.getCache('img:'+src+':1');
     if (this.element) {
         this.element.entities.push(this.entity);

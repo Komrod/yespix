@@ -86,12 +86,28 @@ GfxManager.prototype.getReady = function() {
 	var len = this.list.length;
 	for (var t=0; t<len; t++) {
 		if (!this.list[t].isReady) {
-console.log('GfxManager:getReady : return false');
 			return false;
 		}
 	}
-console.log('GfxManager:getReady : return true');
 	return true;
+};
+
+
+GfxManager.prototype.getAssets = function() { 
+	var len = this.list.length;
+	var assets = [];
+	for (var t=0; t<len; t++) {
+		assets = assets.concat(this.list[t].getAssets());
+	}
+	assets = yespix.unique(assets);
+console.log('assets = ', assets);
+	return assets;
+};
+
+
+GfxManager.prototype.loadAssets = function(options) { 
+	this.loader = new Loader(options, this.getAssets());
+	this.loader.execute();
 };
 
 

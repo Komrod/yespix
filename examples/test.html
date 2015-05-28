@@ -13,31 +13,6 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
-	var loader = new Loader({
-		error: function(event) {
-			console.log('error: event = ', event);
-		},
-		success: function(event) {
-			console.log('success: event = ', event);
-		},
-		complete: function(event) {
-			console.log('complete: event = ', event);
-		},
-		progress: function(event) {
-			console.log('progress: event = ', event);
-		},
-	}, [
-		'unit/image/moons.png',
-/*		'zardoz/image/clouds_01.png',
-		'zardoz/image/clouds_02.png',
-		'zardoz/image/dust_01.png',
-		'zardoz/image/dust_02.png',*/
-		]);
-	loader.execute();
-
-	console.log('loader = ', loader);
-
-/*	
 	// create an object to draw
 	var options = {
 		position: {
@@ -46,10 +21,25 @@
 			z: 90
 		},
 		image: {
-			src: 'zardoz/image/sean.png'
+			src: [
+				'zardoz/image/sean.png',
+				'zardoz/image/zardoz_big.png',
+				'zardoz/image/zardoz_circle.png',
+				'zardoz/image/zardoz_logo.png',
+				'zardoz/image/zardoz_small.png'
+			]
 		}
 	};
+	manager.add(new yespix.class.image(options));
 
+	manager.loadAssets({
+		complete: function(event) {
+			console.log('complete: event = ', event);
+		}
+	});
+
+
+/*
 	for (var t=0; t<600; t++) {
 		options.position.x = t;
 		options.position.y = t;
@@ -58,14 +48,19 @@
 	}
 	
 
-
+*/
 	// draw every entity in the manager
 	manager.when('ready', function() {
 		manager.draw();
 	});
 
+	manager.list[0].image.load('zardoz/image/zardoz_logo.png');
+	manager.when('ready', function() {
+		manager.draw();
+	});
+
 	console.log('manager = ', manager);
-*/
+
 		</script>
 
 	</body>

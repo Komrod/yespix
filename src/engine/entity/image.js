@@ -30,9 +30,15 @@ yespix.define('image', {
         this.super(event);
     },
 
-    assets: function() {
+    getAssets: function() {
         var list = this.super();
-        if (this.image && this.image.src) list.concat([this.image.src]);
+        if (this.image && this.image.src) {
+            if (yespix.isArray(this.image.src)) {
+                list = list.concat(this.image.src);
+            } else {
+                list = list.concat([this.image.src]);
+            }
+        }
         return list;
     },
 

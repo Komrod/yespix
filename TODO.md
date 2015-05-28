@@ -1,7 +1,5 @@
 
 TODO list:
-- make a Loader class
-- multiple images for an entity
 - scaled image
 - make a sound class
 - make a sprite sheet class
@@ -79,6 +77,8 @@ LATER:
 
 
 DONE:
+- multiple images for an entity
+- make a Loader class
 - bug: multiple image entities does not show
 - make an image class
 - Text, wrapped text
