@@ -8,7 +8,9 @@ function Aspect(options, entity) {
         alpha: 1,
         width: 0,
         height: 0,
-        isVisible: true
+        isVisible: true,
+        flipX: false,
+        flipY: false
     };
 
     this.set(options, varDefault);

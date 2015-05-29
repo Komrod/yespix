@@ -1,6 +1,10 @@
+
+
 yespix.define('image', {
 
+
     inheritClass: 'gfx',
+
 
     init: function(options) {
         var options = options || {};
@@ -8,6 +12,7 @@ yespix.define('image', {
         this.image = new Image(options.image || {}, this);
 
     },
+
 
     /**
      * Return True if something has changed (position, aspect ...)
@@ -19,16 +24,19 @@ yespix.define('image', {
         return false;
     },
 
+
     drawRender: function(context) {
         if (this.image) {
             this.image.draw(context);
         }
     },
 
+
     event: function(event) {
 
         this.super(event);
     },
+
 
     getAssets: function() {
         var list = this.super();
@@ -41,6 +49,8 @@ yespix.define('image', {
         }
         return list;
     },
+
+    
 
 });
 

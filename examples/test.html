@@ -18,43 +18,61 @@
 		position: {
 			x: 0,
 			y: 0,
-			z: 90
+			z: 1
 		},
 		image: {
-			src: [
-				'zardoz/image/sean.png',
-				'zardoz/image/zardoz_big.png',
-				'zardoz/image/zardoz_circle.png',
-				'zardoz/image/zardoz_logo.png',
-				'zardoz/image/zardoz_small.png'
-			]
+			src: 'zardoz/image/zardoz_small.png',
+			scale: 0.5
+		},
+		aspect: {
+//			width: 50,
+//			height: 50
 		}
 	};
 	manager.add(new yespix.class.image(options));
+	options.position.x = 100;
+	options.aspect.flipX = true;
+	manager.add(new yespix.class.image(options));
+	options.position.y = 100;
+	options.aspect.flipY = true;
+	manager.add(new yespix.class.image(options));
+	options.position.x = 0;
+	options.aspect.flipX = false;
+	manager.add(new yespix.class.image(options));
 
+/*
 	manager.loadAssets({
 		complete: function(event) {
 			console.log('complete: event = ', event);
 		}
 	});
+*/
 
-
+//	manager.add(new yespix.class.image(options));
 /*
-	for (var t=0; t<600; t++) {
+	for (var t=0; t<1000; t++) {
 		options.position.x = t;
 		options.position.y = t;
 		// add it to manager
 		manager.add(new yespix.class.image(options));
 	}
-	
-
 */
-	// draw every entity in the manager
-	manager.when('ready', function() {
-		manager.draw();
-	});
 
-	manager.list[0].image.load('zardoz/image/zardoz_logo.png');
+	//manager.list[0].image.load('zardoz/image/zardoz_logo.png');
+	/*
+	var width = 0;
+	for (; width < 2000; width++) {
+		manager.list[0].set({
+			aspect: {
+				width: width,
+				height: width
+			}
+		});
+console.log('entity = ', manager.list[0]);
+		manager.draw();
+	}
+	*/
+	// draw every entity in the manager
 	manager.when('ready', function() {
 		manager.draw();
 	});

@@ -1,6 +1,6 @@
 
 TODO list:
-- scaled image
+- snap to pixel
 - make a sound class
 - make a sprite sheet class
 - make the main loop possible
@@ -77,6 +77,9 @@ LATER:
 
 
 DONE:
+- flip image // 2015-05-29
+- scaled image
+- fixed image width/height and change width/height
 - multiple images for an entity
 - make a Loader class
 - bug: multiple image entities does not show
