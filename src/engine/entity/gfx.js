@@ -44,7 +44,9 @@ yespix.define('gfx', {
 
 //console.log('gfx::draw : this.getChanged() = ', this.getChanged());
         // get the draw box
-        //if (this.getChanged()) this.getBoundary(false);
+        if (this.position.isChanged || this.aspect.isChanged) {
+            this.boundary.draw = this.getBoundaryDraw();
+        }
 
         // if cannot draw from this draw box
         //if (!this.canDrawBox(context)) return false;
@@ -67,6 +69,9 @@ yespix.define('gfx', {
 
         this.drawRender(context);
 
+        this.position.isChanged = false;
+        this.aspect.isChanged = false;
+        
         // draw debug
         /*
         if (this.debug) this.debug.draw(context);
@@ -114,17 +119,11 @@ yespix.define('gfx', {
 
 
     getBoundaryDraw: function() {
-        if (this.boundary.draw) return this.boundary.draw;
-
-        this.boundary.draw = {
+        return {
 
         };
-        return this.boundary.draw;
     },
 
-    getBoundaryCollision: function() {
-        if (this.boundary.collision) return this.boundary.collision;
-    },
 
     /**
      * Event: some properties of the entity have changed

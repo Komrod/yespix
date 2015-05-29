@@ -16,9 +16,10 @@
 	// create an object to draw
 	var options = {
 		position: {
-			x: 0,
-			y: 0,
-			z: 1
+			x: 0.5,
+			y: 0.5,
+			z: 1,
+			snapToPixel: true
 		},
 		image: {
 			src: 'zardoz/image/zardoz_small.png',
@@ -29,14 +30,15 @@
 //			height: 50
 		}
 	};
+	
 	manager.add(new yespix.class.image(options));
-	options.position.x = 100;
+	options.position.x += 100;
 	options.aspect.flipX = true;
 	manager.add(new yespix.class.image(options));
-	options.position.y = 100;
+	options.position.y += 100;
 	options.aspect.flipY = true;
 	manager.add(new yespix.class.image(options));
-	options.position.x = 0;
+	options.position.x -= 100;
 	options.aspect.flipX = false;
 	manager.add(new yespix.class.image(options));
 

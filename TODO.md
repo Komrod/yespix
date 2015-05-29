@@ -1,10 +1,16 @@
 
 TODO list:
-- snap to pixel
 - make a sound class
 - make a sprite sheet class
 - make the main loop possible
 - make an animation class
+- handle keys
+- create a vector class
+- extends entity to move
+- Make a basic 2 ways player
+- use collision engine (box2d)
+- load a level
+- parallax move
 
 - new event system to easily remove events and entities
 - optimize: use typed arrays when possible
@@ -77,6 +83,7 @@ LATER:
 
 
 DONE:
+- snap to pixel
 - flip image // 2015-05-29
 - scaled image
 - fixed image width/height and change width/height

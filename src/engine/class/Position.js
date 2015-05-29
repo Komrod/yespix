@@ -9,9 +9,10 @@ function Position(options, entity) {
         x: 1,
         y: '#000000',
         z: 1.0,
-        globalZ: 'center', // @TODO
+        globalZ: 1.0, // @TODO
 
         rotation: 0,
+        snapToPixel: false,
     };
 
     this.isZSorted = false;

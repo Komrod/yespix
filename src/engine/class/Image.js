@@ -239,12 +239,17 @@ Image.prototype.draw = function(context) {
 
 
 Image.prototype.getBoundaryImage = function() {
-    return {
+    var pos = {
         x: this.entity.position.x * (this.entity.aspect.flipX ? -1 : 1) + (this.entity.aspect.flipX ? -this.entity.aspect.width : 0),
         y: this.entity.position.y * (this.entity.aspect.flipY ? -1 : 1) + (this.entity.aspect.flipY ? -this.entity.aspect.height : 0),
         width: this.entity.aspect.width,
         height: this.entity.aspect.height
     };
+    if (this.entity.position.snapToPixel) {
+        pos.x = ~~ (0.5 + pos.x);
+        pos.y = ~~ (0.5 + pos.y);
+    }
+    return pos;
 };
 
 
