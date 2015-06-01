@@ -148,13 +148,13 @@ Sound.prototype.set = function(options, varDefault) {
 Sound.prototype.load = function() {
     if (!this.elements[this.selected]) return false;
     this.elements[this.selected].load();
-    return false;
+    return true;
 };
 
 Sound.prototype.play = function() {
     if (!this.elements[this.selected]) return false;
     this.elements[this.selected].play();
-    return false;
+    return true;
 };
 
 Sound.prototype.isPlaying = function() {
@@ -164,8 +164,15 @@ Sound.prototype.isPlaying = function() {
 
 Sound.prototype.pause = function() {
     if (!this.elements[this.selected]) return false;
+    var time = this.elements[this.selected].currentTime;
+//    this.elements[this.selected].pause();
     this.elements[this.selected].pause();
-    return false;
+    this.elements[this.selected].currentTime = 0;
+    this.elements[this.selected].pause();
+    this.elements[this.selected].currentTime = time;
+console.log('isPaused = '+this.isPaused());
+console.log('isPlaying = '+this.isPlaying());
+    return true;
 };
 
 Sound.prototype.isPaused = function() {
@@ -182,13 +189,6 @@ Sound.prototype.mute = function(b) {
 Sound.prototype.isMuted = function() {
     if (!this.elements[this.selected]) return false;
     return this.elements[this.selected].muted;
-};
-
-Sound.prototype.restart = function() {
-    if (!this.elements[this.selected]) return false;
-    this.stop();
-    this.play();
-    return this;
 };
 
 Sound.prototype.stop = function() {

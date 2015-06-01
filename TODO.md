@@ -1,5 +1,6 @@
 
 TODO list:
+- bug: pause sound and restart at the same location
 - multiple image, getImage and selected in image entity
 - make a sprite sheet class
 - make the main loop possible
