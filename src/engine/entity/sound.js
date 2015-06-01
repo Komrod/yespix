@@ -31,6 +31,9 @@ yespix.define('sound', {
         return list;
     },
 
+    getSound: function(index) {
+        return this.sound.select(index);
+    },
     
 
 });

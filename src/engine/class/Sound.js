@@ -6,27 +6,129 @@ function Sound(options, entity) {
     if (entity) this.entity = entity;
 
     var varDefault = {
-        isLoading: false,
-        isReady: false,
-        isSupported: false,
-
-        src: '',
-
-        loop: false,
+        selected: 0,
+        
         autoplay: false,
-
-        element: null, // img element
+        loop: false,
     };
 
-    this.set(options, this, varDefault);
+    if (!yespix.isArray(options)) {
+        this.set(options, this, varDefault);
+    } else {
+        this.set({}, this, varDefault);
+    }
 
-    this.load(this.src);
+    this.elements = [];
+
+    if (yespix.isArray(options)) {
+        var len = options.length;
+        for (var t=0; t<len; t++) {
+            this.addElement(options[t]);
+        }
+        this.selected = 0;
+    } else if (yespix.isArray(this.src)) {
+        var len = this.src.length;
+        for (var t=0; t<len; t++) {
+            this.addElement(this.src[t]);
+        }
+        this.selected = 0;
+    } else {
+        this.addElement({ src: this.src, name: this.name });
+    }
 }
 
-Sound.prototype.initElement = function() {
-    this.element = document.createElement("audio");
-    
+// new yespix.class.sound({ sound: {src: 'a.wav', name: 'boom', loop: true, autoplay: true});
+// new yespix.class.sound({ sound: {src: ['a.wav', 'b.wav'], loop: true, autoplay: true});
+// new yespix.class.sound({ sound: [{src: 'a.wav', name: 'boom', loop: true}, {src: 'b.wav', autoplay: true}]);
+// entity.getSound('boom').play();
+
+
+Sound.prototype.addElement = function(src, selectNew) {
+
+    var element = document.createElement("audio");
+
+    if (yespix.isObject(src)) {
+        yespix.copy(src, element);
+        src = src.src;
+    } else {
+        if (yespix.isUndefined(element.loop)) element.loop = this.loop;
+        if (yespix.isUndefined(element.autoplay)) element.autoplay = this.autoplay;
+    }
+
+    element.addEventListener("load", function() { 
+       element.entity.sound.eventElement('load', element);
+    }, true);
+    element.addEventListener("play", function() { 
+       element.entity.sound.eventElement('play', element);
+    }, true);
+    element.addEventListener("canplay", function() { 
+        element.entity.sound.eventElement('canplay', element);
+    }, true);
+    element.addEventListener("pause", function() { 
+        element.entity.sound.eventElement('pause', element);
+    }, true);
+    element.addEventListener("error", function() { 
+        element.entity.sound.eventElement('error', element);
+    }, true);
+
+    if (src) {
+        element.src = src;
+        element.load();
+    }
+    element.isReady = false;
+    element.entity = this.entity;
+
+    this.elements.push(element);
+    if (selectNew) this.selected = this.elements.length - 1;
 };
+
+
+Sound.prototype.removeElement = function(index) {
+    if (this.elements[index]) {
+        this.elements.splice(index, 1);
+    }
+};
+
+
+Sound.prototype.eventElement = function(type, element) {
+console.log('eventElement: type='+type+', element = ', element);
+    if (type == 'canplay') {
+        element.isReady = true;
+        if (element.autoplay) {
+            element.autoplay = false;
+            element.play();
+        }
+    } else if (type == 'pause') {
+        if (element.loop && element.ended) {
+                element.pause();
+                element.currentTime = 0;
+                element.play();
+        }
+    }
+};
+
+
+Sound.prototype.select = function(index) {
+    if (yespix.isInt(index)) {
+        if (this.elements[index]) {
+            this.selected = index;
+            return this;
+        }
+        return null;
+    }
+
+    if (!index) return null;
+
+    var len = this.elements.length;
+    for (var t=0; t<len; t++) {
+        if (this.elements[t].name == index) {
+            this.selected = t;
+            return this;
+        }
+    }
+    return null;
+};
+
 
 Sound.prototype.set = function(options, varDefault) {
     yespix.copy(options, this, varDefault);
@@ -43,112 +145,72 @@ Sound.prototype.set = function(options, varDefault) {
 };
 
 
-Sound.prototype.ready = function(entity) {
-    this.isLoading = false;
-    this.isReady = true;
-    if (this.entity.image == this) {
-        this.entity.isReady = true;
-    }
-    this.element.isLoading = false;
-    this.element.isReady = true;
-
-    this.entity.event(
-        {
-            type: 'ready',
-            from: this,
-            fromClass: 'image',
-            entity: this.entity
-        }
-    );
-};
-
-
 Sound.prototype.load = function() {
-    if (!this.isSupported) return this;
-    this.element.load();
-    return this;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].load();
+    return false;
 };
 
 Sound.prototype.play = function() {
-    if (!this.isSupported) return this;
-    this.element.play();
-    return this;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].play();
+    return false;
 };
 
 Sound.prototype.isPlaying = function() {
-    if (!this.isSupported) return null;
-    return !this.element.paused;
+    if (!this.elements[this.selected]) return false;
+    return !this.elements[this.selected].paused;
 };
 
 Sound.prototype.pause = function() {
-    if (!this.isSupported) return this;
-    this.element.pause();
-    return this;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].pause();
+    return false;
 };
 
 Sound.prototype.isPaused = function() {
-    if (!this.isSupported) return null;
-    return !!this.element.paused;
+    if (!this.elements[this.selected]) return false;
+    return !!this.elements[this.selected].paused;
 };
 
 Sound.prototype.mute = function(b) {
-    if (!this.isSupported) return this;
-    this.element.muted = b;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].muted = b;
     return this;
 };
 
 Sound.prototype.isMuted = function() {
-    if (!this.isSupported) return null;
-    return this.element.muted;
+    if (!this.elements[this.selected]) return false;
+    return this.elements[this.selected].muted;
 };
 
 Sound.prototype.restart = function() {
-    if (!this.isSupported) return this;
-    this.stop().play();
+    if (!this.elements[this.selected]) return false;
+    this.stop();
+    this.play();
     return this;
 };
 
 Sound.prototype.stop = function() {
-    if (!this.isSupported) return this;
-    this.element.pause();
-    this.setTime(0);
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].pause();
+    this.elements[this.selected].currentTime = 0;
     return this;
 };
 
 Sound.prototype.setVolume = function(n) {
-    if (!this.isSupported) return this;
-    this.volume = n;
-    if (this.volume < 0) this.volume = 0;
-    else if (this.volume > 1) this.volume = 1;
-    this.element.volume = this.volume;
-    return this;
-};
-
-Sound.prototype.volumeUp = function() {
-    if (!this.isSupported) return this;
-    this.volume -= 0.1;
-    if (this.volume < 0) this.volume = 0;
-    else if (this.volume > 1) this.volume = 1;
-    this.element.volume = this.volume;
-    return this;
-};
-
-Sound.prototype.volumeDown = function() {
-    if (!this.isSupported) return this;
-    this.volume += 0.1;
-    if (this.volume < 0) this.volume = 0;
-    else if (this.volume > 1) this.volume = 1;
-    this.element.volume = this.volume;
-    return this;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].volume = this.volume;
+    return true;
 };
 
 Sound.prototype.setTime = function(time) {
-    if (!this.isSupported) return this;
-    this.element.currentTime = time;
-    return this;
+    if (!this.elements[this.selected]) return false;
+    this.elements[this.selected].currentTime = time;
+    return true;
 };
 
-Sound.prototype.isEnded = function() {
-    if (!this.isSupported) return null;
-    return this.element.ended;
+Sound.prototype.hasEnded = function() {
+    if (!this.elements[this.selected]) return false;
+    return this.elements[this.selected].ended;
 };

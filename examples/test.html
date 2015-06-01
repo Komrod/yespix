@@ -13,67 +13,54 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
-	// create an object to draw
+	/*
+	// create an object
 	var options = {
-		position: {
-			x: 0.5,
-			y: 0.5,
-			z: 1,
-			snapToPixel: true
-		},
-		image: {
-			src: 'zardoz/image/zardoz_small.png',
-			scale: 0.5
-		},
-		aspect: {
-//			width: 50,
-//			height: 50
+		sound: {
+			src: 'unit/sound/ludicrous.ogg',
+			autoPlay: true
 		}
 	};
-	
-	manager.add(new yespix.class.image(options));
-	options.position.x += 100;
-	options.aspect.flipX = true;
-	manager.add(new yespix.class.image(options));
-	options.position.y += 100;
-	options.aspect.flipY = true;
-	manager.add(new yespix.class.image(options));
-	options.position.x -= 100;
-	options.aspect.flipX = false;
-	manager.add(new yespix.class.image(options));
-
-/*
-	manager.loadAssets({
-		complete: function(event) {
-			console.log('complete: event = ', event);
-		}
-	});
-*/
-
-//	manager.add(new yespix.class.image(options));
-/*
-	for (var t=0; t<1000; t++) {
-		options.position.x = t;
-		options.position.y = t;
-		// add it to manager
-		manager.add(new yespix.class.image(options));
-	}
-*/
-
-	//manager.list[0].image.load('zardoz/image/zardoz_logo.png');
-	/*
-	var width = 0;
-	for (; width < 2000; width++) {
-		manager.list[0].set({
-			aspect: {
-				width: width,
-				height: width
-			}
-		});
-console.log('entity = ', manager.list[0]);
-		manager.draw();
-	}
 	*/
+	// create an object
+	var options = {
+		sound: [
+			{
+				src: 'unit/sound/ludicrous.ogg',
+				autoplay: true,
+				loop: false,
+				name: 'ludicrous'
+			},
+			{
+				src: 'unit/sound/wilhelm.ogg',
+				autoplay: false,
+				loop: true,
+				name: 'wilhelm'
+			}
+		],
+	};
+
+	/*
+	// create an object
+	var options = {
+		sound: {
+			src: 'unit/sound/ludicrous.ogg',
+			autoPlay: true
+		}
+	};
+	*/
+
+	var entity = new yespix.class.sound(options);
+	/*
+	entity.when('ready', function() {
+
+	});
+	*/
+	//manager.add(new yespix.class.sound(options));
+
+	//manager.getSound(0).play();
+	//manager.getSound(1).play();
+
 	// draw every entity in the manager
 	manager.when('ready', function() {
 		manager.draw();

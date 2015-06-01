@@ -1,6 +1,6 @@
 
 TODO list:
-- make a sound class
+- multiple image, getImage and selected in image entity
 - make a sprite sheet class
 - make the main loop possible
 - make an animation class
@@ -83,6 +83,7 @@ LATER:
 
 
 DONE:
+- make a sound class
 - snap to pixel
 - flip image // 2015-05-29
 - scaled image
