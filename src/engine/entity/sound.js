@@ -14,11 +14,6 @@ yespix.define('sound', {
     },
 
 
-    event: function(event) {
-        this.super(event);
-    },
-
-
     getAssets: function() {
         var list = this.super();
         if (this.sound && this.sound.src) {

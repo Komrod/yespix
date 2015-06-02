@@ -7,10 +7,13 @@ yespix.define('image', {
 
 
     init: function(options) {
-        var options = options || {};
+        options = options || {};
+        if (yespix.isString(options) || yespix.isArray(options)) {
+            options = {image: {src: options}};
+        }
+console.log('options = ', options);
         this.super(options);
-        this.image = new Image(options.image || {}, this);
-
+        this.image = new Image(options.image, this);
     },
 
 
@@ -29,12 +32,6 @@ yespix.define('image', {
         if (this.image) {
             this.image.draw(context);
         }
-    },
-
-
-    event: function(event) {
-
-        this.super(event);
     },
 
 

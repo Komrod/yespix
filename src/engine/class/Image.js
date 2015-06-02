@@ -9,15 +9,19 @@ function Image(options, entity) {
         isLoading: false,
         isReady: false,
         src: '',
-
         scale: 1.0, // original loading scale of the image
         element: null, // img element
-        changeSize: true // change the size of the entity.aspect each time an image is loaded
+        changeSize: true, // change the size of the entity.aspect each time an image is loaded
     };
 
-    this.set(options, this, varDefault);
-
-    this.load(this.src);
+    this.set(options, varDefault);
+    this.element = null;
+    
+    if (yespix.isArray(this.src)) {
+        this.load(this.src[0]);
+    } else {
+        this.load(this.src);
+    }
 }
 
 
@@ -29,10 +33,18 @@ Image.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'path',
+            fromClass: 'image',
             properties: options
         }
     );
+};
+
+
+Image.prototype.select = function(index) {
+    if (this.src && this.src[index]) {
+        this.load(this.src[index]);
+    }
+    return null;
 };
 
 
@@ -41,7 +53,6 @@ Image.prototype.resize = function(img, scale) {
     // The original image is drawn into an offscreen canvas of the same size
     // and copied, pixel by pixel into another offscreen canvas with the 
     // new size.
-
     var widthScaled = img.width * scale;
     var heightScaled = img.height * scale;
 
@@ -89,7 +100,6 @@ Image.prototype.initScale = function() {
         }
         return true;
     }
-
     this.element = this.resize(img, this.scale);
     this.linkElement('add');
     this.element.isReady = true;
@@ -133,12 +143,12 @@ Image.prototype.linkElement = function(type) {
 
 
 Image.prototype.load = function(src) {
+    var name = '';
+
     if (!src) {
         return false;
-    } else if (yespix.isArray(src)) {
-        src = src[0];
     }
-
+    
     // delete entity from element entities    
     this.linkElement('remove');
     this.element = yespix.getCache('img:'+src+':1');
@@ -231,7 +241,7 @@ Image.prototype.draw = function(context) {
         this.entity.boundary.image.width, // width on canvas
         this.entity.boundary.image.height // height on canvas
     );
-
+console.log('drawn');
     if (this.entity.aspect.flipX || this.entity.aspect.flipY) {
         context.restore();
     }
@@ -253,3 +263,33 @@ Image.prototype.getBoundaryImage = function() {
 };
 
 
+/*
+    Create an image:
+    new yespix.class.image('a.png');
+    new yespix.class.image({ image: 'a.png'}); // TODO
+    new yespix.class.image({ image: {src: 'a.png', name: 'sky', scale: 1.0});
+    new yespix.class.image().load('a.png');
+
+    Create multiple image:
+    new yespix.class.image({ image: {src: ['a.png', 'b.png'], scale: 1.0});
+    new yespix.class.image({ image: [{src: 'a.png', name: 'sky'}, {src: 'b.png', name: 'cloud'}]);
+
+    Set additional properties:
+    var object = new yespix.class.image();
+    object.set({scale: 2.0, changeSize: false});
+
+    Draw image on a context:
+    var canvas = myDocument.createElement('canvas');
+    var context = canvas.getContext('2d');
+    object = new yespix.class.image('a.png');
+    object.draw(context);
+    
+    Draw multiple image:
+    new yespix.class.image({ image: {src: ['a.png', 'b.png'], scale: 1.0});
+    object.select(0).draw(context);
+    object.select(1).draw(context);
+
+    new yespix.class.image({ image: [{src: 'a.png', name: 'sky'}, {src: 'b.png', name: 'cloud'}]);
+    object.select('sky').draw(context);
+    object.select('cloud').draw(context);
+*/

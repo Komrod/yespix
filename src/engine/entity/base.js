@@ -13,14 +13,6 @@ yespix.define('base', {
 
     
     /**
-     * Return the array of assets used for the entity.
-     */
-    assets: function() {
-        return [];
-    },
-
-    
-    /**
      * Initilize the entity object. The original code of the function is called for the class name of
      * the entity and each ancestor classes
      */

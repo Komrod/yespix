@@ -1,7 +1,9 @@
 
 TODO list:
-- bug: pause sound and restart at the same location
-- multiple image, getImage and selected in image entity
+- multiple image, image.get and image.select
+- multiple sound, sound.get and sound.select
+- load image when draw if no preload
+- load sound when play if no preload
 - make a sprite sheet class
 - make the main loop possible
 - make an animation class
@@ -84,6 +86,7 @@ LATER:
 
 
 DONE:
+- bug: pause sound and restart at the same location
 - make a sound class
 - snap to pixel
 - flip image // 2015-05-29
