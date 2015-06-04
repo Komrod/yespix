@@ -11,7 +11,6 @@ yespix.define('image', {
         if (yespix.isString(options) || yespix.isArray(options)) {
             options = {image: {src: options}};
         }
-console.log('options = ', options);
         this.super(options);
         this.image = new Image(options.image, this);
     },

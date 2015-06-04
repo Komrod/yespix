@@ -59,31 +59,37 @@
 	//manager.add(new yespix.class.image('unit/image/sean.png'));
 	//////////////////////////////////////////////////////////////////////////////
 	// options as array and select
-	manager.add(new yespix.class.image(['unit/image/sean.png', 'unit/image/zardoz.png']));
-	manager.list[0].image.select(1);
+	//manager.add(new yespix.class.image(['unit/image/sean.png', 'unit/image/zardoz.png']));
+	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
-	// normal src
-	//manager.add(new yespix.class.image({image: {src: 'unit/image/sean.png'}}));
+	// src as string
+	//manager.add(new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 2.0}}));
 	//////////////////////////////////////////////////////////////////////////////
-	// normal src with name
-	//manager.add(new yespix.class.image({image: {src: 'unit/image/sean.png', name: 'test'}}));
-	//console.log('Find image "test"? '+( manager.list[0].image.get('test') ? 'yes' : 'no'));
+	// src as object with name and select
+	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/image/sean.png'}, scale: 2.0}}));
+	//console.log('Find image "sean"? '+( manager.list[0].image.select('sean') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
-	// src as array and select
-	//manager.add(new yespix.class.image({image: {src: ['unit/image/sean.png', 'unit/image/zardoz.png']}}));
-	//manager.list[0].image.select(1);
-	//console.log('Find image index 1? '+( manager.list[0].image.get(1) ? 'yes' : 'no'));
+	// src as array of strings and select
+	//manager.add(new yespix.class.image({image: {src: ['unit/image/sean.png', 'unit/image/zardoz.png'], scale: 2.0}}));
+	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
-	// src as array
-	//manager.add(new yespix.class.image({image: [{src: 'unit/image/sean.png', name: 'sean'}, {src: 'unit/image/zardoz.png', name: 'zardoz'}]}));
-	//console.log('Find image "zardoz"? '+( manager.list[0].image.get('zardoz') ? 'yes' : 'no'));
+	// src as array of objects with name and select
+	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/image/sean.png', zardoz: 'unit/image/zardoz.png'}, scale: 2.0}}));
+	//console.log('Find image "zardoz"? '+( manager.list[0].image.select('zardoz') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
+	// scale after load
+	//manager.add(new yespix.class.image('unit/image/sean.png'));
+	//setTimeout(function () { manager.list[0].image.set({scale: 2.0}); }, 2000);
+	//////////////////////////////////////////////////////////////////////////////
+	// dont load before draw
+	manager.add(new yespix.class.image('unit/image/sean.png'));
+	console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
 
 	//manager.getSound(0).play();
 	//manager.getSound(1).play();
 
 	// draw every entity in the manager
-	manager.when('ready', function() {
+	manager.when('ready', function(e) {
 		manager.draw();
 	});
 

@@ -1,10 +1,10 @@
 
 TODO list:
-- multiple image, image.get and image.select
-- multiple sound, sound.get and sound.select
 - load image when draw if no preload
+- multiple sound, and sound.select
 - load sound when play if no preload
 - make a sprite sheet class
+- function to clear canvas in GfxManager
 - make the main loop possible
 - make an animation class
 - handle keys
@@ -86,6 +86,7 @@ LATER:
 
 
 DONE:
+- multiple image, and image.select
 - bug: pause sound and restart at the same location
 - make a sound class
 - snap to pixel

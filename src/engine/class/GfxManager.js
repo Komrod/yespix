@@ -75,9 +75,9 @@ GfxManager.prototype.sort = function() {
 
 
 GfxManager.prototype.event = function(event) {
-	if (this.getReady()) {
+	if (event.type == 'ready' && this.getReady()) {
 		this.isReady = true;
-		this.trigger('ready');
+		this.trigger('ready', event);
 	}
 };
 
@@ -100,12 +100,11 @@ GfxManager.prototype.getAssets = function() {
 		assets = assets.concat(this.list[t].getAssets());
 	}
 	assets = yespix.unique(assets);
-console.log('assets = ', assets);
 	return assets;
 };
 
 
-GfxManager.prototype.loadAssets = function(options) { 
+GfxManager.prototype.loadAssets = function(options) {
 	this.loader = new Loader(options, this.getAssets());
 	this.loader.execute();
 };
@@ -117,11 +116,11 @@ GfxManager.prototype.when = function(eventName, fn) {
 };
 
 
-GfxManager.prototype.trigger = function(eventName) {
+GfxManager.prototype.trigger = function(eventName, event) {
 	if (!this.events[eventName]) return false;
 	var len = this.events[eventName].length;
 	for (var t=0; t<len; t++) {
-		this.events[eventName][t]();
+		this.events[eventName][t](event);
 	}
 	return true;
 };
