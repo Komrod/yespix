@@ -8,6 +8,7 @@ function Image(options, entity) {
     var varDefault = {
         isLoading: false,
         isReady: false,
+        autoLoad: false,
         src: '',
         scale: 1.0, // original loading scale of the image
         element: null, // img element
@@ -17,15 +18,8 @@ function Image(options, entity) {
     this.set(options, varDefault);
     this.element = null;
     
-    if (yespix.isArray(this.src)) {
-        this.load(this.src[0]);
-    } else if (yespix.isObject(this.src)) {
-        for (var n in this.src) {
-            this.load(this.src[n]);
-            break;
-        }
-    } else {
-        this.load(this.src);
+    if (this.autoLoad) {
+        this.load();
     }
 }
 
@@ -164,6 +158,16 @@ Image.prototype.load = function(src) {
     var name = '';
 
     if (!src) {
+        if (yespix.isArray(this.src)) {
+            return this.load(this.src[0]);
+        } else if (yespix.isObject(this.src)) {
+            for (var n in this.src) {
+                return this.load(this.src[n]);
+                break;
+            }
+        } else {
+            return this.load(this.src);
+        }
         return false;
     }
     
@@ -252,6 +256,10 @@ Image.prototype.ready = function(entity) {
 
 Image.prototype.draw = function(context) {
     if (!this.isReady) {
+        if (!this.isLoading) {
+console.log('not ready and not loading');
+            this.load();
+        }
         return false;
     }
 

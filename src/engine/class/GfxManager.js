@@ -75,10 +75,14 @@ GfxManager.prototype.sort = function() {
 
 
 GfxManager.prototype.event = function(event) {
-	if (event.type == 'ready' && this.getReady()) {
-		this.isReady = true;
-		this.trigger('ready', event);
+	if (event.type == 'ready') {
+		if (this.getReady()) {
+			this.isReady = true;
+			this.trigger('ready', event);
+		}
+		return true;
 	}
+	return true;
 };
 
 
@@ -105,6 +109,11 @@ GfxManager.prototype.getAssets = function() {
 
 
 GfxManager.prototype.loadAssets = function(options) {
+	if (!options.complete) {
+		options.complete = function() {
+			
+		}
+	}
 	this.loader = new Loader(options, this.getAssets());
 	this.loader.execute();
 };
