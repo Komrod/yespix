@@ -62,6 +62,13 @@
 	//manager.add(new yespix.class.image(['unit/image/sean.png', 'unit/image/zardoz.png']));
 	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
+	// image as string
+	//manager.add(new yespix.class.image({image: 'unit/image/sean.png'}));
+	//////////////////////////////////////////////////////////////////////////////
+	// image as array and select
+	//manager.add(new yespix.class.image({image: ['unit/image/sean.png', 'unit/image/zardoz.png']}));
+	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
+	//////////////////////////////////////////////////////////////////////////////
 	// src as string
 	//manager.add(new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 2.0}}));
 	//////////////////////////////////////////////////////////////////////////////
@@ -82,11 +89,65 @@
 	//setTimeout(function () { manager.list[0].image.set({scale: 2.0}); }, 2000);
 	//////////////////////////////////////////////////////////////////////////////
 	// dont load before draw
-	manager.add(new yespix.class.image('unit/image/sean.png'));
-	console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//manager.add(new yespix.class.image('unit/image/sean.png'));
+	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//manager.loadAssets();
+	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
 
-	//manager.getSound(0).play();
-	//manager.getSound(1).play();
+
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST SOUND
+	//////////////////////////////////////////////////////////////////////////////
+	// options as string
+	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	//manager.list[0].sound.autoPlay = true;
+	//////////////////////////////////////////////////////////////////////////////
+	// options as array and select
+	//manager.add(new yespix.class.sound(['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']));
+	//manager.list[0].sound.select(1).play();
+	//////////////////////////////////////////////////////////////////////////////
+	// src as string
+	manager.add(new yespix.class.image({image: {src: 'unit/sound/wilhelm.ogg', autoPlay: true}}));
+	//////////////////////////////////////////////////////////////////////////////
+	// sound as string
+	//manager.add(new yespix.class.image({sound: 'unit/sound/wilhelm.ogg'}));
+	//////////////////////////////////////////////////////////////////////////////
+	// sound as array of string
+	//manager.add(new yespix.class.image({sound: ['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']}));
+	//////////////////////////////////////////////////////////////////////////////
+	// src as object with name and select
+	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/sound/wilhelm.ogg'}, scale: 2.0}}));
+	//console.log('Find image "sean"? '+( manager.list[0].image.select('sean') ? 'yes' : 'no'));
+	//////////////////////////////////////////////////////////////////////////////
+	// src as array of strings and select
+	//manager.add(new yespix.class.image({image: {src: ['unit/sound/wilhelm.ogg', 'unit/sound/wilhelm.ogg'], scale: 2.0}}));
+	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
+	//////////////////////////////////////////////////////////////////////////////
+	// src as array of objects with name and select
+	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/sound/wilhelm.ogg', zardoz: 'unit/sound/wilhelm.ogg'}, scale: 2.0}}));
+	//console.log('Find image "zardoz"? '+( manager.list[0].image.select('zardoz') ? 'yes' : 'no'));
+	//////////////////////////////////////////////////////////////////////////////
+	// dont load before draw
+	//manager.add(new yespix.class.image('unit/sound/wilhelm.ogg'));
+	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//manager.loadAssets();
+	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
+	//////////////////////////////////////////////////////////////////////////////
+	// autoplay
+	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	//manager.list[0].sound.autoPlay = true;
+	//////////////////////////////////////////////////////////////////////////////
+	// autoload
+	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	//manager.list[0].sound.autoLoad = true;
+	// no autoload nor autoload
+	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	
+
+
+	manager.load();
 
 	// draw every entity in the manager
 	manager.when('ready', function(e) {

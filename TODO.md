@@ -1,6 +1,5 @@
 
 TODO list:
-- load image when draw if no preload
 - multiple sound, and sound.select
 - load sound when play if no preload
 - make a sprite sheet class
@@ -86,6 +85,7 @@ LATER:
 
 
 DONE:
+- load image when call load
 - multiple image, and image.select
 - bug: pause sound and restart at the same location
 - make a sound class

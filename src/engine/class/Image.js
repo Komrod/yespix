@@ -158,6 +158,7 @@ Image.prototype.load = function(src) {
     var name = '';
 
     if (!src) {
+        if (this.isLoading || this.isReady) return true;
         if (yespix.isArray(this.src)) {
             return this.load(this.src[0]);
         } else if (yespix.isObject(this.src)) {
@@ -226,7 +227,7 @@ Image.prototype.load = function(src) {
 };
 
 
-Image.prototype.ready = function(entity) {
+Image.prototype.ready = function() {
     this.isLoading = false;
     this.isReady = true;
     if (this.entity.image == this) {
@@ -243,6 +244,7 @@ Image.prototype.ready = function(entity) {
             this.entity.aspect.height = this.element.height;
         }
     }
+
     this.entity.event(
         {
             type: 'ready',
@@ -256,10 +258,6 @@ Image.prototype.ready = function(entity) {
 
 Image.prototype.draw = function(context) {
     if (!this.isReady) {
-        if (!this.isLoading) {
-console.log('not ready and not loading');
-            this.load();
-        }
         return false;
     }
 

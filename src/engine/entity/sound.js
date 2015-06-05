@@ -8,10 +8,19 @@ yespix.define('sound', {
 
     init: function(options) {
         var options = options || {};
+        if (yespix.isString(options) || yespix.isArray(options)) {
+            options = {sound: {src: options}};
+        }
         this.super(options);
         this.sound = new Sound(options.sound || {}, this);
 
     },
+
+
+    load: function() {
+        this.sound.load();
+    },
+    
 
 
     getAssets: function() {
@@ -25,11 +34,6 @@ yespix.define('sound', {
         }
         return list;
     },
-
-    getSound: function(index) {
-        return this.sound.select(index);
-    },
-    
 
 });
 

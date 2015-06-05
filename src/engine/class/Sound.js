@@ -7,53 +7,65 @@ function Sound(options, entity) {
 
     var varDefault = {
         selected: 0,
-        
-        autoplay: false,
+        autoLoad: false,
+        autoPlay: false,
         loop: false,
+        src: '',
+        isLoading: false,
+        isReady: false
     };
 
-    if (!yespix.isArray(options)) {
-        this.set(options, this, varDefault);
+    if (yespix.isObject(options)) {
+        this.set(options, varDefault);
     } else {
-        this.set({}, this, varDefault);
+        this.set({}, varDefault);
     }
 
     this.elements = [];
 
-    if (yespix.isArray(options)) {
-        var len = options.length;
-        for (var t=0; t<len; t++) {
-            this.addElement(options[t]);
-        }
-        this.selected = 0;
-    } else if (yespix.isArray(this.src)) {
-        var len = this.src.length;
-        for (var t=0; t<len; t++) {
-            this.addElement(this.src[t]);
-        }
-        this.selected = 0;
-    } else {
-        this.addElement({ src: this.src, name: this.name });
+    if (this.autoPlay || this.autoLoad) {
+        this.load();
     }
 }
 
-// new yespix.class.sound({ sound: {src: 'a.wav', name: 'boom', loop: true, autoplay: true});
-// new yespix.class.sound({ sound: {src: ['a.wav', 'b.wav'], loop: true, autoplay: true});
-// new yespix.class.sound({ sound: [{src: 'a.wav', name: 'boom', loop: true}, {src: 'b.wav', autoplay: true}]);
+// new yespix.class.sound('');
+// new yespix.class.sound(['', '']);
+// new yespix.class.sound({ sound: '');
+// new yespix.class.sound({ sound: ['', '']});
+// new yespix.class.sound({ sound: { src: '', autoPlay: true});
+// new yespix.class.sound({ sound: { src: ['', ''], autoPlay: true});
+// new yespix.class.sound({ sound: { src: { wilhelm: '', ludicrous: ''}, autoPlay: true});
 // entity.getSound('boom').play();
+
+Sound.prototype.load = function() {
+
+    if (this.isLoading || this.isReady) return true;
+
+    this.isLoading = true;
+    this.isReady = false;
+
+    if (yespix.isString(this.src)) {
+        this.addElement(this.src, true);
+    } else if (yespix.isArray(this.src)) {
+        var len = this.src.length;
+        for (var t=0; t<len; t++) {
+            this.addElement(this.src[t], true);
+        }
+    } else if (yespix.isObject(this.src)) {
+        for (var n in this.src) {
+            this.addElement(this.src[n], true);
+        }
+    }
+
+};
 
 
 Sound.prototype.addElement = function(src, selectNew) {
 
     var element = document.createElement("audio");
 
-    if (yespix.isObject(src)) {
-        yespix.copy(src, element);
-        src = src.src;
-    } else {
-        if (yespix.isUndefined(element.loop)) element.loop = this.loop;
-        if (yespix.isUndefined(element.autoplay)) element.autoplay = this.autoplay;
-    }
+    element.loop = this.loop;
+    element.autoplay = this.autoPlay;
 
     element.addEventListener("load", function() { 
        element.entity.sound.eventElement('load', element);
@@ -76,10 +88,26 @@ Sound.prototype.addElement = function(src, selectNew) {
         element.load();
     }
     element.isReady = false;
+    element.isLoading = true;
     element.entity = this.entity;
 
     this.elements.push(element);
     if (selectNew) this.selected = this.elements.length - 1;
+};
+
+
+Image.prototype.ready = function() {
+    this.isLoading = false;
+    this.isReady = true;
+
+    this.entity.event(
+        {
+            type: 'ready',
+            from: this,
+            fromClass: 'sound',
+            entity: this.entity
+        }
+    );
 };
 
 
@@ -91,13 +119,38 @@ Sound.prototype.removeElement = function(index) {
 
 
 Sound.prototype.eventElement = function(type, element) {
-console.log('eventElement: type='+type+', element = ', element);
     if (type == 'canplay') {
-        element.isReady = true;
+        if (!element.ready) {
+            element.isReady = true;
+            element.isLoading = false;
+
+            var len = this.elements.length;
+            var allReady = true;
+            var oneLoading = false;
+            for (var t=0; t<len; t++) {
+                if (!this.elements[t].isReady) {
+                    allReady = false;
+                }
+                if (this.elements[t].isLoading) {
+                    oneLoading = true;
+                }
+            }
+            this.isReady = allReady;
+            this.isLoading = oneLoading;
+        } else {
+            element.isReady = true;
+            element.isLoading = false;
+        }
         if (element.autoplay) {
             element.autoplay = false;
             element.play();
         }
+    } else if (type == 'load') {
+        element.isReady = false;
+        element.isLoading = true;
+    } else if (type == 'error') {
+        element.isReady = false;
+        element.isLoading = false;
     } else if (type == 'pause') {
         if (element.loop && element.ended) {
                 element.pause();
@@ -109,6 +162,10 @@ console.log('eventElement: type='+type+', element = ', element);
 
 
 Sound.prototype.select = function(index) {
+    if (!this.isReady && !this.isLoading) {
+        this.load();
+    }
+
     if (yespix.isInt(index)) {
         if (this.elements[index]) {
             this.selected = index;
@@ -116,6 +173,7 @@ Sound.prototype.select = function(index) {
         }
         return null;
     }
+
 
     if (!index) return null;
 
@@ -145,7 +203,7 @@ Sound.prototype.set = function(options, varDefault) {
 };
 
 
-Sound.prototype.load = function() {
+Sound.prototype.loadSelected = function() {
     if (!this.elements[this.selected]) return false;
     this.elements[this.selected].load();
     return true;

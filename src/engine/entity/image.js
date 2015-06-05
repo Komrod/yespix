@@ -15,7 +15,10 @@ yespix.define('image', {
         this.image = new Image(options.image, this);
     },
 
-
+    load: function() {
+        this.image.load();
+    },
+    
     /**
      * Return True if something has changed (position, aspect ...)
      * @return {bool} 

@@ -109,13 +109,28 @@ GfxManager.prototype.getAssets = function() {
 
 
 GfxManager.prototype.loadAssets = function(options) {
+	options = options || {};
+	var manager = this;
 	if (!options.complete) {
-		options.complete = function() {
-			
+		options.complete = function(event) {
+			manager.load();
 		}
 	}
 	this.loader = new Loader(options, this.getAssets());
 	this.loader.execute();
+};
+
+GfxManager.prototype.load = function() {
+	manager.each(function() { 
+		if (this.load) this.load(); 
+	});
+};
+
+GfxManager.prototype.each = function(fn) {
+	var len = this.list.length;
+	for (var t=0; t<len; t++) {
+		fn.call(this.list[t]);
+	}
 };
 
 
