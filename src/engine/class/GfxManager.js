@@ -75,6 +75,7 @@ GfxManager.prototype.sort = function() {
 
 
 GfxManager.prototype.event = function(event) {
+console.log('GfxManager.event: event = ', event);	
 	if (event.type == 'ready') {
 		if (this.getReady()) {
 			this.isReady = true;

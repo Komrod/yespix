@@ -1,10 +1,12 @@
 
 
 function Image(options, entity) {
-
     options = options || {};
     if (entity) this.entity = entity;
-
+    if (yespix.isString(options) || yespix.isArray(options)) {
+        options = {src: options};
+    }
+console.log('Image.init: options = ', options);
     var varDefault = {
         isLoading: false,
         isReady: false,
@@ -156,7 +158,6 @@ Image.prototype.linkElement = function(type) {
 
 Image.prototype.load = function(src) {
     var name = '';
-
     if (!src) {
         if (this.isLoading || this.isReady) return true;
         if (yespix.isArray(this.src)) {
