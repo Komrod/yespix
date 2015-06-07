@@ -4,6 +4,9 @@ function Sound(options, entity) {
 
     options = options || {};
     if (entity) this.entity = entity;
+    if (yespix.isString(options) || yespix.isArray(options)) {
+        options = {src: options};
+    }
 
     var varDefault = {
         selected: 0,
@@ -22,6 +25,7 @@ function Sound(options, entity) {
     }
 
     this.elements = [];
+    this.elementsName = {};
 
     if (this.autoPlay || this.autoLoad) {
         this.load();
@@ -44,25 +48,32 @@ Sound.prototype.load = function() {
     this.isLoading = true;
     this.isReady = false;
 
+    var count = 0;
     if (yespix.isString(this.src)) {
-        this.addElement(this.src, true);
+        this.addElement(this.src, false, true);
+        count++;
     } else if (yespix.isArray(this.src)) {
         var len = this.src.length;
         for (var t=0; t<len; t++) {
-            this.addElement(this.src[t], true);
+            this.addElement(this.src[t], false, true);
+            count++;
         }
     } else if (yespix.isObject(this.src)) {
         for (var n in this.src) {
-            this.addElement(this.src[n], true);
+            this.addElement(this.src[n], n, true);
+            count++;
         }
     }
-
+    if (count == 0) {
+        this.ready();
+    }
 };
 
 
-Sound.prototype.addElement = function(src, selectNew) {
+Sound.prototype.addElement = function(src, name, selectNew) {
 
     var element = document.createElement("audio");
+    if (name) element.name = name;
 
     element.loop = this.loop;
     element.autoplay = this.autoPlay;
@@ -96,7 +107,8 @@ Sound.prototype.addElement = function(src, selectNew) {
 };
 
 
-Image.prototype.ready = function() {
+Sound.prototype.ready = function() {
+
     this.isLoading = false;
     this.isReady = true;
 
@@ -175,12 +187,17 @@ Sound.prototype.select = function(index) {
     }
 
 
-    if (!index) return null;
+    if (this.src[index]) return null;
+    if (this.elementsName[index]) {
+        this.selected = this.elementsName[index];
+        return this;
+    }
 
     var len = this.elements.length;
     for (var t=0; t<len; t++) {
         if (this.elements[t].name == index) {
             this.selected = t;
+            this.elementsName[index] = t;
             return this;
         }
     }

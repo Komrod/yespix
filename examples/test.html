@@ -107,26 +107,25 @@
 	//manager.add(new yespix.class.sound(['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']));
 	//manager.list[0].sound.select(1).play();
 	//////////////////////////////////////////////////////////////////////////////
-	// src as string
-	manager.add(new yespix.class.image({image: {src: 'unit/sound/wilhelm.ogg', autoPlay: true}}));
-	//////////////////////////////////////////////////////////////////////////////
 	// sound as string
-	//manager.add(new yespix.class.image({sound: 'unit/sound/wilhelm.ogg'}));
+	//manager.add(new yespix.class.sound({sound: 'unit/sound/wilhelm.ogg'}));
+	//manager.list[0].sound.autoPlay = true;
 	//////////////////////////////////////////////////////////////////////////////
 	// sound as array of string
-	//manager.add(new yespix.class.image({sound: ['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']}));
+	//manager.add(new yespix.class.sound({sound: ['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']}));
+	//manager.list[0].sound.select(1).play();
 	//////////////////////////////////////////////////////////////////////////////
 	// src as object with name and select
-	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/sound/wilhelm.ogg'}, scale: 2.0}}));
-	//console.log('Find image "sean"? '+( manager.list[0].image.select('sean') ? 'yes' : 'no'));
+	//manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg'}, autoPlay: true}}));
+	//console.log('Find sound "wilhelm"? '+( manager.list[0].sound.select('wilhelm') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
 	// src as array of strings and select
-	//manager.add(new yespix.class.image({image: {src: ['unit/sound/wilhelm.ogg', 'unit/sound/wilhelm.ogg'], scale: 2.0}}));
-	//console.log('Find image index 1? '+( manager.list[0].image.select(1) ? 'yes' : 'no'));
+	//manager.add(new yespix.class.sound({sound: {src: ['unit/sound/wilhelm.ogg', 'unit/sound/wilhelm.ogg'], autoPlay: true}}));
+	//console.log('Find sound index 1? '+( manager.list[0].sound.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
 	// src as array of objects with name and select
-	//manager.add(new yespix.class.image({image: {src: {sean: 'unit/sound/wilhelm.ogg', zardoz: 'unit/sound/wilhelm.ogg'}, scale: 2.0}}));
-	//console.log('Find image "zardoz"? '+( manager.list[0].image.select('zardoz') ? 'yes' : 'no'));
+	manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg', ludicrous: 'unit/sound/ludicrous.ogg'}, autoPlay: false}}));
+	console.log('Find sound "ludicrous"? '+( manager.list[0].sound.select('ludicrous') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
 	// dont load before draw
 	//manager.add(new yespix.class.image('unit/sound/wilhelm.ogg'));
