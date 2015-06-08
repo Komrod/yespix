@@ -100,8 +100,8 @@
 	// UNIT TEST SOUND
 	//////////////////////////////////////////////////////////////////////////////
 	// options as string
-	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
-	//manager.list[0].sound.autoPlay = true;
+	manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	manager.list[0].sound.autoPlay = true;
 	//////////////////////////////////////////////////////////////////////////////
 	// options as array and select
 	//manager.add(new yespix.class.sound(['unit/sound/wilhelm.ogg', 'unit/sound/ludicrous.ogg']));
@@ -123,9 +123,9 @@
 	//manager.add(new yespix.class.sound({sound: {src: ['unit/sound/wilhelm.ogg', 'unit/sound/wilhelm.ogg'], autoPlay: true}}));
 	//console.log('Find sound index 1? '+( manager.list[0].sound.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
-	// src as array of objects with name and select
-	manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg', ludicrous: 'unit/sound/ludicrous.ogg'}, autoPlay: false}}));
-	console.log('Find sound "ludicrous"? '+( manager.list[0].sound.select('ludicrous') ? 'yes' : 'no'));
+	// src as object with name and select
+	//manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg', ludicrous: 'unit/sound/ludicrous.ogg'}, autoPlay: false}}));
+	//console.log('Find sound "ludicrous"? '+( manager.list[0].sound.select('ludicrous') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
 	// dont load before draw
 	//manager.add(new yespix.class.image('unit/sound/wilhelm.ogg'));

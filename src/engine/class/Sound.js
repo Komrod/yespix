@@ -24,13 +24,15 @@ function Sound(options, entity) {
         this.set({}, varDefault);
     }
 
-    this.elements = [];
-    this.elementsName = {};
+    this.elements = {};
+    this.bySources = {};
+    this.byNames = {};
 
     if (this.autoPlay || this.autoLoad) {
         this.load();
     }
 }
+
 
 // new yespix.class.sound('');
 // new yespix.class.sound(['', '']);
@@ -41,21 +43,25 @@ function Sound(options, entity) {
 // new yespix.class.sound({ sound: { src: { wilhelm: '', ludicrous: ''}, autoPlay: true});
 // entity.getSound('boom').play();
 
+
 Sound.prototype.load = function() {
 
     if (this.isLoading || this.isReady) return true;
 
     this.isLoading = true;
     this.isReady = false;
+    this.elements = {};
+    this.bySources = {};
+    this.byNames = {};
 
     var count = 0;
     if (yespix.isString(this.src)) {
-        this.addElement(this.src, false, true);
+        this.addElement(this.src, 0, true);
         count++;
     } else if (yespix.isArray(this.src)) {
         var len = this.src.length;
         for (var t=0; t<len; t++) {
-            this.addElement(this.src[t], false, true);
+            this.addElement(this.src[t], t, true);
             count++;
         }
     } else if (yespix.isObject(this.src)) {
@@ -73,10 +79,15 @@ Sound.prototype.load = function() {
 Sound.prototype.addElement = function(src, name, selectNew) {
 
     var element = document.createElement("audio");
-    if (name) element.name = name;
-
+    element.source = src;
     element.loop = this.loop;
     element.autoplay = this.autoPlay;
+
+    if (!yespix.isUndefined(name)) {
+        element.name = name;
+        this.byNames[name] = element;
+    }
+    this.bySources[src] = element;
 
     element.addEventListener("load", function() { 
        element.entity.sound.eventElement('load', element);
@@ -103,7 +114,9 @@ Sound.prototype.addElement = function(src, name, selectNew) {
     element.entity = this.entity;
 
     this.elements.push(element);
-    if (selectNew) this.selected = this.elements.length - 1;
+    if (selectNew && !yespix.isUndefined(name)) {
+        this.selected = name;
+    }
 };
 
 
@@ -125,7 +138,8 @@ Sound.prototype.ready = function() {
 
 Sound.prototype.removeElement = function(index) {
     if (this.elements[index]) {
-        this.elements.splice(index, 1);
+        //this.elements.splice(index, 1);
+        // @TODO
     }
 };
 
@@ -178,29 +192,11 @@ Sound.prototype.select = function(index) {
         this.load();
     }
 
-    if (yespix.isInt(index)) {
-        if (this.elements[index]) {
-            this.selected = index;
-            return this;
-        }
-        return null;
-    }
-
-
-    if (this.src[index]) return null;
-    if (this.elementsName[index]) {
-        this.selected = this.elementsName[index];
+    if (this.byNames[index]) {
+        this.selected = this.byNames[index].name;
         return this;
     }
-
-    var len = this.elements.length;
-    for (var t=0; t<len; t++) {
-        if (this.elements[t].name == index) {
-            this.selected = t;
-            this.elementsName[index] = t;
-            return this;
-        }
-    }
+    
     return null;
 };
 
