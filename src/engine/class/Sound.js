@@ -25,8 +25,7 @@ function Sound(options, entity) {
     }
 
     this.elements = {};
-    this.bySources = {};
-    this.byNames = {};
+    this.elementIndex = 0;
 
     if (this.autoPlay || this.autoLoad) {
         this.load();
@@ -51,8 +50,7 @@ Sound.prototype.load = function() {
     this.isLoading = true;
     this.isReady = false;
     this.elements = {};
-    this.bySources = {};
-    this.byNames = {};
+    this.elementIndex = 0;
 
     var count = 0;
     if (yespix.isString(this.src)) {
@@ -78,31 +76,28 @@ Sound.prototype.load = function() {
 
 Sound.prototype.addElement = function(src, name, selectNew) {
 
+    name = name || this.elementIndex;
+
     var element = document.createElement("audio");
     element.source = src;
+    element.name = name;
     element.loop = this.loop;
     element.autoplay = this.autoPlay;
 
-    if (!yespix.isUndefined(name)) {
-        element.name = name;
-        this.byNames[name] = element;
-    }
-    this.bySources[src] = element;
-
     element.addEventListener("load", function() { 
-       element.entity.sound.eventElement('load', element);
+       this.entity.sound.eventElement('load', this);
     }, true);
     element.addEventListener("play", function() { 
-       element.entity.sound.eventElement('play', element);
+       this.entity.sound.eventElement('play', this);
     }, true);
     element.addEventListener("canplay", function() { 
-        element.entity.sound.eventElement('canplay', element);
+        this.entity.sound.eventElement('canplay', this);
     }, true);
     element.addEventListener("pause", function() { 
-        element.entity.sound.eventElement('pause', element);
+        this.entity.sound.eventElement('pause', this);
     }, true);
     element.addEventListener("error", function() { 
-        element.entity.sound.eventElement('error', element);
+        this.entity.sound.eventElement('error', this);
     }, true);
 
     if (src) {
@@ -113,8 +108,10 @@ Sound.prototype.addElement = function(src, name, selectNew) {
     element.isLoading = true;
     element.entity = this.entity;
 
-    this.elements.push(element);
-    if (selectNew && !yespix.isUndefined(name)) {
+    this.elements[name] = element;
+    this.elementIndex++;
+
+    if (selectNew) {
         this.selected = name;
     }
 };
@@ -137,9 +134,18 @@ Sound.prototype.ready = function() {
 
 
 Sound.prototype.removeElement = function(index) {
+
+    if (yespix.isUndefined(index)) {
+        for (var n in this.elements) {
+            this.removeElement(n);
+        }
+        return true;
+    }
+
     if (this.elements[index]) {
-        //this.elements.splice(index, 1);
-        // @TODO
+        this.elements[index].entity = null;
+        this.elements[index] = null;
+        delete(this.elements[index]);
     }
 };
 
@@ -192,11 +198,11 @@ Sound.prototype.select = function(index) {
         this.load();
     }
 
-    if (this.byNames[index]) {
-        this.selected = this.byNames[index].name;
+    if (this.elements[index]) {
+        this.selected = index;
         return this;
     }
-    
+
     return null;
 };
 
@@ -211,6 +217,24 @@ Sound.prototype.set = function(options, varDefault) {
             from: this,
             fromClass: 'sound',
             properties: options
+        }
+    );
+};
+
+Sound.prototype.setElement = function(index, options, varDefault) {
+    if (!this.elements[index]) return false;
+
+    yespix.copy(options, this.elements[index], varDefault);
+    this.isChanged = true;
+    this.entity.event(
+        {
+            type: 'change',
+            entity: this.entity,
+            from: this,
+            fromClass: 'sound',
+            properties: options,
+            element: this.elements[index],
+            index: index
         }
     );
 };
