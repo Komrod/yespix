@@ -1,4 +1,5 @@
 
+
 /**
  * Handle liste of elements, specifically DOM elements that can be retrieved by name or index.
  * @param {object} params  Parameters in an object
@@ -18,10 +19,11 @@ function ElementList(params, manager) {
 
     this.set(params, varDefault);
     this.list = {};
-    this.selected = 0;
-    this.index = 0;
+    this.selected = null;
+    this.nextIndex = 0;
     this.isChanged = true;
 }
+
 
 /**
  * Set parameter of the Element List object. Call manager.event with type "change"
@@ -32,7 +34,7 @@ function ElementList(params, manager) {
 ElementList.prototype.set = function(params, varDefault) {
     yespix.copy(params, this, varDefault);
     this.isChanged = true;
-    if (this.manager) {
+    if (this.manager && this.manager.event) {
         this.manager.event(
             {
                 type: 'change',
@@ -84,6 +86,7 @@ ElementList.prototype.setProp = function(params, index) {
     return false;
 };
 
+
 /**
  * Set an element as selected
  * @param  {integer|string} index Name or index of the element
@@ -91,7 +94,8 @@ ElementList.prototype.setProp = function(params, index) {
  */
 ElementList.prototype.select = function(index) {
     if (this.list[index]) {
-        this.selected = index;
+        this.selectedIndex = index;
+        this.selected = this.list[index];
         return this;
     }
     return this;
@@ -99,7 +103,12 @@ ElementList.prototype.select = function(index) {
 
 
 ElementList.prototype.get = function(index) {
+    if (this.selected) {
+        return this.selected;
+    }
+    return null;
 };
+
 
 /**
  * Add an element at an index in the list. 
@@ -107,7 +116,7 @@ ElementList.prototype.get = function(index) {
  * @param {int|string} index Optional, index of the element as integer or string
  */
 ElementList.prototype.add = function(params, index) {
-    index = index || this.elementIndex;
+    index = index || this.nextIndex;
 
     if (this.list[index]) {
         this.remove(index);
@@ -121,32 +130,21 @@ ElementList.prototype.add = function(params, index) {
     }
     
     element.index = index;
+    element.hasError = false;
     element.isReady = false;
     element.isLoading = true;
     element.manager = this;
 
-    yespix.copy(element, params, this.propDefault);
-
     this.list[index] = element;
-    this.index++;
+    this.nextIndex++;
 
-    if (element.addEventListener) {
-        element.addEventListener("load", function() { 
-           this.manager.event('load', this);
-        }, true);
-        element.addEventListener("play", function() { 
-           this.manager.event('play', this);
-        }, true);
-        element.addEventListener("canplay", function() { 
-            this.manager.event('canplay', this);
-        }, true);
-        element.addEventListener("pause", function() { 
-            this.manager.event('pause', this);
-        }, true);
-        element.addEventListener("error", function() { 
-            this.manager.event('error', this);
-        }, true);
-    }
+    element.addEventListener("load", this.event, true);
+    element.addEventListener("play", this.event, true);
+    element.addEventListener("canplay", this.event, true);
+    element.addEventListener("pause", this.event, true);
+    element.addEventListener("error", this.event, true);
+
+    this.setProp(params, index);
 
     if (element.isLoading && element.src && element.load) {
         element.load();
@@ -156,12 +154,36 @@ ElementList.prototype.add = function(params, index) {
         element.isReady = true;
         element.isLoading = false;
     }
+
+    if (this.selected === null) {
+        this.selected = element;
+        this.selectedIndex = index;
+    }
     return this;
+};
+
+
+ElementList.prototype.event = function(event) {
+    if (this.target && this.target.manager && this.target.manager.manager) {
+        this.manager.manager.event(event.type, event);
+    }
 };
 
 
 ElementList.prototype.remove = function(index) {
     if (!this.list[index]) return this;
+
+    var element = this.list[index];
+    if (this.selected == element) {
+        this.selected = null;
+        this.selectedIndex = null;
+    }
+    
+    element.removeEventListener("load", this.event, true);
+    element.removeEventListener("play", this.event, true);
+    element.removeEventListener("canplay", this.event, true);
+    element.removeEventListener("pause", this.event, true);
+    element.removeEventListener("error", this.event, true);
 
     this.list[index].manager = null;
     this.list[index] = null;
