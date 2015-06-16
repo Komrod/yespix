@@ -126,7 +126,7 @@ Sound.prototype.ready = function() {
         {
             type: 'ready',
             from: this,
-            fromClass: 'sound',
+            fromClass: 'Sound',
             entity: this.entity
         }
     );
@@ -215,7 +215,7 @@ Sound.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'sound',
+            fromClass: 'Sound',
             properties: options
         }
     );
@@ -231,7 +231,7 @@ Sound.prototype.setElement = function(index, options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'sound',
+            fromClass: 'Sound',
             properties: options,
             element: this.elements[index],
             index: index

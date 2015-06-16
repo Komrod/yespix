@@ -1,7 +1,5 @@
 
 TODO list:
-- multiple sound, and sound.select
-- load sound when play if no preload
 - make a sprite sheet class
 - function to clear canvas in GfxManager
 - make the main loop possible
@@ -85,6 +83,8 @@ LATER:
 
 
 DONE:
+- multiple sound, and sound.select
+- load sound and image when needed
 - load image when call load
 - multiple image, and image.select
 - bug: pause sound and restart at the same location

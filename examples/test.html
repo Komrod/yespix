@@ -67,22 +67,6 @@
 	//object.add({test: 'test 3'});
 	//console.log(object);
 	//////////////////////////////////////////////////////////////////////////////
-	// create audio and play
-	//var object = new ElementList({tag: 'audio'});
-	//object.add({test: 'test 1', src: 'unit/sound/wilhelm.ogg'});
-	//object.get(0).play();
-	//console.log(object);
-	//////////////////////////////////////////////////////////////////////////////
-	// create 1000 images and remove
-	var object = new ElementList({tag: 'img'});
-	for (var t=0; t<10000; t++) {
-		object.add({src: 'unit/image/zardoz.png'}, t);
-	}
-	for (var t=0; t<10000; t++) {
-		object.remove(t);
-	}
-	console.log(object);
-	//
 	
 
 
@@ -158,29 +142,37 @@
 	//console.log('Find sound index 1? '+( manager.list[0].sound.select(1) ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
 	// src as object with name and select
-	//manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg', ludicrous: 'unit/sound/ludicrous.ogg'}, autoPlay: false}}));
+	//manager.add(new yespix.class.sound({sound: {src: {wilhelm: 'unit/sound/wilhelm.ogg', ludicrous: 'unit/sound/ludicrous.ogg'}, autoPlay: true}}));
 	//console.log('Find sound "ludicrous"? '+( manager.list[0].sound.select('ludicrous') ? 'yes' : 'no'));
 	//////////////////////////////////////////////////////////////////////////////
-	// dont load before draw
-	//manager.add(new yespix.class.image('unit/sound/wilhelm.ogg'));
-	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	// dont load before play
+	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	//console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady);
 	//manager.loadAssets();
-	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
-	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
+	//console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady); manager.list[0].sound.select(0).play(); }, 2000);
 	//////////////////////////////////////////////////////////////////////////////
 	// autoplay
 	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
 	//manager.list[0].sound.autoPlay = true;
+	//console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady); }, 2000);
 	//////////////////////////////////////////////////////////////////////////////
 	// autoload
 	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
 	//manager.list[0].sound.autoLoad = true;
+	//console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady); }, 2000);
+	//////////////////////////////////////////////////////////////////////////////
 	// no autoload nor autoload
 	//manager.add(new yespix.class.sound('unit/sound/wilhelm.ogg'));
+	//console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].sound.isLoading, ', isReady? ', manager.list[0].sound.isReady); }, 2000);
+	//////////////////////////////////////////////////////////////////////////////
 	
 
 
-	manager.load();
+	//manager.load();
 
 	// draw every entity in the manager
 	manager.when('ready', function(e) {

@@ -37,7 +37,7 @@ Text.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'text',
+            fromClass: 'Text',
             properties: options
         }
     );

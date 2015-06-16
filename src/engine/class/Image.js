@@ -6,7 +6,6 @@ function Image(options, entity) {
     if (yespix.isString(options) || yespix.isArray(options)) {
         options = {src: options};
     }
-console.log('Image.init: options = ', options);
     var varDefault = {
         isLoading: false,
         isReady: false,
@@ -39,7 +38,7 @@ Image.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'image',
+            fromClass: 'Image',
             properties: options
         }
     );
@@ -250,7 +249,7 @@ Image.prototype.ready = function() {
         {
             type: 'ready',
             from: this,
-            fromClass: 'image',
+            fromClass: 'Image',
             entity: this.entity
         }
     );

@@ -13,15 +13,14 @@ function ElementList(params, manager) {
         isLoading: false,
         isReady: false,
         hasError: false,
-        tag: '',
-        propDefault: {},
+        events: ['change', 'load', 'play', 'canPlay', 'pause', 'error'],
     };
 
     this.set(params, varDefault);
+
     this.list = {};
     this.selected = null;
     this.nextIndex = 0;
-    this.isChanged = true;
 }
 
 
@@ -137,12 +136,10 @@ ElementList.prototype.add = function(params, index) {
 
     this.list[index] = element;
     this.nextIndex++;
-
-    element.addEventListener("load", this.event, true);
-    element.addEventListener("play", this.event, true);
-    element.addEventListener("canplay", this.event, true);
-    element.addEventListener("pause", this.event, true);
-    element.addEventListener("error", this.event, true);
+    
+    for (var t=0; t<this.events.length; t++) {
+        element.addEventListener(this.events[t], this.event, true);
+    }
 
     this.setProp(params, index);
 
@@ -164,6 +161,9 @@ ElementList.prototype.add = function(params, index) {
 
 
 ElementList.prototype.event = function(event) {
+    if (event.type == 'load') {
+
+    }
     if (this.target && this.target.manager && this.target.manager.manager) {
         this.manager.manager.event(event.type, event);
     }
@@ -179,11 +179,9 @@ ElementList.prototype.remove = function(index) {
         this.selectedIndex = null;
     }
     
-    element.removeEventListener("load", this.event, true);
-    element.removeEventListener("play", this.event, true);
-    element.removeEventListener("canplay", this.event, true);
-    element.removeEventListener("pause", this.event, true);
-    element.removeEventListener("error", this.event, true);
+    for (var t=0; t<this.events.length; t++) {
+        element.removeEventListener(this.events[t], this.event, true);
+    }
 
     this.list[index].manager = null;
     this.list[index] = null;

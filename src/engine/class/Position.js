@@ -33,7 +33,7 @@ Position.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'position',
+            fromClass: 'Position',
             properties: options
         }
     );

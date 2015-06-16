@@ -32,7 +32,7 @@ Path.prototype.set = function(options, varDefault) {
             type: 'change',
             entity: this.entity,
             from: this,
-            fromClass: 'path',
+            fromClass: 'Path',
             properties: options
         }
     );
