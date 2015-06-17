@@ -1,6 +1,8 @@
 
 TODO list:
 - make a sprite sheet class
+- error event with sound
+- video entity
 - function to clear canvas in GfxManager
 - make the main loop possible
 - make an animation class
@@ -71,18 +73,8 @@ TODO list:
 - make the Chuck game
 
 
-LATER:
-- line in path object must not override box content // TODO a line box and a fill box
-- the level follow changes the aimed position relative to the entity speed
-- smooth move on aimed position change for the level follow
-- make drawDebugImage(), drawDebugCollision(), drawDebugMove()
-- draw debug ignore general alpha value of entity
-- option collisionAtBorders that avoid entities to get out of the level
-- option stopAtBorders that makes the level follow stops at level border
-- bug with pixelSize level from 3 and up
-
-
 DONE:
+- error event with image
 - multiple sound, and sound.select
 - load sound and image when needed
 - load image when call load
@@ -102,6 +94,18 @@ DONE:
 - make a position class
 - examples and build folders in the root project
 - new engine
+
+
+LATER:
+- line in path object must not override box content // TODO a line box and a fill box
+- the level follow changes the aimed position relative to the entity speed
+- smooth move on aimed position change for the level follow
+- make drawDebugImage(), drawDebugCollision(), drawDebugMove()
+- draw debug ignore general alpha value of entity
+- option collisionAtBorders that avoid entities to get out of the level
+- option stopAtBorders that makes the level follow stops at level border
+- bug with pixelSize level from 3 and up
+
 
 
 OLD_DONE:

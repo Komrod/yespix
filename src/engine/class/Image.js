@@ -306,13 +306,16 @@ Image.prototype.draw = function(context) {
     if (!this.entity.boundary.image || this.isChanged || this.entity.aspect.isChanged) {
         this.entity.boundary.image = this.getBoundaryImage();
     }
+    if (!this.entity.boundary.clip || this.isChanged || this.entity.aspect.isChanged) {
+        this.entity.boundary.clip = this.getBoundaryClip();
+    }
 
     context.globalAlpha = this.entity.aspect.alpha;
     context.drawImage(this.element, //image element
-        0, // x position on image
-        0, // y position on image
-        this.element.width, // width on image
-        this.element.height, // height on image
+        this.entity.boundary.clip.x, // x position on image
+        this.entity.boundary.clip.y, // y position on image
+        this.entity.boundary.clip.width, // width on image
+        this.entity.boundary.clip.height, // height on image
         this.entity.boundary.image.x, // x position on canvas
         this.entity.boundary.image.y, // y position on canvas
         this.entity.boundary.image.width, // width on canvas
@@ -336,6 +339,17 @@ Image.prototype.getBoundaryImage = function() {
         pos.y = ~~ (0.5 + pos.y);
     }
     return pos;
+};
+
+
+Image.prototype.getBoundaryClip = function() {
+    var clip = {
+        x: this.entity.aspect.clipX,
+        y: this.entity.aspect.clipY,
+        width: this.entity.aspect.clipWidth,
+        height: this.entity.aspect.clipHeight
+    };
+    return clip;
 };
 
 

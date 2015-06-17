@@ -116,6 +116,7 @@ module.exports = function(grunt) {
                     '../engine/entity/text.js',
                     '../engine/entity/image.js',
                     '../engine/entity/sound.js',
+                    '../engine/entity/sprite.js',
 
                     // entities end
                     '../engine/template/entities_end.js',

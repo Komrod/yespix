@@ -123,7 +123,7 @@ yespix.define('gfx', {
     event: function(event) {
         if (!this.manager) return;
         switch (event.type+':'+event.fromClass) {
-            case 'change:position':
+            case 'change:Position':
                 if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {
                     this.manager.isZSorted = false;
                 }

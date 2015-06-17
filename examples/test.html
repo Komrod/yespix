@@ -13,45 +13,6 @@
 	// create gfx manager
 	var manager = new GfxManager(true);
 
-	/*
-	// create an object
-	var options = {
-		sound: {
-			src: 'unit/sound/ludicrous.ogg',
-			autoPlay: true
-		}
-	};
-	*/
-	// create an object
-	var options = {
-		sound: [
-			{
-				src: 'unit/sound/ludicrous.ogg',
-				autoplay: true,
-				loop: false,
-				name: 'ludicrous'
-			},
-			{
-				src: 'unit/sound/wilhelm.ogg',
-				autoplay: false,
-				loop: true,
-				name: 'wilhelm'
-			}
-		],
-	};
-
-	/*
-	// create an object
-	var options = {
-		sound: {
-			src: 'unit/sound/ludicrous.ogg',
-			autoPlay: true
-		}
-	};
-	*/
-
-	//var entity = new yespix.class.sound(options);
-
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT ElementList
 	//////////////////////////////////////////////////////////////////////////////
@@ -112,6 +73,10 @@
 	//manager.loadAssets();
 	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
 	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
+	//////////////////////////////////////////////////////////////////////////////
+	// clip
+	//manager.add(new yespix.class.image('unit/image/zardoz.png'));
+	//manager.list[0].set({aspect: {clipX: 20, clipY: 20, clipWidth: 20, clipHeight: 20, width: 20, height: 20}, image: {changeSize: false}});
 
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -171,8 +136,16 @@
 	//////////////////////////////////////////////////////////////////////////////
 	
 
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST SPRITE
+	//////////////////////////////////////////////////////////////////////////////
+	// 
+	
+	manager.add(new yespix.class.sprite({image:'chuck/player.png', sprite: {width: 32, height: 40} }));
+	manager.list[0].sprite.select(8);
 
-	//manager.load();
+
+	manager.load();
 
 	// draw every entity in the manager
 	manager.when('ready', function(e) {
