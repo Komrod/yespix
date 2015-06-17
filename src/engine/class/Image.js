@@ -199,14 +199,11 @@ Image.prototype.load = function(src) {
     this.element.entities = new Array();
     this.element.entities.push(this.entity);
     this.element.source = src;
-    this.element.src = src;
     yespix.setCache('img:'+src+':1', this.element);
-
+console.log('set onlad event');
     // set the onload event for image element
     this.element.onload = function(e) {
-        this.isLoading = false;
-        this.isReady = true;
-        this.isChanged = false;
+console.log('image:onload');
 
         var len = this.entities.length;
         for (var t=len-1; t>=0; t--) {
@@ -219,10 +216,22 @@ Image.prototype.load = function(src) {
         }
     };
 
+    this.element.onerror = function(e) {
+console.log('image:onerror');
+        var len = this.entities.length;
+        for (var t=0; t<len; t++) {
+            this.entities[t].image.error();
+        }
+    };
+
+    // set src after onload event
+    this.element.src = src;
+
     this.element.isLoading = true;
     this.element.isReady = false;
     this.isLoading = true;
     this.isReady = false;
+    this.hasError = false;
     this.entity.isReady = false;
 };
 
@@ -230,11 +239,14 @@ Image.prototype.load = function(src) {
 Image.prototype.ready = function() {
     this.isLoading = false;
     this.isReady = true;
+    this.hasError = false;
+
     if (this.entity.image == this) {
         this.entity.isReady = true;
     }
     this.element.isLoading = false;
     this.element.isReady = true;
+    this.element.hasError = false;
 
     if (this.entity.aspect) {
         if (this.changeSize || this.entity.aspect.width == 0) {
@@ -248,6 +260,29 @@ Image.prototype.ready = function() {
     this.entity.event(
         {
             type: 'ready',
+            from: this,
+            fromClass: 'Image',
+            entity: this.entity
+        }
+    );
+};
+
+
+Image.prototype.error = function() {
+    this.isLoading = false;
+    this.isReady = false;
+    this.hasError = true;
+
+    if (this.entity.image == this) {
+        this.entity.isReady = true;
+    }
+    this.element.isLoading = false;
+    this.element.isReady = false;
+    this.element.hasError = true;
+
+    this.entity.event(
+        {
+            type: 'error',
             from: this,
             fromClass: 'Image',
             entity: this.entity
