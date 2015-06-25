@@ -3,25 +3,22 @@
 function Image(options, entity) {
     options = options || {};
     if (entity) this.entity = entity;
-    if (yespix.isString(options) || yespix.isArray(options)) {
+    if (yespix.isString(options)) {
         options = {src: options};
     }
     var varDefault = {
-        isLoading: false,
-        isReady: false,
-        autoLoad: false,
-        src: '',
-        scale: 1.0, // original loading scale of the image
-        element: null, // img element
-        changeSize: true, // change the size of the entity.aspect each time an image is loaded
+        src: '',  // source and params of the images
+        scale: 1.0, // default original loading scale of the images
+        autoSize: true, // default change the size of the entity.aspect each time an image is loaded
+        autoload: false
     };
 
     this.set(options, varDefault);
+
+    this.isLoading = false;
+    this.isReady =  false;
+    this.hasError = false;
     this.element = null;
-    
-    if (this.autoLoad) {
-        this.load();
-    }
 }
 
 
@@ -45,19 +42,12 @@ Image.prototype.set = function(options, varDefault) {
 };
 
 
-Image.prototype.select = function(index) {
-    if (this.src && this.src[index]) {
-        this.load(this.src[index]);
-        return this;
-    }
-    return null;
-};
-
-
+/**
 // Takes an image and a scaling factor and returns the scaled image
 // The original image is drawn into an offscreen canvas of the same size
 // and copied, pixel by pixel into another offscreen canvas with the 
 // new size.
+ */
 Image.prototype.resize = function(img, scale) {
     if (!scale) return img;
     
@@ -155,22 +145,24 @@ Image.prototype.linkElement = function(type) {
 };
 
 
-Image.prototype.load = function(src) {
-    var name = '';
-    if (!src) {
-        if (this.isLoading || this.isReady) return true;
-        if (yespix.isArray(this.src)) {
-            return this.load(this.src[0]);
-        } else if (yespix.isObject(this.src)) {
-            for (var n in this.src) {
-                return this.load(this.src[n]);
-                break;
-            }
-        } else {
-            return this.load(this.src);
-        }
-        return false;
+Image.prototype.unload = function() {
+    this.src = '';
+    this.linkElement('remove');
+    this.element = null;
+    this.isLoading = false;
+    this.isReady = false;
+    this.hasError = false;
+    if (this.entity) {
+        this.entity.isReady = false;
+        this.entity.boundary = {};
     }
+};
+
+
+Image.prototype.load = function(src) {
+    
+    src = src || this.src;
+    this.src = src;
     
     // get cache at current scale
     this.linkElement('remove');
@@ -183,15 +175,17 @@ Image.prototype.load = function(src) {
         return true;
     }
 
-    // get cache at scale 1
-    this.linkElement('remove');
-    this.element = yespix.getCache('img:'+src+':1');
-    if (this.element) {
-        this.linkElement('add');
-        if (this.element.isReady) {
-            this.initScale();
+    if (this.scale != 1) {
+        // get cache at scale 1
+        this.linkElement('remove');
+        this.element = yespix.getCache('img:'+src+':1');
+        if (this.element) {
+            this.linkElement('add');
+            if (this.element.isReady) {
+                this.initScale();
+            }
+            return true;
         }
-        return true;
     }
 
     // load image at scale 1
@@ -200,10 +194,9 @@ Image.prototype.load = function(src) {
     this.element.entities.push(this.entity);
     this.element.source = src;
     yespix.setCache('img:'+src+':1', this.element);
-console.log('set onlad event');
+    
     // set the onload event for image element
     this.element.onload = function(e) {
-console.log('image:onload');
 
         var len = this.entities.length;
         for (var t=len-1; t>=0; t--) {
@@ -217,7 +210,6 @@ console.log('image:onload');
     };
 
     this.element.onerror = function(e) {
-console.log('image:onerror');
         var len = this.entities.length;
         for (var t=0; t<len; t++) {
             this.entities[t].image.error();
@@ -229,9 +221,12 @@ console.log('image:onerror');
 
     this.element.isLoading = true;
     this.element.isReady = false;
+    this.element.hasError = false;
+    
     this.isLoading = true;
     this.isReady = false;
     this.hasError = false;
+
     this.entity.isReady = false;
 };
 
@@ -249,11 +244,13 @@ Image.prototype.ready = function() {
     this.element.hasError = false;
 
     if (this.entity.aspect) {
-        if (this.changeSize || this.entity.aspect.width == 0) {
+        if (this.autoSize || this.entity.aspect.width == 0) {
             this.entity.aspect.width = this.element.width;
+            this.entity.aspect.clipWidth = this.element.width;
         }
-        if (this.changeSize || this.entity.aspect.height == 0) {
+        if (this.autoSize || this.entity.aspect.height == 0) {
             this.entity.aspect.height = this.element.height;
+            this.entity.aspect.clipHeight = this.element.height;
         }
     }
 
@@ -366,7 +363,7 @@ Image.prototype.getBoundaryClip = function() {
 
     Set additional properties:
     var object = new yespix.class.image();
-    object.set({ image: { scale: 2.0, changeSize: false } });
+    object.set({ image: { scale: 2.0, autoSize: false } });
 
     Draw image on a context:
     var canvas = myDocument.createElement('canvas');

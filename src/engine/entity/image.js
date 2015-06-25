@@ -9,7 +9,7 @@ yespix.define('image', {
     init: function(options) {
 //console.log('isString options = ', yespix.isString(options), options);        
         options = options || {};
-        if (yespix.isString(options) || yespix.isArray(options)) {
+        if (yespix.isString(options)) {
             options = {image: {src: options}};
         }
         this.super(options);

@@ -20,32 +20,10 @@ function ElementList(params, manager) {
 
     this.list = {};
     this.selected = null;
+    this.selectedIndex = null;
+    this.selectedNext = 0;
     this.nextIndex = 0;
 }
-
-
-/**
- * Set parameter of the Element List object. Call manager.event with type "change"
- * @param {object} params     Parameters
- * @param {object} varDefault Default parameters
- * @event change
- */
-ElementList.prototype.set = function(params, varDefault) {
-    yespix.copy(params, this, varDefault);
-    this.isChanged = true;
-    if (this.manager && this.manager.event) {
-        this.manager.event(
-            {
-                type: 'change',
-                from: this,
-                fromClass: 'ElementList',
-                properties: params,
-                entity: entity,
-
-            }
-        );
-    }
-};
 
 
 /**
@@ -53,14 +31,14 @@ ElementList.prototype.set = function(params, varDefault) {
  * @event changeElement
  * @return {boolean} True on success
  */
-ElementList.prototype.setProp = function(params, index) {
+ElementList.prototype.set = function(params, index) {
     if (!params) {
         return false;
     }
 
     if (yespix.isUndefined(index)) {
         for (var n in this.list) {
-            this.setProp(params, n);
+            this.set(params, n);
         }
         return true;
     }
@@ -100,12 +78,23 @@ ElementList.prototype.select = function(index) {
     return this;
 };
 
-
+/**
+ * Get the element at index or get the selected element
+ * @param  {int} index Index
+ * @return {object} The element
+ */
 ElementList.prototype.get = function(index) {
-    if (this.selected) {
-        return this.selected;
+    if (yespix.isUndefined(index)) {
+        if (this.selected) {
+            return this.selected;
+        }
+        return null;
+    } else {
+        if (this.list[index]) {
+            return this.list[index];
+        }
+        return null;
     }
-    return null;
 };
 
 
@@ -114,42 +103,26 @@ ElementList.prototype.get = function(index) {
  * @param {int|string} params Index as integer or string
  * @param {int|string} index Optional, index of the element as integer or string
  */
-ElementList.prototype.add = function(params, index) {
+ElementList.prototype.add = function(element, index) {
     index = index || this.nextIndex;
 
     if (this.list[index]) {
         this.remove(index);
     }
 
-    var element = null;
-    if (this.tag != '') {
-        element = document.createElement(this.tag);
-    } else {
-        element = {};
-    }
-    
     element.index = index;
     element.hasError = false;
     element.isReady = false;
-    element.isLoading = true;
+    element.isLoading = false;
     element.manager = this;
 
     this.list[index] = element;
     this.nextIndex++;
     
-    for (var t=0; t<this.events.length; t++) {
-        element.addEventListener(this.events[t], this.event, true);
-    }
-
-    this.setProp(params, index);
-
-    if (element.isLoading && element.src && element.load) {
-        element.load();
-    }
-    
-    if (!element.load && !element.addEventListener){
-        element.isReady = true;
-        element.isLoading = false;
+    if (element.addEventListener) {
+        for (var t=0; t<this.events.length; t++) {
+            element.addEventListener(this.events[t], this.event, true);
+        }
     }
 
     if (this.selected === null) {
@@ -161,9 +134,6 @@ ElementList.prototype.add = function(params, index) {
 
 
 ElementList.prototype.event = function(event) {
-    if (event.type == 'load') {
-
-    }
     if (this.target && this.target.manager && this.target.manager.manager) {
         this.manager.manager.event(event.type, event);
     }
