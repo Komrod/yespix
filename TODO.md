@@ -1,5 +1,6 @@
 
 TODO list:
+- single sound in an entity sound and class Sound
 - make a sprite sheet class
 - error event with sound
 - video entity
@@ -74,6 +75,7 @@ TODO list:
 
 
 DONE:
+- single image in an entity image and class Image // 2015-06-25
 - error event with image
 - multiple sound, and sound.select
 - load sound and image when needed

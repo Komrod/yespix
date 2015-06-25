@@ -166,6 +166,9 @@ Image.prototype.unload = function() {
 
 
 Image.prototype.load = function(src) {
+    if (!src && (this.isLoading || this.isReady)) {
+        return false;
+    }
     
     src = src || this.src;
     if (!src) return false;
