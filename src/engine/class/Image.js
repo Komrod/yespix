@@ -1,16 +1,18 @@
 
 
 function Image(options, entity) {
+    
     options = options || {};
     if (entity) this.entity = entity;
     if (yespix.isString(options)) {
         options = {src: options};
     }
+    
     var varDefault = {
         src: '',  // source and params of the images
         scale: 1.0, // default original loading scale of the images
-        autoSize: true, // default change the size of the entity.aspect each time an image is loaded
-        autoload: false
+        autoSize: true, // default change the size of the entity.aspect when element ready
+        autoLoad: false
     };
 
     this.set(options, varDefault);
@@ -19,6 +21,10 @@ function Image(options, entity) {
     this.isReady =  false;
     this.hasError = false;
     this.element = null;
+
+    if (this.autoLoad) {
+        this.load();
+    }
 }
 
 
@@ -162,6 +168,7 @@ Image.prototype.unload = function() {
 Image.prototype.load = function(src) {
     
     src = src || this.src;
+    if (!src) return false;
     this.src = src;
     
     // get cache at current scale
@@ -246,11 +253,9 @@ Image.prototype.ready = function() {
     if (this.entity.aspect) {
         if (this.autoSize || this.entity.aspect.width == 0) {
             this.entity.aspect.width = this.element.width;
-            this.entity.aspect.clipWidth = this.element.width;
         }
         if (this.autoSize || this.entity.aspect.height == 0) {
             this.entity.aspect.height = this.element.height;
-            this.entity.aspect.clipHeight = this.element.height;
         }
     }
 
@@ -271,7 +276,7 @@ Image.prototype.error = function() {
     this.hasError = true;
 
     if (this.entity.image == this) {
-        this.entity.isReady = true;
+        this.entity.isReady = false;
     }
     this.element.isLoading = false;
     this.element.isReady = false;
@@ -346,6 +351,10 @@ Image.prototype.getBoundaryClip = function() {
         width: this.entity.aspect.clipWidth,
         height: this.entity.aspect.clipHeight
     };
+    
+    if (!clip.width) clip.width = this.element.width;
+    if (!clip.height) clip.height = this.element.height;
+
     return clip;
 };
 

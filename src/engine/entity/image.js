@@ -41,11 +41,7 @@ yespix.define('image', {
     getAssets: function() {
         var list = this.super();
         if (this.image && this.image.src) {
-            if (yespix.isArray(this.image.src)) {
-                list = list.concat(this.image.src);
-            } else {
-                list = list.concat([this.image.src]);
-            }
+            list = list.concat([this.image.src]);
         }
         return list;
     },
