@@ -55,12 +55,11 @@
 	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
 	//////////////////////////////////////////////////////////////////////////////
 	// handle multiple images
-	var objects = {
-		zardoz: new yespix.class.image({image: {src: 'unit/image/zardoz.png', scale: 1.0}, position: {z: 10}}),
-		sean: new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 2.0}, position: {z: 20}}),
-	};
-	manager.add(objects.zardoz, objects.sean);
-	//manager.add(new yespix.class.image({image: {src: 'unit/image/zardoz.png', scale: 2.0}}));
+	//var objects = {
+	//	zardoz: new yespix.class.image({image: {src: 'unit/image/zardoz.png', scale: 2.0}, position: {z: 20}}),
+	//	sean: new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 1.0}, position: {z: 10}})
+	//};
+	//manager.add(objects.zardoz, objects.sean);
 	//////////////////////////////////////////////////////////////////////////////
 	// clip
 	//manager.add(new yespix.class.image('unit/image/zardoz.png'));
@@ -127,10 +126,8 @@
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT TEST SPRITE
 	//////////////////////////////////////////////////////////////////////////////
-	// 
-	
-	manager.add(new yespix.class.sprite({image:'chuck/player.png', sprite: {width: 32, height: 40} }));
-	manager.list[0].sprite.select(8);
+	//manager.add(new yespix.class.sprite({image:'chuck/player.png', sprite: {width: 32, height: 40} }));
+	//manager.list[0].sprite.select(8);
 
 
 	manager.load();

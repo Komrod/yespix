@@ -49,16 +49,28 @@ GfxManager.prototype.draw = function(context) {
 };
 
 
-GfxManager.prototype.add = function(entity) {
-	entity.manager = this;
-    this.list.push(entity);
-    this.isZSorted = false;
-    this.isReady = false;
-    return this.list.length - 1;
+GfxManager.prototype.add = function() {
+	for (var t = 0; t < arguments.length; t++) {
+		arguments[t].manager = this;
+	    this.list.push(arguments[t]);
+	    this.isZSorted = false;
+	    if (!arguments[t].isReady) {
+	    	this.isReady = false;
+	    }
+	}	
+	return this.list.length - 1;
 };
 
 
-GfxManager.prototype.remove = function(entity) {
+GfxManager.prototype.remove = function() {
+	for (var t = 0; t < arguments.length; t++) {
+		for (var u = this.list.length-1; u >=0; u--) {
+			if (this.list[u] == arguments[t]) {
+				this.list = this.list.splice(u, 1);
+		    }
+		}
+	}	
+	return true;
 };
 
 
