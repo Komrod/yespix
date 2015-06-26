@@ -162,4 +162,3 @@ GfxManager.prototype.trigger = function(eventName, event) {
 	return true;
 };
 
-

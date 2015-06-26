@@ -114,21 +114,26 @@
 	//manager.list[0].sprite.select(3);
 	//////////////////////////////////////////////////////////////////////////////
 	// image object and scale
-	manager.add(new yespix.class.sprite({ image: {src: 'unit/image/perso.png', scale: 2}, sprite: { width: 32, height: 32 } }));
-	manager.list[0].sprite.select(3);
+	//manager.add(new yespix.class.sprite({ image: {src: 'unit/image/perso.png', scale: 2}, sprite: { width: 32, height: 32 } }));
+	//manager.list[0].sprite.select(3);
 
 
-
-
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST LOOP
+	//////////////////////////////////////////////////////////////////////////////
+	// loop on console 1/sec
+	var loop = new Loop(1);
+	loop.register(function(loop) { console.log('loop.time = '+loop.time); });
+	loop.start();
 
 	manager.load();
-
 	// draw every entity in the manager
 	manager.when('ready', function(e) {
 		manager.draw();
 	});
 
 	console.log('manager = ', manager);
+	console.log('loop = ', loop);
 
 		</script>
 
