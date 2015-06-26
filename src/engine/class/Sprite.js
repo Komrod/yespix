@@ -56,19 +56,20 @@ Sprite.prototype.select = function(index) {
     this.selectedIndex = index;
     this.selected = this.frame(index);
     this.isChanged = true;
+    this.prepare();
     return null;
 };
 
 
 Sprite.prototype.buildFrames = function() {
-console.log('buildFrames: start');
+//console.log('buildFrames: start');
     if (!this.entity.image.isReady) {
         return false;
     }
-console.log('buildFrames: entity = ', this.entity);
+//console.log('buildFrames: entity = ', this.entity);
     var frames = [],
-        maxCols = (this.entity.aspect.width - this.x) / this.width,
-        maxLines = (this.entity.aspect.height - this.y) / this.height,
+        maxCols = (this.entity.aspect.width - this.x) / (this.width * this.entity.image.scale),
+        maxLines = (this.entity.aspect.height - this.y) / (this.height * this.entity.image.scale),
         line = 0,
         col = 0;
 
@@ -80,14 +81,14 @@ console.log('buildFrames: entity = ', this.entity);
             maxCols = this.maxCols;
         }
     }
-console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
+//console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
     for (line=0; line<maxLines; line++) {
         for (col=0; col<maxCols; col++) {
             frames.push({
-                x: this.x + col * this.width,
-                y: this.y + line * this.height,
-                width: this.width,
-                height: this.height,
+                x: this.x * this.entity.image.scale + col * this.width * this.entity.image.scale,
+                y: this.y * this.entity.image.scale + line * this.height * this.entity.image.scale,
+                width: this.width * this.entity.image.scale,
+                height: this.height * this.entity.image.scale,
                 offsetX: 0,
                 offsetY: 0
             });
@@ -98,7 +99,7 @@ console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
 
 
 Sprite.prototype.load = function() {
-console.log('Sprite:load: start');
+//console.log('Sprite:load: start');
     if (!this.entity.image) {
         return false;
     }
@@ -122,6 +123,7 @@ console.log('Sprite:load: start');
             fromClass: 'Sprite'
         }
     );
+    return true;
 };
 
 
