@@ -1,26 +1,32 @@
 
 
 function Sprite(options, entity) {
+
     options = options || {};
-    if (entity) this.entity = entity;
-    if (yespix.isString(options) || yespix.isArray(options)) {
-        options = {src: options};
+    if (entity) {
+        this.entity = entity;
     }
+
     var varDefault = {
-        isReady: false,
         width: 32,
         height: 32,
-        left: 0,
-        top: 0,
+        x: 0,
+        y: 0,
         maxCols: 0,
         maxLines: 0,
+        selectedIndex: 0,
     };
 
     this.set(options, varDefault);
-    this.frames = [];
+
+    this.isLoading = false;
+    this.isReady =  false;
+    this.hasError = false;
     this.selected = null;
-    this.selectedIndex = 0;
-    this.selectedNext = 0;
+
+    if (!this.frames) {
+        this.frames = [];
+    }
 }
 
 
@@ -47,23 +53,22 @@ Sprite.prototype.frame = function(index) {
 
 
 Sprite.prototype.select = function(index) {
-    if (!this.frames[index]) {
-        this.selectedNext = index;
-        return false;
-    }
-    this.selected = this.frame(index);
     this.selectedIndex = index;
+    this.selected = this.frame(index);
+    this.isChanged = true;
+    return null;
 };
 
 
 Sprite.prototype.buildFrames = function() {
+console.log('buildFrames: start');
     if (!this.entity.image.isReady) {
         return false;
     }
 console.log('buildFrames: entity = ', this.entity);
     var frames = [],
-        maxCols = (this.entity.aspect.width - this.left) / this.width,
-        maxLines = (this.entity.aspect.height - this.top) / this.height,
+        maxCols = (this.entity.aspect.width - this.x) / this.width,
+        maxLines = (this.entity.aspect.height - this.y) / this.height,
         line = 0,
         col = 0;
 
@@ -79,8 +84,8 @@ console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
     for (line=0; line<maxLines; line++) {
         for (col=0; col<maxCols; col++) {
             frames.push({
-                x: this.left + col * this.width,
-                y: this.top + line * this.height,
+                x: this.x + col * this.width,
+                y: this.y + line * this.height,
                 width: this.width,
                 height: this.height,
                 offsetX: 0,
@@ -88,31 +93,42 @@ console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
             });
         }
     }
-    this.frames = this.frames.concat(frames);
+    this.frames = frames;
 };
 
 
 Sprite.prototype.load = function() {
-    if (!this.entity.image.isReady) return false;
-    if (this.frames.length == 0) {
+console.log('Sprite:load: start');
+    if (!this.entity.image) {
+        return false;
+    }
+
+    if (!this.entity.image.isReady) {
+        this.entity.image.load();
+        return false;
+    }
+
+    if (!this.frames || this.frames.length == 0) {
         this.buildFrames();
-        this.select(this.selectedNext);
+        this.select(this.selectedIndex);
     }
     this.isReady = true;
 
     this.entity.event(
-            {
-                type: 'ready',
-                entity: this.entity,
-                from: this,
-                fromClass: 'Sprite'
-            }
-        );
+        {
+            type: 'ready',
+            entity: this.entity,
+            from: this,
+            fromClass: 'Sprite'
+        }
+    );
 };
 
 
 Sprite.prototype.prepare = function() {
-    if (this.entity.aspect.width != this.selected.width 
+    if (!this.selected) return false;
+    if (
+        this.entity.aspect.width != this.selected.width
         || this.entity.aspect.height != this.selected.height
         || this.entity.aspect.clipX != this.selected.x
         || this.entity.aspect.clipy != this.selected.y
@@ -129,5 +145,11 @@ Sprite.prototype.prepare = function() {
         };
         this.entity.aspect.set(aspect);
     }
+};
+
+
+Sprite.prototype.event = function(event) {
+    if (this.entity) return this.entity.event(event);
+    return true;
 };
 

@@ -1,11 +1,10 @@
 
 TODO list:
-- single sound in an entity sound and class Sound
-- make a sprite sheet class
+- adapt sprite to image scale
 - error event with sound
-- video entity
 - function to clear canvas in GfxManager
 - make the main loop possible
+- video entity
 - make an animation class
 - handle keys
 - create a vector class
@@ -45,7 +44,6 @@ TODO list:
 - button entity
 - Separate the fall down / jump up animation of a character
 
-- add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - make a debug panel where you can change variables and see entities
 - fix collision between entities
@@ -75,6 +73,8 @@ TODO list:
 
 
 DONE:
+- make a sprite sheet class
+- single sound in an entity sound and class Sound
 - single image in an entity image and class Image // 2015-06-25
 - error event with image
 - multiple sound, and sound.select

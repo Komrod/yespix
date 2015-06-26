@@ -121,6 +121,7 @@ yespix.define('gfx', {
      * Event: some properties of the entity have changed
      */
     event: function(event) {
+//console.log('gfx:event: event = ', event);
         if (!this.manager) return;
         switch (event.type+':'+event.fromClass) {
             case 'change:Position':
