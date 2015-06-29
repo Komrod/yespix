@@ -1,12 +1,8 @@
 
 TODO list:
-- adapt sprite to image scale
-- error event with sound
-- function to clear canvas in GfxManager
-- make the main loop possible
 - video entity
 - make an animation class
-- handle keys
+- handle keypress
 - create a vector class
 - extends entity to move
 - Make a basic 2 ways player
@@ -73,6 +69,10 @@ TODO list:
 
 
 DONE:
+- adapt sprite to image scale
+- error event with sound
+- function to clear canvas in GfxManager
+- make the main loop possible
 - make a sprite sheet class
 - single sound in an entity sound and class Sound
 - single image in an entity image and class Image // 2015-06-25
