@@ -162,3 +162,8 @@ GfxManager.prototype.trigger = function(eventName, event) {
 	return true;
 };
 
+GfxManager.prototype.clear = function() {
+	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	return true;
+};
+
