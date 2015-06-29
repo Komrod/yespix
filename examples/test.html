@@ -35,7 +35,7 @@
 	// UNIT TEST IMAGE
 	//////////////////////////////////////////////////////////////////////////////
 	// options as string
-	//manager.add(new yespix.class.image('unit/image/sean.png'));
+	manager.add(new yespix.class.image('unit/image/sean.png'));
 	//////////////////////////////////////////////////////////////////////////////
 	// image as string
 	//manager.add(new yespix.class.image({image: 'unit/image/zardoz.png'}));
@@ -122,16 +122,22 @@
 	// UNIT TEST LOOP
 	//////////////////////////////////////////////////////////////////////////////
 	// loop on console 1/sec
-	var loop = new Loop(1);
-	loop.register(function(loop) { console.log('loop.time = '+loop.time); });
+	var loop = new Loop(60);
+	loop.register(
+		function(loop) { console.log('frame: loop.time = '+loop.time); manager.clear(); manager.draw(); }, 
+		function(loop) { console.log('step: loop.time = '+loop.time); }
+	);
 	loop.start();
+	setTimeout(function () { loop.stop(); }, 2000);
 
 	manager.load();
+
+	/*
 	// draw every entity in the manager
 	manager.when('ready', function(e) {
 		manager.draw();
 	});
-
+	*/
 	console.log('manager = ', manager);
 	console.log('loop = ', loop);
 

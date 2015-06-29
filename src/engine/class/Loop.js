@@ -1,8 +1,9 @@
 
+
 function Loop(fps) {
     this.frame = 0;         // frame index starting at 0
     this.ms = 1;            // minimum milliSecPerFrame
-    this.request = null;    // fonction to call for each frame (frameRequest)
+    this.request = null;    // fonction to call for each frame (requestAnimationFrame)
     this.requestId = null;  // requestId to stop the loop
     this.tick = null;       // fonction to call for each tick
     this.tickNext = (new Date()).getTime();  // nextGameTick
@@ -11,12 +12,8 @@ function Loop(fps) {
     this.fps = fps || 60;   // maximum frames in 1 second
 
     this.frameFunction = null;
-    this.tickFunction = null;
-}
+    this.stepFunction = null;
 
-
-Loop.prototype.start = function() {
-    // Init the requestAnimationFrame in this.frameRequest
     if (!this.request) this.request = (function() {
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -27,19 +24,21 @@ Loop.prototype.start = function() {
                 return window.setInterval(callback, 1000 / this.fps);
             };
     })();
+}
 
-    if (this.request) {
-        this.stop();
-    }
+
+Loop.prototype.start = function() {
+    // Init the requestAnimationFrame in this.frameRequest
 
     this.ms = 1000 / this.fps;
-    var loop = this;
+    var looper = this;
     this.tick = function() {
-        loop.step();
-        loop.request.call(window, loop.tick);
+        looper.step();
+        if (looper.tick) looper.request.call(window, looper.tick);
     };
 
     this.tick();
+    return this;
 };
 
 
@@ -47,7 +46,9 @@ Loop.prototype.stop = function() {
     // Cancel the setInterval
     clearInterval(this.requestId);
     this.tick = null;
+    return this;
 };
+
 
 Loop.prototype.step = function() {
     
@@ -60,12 +61,20 @@ Loop.prototype.step = function() {
     }
     while (this.time > this.tickNext) {
         this.frame++;
-        this.frameTickNext += this.frameMs;
+        this.tickNext += this.ms;
         loops = true;
+        if (this.frameFunction) this.frameFunction(this);
+    }
+
+    if (loop) {
+        if (this.stepFunction) this.stepFunction(this);
     }
 };
 
-Loop.prototype.register = function(frameFunction, tickFunction) {
+
+Loop.prototype.register = function(frameFunction, stepFunction) {
     this.frameFunction = frameFunction;
-    this.tickFunction = tickFunction;
-}
+    if (stepFunction) this.stepFunction = stepFunction;
+    return this;
+};
+
