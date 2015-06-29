@@ -8,7 +8,7 @@ yespix.define('sound', {
 
     init: function(options) {
         var options = options || {};
-        if (yespix.isString(options) || yespix.isArray(options)) {
+        if (yespix.isString(options)) {
             options = {sound: {src: options}};
         }
         this.super(options);
@@ -26,11 +26,7 @@ yespix.define('sound', {
     getAssets: function() {
         var list = this.super();
         if (this.sound && this.sound.src) {
-            if (yespix.isArray(this.sound.src)) {
-                list = list.concat(this.sound.src);
-            } else {
-                list = list.concat([this.sound.src]);
-            }
+            list = list.concat([this.sound.src]);
         }
         return list;
     },

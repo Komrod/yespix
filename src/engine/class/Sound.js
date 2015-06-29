@@ -48,7 +48,7 @@ Sound.prototype.set = function(options, varDefault) {
 };
 
 
-Image.prototype.unload = function() {
+Sound.prototype.unload = function() {
     this.src = '';
     if (this.element) {
         this.element.entity = null;
@@ -101,8 +101,6 @@ Sound.prototype.load = function(src) {
 
 
 Sound.prototype.ready = function() {
-console.log('ready: this = ', this);
-
     this.isLoading = false;
     this.isReady = true;
     this.hasError = false;
@@ -128,7 +126,7 @@ console.log('ready: this = ', this);
     }
 };
 
-Image.prototype.error = function() {
+Sound.prototype.error = function() {
     this.isLoading = false;
     this.isReady = false;
     this.hasError = true;
@@ -150,50 +148,6 @@ Image.prototype.error = function() {
         }
     );
 };
-
-/*
-Sound.prototype.event = function(type, element) {
-    if (type == 'canplay') {
-        if (!element.ready) {
-            element.isReady = true;
-            element.isLoading = false;
-
-            var len = this.elements.length;
-            var allReady = true;
-            var oneLoading = false;
-            for (var t=0; t<len; t++) {
-                if (!this.elements[t].isReady) {
-                    allReady = false;
-                }
-                if (this.elements[t].isLoading) {
-                    oneLoading = true;
-                }
-            }
-            this.isReady = allReady;
-            this.isLoading = oneLoading;
-        } else {
-            element.isReady = true;
-            element.isLoading = false;
-        }
-        if (element.autoplay) {
-            element.autoplay = false;
-            element.play();
-        }
-    } else if (type == 'load') {
-        element.isReady = false;
-        element.isLoading = true;
-    } else if (type == 'error') {
-        element.isReady = false;
-        element.isLoading = false;
-    } else if (type == 'pause') {
-        if (element.loop && element.ended) {
-                element.pause();
-                element.currentTime = 0;
-                element.play();
-        }
-    }
-};
-*/
 
 
 Sound.prototype.play = function() {
