@@ -122,10 +122,10 @@
 	// UNIT TEST LOOP
 	//////////////////////////////////////////////////////////////////////////////
 	// loop on console 1/sec
-	var loop = new Loop(60);
+	var loop = new Loop(100);
 	loop.register(
-		function(loop) { console.log('frame: loop.time = '+loop.time); manager.clear(); manager.draw(); }, 
-		function(loop) { console.log('step: loop.time = '+loop.time); }
+		function(loop, time) { console.log('frame: time = '+time); manager.clear(); manager.draw(); }, 
+		function(loop, time) { console.log('step: time = '+time); }
 	);
 	loop.start();
 	setTimeout(function () { loop.stop(); }, 2000);
