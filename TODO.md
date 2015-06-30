@@ -1,12 +1,11 @@
 
 TODO list:
-- video entity
 - make an animation class
+- auto detect when to set autoSize to false with set of width or height on video / image
 - handle keypress
-- create a vector class
+- use collision engine (box2d)
 - extends entity to move
 - Make a basic 2 ways player
-- use collision engine (box2d)
 - load a level
 - parallax move
 
@@ -69,6 +68,7 @@ TODO list:
 
 
 DONE:
+- video entity
 - adapt sprite to image scale
 - error event with sound
 - function to clear canvas in GfxManager
