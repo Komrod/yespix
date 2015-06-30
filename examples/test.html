@@ -159,21 +159,68 @@
 	//manager.add(objects.test, objects.zardoz);
 	//////////////////////////////////////////////////////////////////////////////
 	// clip
-	manager.add(new yespix.class.video('unit/video/video.ogv'));
-	manager.list[0].set({aspect: {clipX: 95, clipY: 40, clipWidth: 50, clipHeight: 50, width: 50, height: 50}, video: {autoSize: false}});
+	//manager.add(new yespix.class.video('unit/video/video.ogv'));
+	//manager.list[0].set({aspect: {clipX: 95, clipY: 40, clipWidth: 50, clipHeight: 50, width: 50, height: 50}, video: {autoSize: false}});
 
 
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST ANIMATION
+	//////////////////////////////////////////////////////////////////////////////
+	// simple	
+	manager.add(new yespix.class.animation({
+		animation: {
+			defaultAnimation: 'idle',
+			defaultSprite: 'perso',
+			defaultDuration: 300,
+
+			sprites: { 
+				'perso': {
+					image: 'unit/image/perso.png', 
+					sprite: { width: 32, height: 32 }
+				}
+			},
+			list: {
+				'runLeft': { frames: [3, 4, 3, 5] }
+			}
+		}
+	}));
+	//////////////////////////////////////////////////////////////////////////////
+	// anim with 2 sprites
+	/*manager.add(new yespix.class.animation({
+		animation: {
+			defaultAnimation: 'idle',
+			defaultSprite: 'perso',
+			defaultDuration: 100,
+
+			sprites: { 
+				'perso': {
+					image: 'unit/image/perso.png', 
+					sprite: { width: 32, height: 32 }
+				}
+			},
+			
+			list: {
+				'idle': {
+					frames: [0]
+				},
+				'runLeft': {
+					frames: [0, 1, 2, 1]
+				},
+				'runRight': {
+					extends: 'runLeft',
+					flipX: true,
+				}
+			}
+		}
+	}));*/
 
 	manager.load();
-
-	manager.list[0].video.play();
 
 	var loop = new Loop(60);
 	loop.register(
 		function(loop, time) { manager.clear(); manager.draw(); }, 
 		function(loop, time) { }
-	);
-	loop.start();
+	).start();
 	
 	// draw every entity in the manager
 	/*manager.when('ready', function(e) {

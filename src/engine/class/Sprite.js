@@ -62,7 +62,7 @@ Sprite.prototype.select = function(index) {
 
 
 Sprite.prototype.buildFrames = function() {
-//console.log('buildFrames: start');
+console.log('Sprite:buildFrames: start');
     if (!this.entity.image.isReady) {
         return false;
     }
@@ -99,7 +99,7 @@ Sprite.prototype.buildFrames = function() {
 
 
 Sprite.prototype.load = function() {
-//console.log('Sprite:load: start');
+console.log('Sprite:load: start');
     if (!this.entity.image) {
         return false;
     }
