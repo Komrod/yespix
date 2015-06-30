@@ -68,7 +68,6 @@ Video.prototype.load = function(src) {
     if (!src) return false;
     this.src = src;
 
-console.log('video:load: start src = '+src);    
     this.isLoading = true;
     this.isReady = false;
     this.hasError = false;
@@ -110,14 +109,15 @@ Video.prototype.ready = function() {
     this.element.hasError = true;
 
     if (this.entity.aspect) {
+console.log('this.autoSize = ', this.autoSize, ', this.entity.aspect.width = ',  this.entity.aspect.width);
         if (this.autoSize || this.entity.aspect.width == 0) {
-            this.entity.aspect.width = this.element.width;
+console.log('set width to '+this.element.videoWidth);
+            this.entity.aspect.width = this.element.videoWidth;
         }
         if (this.autoSize || this.entity.aspect.height == 0) {
-            this.entity.aspect.height = this.element.height;
+            this.entity.aspect.height = this.element.videoHeight;
         }
     }
-console.log('video:ready : this = ', this);
     this.entity.event(
         {
             type: 'ready',
@@ -279,9 +279,7 @@ Video.prototype.getBoundaryClip = function() {
         width: this.entity.aspect.clipWidth,
         height: this.entity.aspect.clipHeight
     };
-    
-    if (!clip.width) clip.width = this.element.width;
-    if (!clip.height) clip.height = this.element.height;
-
+    if (!clip.width) clip.width = this.element.videoWidth;
+    if (!clip.height) clip.height = this.element.videoHeight;
     return clip;
 };

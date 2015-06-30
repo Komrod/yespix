@@ -22,6 +22,11 @@ yespix.define('video', {
     },
     
 
+    drawRender: function(context) {
+        if (this.video) {
+            this.video.draw(context);
+        }
+    },
 
     getAssets: function() {
         var list = this.super();

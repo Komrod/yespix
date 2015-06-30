@@ -136,46 +136,42 @@
 	// UNIT TEST VIDEO
 	//////////////////////////////////////////////////////////////////////////////
 	// options as string
-	manager.add(new yespix.class.video('unit/video/video.ogv'));
+	//manager.add(new yespix.class.video('unit/video/video.ogv'));
 	//////////////////////////////////////////////////////////////////////////////
 	// image as string
-	//manager.add(new yespix.class.image({image: 'unit/image/zardoz.png'}));
+	//manager.add(new yespix.class.video({video: 'unit/video/video.ogv'}));
 	//////////////////////////////////////////////////////////////////////////////
 	// src as string
-	//manager.add(new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 2.0}}));
-	//////////////////////////////////////////////////////////////////////////////
-	// scale after load
-	//manager.add(new yespix.class.image('unit/image/sean.png'));
-	//setTimeout(function () { manager.list[0].image.set({scale: 2.0}); }, 2000);
+	//manager.add(new yespix.class.video({video: {src: 'unit/video/video.ogv', autoLoad: true}}));
 	//////////////////////////////////////////////////////////////////////////////
 	// dont load
-	//manager.add(new yespix.class.image('unit/image/sean.png'));
-	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
+	//manager.add(new yespix.class.video({video: {src: 'unit/video/video.ogv', autoLoad: false}}));
+	//console.log('isLoading? ', manager.list[0].video.isLoading, ', isReady? ', manager.list[0].video.isReady);
 	//manager.loadAssets();
-	//console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady);
-	//setTimeout(function () { console.log('isLoading? ', manager.list[0].image.isLoading, ', isReady? ', manager.list[0].image.isReady); }, 2000);
+	//console.log('isLoading? ', manager.list[0].video.isLoading, ', isReady? ', manager.list[0].video.isReady);
+	//setTimeout(function () { console.log('isLoading? ', manager.list[0].video.isLoading, ', isReady? ', manager.list[0].video.isReady); }, 2000);
 	//////////////////////////////////////////////////////////////////////////////
-	// handle multiple images
+	// handle multiple entities
 	//var objects = {
-	//	zardoz: new yespix.class.image({image: {src: 'unit/image/zardoz.png', scale: 2.0}, position: {z: 20}}),
-	//	sean: new yespix.class.image({image: {src: 'unit/image/sean.png', scale: 1.0}, position: {z: 10}})
+	//	test: new yespix.class.video({video: {src: 'unit/video/video.ogv', loop: true}, position: {z: 20}}),
+	//	zardoz: new yespix.class.image({image: 'unit/image/zardoz.png', position: {x: 80, y: 20, z: 30}})
 	//};
-	//manager.add(objects.zardoz, objects.sean);
+	//manager.add(objects.test, objects.zardoz);
 	//////////////////////////////////////////////////////////////////////////////
 	// clip
-	//manager.add(new yespix.class.image('unit/image/zardoz.png'));
-	//manager.list[0].set({aspect: {clipX: 20, clipY: 20, clipWidth: 20, clipHeight: 20, width: 20, height: 20}, image: {autoSize: false}});
+	manager.add(new yespix.class.video('unit/video/video.ogv'));
+	manager.list[0].set({aspect: {clipX: 95, clipY: 40, clipWidth: 50, clipHeight: 50, width: 50, height: 50}, video: {autoSize: false}});
 
 
 
 	manager.load();
 
 	manager.list[0].video.play();
-	
+
 	var loop = new Loop(60);
 	loop.register(
 		function(loop, time) { manager.clear(); manager.draw(); }, 
-		function(loop, time) { manager.list[0].position.x += 0.2 * time; }
+		function(loop, time) { }
 	);
 	loop.start();
 	
