@@ -109,9 +109,7 @@ Video.prototype.ready = function() {
     this.element.hasError = true;
 
     if (this.entity.aspect) {
-console.log('this.autoSize = ', this.autoSize, ', this.entity.aspect.width = ',  this.entity.aspect.width);
         if (this.autoSize || this.entity.aspect.width == 0) {
-console.log('set width to '+this.element.videoWidth);
             this.entity.aspect.width = this.element.videoWidth;
         }
         if (this.autoSize || this.entity.aspect.height == 0) {
