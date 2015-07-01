@@ -379,3 +379,14 @@ yespix.fn.async = function(fn, parameters, callback) {
     }, 0);
 };
 
+
+if (window.performance.now) {
+    yespix.fn.startTime = +new Date();
+    yespix.fn.getTime = function() {
+        return this.startTime + window.performance.now();
+    };
+} else {
+    yespix.fn.getTime = function() {
+        return +new Date();
+    };
+}

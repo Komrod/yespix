@@ -16,16 +16,6 @@ function Loop(fps) {
 
     this.stepTime = 0;
     this.frameTime = 0;
-
-    if (window.performance.now) {
-        this.getTime = function() {
-            return this.startTime + window.performance.now();
-        };
-    } else {
-        this.getTime = function() {
-            return +new Date();
-        };
-    }
 }
 
 
@@ -37,8 +27,8 @@ Loop.prototype.start = function() {
         if (looper.tick) looper.request.call(window, looper.tick);
     };
 
-    this.stepTime = this.getTime();
-    this.frameTime = this.getTime();
+    this.stepTime = yespix.getTime();
+    this.frameTime = yespix.getTime();
     this.tick();
     return this;
 };
@@ -72,21 +62,21 @@ Loop.prototype.stop = function() {
 Loop.prototype.step = function() {
     var loops = false; // set to true if frame loop is called at least once
 
-    this.time = this.getTime();
+    this.time = yespix.getTime();
     if (this.time - this.tickNext > 60 * this.ms) {
         this.tickNext = this.time - this.ms;
     }
     while (this.time > this.tickNext) {
         this.tickNext += this.ms;
         loops = true;
-        this.stepDeltaTime = this.getTime()-this.stepTime;
-        this.stepTime = this.getTime();
+        this.stepDeltaTime = yespix.getTime()-this.stepTime;
+        this.stepTime = yespix.getTime();
         if (this.stepFunction) this.stepFunction(this, this.stepDeltaTime, this.frame);
     }
 
     if (loops) {
-        this.frameDeltaTime = this.getTime()-this.frameTime;
-        this.frameTime = this.getTime();
+        this.frameDeltaTime = yespix.getTime()-this.frameTime;
+        this.frameTime = yespix.getTime();
         if (this.frameFunction) this.frameFunction(this, this.frameDeltaTime, this.frame);
         this.frame++;
     }
