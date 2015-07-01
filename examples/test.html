@@ -304,7 +304,7 @@
 	}));*/
 	//////////////////////////////////////////////////////////////////////////////
 	// frame with different offsets
-	manager.add(new yespix.class.animation({
+	/*manager.add(new yespix.class.animation({
 		animation: {
 			defaultAnimation: 'runleft',
 			defaultSprite: 'perso',
@@ -328,7 +328,29 @@
 				'runleft': { frames: [0, 1, 2, 3, 4, 5] }
 			}
 		}
+	}));*/
+	//////////////////////////////////////////////////////////////////////////////
+	// extends animation
+	manager.add(new yespix.class.animation({
+		animation: {
+			defaultAnimation: 'idle',
+			defaultSprite: 'perso',
+			defaultDuration: 200,
+			sprites: { 
+				'perso': {
+					image: 'unit/image/perso.png', 
+					sprite: { width: 32, height: 32 }
+				},
+			},
+			list: {
+				'idle': { frames: [0] },
+				'runleft': { frames: [1,0,2,0] },
+				'runright': { extends: 'runleft', flipX: true }
+			}
+		}
 	}));
+	setTimeout(function () { manager.list[0].animation.play('runleft'); }, 3000);
+	setTimeout(function () { manager.list[0].animation.play('runright');  }, 6000);
 	
 
 
