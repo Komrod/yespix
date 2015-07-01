@@ -12,7 +12,9 @@ function Image(options, entity) {
         src: '',  // source and params of the images
         scale: 1.0, // default original loading scale of the images
         autoSize: true, // default change the size of the entity.aspect when element ready
-        autoLoad: false
+        autoLoad: false,
+        offsetX: 0,
+        offsetY: 0
     };
 
     this.set(options, varDefault);
@@ -334,8 +336,8 @@ Image.prototype.draw = function(context) {
 
 Image.prototype.getBoundaryImage = function() {
     var pos = {
-        x: this.entity.position.x * (this.entity.aspect.flipX ? -1 : 1) + (this.entity.aspect.flipX ? -this.entity.aspect.width : 0),
-        y: this.entity.position.y * (this.entity.aspect.flipY ? -1 : 1) + (this.entity.aspect.flipY ? -this.entity.aspect.height : 0),
+        x: (this.entity.position.x + this.offsetX ) * (this.entity.aspect.flipX ? -1 : 1) + (this.entity.aspect.flipX ? -this.entity.aspect.width : 0),
+        y: (this.entity.position.y + this.offsetY ) * (this.entity.aspect.flipY ? -1 : 1) + (this.entity.aspect.flipY ? -this.entity.aspect.height : 0),
         width: this.entity.aspect.width,
         height: this.entity.aspect.height
     };

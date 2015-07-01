@@ -98,6 +98,41 @@ console.log('Sprite:buildFrames: start');
 };
 
 
+Sprite.prototype.completeFrames = function() {
+console.log('Sprite:completeFrames: start');
+    if (!this.entity.image.isReady) {
+        return false;
+    }
+    var max = this.frames.length;
+    for (index=0; index<max; index++) {
+        if (yespix.isUndefined(this.frames[index].x)) {
+            this.frames[index].x = this.x;
+        }
+        if (yespix.isUndefined(this.frames[index].y)) {
+            this.frames[index].y = this.y;
+        }
+        if (yespix.isUndefined(this.frames[index].offsetX)) {
+            this.frames[index].offsetX = 0;
+        }
+        if (yespix.isUndefined(this.frames[index].offsetY)) {
+            this.frames[index].offsetY = 0;
+        }
+        if (yespix.isUndefined(this.frames[index].width)) {
+            this.frames[index].width = this.width;
+        }
+        if (yespix.isUndefined(this.frames[index].height)) {
+            this.frames[index].height = this.height;
+        }
+        if (this.entity.image.scale != 1) {
+            this.frames[index].x = this.frames[index].x * this.entity.image.scale;
+            this.frames[index].y = this.frames[index].y * this.entity.image.scale;
+            this.frames[index].width = this.frames[index].width * this.entity.image.scale;
+            this.frames[index].height = this.frames[index].height * this.entity.image.scale;
+        }
+    }
+};
+
+
 Sprite.prototype.load = function() {
 console.log('Sprite:load: start');
     if (!this.entity.image) {
@@ -111,6 +146,9 @@ console.log('Sprite:load: start');
 
     if (!this.frames || this.frames.length == 0) {
         this.buildFrames();
+        this.select(this.selectedIndex);
+    } else if (this.frames && this.frames.length > 0) {
+        this.completeFrames();
         this.select(this.selectedIndex);
     }
     this.isReady = true;
@@ -146,6 +184,16 @@ Sprite.prototype.prepare = function() {
             clipHeight: this.selected.height
         };
         this.entity.aspect.set(aspect);
+    }
+    if (
+        this.entity.image.offsetX != this.selected.offsetX
+        || this.entity.image.offsetY != this.selected.offsetY
+        ) {
+        var image = {
+            offsetX: this.selected.offsetX,
+            offsetY: this.selected.offsetY
+        };
+        this.entity.image.set(image);
     }
 };
 
