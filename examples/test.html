@@ -167,11 +167,11 @@
 	// UNIT TEST ANIMATION
 	//////////////////////////////////////////////////////////////////////////////
 	// simple	
-	manager.add(new yespix.class.animation({
+	/*manager.add(new yespix.class.animation({
 		animation: {
-			defaultAnimation: 'idle',
+			defaultAnimation: 'runLeft',
 			defaultSprite: 'perso',
-			defaultDuration: 300,
+			defaultDuration: 200,
 
 			sprites: { 
 				'perso': {
@@ -183,14 +183,14 @@
 				'runLeft': { frames: [3, 4, 3, 5] }
 			}
 		}
-	}));
+	}));*/
 	//////////////////////////////////////////////////////////////////////////////
-	// anim with 2 sprites
-	/*manager.add(new yespix.class.animation({
+	// flipX flipY
+	manager.add(new yespix.class.animation({
 		animation: {
-			defaultAnimation: 'idle',
+			defaultAnimation: 'runLeft',
 			defaultSprite: 'perso',
-			defaultDuration: 100,
+			defaultDuration: 2000,
 
 			sprites: { 
 				'perso': {
@@ -198,30 +198,29 @@
 					sprite: { width: 32, height: 32 }
 				}
 			},
-			
 			list: {
-				'idle': {
-					frames: [0]
-				},
-				'runLeft': {
-					frames: [0, 1, 2, 1]
-				},
-				'runRight': {
-					extends: 'runLeft',
-					flipX: true,
-				}
+				'runLeft': { frames: [3, 4, 3, 5], flipX: true, flipY: true }
 			}
 		}
-	}));*/
+	}));
 
 	manager.load();
 
+	/*
+	manager.when('ready', function(e) {
+		manager.draw();
+		console.log('GfxManager:ready!');
+	});
+	*/
+
+	
 	var loop = new Loop(60);
 	loop.register(
 		function(loop, time) { manager.clear(); manager.draw(); }, 
 		function(loop, time) { }
 	).start();
 	
+
 	// draw every entity in the manager
 	/*manager.when('ready', function(e) {
 		manager.list[0].video.play();

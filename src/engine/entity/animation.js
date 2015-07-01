@@ -27,5 +27,14 @@ yespix.define('animation', {
         return this.super(event);
     },
 
+    drawRender: function(context) {
+        if (this.animation) {
+            this.animation.checkFrame();
+        }
+        if (this.image) {
+            this.image.draw(context);
+        }
+    },
+
 });
 

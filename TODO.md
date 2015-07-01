@@ -2,6 +2,7 @@
 TODO list:
 - make an animation class
 - auto detect when to set autoSize to false with set of width or height on video / image
+- Facade for image, sound, video
 - handle keypress
 - use collision engine (box2d)
 - extends entity to move

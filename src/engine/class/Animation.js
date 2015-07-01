@@ -9,9 +9,11 @@ function Animation(options, entity) {
         defaultAnimation: '',
         defaultSprite: '',
         defaultDuration: '',
+        defaultPriority: 0,
 
         selectedFrame: '',
-        selectedAnimation: ''
+        selectedAnimation: '',
+        selectedSprite: ''
     };
 
     if (options.sprites) {
@@ -21,8 +23,8 @@ function Animation(options, entity) {
         }
     };
     this.set(options, varDefault);
-
     this.isReady =  false;
+    this.nextTime = 0;
 }
 
 
@@ -87,9 +89,7 @@ Animation.prototype.ready = function() {
     this.isLoading = false;
     this.isReady = true;
 
-    if (!this.buildAnimations()) {
-        return false;
-    }
+    this.buildAnimations();
 
     this.entity.isReady = true;
 
@@ -104,19 +104,6 @@ Animation.prototype.ready = function() {
 };
 
 
-Animation.prototype.warning = function(message) {
-    this.entity.event(
-        {
-            type: 'warning',
-            from: this,
-            fromClass: 'Animation',
-            entity: this.entity,
-            message: message
-        }
-    );
-};
-
-
 Animation.prototype.buildAnimations = function() {
 console.log('Animation:buildAnimations: start');    
     for (var n in this.list) {
@@ -125,6 +112,15 @@ console.log('Animation:buildAnimations: start');
         }
         if (yespix.isUndefined(this.list[n].duration)) {
             this.list[n].duration = this.defaultDuration;
+        }
+        if (yespix.isUndefined(this.list[n].priority)) {
+            this.list[n].priority = this.defaultPriority;
+        }
+        if (yespix.isUndefined(this.list[n].flipX)) {
+            this.list[n].flipX = false;
+        }
+        if (yespix.isUndefined(this.list[n].flipY)) {
+            this.list[n].flipY = false;
         }
         if (!this.list[n].frames) {
             this.list[n].frames = [];
@@ -137,8 +133,10 @@ console.log('Animation:buildAnimations: start');
                     frame: this.list[n].frames[i],
                     sprite: this.list[n].sprite,
                     duration: this.list[n].duration,
-                    priority: 0
-                }
+                    priority: 0,
+                    flipX: this.list[n].flipX,
+                    flipY: this.list[n].flipY
+                };
             } else {
                 if (yespix.isUndefined(this.list[n].frames[i].sprite)) {
                     this.list[n].frames[i].sprite = this.list[n].sprite;
@@ -152,26 +150,97 @@ console.log('Animation:buildAnimations: start');
                 if (yespix.isUndefined(this.list[n].frames[i].priority)) {
                     this.list[n].frames[i].priority = 0;
                 }
+                if (yespix.isUndefined(this.list[n].frames[i].flipX)) {
+                    this.list[n].frames[i].flipX = this.list[n].flipX;
+                }
+                if (yespix.isUndefined(this.list[n].frames[i].flipY)) {
+                    this.list[n].frames[i].flipY = this.list[n].flipY;
+                }
             }
         }
     }
-    this.play(this.defaultAnimation);
+    this.play(this.defaultAnimation, 0, true);
 };
 
 
 
-Animation.prototype.play = function(name, frame) {
-    frame = frame | 0;
-    if (!this.list[name] || !this.list[name].frame[frame]) {
+Animation.prototype.play = function(name, frame, force) {
+//console.log('Animation:play: start');
+    frame = frame || 0;
+    force = force || false;
+
+    if (!this.list[name]) {
+//console.log('Animation:play: error');
         return false;
     }
 
-    this.selectedAnimation = name;
-    this.selectedFrame = frame;
-    this.selectedSprite = this.list[name].frame[frame].sprite;
-    this.nextTime = yespix.getTime() + this.list[name].frame[frame].duration;
-
-    // select 
-    this.entity.boundary = {};
-    this.entity.image = this.sprites[this.selectedSprite].image;
+    if (this.selectedAnimation != name || force) {
+//console.log('Animation:play: set animation');
+        this.selectedAnimation = name;
+        this.changeFrame(frame, force);
+        return true;
+    }
+    return false;
 };
+
+
+Animation.prototype.changeFrame = function(frame, force) {
+//console.log('Animation.changeFrame: start');
+    frame = frame || 0;
+    force = force || false;
+
+    if (!this.list[this.selectedAnimation] || !this.list[this.selectedAnimation].frames[frame]) {
+//console.log('Animation.changeFrame: error');
+        return false;
+    }
+
+    if (this.selectedFrame != frame || force) {
+        this.selectedFrame = frame;
+        this.selectedSprite = this.list[this.selectedAnimation].frames[frame].sprite;
+        this.nextTime = yespix.getTime() + this.list[this.selectedAnimation].frames[frame].duration;
+
+        // select 
+        this.entity.boundary = {};
+        this.sprites[this.selectedSprite].sprite.select(this.list[this.selectedAnimation].frames[frame].frame);
+        this.entity.image = this.sprites[this.selectedSprite].image;
+        this.sprites[this.selectedSprite].set({
+            aspect: 
+            {
+                flipX: this.list[this.selectedAnimation].frames[frame].flipX,
+                flipY: this.list[this.selectedAnimation].frames[frame].flipY
+            }
+        });
+        return true;
+    }
+    return false;
+};
+
+
+Animation.prototype.checkFrame = function() {
+    if (this.nextTime <= yespix.getTime()) {
+        this.nextFrame();
+        return true;
+    }
+    return false;
+};
+
+
+Animation.prototype.nextFrame = function() {
+//console.log('Animation:nextFrame: start');
+    if (!this.list[this.selectedAnimation]) {
+//console.log('Animation:nextFrame: error');
+        return false;
+    }
+    var nextFrame = this.selectedFrame + 1;
+    if (!this.list[this.selectedAnimation].frames[nextFrame]) {
+        nextFrame = 0;
+    }
+//console.log('Animation:nextFrame: nextFrame = '+nextFrame);
+    if (nextFrame != this.selectedFrame) {
+//console.log('Animation:nextFrame: set selectedFrame');
+        this.changeFrame(nextFrame);
+    }
+    return true;
+};
+
+
