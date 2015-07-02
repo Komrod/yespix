@@ -22,6 +22,12 @@ function Aspect(options, entity) {
 
 Aspect.prototype.set = function(options, varDefault) {
     
+    if (options.width || options.height) {
+        if (this.entity && this.entity.image) {
+            this.entity.image.set({autoSize: false});
+        }
+    }
+
     yespix.copy(options, this, varDefault);
     
     this.isChanged = true;

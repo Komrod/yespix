@@ -1,7 +1,5 @@
 
 TODO list:
-- make an animation class
-- auto detect when to set autoSize to false with set of width or height on video / image
 - Facade for image, sound, video
 - handle keypress
 - use collision engine (box2d)
@@ -69,6 +67,8 @@ TODO list:
 
 
 DONE:
+- auto detect when to set autoSize to false with set of width or height on video / image
+- make an animation class // 2015-07-02
 - video entity
 - adapt sprite to image scale
 - error event with sound

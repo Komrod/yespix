@@ -171,7 +171,7 @@ console.log('Animation:buildAnimations: start');
 
 Animation.prototype.extendAnimation = function(source, dest) {
     var len = source.frames.length;
-    dest.frames = new Array(source.frames.length);
+    dest.frames = new Array(len);
     for (var i = 0; i<len; i++) {
         dest.frames[i] = {};
         yespix.copy(dest, dest.frames[i], source.frames[i]);
