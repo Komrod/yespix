@@ -106,74 +106,43 @@ Animation.prototype.ready = function() {
 
 Animation.prototype.buildAnimations = function() {
 console.log('Animation:buildAnimations: start');
-    var extended;
     for (var n in this.list) {
-        extended = false;
         if (yespix.isString(this.list[n].extends) && this.list[this.list[n].extends]) {
-                extended = this.list[n].extends;
-            }
+            this.list[n] = this.extendAnimation(this.list[this.list[n].extends], this.list[n]);
+            continue;
         }
+
         if (yespix.isUndefined(this.list[n].sprite)) {
-            if (extended) {
-                this.list[n].sprite = extended.sprite;
-            } else {
-                this.list[n].sprite = this.defaultSprite;
-            }
+            this.list[n].sprite = this.defaultSprite;
         }
         if (yespix.isUndefined(this.list[n].duration)) {
-            if (extended) {
-                this.list[n].duration = extended.duration;
-            } else {
                 this.list[n].duration = this.defaultDuration;
-            }
         }
         if (yespix.isUndefined(this.list[n].priority)) {
-            if (extended) {
-                this.list[n].priority = extended.priority;
-            } else {
-                this.list[n].priority = this.defaultPriority;
-            }
+            this.list[n].priority = this.defaultPriority;
         }
         if (yespix.isUndefined(this.list[n].flipX)) {
-            if (extended) {
-                this.list[n].flipX = extended.flipX;
-            } else {
-                this.list[n].flipX = false;
-            }
+            this.list[n].flipX = false;
         }
         if (yespix.isUndefined(this.list[n].flipY)) {
-            if (extended) {
-                this.list[n].flipY = extended.flipY;
-            } else {
-                this.list[n].flipY = false;
-            }
+            this.list[n].flipY = false;
         }
         if (!this.list[n].frames) {
             this.list[n].frames = [];
             continue;
         }
+
         var len = this.list[n].frames.length;
         for (var i = 0; i<len; i++) {
             if (yespix.isInt(this.list[n].frames[i])) {
-                if (extended) {
-                    this.list[n].frames[i] = {
-                        frame: this.list[n].frames[i],
-                        sprite: this.list[n].sprite,
-                        duration: this.list[n].duration,
-                        priority: this.list[n].priority,
-                        flipX: this.list[n].flipX,
-                        flipY: this.list[n].flipY
-                    };
-                } else {
-                    this.list[n].frames[i] = {
-                        frame: this.list[n].frames[i],
-                        sprite: this.list[n].sprite,
-                        duration: this.list[n].duration,
-                        priority: this.list[n].priority,
-                        flipX: this.list[n].flipX,
-                        flipY: this.list[n].flipY
-                    };
-                }
+                this.list[n].frames[i] = {
+                    frame: this.list[n].frames[i],
+                    sprite: this.list[n].sprite,
+                    duration: this.list[n].duration,
+                    priority: this.list[n].priority,
+                    flipX: this.list[n].flipX,
+                    flipY: this.list[n].flipY
+                };
             } else {
                 if (yespix.isUndefined(this.list[n].frames[i].sprite)) {
                     this.list[n].frames[i].sprite = this.list[n].sprite;
@@ -199,6 +168,16 @@ console.log('Animation:buildAnimations: start');
     this.play(this.defaultAnimation, 0, true);
 };
 
+
+Animation.prototype.extendAnimation = function(source, dest) {
+    var len = source.frames.length;
+    dest.frames = new Array(source.frames.length);
+    for (var i = 0; i<len; i++) {
+        dest.frames[i] = {};
+        yespix.copy(dest, dest.frames[i], source.frames[i]);
+    }
+    return dest;
+};
 
 
 Animation.prototype.play = function(name, frame, force) {
