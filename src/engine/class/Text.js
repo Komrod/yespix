@@ -57,24 +57,12 @@ Text.prototype.draw = function(context) {
 
 
 Text.prototype.drawText = function(context) {
-console.log('Text:drawText');
     // draw fill
     if (this.fillColor != '' && this.fillAlpha > 0) {
         this.drawFill(context);
     }
 
     return true;
-};
-
-
-// @TODO
-Text.prototype.drawLine = function(context) {
-/*
-    context.globalAlpha = this.entity.aspect.alpha * this.lineAlpha;
-    context.lineWidth = this.lineWidth;
-    context.strokeStyle = this.lineColor;
-    context.stroke();
-*/
 };
 
 

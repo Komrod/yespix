@@ -6,6 +6,7 @@ TODO list:
 - extends entity to move
 - Make a basic 2 ways player
 - load a level
+- use collision in a level
 - parallax move
 
 - new event system to easily remove events and entities

@@ -16,8 +16,12 @@ yespix.define('image', {
         this.image = new Image(options.image, this);
     },
 
-    load: function() {
-        this.image.load();
+    load: function(src) {
+        this.image.load(src);
+    },
+    
+    unload: function() {
+        this.image.unload();
     },
     
     /**
