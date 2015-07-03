@@ -1,6 +1,5 @@
 
 TODO list:
-- Facade for image, sound, video
 - handle keypress
 - use collision engine (box2d)
 - extends entity to move
@@ -68,6 +67,7 @@ TODO list:
 
 
 DONE:
+- Facade for image, sound, video
 - auto detect when to set autoSize to false with set of width or height on video / image
 - make an animation class // 2015-07-02
 - video entity
