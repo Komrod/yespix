@@ -357,6 +357,11 @@
 	setTimeout(function () { manager.list[0].animation.play('runright');  }, 6000);
 	*/
 
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST INPUT
+	//////////////////////////////////////////////////////////////////////////////
+	// simple
+	var input = new yespix.class.input();
 
 
 	manager.load();
@@ -370,12 +375,14 @@
 
 	
 	var loop = new Loop(60);
+	var key = 'a';
 	loop.register(
-		function(loop, time) { manager.clear(); manager.draw(); }, 
+		function(loop, time) { if (input.key('a')) console.log('ok'); }, 
 		function(loop, time) { }
 	).start();
 	
-
+	//setInterval(function () { console.log('key "'+key+'" = ', input.key(key));   }, 4000);
+	
 	// draw every entity in the manager
 	/*manager.when('ready', function(e) {
 		manager.list[0].video.play();
