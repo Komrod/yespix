@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script type="text/javascript" src="../build/yespix.js"></script>
+	    <script src="engines/box2d.js"></script>
+		<script src="../build/yespix.js"></script>
 	</head>
 	<body style="background-color: #789;">
 		<script type="text/javascript">
@@ -361,7 +362,30 @@
 	// UNIT TEST INPUT
 	//////////////////////////////////////////////////////////////////////////////
 	// simple
+	/*
 	var input = new Input();
+	var loop = new Loop(1);
+	loop.register(
+		function(loop, time) { if (input.key('ctrl-a')) console.log('ok'); }, 
+		function(loop, time) { }
+	).start();
+	*/
+
+
+
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST BOX2D
+	//////////////////////////////////////////////////////////////////////////////
+	// simple
+	var input = new Input();
+	var loop = new Loop(1);
+	loop.register(
+		function(loop, time) { }, 
+		function(loop, time) { }
+	).start();
+
+
+
 
 
 	manager.load();
@@ -374,12 +398,6 @@
 	*/
 
 	
-	var loop = new Loop(1);
-	var key = 'a';
-	loop.register(
-		function(loop, time) { if (input.key('ctrl-a')) console.log('ok'); }, 
-		function(loop, time) { }
-	).start();
 	
 	//setInterval(function () { console.log('key "'+key+'" = ', input.key(key));   }, 4000);
 	
