@@ -361,7 +361,7 @@
 	// UNIT TEST INPUT
 	//////////////////////////////////////////////////////////////////////////////
 	// simple
-	var input = new yespix.class.input();
+	var input = new Input();
 
 
 	manager.load();
@@ -377,7 +377,7 @@
 	var loop = new Loop(1);
 	var key = 'a';
 	loop.register(
-		function(loop, time) { if (input.key('ctrl-a-s')) console.log('ok'); }, 
+		function(loop, time) { if (input.key('ctrl-a')) console.log('ok'); }, 
 		function(loop, time) { }
 	).start();
 	
