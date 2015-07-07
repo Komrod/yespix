@@ -13,7 +13,7 @@ Function.prototype.extend = function() {
         for (var key in arguments[i])
             if (arguments[i].hasOwnProperty(key)) {
                 destination[key] = arguments[i][key];
-                destination[key]._methodName = key;
+                if (destination[key]) destination[key]._methodName = key;
             }
 }
 
@@ -25,7 +25,7 @@ Function.prototype.inherit = function(parent) {
     this.prototype.constructor = parent;
 
     for (var methodName in p) {
-        p[methodName]._methodName = methodName;
+        if (p[methodName]) p[methodName]._methodName = methodName;
     }
 
     Object.defineProperty(this.prototype, "super", {
@@ -43,7 +43,7 @@ Function.prototype.inherit = function(parent) {
                     return proto[name];
                 }
             }
-            if (!foundImpl) throw "super function may not be called outside an inherit implementation";
+            //if (!foundImpl) throw "super function may not be called outside an inherit implementation";
         }
     });
 };
