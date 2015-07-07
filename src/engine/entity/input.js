@@ -7,7 +7,7 @@ yespix.define('input', {
         
 
         this.super(options);
-        this.persistence = this.persistence || 200;
+        this.persistence = this.persistence || 100;
 
         var input = this;
 
@@ -32,11 +32,11 @@ yespix.define('input', {
             input.data.hold[parseInt(code)] = true;
 
             // special key pressed
-            if (e.ctrlKey) input.data.down[input.data.special['ctrl']] = true;
+            if (e.ctrlKey) input.data.hold[input.data.special['ctrl']] = true;
             else input.data.hold[input.data.special['ctrl']] = false;
-            if (e.altKey) input.data.down[input.data.special['alt']] = true;
+            if (e.altKey) input.data.hold[input.data.special['alt']] = true;
             else input.data.hold[input.data.special['alt']] = false;
-            if (e.shiftKey) input.data.down[input.data.special['shift']] = true;
+            if (e.shiftKey) input.data.hold[input.data.special['shift']] = true;
             else input.data.hold[input.data.special['shift']] = false;
         };
 
@@ -56,11 +56,11 @@ yespix.define('input', {
             input.data.hold[parseInt(code)] = false;
 
             // special key pressed
-            if (e.ctrlKey) input.data.pressed[input.data.special['ctrl']] = true;
+            if (e.ctrlKey) input.data.hold[input.data.special['ctrl']] = true;
             else input.data.hold[input.data.special['ctrl']] = false;
-            if (e.altKey) input.data.pressed[input.data.special['alt']] = true;
+            if (e.altKey) input.data.hold[input.data.special['alt']] = true;
             else input.data.hold[input.data.special['alt']] = false;
-            if (e.shiftKey) input.data.pressed[input.data.special['shift']] = true;
+            if (e.shiftKey) input.data.hold[input.data.special['shift']] = true;
             else input.data.hold[input.data.special['shift']] = false;
 
 
@@ -75,7 +75,7 @@ yespix.define('input', {
                 input.data.hold[parseInt(code)] = false;
 
                 // special key pressed
-                input.data.pressed[input.data.special['ctrl']] = false;
+                input.data.hold[input.data.special['ctrl']] = false;
                 input.data.hold[input.data.special['alt']] = false;
                 input.data.hold[input.data.special['shift']] = false;
             }, this.persistence);
@@ -202,20 +202,26 @@ yespix.define('input', {
                     if (this.key(arr[t], type)) return true;
                 return false;
             }
-            if (s.indexOf('-') != -1 && s.charAt(s.indexOf('-') - 1) != '\\' && s.length > 1) return this.key(s.split('-', 2), type);
+            if (s.indexOf('-') != -1 && s.charAt(s.indexOf('-') - 1) != '\\' && s.length > 1) return this.key(s.split('-'), type);
             if (s.length > 1) return this.specialKey(s, type);
             //if (type != 'pressed') s = s.toUpperCase();
-            if (type == 'hold' && this.data['up'][s.charCodeAt(0)]) return true;
+            if (type == 'hold' && this.data['up'][s.charCodeAt(0)]) {
+                return true;
+            }
             return !!this.data[type][s.charCodeAt(0)];
         }
 
         if (yespix.isArray(s)) {
             for (t = 0; t < s.length; t++)
-                if (!this.key(s[t], type)) return false;
+                if (!this.key(s[t], type)) {
+                    return false;
+                }
             return true;
         }
         if (yespix.isInt(s)) {
-            if (type == 'hold' && this.data['up'][s]) return true;
+            if (type == 'hold' && this.data['up'][s]) {
+                return true;
+            }
             return !!this.data[type][s];
         }
         return false;
@@ -228,7 +234,9 @@ yespix.define('input', {
 
     specialKey: function(s, type) {
         type = type || 'hold';
-        if (type == 'hold' && this.data['up'][this.data.special[s.toLowerCase()]]) return true;
+        if (type == 'hold' && this.data['up'][this.data.special[s.toLowerCase()]]) {
+            return true;
+        }
         return !!this.data[type][this.data.special[s.toLowerCase()]];
     },
 
