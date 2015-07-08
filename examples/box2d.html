@@ -7,8 +7,9 @@
         <script src="engines/box2d.js"></script>
     </head>
     <body>
-  
 <script>
+
+
     // init yespix engine
     yespix();
     var manager = new GfxManager(true);
@@ -16,112 +17,31 @@
 
     // create ground
     manager.engine.createRect(0, 400, 640, 10, true);
-
-    // create entity
-    var rect = new yespix.class.path({position: {x: 200, y: 50}, aspect: {width: 50, height: 20}});
-    // add collision
-    rect.collision = new Collision({x: 0, y: 0, width: 50, height: 20, engine: manager.engine}, rect);
-    // add to manager
-    manager.add(rect);
-    
-    manager.engine.createRect(yespix.randInt(0,640), -200, yespix.randInt(10,50), yespix.randInt(10,50), false, {
-        fixedRotation: true,
-    });
+    for (var t=0; t<100; t++) {
+        // create entity
+        var rect = new yespix.class.path({position: {x: yespix.randInt(1,600), y: 50, snapToPixel: false}, aspect: {width: yespix.randInt(1,60), height: yespix.randInt(1,30)}});
+        manager.add(rect);
+        rect.collision = new Collision({fixedRotation: true}, rect);
+        // add to manager
+    }
 
 
-    /*
-    var world
-        canvas = manager.canvas,
-        context = manager.context;
-    function init() {
-       var   b2Vec2 = Box2D.Common.Math.b2Vec2
-        , b2BodyDef = Box2D.Dynamics.b2BodyDef
-        , b2Body = Box2D.Dynamics.b2Body
-        , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-        , b2Fixture = Box2D.Dynamics.b2Fixture
-        , b2World = Box2D.Dynamics.b2World
-        , b2MassData = Box2D.Collision.Shapes.b2MassData
-        , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-        , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-        , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-          ;
-     
-       world = new b2World(
-             new b2Vec2(0, 10)    //gravity
-          ,  true                 //allow sleep
-       );
-       
-       var SCALE = 50;
-     
-       var fixDef = new b2FixtureDef;
-       fixDef.density = 1.0;
-       fixDef.friction = 0.5;
-       fixDef.restitution = 0.2;
-     
-       var bodyDef = new b2BodyDef;
-     
-       //create ground
-       bodyDef.type = b2Body.b2_staticBody;
-       
-       // positions the center of the object (not upper left!)
-       bodyDef.position.x = canvas.width / 2 / SCALE;
-       bodyDef.position.y = (canvas.height / SCALE) - 1;
-       
-       fixDef.shape = new b2PolygonShape;
-       
-       // half width, half height. eg actual height here is 1 unit
-       fixDef.shape.SetAsBox((canvas.width / SCALE) / 2, 0.5 / 2);
-       world.CreateBody(bodyDef).CreateFixture(fixDef);
-      
-      for (var t=0; t<100; t++) {
-         //create dynamic circle object
-         bodyDef.type = b2Body.b2_dynamicBody;
-         fixDef.shape = new b2CircleShape(
-            Math.random() * 0.5 + 0.1 //radius
-         );
-         bodyDef.position.x = Math.random() * 25;
-         bodyDef.position.y = Math.random() * 10;
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
-         
-         // create dynamic polygon object
-         bodyDef.type = b2Body.b2_dynamicBody;
-         fixDef.shape = new b2PolygonShape;
-         fixDef.shape.SetAsBox(
-               Math.random() * 0.5 + 0.1 //half width
-            ,  Math.random() * 0.5 + 0.1 //half height
-         );
-         bodyDef.position.x = Math.random() * 25;
-         bodyDef.position.y = Math.random() * 10;
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
-       }
-
-       //setup debug draw
-       var debugDraw = new b2DebugDraw();
-       debugDraw.SetSprite(context);
-       debugDraw.SetDrawScale(SCALE);
-       debugDraw.SetFillAlpha(0.3);
-       debugDraw.SetLineThickness(1.0);
-       debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-       world.SetDebugDraw(debugDraw);
-     
-    }; // init()
-    init();*/
-
-    //var input = new Input();
+    // create the loop
     var loop = new Loop(60);
+
+    // register functions
     loop.register(
+        // frame function
         function(loop, time) { 
-            manager.applyEnginePosition(); // apply position from physics engine
-            manager.draw(); // draw entities
+            manager.applyPhysics(); // apply position from physics engine
+            //manager.clear();
             manager.engine.world.DrawDebugData(); // draw debug
-            //manager.engine.world.ClearForces();
+            manager.draw(); // draw entities
+            manager.engine.world.ClearForces();
         }, 
-        function(loop, time) { 
-            manager.engine.world.Step(
-                time/1000, // time in seconds
-                10,        // velocity iterations
-                10         // position iterations
-            );
+        // step function
+        function(loop, time) {  
+            manager.engine.world.Step(time/1000, 10, 10);
         }
     ).start();
 

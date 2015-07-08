@@ -26,7 +26,7 @@ GfxManager.prototype.setEngine = function(engine) {
 };
 
 
-GfxManager.prototype.applyEnginePosition = function() {
+GfxManager.prototype.applyPhysics = function() {
 	if (!this.engine) {
 		return false;
 	}
@@ -34,7 +34,7 @@ GfxManager.prototype.applyEnginePosition = function() {
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
-    	if (this.list[t].collision) this.list[t].collision.applyPosition(this.context);
+    	if (this.list[t].collision) this.list[t].collision.applyPhysics();
     }
     return true;
 };
@@ -108,7 +108,7 @@ GfxManager.prototype.sort = function() {
 
 
 GfxManager.prototype.event = function(event) {
-console.log('GfxManager.event: event = ', event);	
+//console.log('GfxManager.event: event = ', event);	
 	if (event.type == 'ready') {
 		if (this.getReady()) {
 			this.isReady = true;

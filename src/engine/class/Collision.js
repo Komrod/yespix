@@ -3,20 +3,25 @@
 function Collision(options, entity) {
 
     options = options || {};
+    
+    if (options.engine) {
+        this.setEngine(options.engine);
+    }
+
     if (entity) {
         this.entity = entity;
-console.log('Collision: entity = ', entity);
-        if (options.engine) {
-            this.setEngine(options.engine);
-        } else if (entity.engine) {
-            this.setEngine(entity.engine);
-        } else if (entity.manager && entity.manager.engine) {
-            this.setEngine(entity.manager.engine);
+//console.log('Collision: entity = ', entity);
+        if (!options.engine) {
+            if (entity.engine) {
+                this.setEngine(entity.engine);
+            } else if (entity.manager && entity.manager.engine) {
+                this.setEngine(entity.manager.engine);
+            }
         }
     }
     var varDefault = {
-        x: 0,
-        y: 0,
+        offsetX: 0,
+        offsetY: 0,
         width: 0,
         height: 0,
 	    type: 'dynamic', // "static" / "dynamic"
@@ -26,7 +31,7 @@ console.log('Collision: entity = ', entity);
     };
 
     this.set(options, varDefault);
-console.log('Collision:this.engine = ', this.engine);
+//console.log('Collision:this.engine = ', this.engine);
     if (this.engine) {
         this.create();
     }
@@ -55,8 +60,8 @@ Collision.prototype.set = function(options, varDefault) {
 
 
 Collision.prototype.create = function() {
-console.log('collision:create: this = ', this);
-    if (!this.engine || this.width == 0 || this.height == 0) {
+//console.log('collision:create: this = ', this);
+    if (!this.engine) {
         return false;
     }
 
@@ -64,12 +69,33 @@ console.log('collision:create: this = ', this);
         // TODO delete the object
     }
 
-    this.engine.create(this);
+    this.object = this.engine.create(this);
 };
 
 
-Collision.prototype.applyPosition = function() {
-    
+Collision.prototype.getPosition = function() {
+    return {
+        x: this.entity.position.x + this.offsetX,
+        y: this.entity.position.y + this.offsetY
+    };        
 };
 
 
+Collision.prototype.getSize = function() {
+    return {
+        width: this.width || this.entity.aspect.width,
+        height: this.height || this.entity.aspect.height
+    };        
+}
+
+
+Collision.prototype.applyPhysics = function() {
+    var position = this.object.GetBody().GetPosition();
+    var size = this.getSize();
+    this.entity.set({
+        position: {
+            x: (position.x - size.width / 2 / this.engine.scale) * this.engine.scale - this.offsetX,
+            y: (position.y - size.height / 2 / this.engine.scale) * this.engine.scale - this.offsetY
+        }
+    });
+}

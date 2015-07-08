@@ -76,12 +76,11 @@ EngineBox2d.prototype.set = function(options) {
 };
 
 
-EngineBox2d.prototype.create = function(entity) {
-console.log('engine:create: entity = ', entity);
-	if (entity.type == 'rect') {
-		var position = entity.collision.getPosition();
-		var aspect = entity.aspect;
-		return this.createRect(position.x, position.y, aspect.width, aspect.height, entity);
+EngineBox2d.prototype.create = function(object) {
+	if (object.shape == 'rect') {
+		var position = object.getPosition();
+		var size = object.getSize();
+		return this.createRect(position.x, position.y, size.width, size.height, false, object);
 	}
 };
 
@@ -96,6 +95,7 @@ fixDef.shape.SetAsBox(
 bodyDef.position.x = Math.random() * 25;
 bodyDef.position.y = Math.random() * 10;
 world.CreateBody(bodyDef).CreateFixture(fixDef);*/
+	static = static || false;
 	this.setToDefault();
 
 	if (static) this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
