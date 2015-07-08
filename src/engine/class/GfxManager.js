@@ -18,6 +18,27 @@ function GfxManager(canvas, list) {
     this.isReady = true;
 }
 
+GfxManager.prototype.setEngine = function(engine) {
+	this.engine = engine;
+	if (this.engine.setManager) {
+		engine.setManager(this);
+	}
+};
+
+
+GfxManager.prototype.applyEnginePosition = function() {
+	if (!this.engine) {
+		return false;
+	}
+
+    var length = this.list.length,
+    	t=0;
+    for (; t<length; t++) {
+    	if (this.list[t].collision) this.list[t].collision.applyPosition(this.context);
+    }
+    return true;
+};
+
 
 GfxManager.prototype.setCanvas = function(canvas) {
 	this.canvas = canvas;

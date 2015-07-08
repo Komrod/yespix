@@ -16,7 +16,13 @@ yespix.define('gfx', {
         this.boundary = options.boundary || {};
         this.prerender = options.prerender || null;
         this.manager = options.manager || null;
+    },
 
+    setManager: function(manager) {
+        this.manager = manager;
+        if (this.collision) {
+            this.collision.setManager(manager);
+        }
     },
 
     /**

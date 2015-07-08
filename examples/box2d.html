@@ -12,11 +12,27 @@
     // init yespix engine
     yespix();
     var manager = new GfxManager(true);
+    manager.setEngine(new EngineBox2d());
 
+    // create ground
+    manager.engine.createRect(0, 400, 640, 10, true);
+
+    // create entity
+    var rect = new yespix.class.path({position: {x: 200, y: 50}, aspect: {width: 50, height: 20}});
+    // add collision
+    rect.collision = new Collision({x: 0, y: 0, width: 50, height: 20, engine: manager.engine}, rect);
+    // add to manager
+    manager.add(rect);
+    
+    manager.engine.createRect(yespix.randInt(0,640), -200, yespix.randInt(10,50), yespix.randInt(10,50), false, {
+        fixedRotation: true,
+    });
+
+
+    /*
     var world
         canvas = manager.canvas,
         context = manager.context;
-  
     function init() {
        var   b2Vec2 = Box2D.Common.Math.b2Vec2
         , b2BodyDef = Box2D.Dynamics.b2BodyDef
@@ -89,24 +105,22 @@
        world.SetDebugDraw(debugDraw);
      
     }; // init()
-    
-
-
-
-    init();
+    init();*/
 
     //var input = new Input();
     var loop = new Loop(60);
     loop.register(
         function(loop, time) { 
-            world.DrawDebugData();
-            world.ClearForces();
+            manager.applyEnginePosition(); // apply position from physics engine
+            manager.draw(); // draw entities
+            manager.engine.world.DrawDebugData(); // draw debug
+            //manager.engine.world.ClearForces();
         }, 
         function(loop, time) { 
-            world.Step(
-                 time/1000 //frame-rate
-              ,  1        //velocity iterations
-              ,  1        //position iterations
+            manager.engine.world.Step(
+                time/1000, // time in seconds
+                10,        // velocity iterations
+                10         // position iterations
             );
         }
     ).start();
