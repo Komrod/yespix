@@ -17,34 +17,36 @@
 
     // create ground
     manager.engine.createRect(0, 400, 640, 10, true);
-    
-    for (var t=0; t<1000; t++) {
-        manager.engine.createRect(yespix.randInt(1,30000), yespix.randInt(100,400), yespix.randInt(1,10), yespix.randInt(1,10), true);
-        
+    for (var t=0; t<10; t++) {
+        manager.engine.createRect(yespix.randInt(1,600), yespix.randInt(100,400), yespix.randInt(10,50), yespix.randInt(10,50), true);
     }
 
-    for (var t=0; t<100; t++) {
+    for (var t=0; t<1000; t++) {
         // create entity
-        var rect = new yespix.class.path({
+        var rect = new yespix.class.image({
+            image: 'unit/image/zardoz.png',
             position: {
                 x: yespix.randInt(1,600), 
-                y: 50, 
-//                rotation: 45,
-                snapToPixel: false,
+                y: yespix.randInt(-10300,300), 
+                snapToPixel: true,
             }, 
             aspect: {
-                width: yespix.randInt(1,60), 
-                height: yespix.randInt(1,30),
-            }
+                width: 20,
+                height: 20
+            },
         });
-        manager.add(rect);
-        rect.collision = new Collision({fixedRotation: false}, rect);
+        //rect.set({aspect: {width: 20, height: 20}, image: {autoSize: false}});
+
         // add to manager
+        manager.add(rect);
+
+        rect.collision = new Collision({offsetX: 2, width: 16, fixedRotation: false}, rect);
     }
 
+    manager.load();
 
     // create the loop
-    var loop = new Loop(50);
+    var loop = new Loop(100);
 
     /*
     manager.engine.world.Step(10, 100, 100);
@@ -59,10 +61,10 @@
         // frame function
         function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
-            manager.clear();
-            //manager.engine.world.DrawDebugData(); // draw debug
-            manager.draw(); // draw entities
-            manager.engine.world.ClearForces();
+            manager.clear(); // clear canvas
+            manager.engine.world.DrawDebugData(); // draw debug
+            //manager.draw(); // draw entities
+            //manager.engine.world.ClearForces();
         }, 
         // step function
         function(loop, time) {  

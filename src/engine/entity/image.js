@@ -13,17 +13,20 @@ yespix.define('image', {
             options = {image: {src: options}};
         }
         this.super(options);
-        this.image = new Image(options.image, this);
+        this.image = new Image(this.image, this);
     },
+
 
     load: function(src) {
         this.image.load(src);
     },
     
+
     unload: function() {
         this.image.unload();
     },
     
+
     /**
      * Return True if something has changed (position, aspect ...)
      * @return {bool} 
@@ -49,8 +52,5 @@ yespix.define('image', {
         }
         return list;
     },
-
-    
-
 });
 

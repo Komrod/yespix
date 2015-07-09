@@ -24,10 +24,22 @@ Aspect.prototype.set = function(options, varDefault) {
     
     if (options.width || options.height) {
         if (this.entity && this.entity.image) {
-            this.entity.image.set({autoSize: false});
+            if (this.entity.image.set) {
+                this.entity.image.set({autoSize: false});
+            } else {
+                if (yespix.isString(this.entity.image)) {
+                    this.entity.image = {
+                        src: this.entity.image,
+                        autoSize: false
+                    };
+                } else {
+                    this.entity.image.autoSize = false;
+                }
+console.log('this.entity.image = ', this.entity.image);
+            }
         }
     }
-
+    
     yespix.copy(options, this, varDefault);
     
     this.isChanged = true;

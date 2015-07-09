@@ -5,6 +5,7 @@ function Image(options, entity) {
     options = options || {};
     if (entity) this.entity = entity;
     if (yespix.isString(options)) {
+console.log('image: is string = ', options);
         options = {src: options};
     }
     
@@ -304,9 +305,19 @@ Image.prototype.draw = function(context) {
     }
 
     var contextSaved = false;
-    if (this.entity.aspect.flipX || this.entity.aspect.flipY) {
+    if (this.entity.aspect.rotation != 0) {
+        var pivot = this.entity.getPivot();
         contextSaved = true;
         context.save();
+        context.translate(pivot.x, pivot.y);
+        context.rotate(this.entity.position.rotation * Math.PI / 180);
+        context.translate(-pivot.x, -pivot.y);
+    }
+    if (this.entity.aspect.flipX || this.entity.aspect.flipY) {
+        contextSaved = true;
+        if (!contextSaved) {
+            context.save();
+        }
         context.scale( (this.entity.aspect.flipX ? -1 : 1), (this.entity.aspect.flipY ? -1 : 1) );
     }
 

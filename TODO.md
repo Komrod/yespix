@@ -1,9 +1,11 @@
 
 TODO list:
-- rotation path
-- rotation image
-- fix clipping with zSort
+- bug: border radius on small rect
+- bug: clipping with GfxManager zSort
+- dont use options reference after super() in entity init
 - Make a basic 2 ways player
+- Impulse to move and jump player
+- Detect when on ground with player
 - load a level
 - use collision in a level
 - parallax move
@@ -66,6 +68,9 @@ TODO list:
 
 
 DONE:
+- bug: cant change aspect on image creation
+- rotation image
+- rotation path
 - optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - use collision engine (box2d) // 2015-07-09
 - handle keypress

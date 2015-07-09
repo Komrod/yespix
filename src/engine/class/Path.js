@@ -65,7 +65,6 @@ Path.prototype.draw = function(context) {
     if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
 
     var contextSaved = false;
-    
     if (this.entity.aspect.rotation != 0) {
         var pivot = this.entity.getPivot();
         contextSaved = true;
