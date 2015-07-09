@@ -12,6 +12,9 @@ function Position(options, entity) {
         globalZ: 1.0, // @TODO
 
         rotation: 0,
+        pivotX: 0,
+        pivotY: 0,
+        
         snapToPixel: false,
     };
 

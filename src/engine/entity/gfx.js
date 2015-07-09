@@ -122,6 +122,13 @@ yespix.define('gfx', {
         };
     },
 
+    getPivot: function() {
+        return {
+            x: this.position.x + this.aspect.width / 2 + this.position.pivotX,
+            y: this.position.y + this.aspect.height / 2 + this.position.pivotY
+        }
+    },
+
 
     /**
      * Event: some properties of the entity have changed

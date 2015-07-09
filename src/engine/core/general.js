@@ -390,3 +390,15 @@ if (window.performance.now) {
         return +new Date();
     };
 }
+
+
+// Converts from degrees to radians.
+yespix.fn.toRadian = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+ 
+// Converts from radians to degrees.
+yespix.fn.toDegree = function(radians) {
+  return radians * 180 / Math.PI;
+};
+

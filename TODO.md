@@ -20,7 +20,6 @@ TODO list:
 - optimize: add the collision box to _box
 - optimize: use clearRect to clear faster the canvas
 - optimize: Z sort function only sort the changed entities
-- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - optimize: tiled levelLayer to fix the drawImage speed on phone
 - center position with position.align ("center left", "top right" ...)
 - fix position of followed entity in the center of entity
@@ -67,6 +66,7 @@ TODO list:
 
 
 DONE:
+- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - use collision engine (box2d) // 2015-07-09
 - handle keypress
 - Facade for image, sound, video

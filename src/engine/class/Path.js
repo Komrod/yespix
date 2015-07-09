@@ -64,6 +64,17 @@ Path.prototype.drawFill = function(context) {
 Path.prototype.draw = function(context) {
     if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
 
+    var contextSaved = false;
+    
+    if (this.entity.aspect.rotation != 0) {
+        var pivot = this.entity.getPivot();
+        contextSaved = true;
+        context.save();
+        context.translate(pivot.x, pivot.y);
+        context.rotate(this.entity.position.rotation * Math.PI / 180);
+        context.translate(-pivot.x, -pivot.y);
+    }
+
     switch (this.type) {
         case 'rect':
             if (this.getBorderRadius() > 0) {
@@ -83,13 +94,20 @@ Path.prototype.draw = function(context) {
             this.drawPolygon(context);
             break;
     }
+
+    if (contextSaved) {
+        context.restore();
+        //context.rotate(0);
+        //context.setTransform(1, 0, 0, 1, 0, 0);
+        //context.translate(0, 0);
+    }
 };
 
 
 Path.prototype.drawRect = function(context) {
-
     // draw path
     context.beginPath();
+
     context.rect(this.entity.position.x, this.entity.position.y, this.entity.aspect.width, this.entity.aspect.height);
 
     // draw line
@@ -169,4 +187,5 @@ Path.prototype.drawEllipse = function(context) {
         this.drawFill(context);
     }
 };
+
 

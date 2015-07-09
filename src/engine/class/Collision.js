@@ -92,10 +92,14 @@ Collision.prototype.getSize = function() {
 Collision.prototype.applyPhysics = function() {
     var position = this.object.GetBody().GetPosition();
     var size = this.getSize();
+    var angle = this.object.GetBody().GetAngle();
+    var degree = yespix.toDegree(angle);
+//console.log('angle = '+angle+', degree = '+degree);
     this.entity.set({
         position: {
             x: (position.x - size.width / 2 / this.engine.scale) * this.engine.scale - this.offsetX,
-            y: (position.y - size.height / 2 / this.engine.scale) * this.engine.scale - this.offsetY
+            y: (position.y - size.height / 2 / this.engine.scale) * this.engine.scale - this.offsetY,
+            rotation: degree
         }
     });
 }

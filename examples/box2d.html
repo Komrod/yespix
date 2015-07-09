@@ -17,35 +17,59 @@
 
     // create ground
     manager.engine.createRect(0, 400, 640, 10, true);
+    
+    for (var t=0; t<1000; t++) {
+        manager.engine.createRect(yespix.randInt(1,30000), yespix.randInt(100,400), yespix.randInt(1,10), yespix.randInt(1,10), true);
+        
+    }
+
     for (var t=0; t<100; t++) {
         // create entity
-        var rect = new yespix.class.path({position: {x: yespix.randInt(1,600), y: 50, snapToPixel: false}, aspect: {width: yespix.randInt(1,60), height: yespix.randInt(1,30)}});
+        var rect = new yespix.class.path({
+            position: {
+                x: yespix.randInt(1,600), 
+                y: 50, 
+//                rotation: 45,
+                snapToPixel: false,
+            }, 
+            aspect: {
+                width: yespix.randInt(1,60), 
+                height: yespix.randInt(1,30),
+            }
+        });
         manager.add(rect);
-        rect.collision = new Collision({fixedRotation: true}, rect);
+        rect.collision = new Collision({fixedRotation: false}, rect);
         // add to manager
     }
 
 
     // create the loop
-    var loop = new Loop(60);
+    var loop = new Loop(50);
 
+    /*
+    manager.engine.world.Step(10, 100, 100);
+    manager.applyPhysics(); // apply position from physics engine
+    manager.engine.world.DrawDebugData(); // draw debug
+    manager.draw(); // draw entities
+    */
+   
+    
     // register functions
     loop.register(
         // frame function
         function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
-            //manager.clear();
-            manager.engine.world.DrawDebugData(); // draw debug
+            manager.clear();
+            //manager.engine.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
             manager.engine.world.ClearForces();
         }, 
         // step function
         function(loop, time) {  
-            manager.engine.world.Step(time/1000, 10, 10);
+            manager.engine.world.Step(time/1000, 100, 100);
         }
     ).start();
-
-
+    
     
     </script>
     
