@@ -1,7 +1,8 @@
 
 TODO list:
-- use collision engine (box2d)
-- extends entity to move
+- rotation path
+- rotation image
+- fix clipping with zSort
 - Make a basic 2 ways player
 - load a level
 - use collision in a level
@@ -66,6 +67,7 @@ TODO list:
 
 
 DONE:
+- use collision engine (box2d) // 2015-07-09
 - handle keypress
 - Facade for image, sound, video
 - auto detect when to set autoSize to false with set of width or height on video / image
