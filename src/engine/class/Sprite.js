@@ -57,16 +57,14 @@ Sprite.prototype.select = function(index) {
     this.selected = this.frame(index);
     this.isChanged = true;
     this.prepare();
-    return null;
+    return this;
 };
 
 
 Sprite.prototype.buildFrames = function() {
-console.log('Sprite:buildFrames: start');
     if (!this.entity.image.isReady) {
         return false;
     }
-//console.log('buildFrames: entity = ', this.entity);
     var frames = [],
         maxCols = (this.entity.aspect.width - this.x) / (this.width * this.entity.image.scale),
         maxLines = (this.entity.aspect.height - this.y) / (this.height * this.entity.image.scale),
@@ -81,7 +79,6 @@ console.log('Sprite:buildFrames: start');
             maxCols = this.maxCols;
         }
     }
-//console.log('maxLines = '+maxLines+', maxCols = '+maxCols);
     for (line=0; line<maxLines; line++) {
         for (col=0; col<maxCols; col++) {
             frames.push({
@@ -99,7 +96,6 @@ console.log('Sprite:buildFrames: start');
 
 
 Sprite.prototype.completeFrames = function() {
-console.log('Sprite:completeFrames: start');
     if (!this.entity.image.isReady) {
         return false;
     }
@@ -134,7 +130,6 @@ console.log('Sprite:completeFrames: start');
 
 
 Sprite.prototype.load = function() {
-console.log('Sprite:load: start');
     if (!this.entity.image) {
         return false;
     }
@@ -166,7 +161,10 @@ console.log('Sprite:load: start');
 
 
 Sprite.prototype.prepare = function() {
-    if (!this.selected) return false;
+    if (!this.selected) {
+        return false;
+    }
+
     if (
         this.entity.aspect.width != this.selected.width
         || this.entity.aspect.height != this.selected.height

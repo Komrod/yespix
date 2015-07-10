@@ -1,8 +1,11 @@
 
 TODO list:
-- bug: infinite loop on loading animation
+- rotation text
+- rotation sprite
+- rotation animation
 - bug: strange border radius on small rect
 - bug: clipping with GfxManager zSort
+- dont draw if aspect.isVisible = false
 - dont use options reference after super() in entity init
 - Make a basic 2 ways player
 - Impulse to move and jump player
@@ -10,7 +13,6 @@ TODO list:
 - load a level
 - use collision in a level
 - parallax move
-- rotation text
 
 - new event system to easily remove events and entities
 - optimize: use typed arrays when possible
@@ -70,6 +72,7 @@ TODO list:
 
 
 DONE:
+- bug: infinite loop on loading animation
 - bug: cant change aspect on image creation
 - rotation image
 - rotation path

@@ -5,7 +5,6 @@ function Image(options, entity) {
     options = options || {};
     if (entity) this.entity = entity;
     if (yespix.isString(options)) {
-console.log('image: is string = ', options);
         options = {src: options};
     }
     
@@ -34,7 +33,7 @@ console.log('image: is string = ', options);
 Image.prototype.set = function(options, varDefault) {
     yespix.copy(options, this, varDefault);
     this.isChanged = true;
-    if (options.scale != 1) {
+    if (!yespix.isUndefined(options.scale) && options.scale != 1) {
         if (this.isReady) {
             this.load(this.element.source);
         }

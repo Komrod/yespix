@@ -21,26 +21,39 @@
         manager.engine.createRect(yespix.randInt(1,600), yespix.randInt(100,400), yespix.randInt(10,50), yespix.randInt(10,50), true);
     }
 
-    for (var t=0; t<1000; t++) {
+    for (var t=0; t<10; t++) {
         // create entity
-        var rect = new yespix.class.image({
-            image: 'unit/image/zardoz.png',
+        var rect = new yespix.class.animation({
+            animation: {
+                defaultAnimation: 'runLeft',
+                defaultSprite: 'perso',
+                defaultDuration: 200,
+                sprites: { 
+                    'perso': {
+                        image: 'unit/image/perso.png', 
+                        sprite: { width: 32, height: 32 }
+                    }
+                },
+                list: {
+                    'runLeft': { frames: [3, 4, 3, 5] }
+                }
+            },
             position: {
                 x: yespix.randInt(1,600), 
                 y: yespix.randInt(-10300,300), 
                 snapToPixel: true,
             }, 
-            aspect: {
+/*            aspect: {
                 width: 20,
                 height: 20
-            },
+            },*/
         });
         //rect.set({aspect: {width: 20, height: 20}, image: {autoSize: false}});
 
         // add to manager
         manager.add(rect);
 
-        rect.collision = new Collision({offsetX: 2, width: 16, fixedRotation: false}, rect);
+        //rect.collision = new Collision({offsetX: 2, width: 16, fixedRotation: false}, rect);
     }
 
     manager.load();
@@ -62,8 +75,8 @@
         function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
-            manager.engine.world.DrawDebugData(); // draw debug
-            //manager.draw(); // draw entities
+            //manager.engine.world.DrawDebugData(); // draw debug
+            manager.draw(); // draw entities
             //manager.engine.world.ClearForces();
         }, 
         // step function

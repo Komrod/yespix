@@ -6,11 +6,15 @@ function Aspect(options, entity) {
 
     var varDefault = {
         alpha: 1,
+        
         width: 0,
         height: 0,
+        
         isVisible: true,
+        
         flipX: false,
         flipY: false,
+        
         clipX: 0,
         clipY: 0,
         clipWidth: 0,
@@ -21,7 +25,6 @@ function Aspect(options, entity) {
 }
 
 Aspect.prototype.set = function(options, varDefault) {
-    
     if (options.width || options.height) {
         if (this.entity && this.entity.image) {
             if (this.entity.image.set) {
@@ -35,7 +38,6 @@ Aspect.prototype.set = function(options, varDefault) {
                 } else {
                     this.entity.image.autoSize = false;
                 }
-console.log('this.entity.image = ', this.entity.image);
             }
         }
     }

@@ -64,7 +64,6 @@ Animation.prototype.load = function() {
 
 
 Animation.prototype.event = function(event) {
-console.log('Animation.event: event = ', event);  
     if (event.type == 'ready') {
         this.getSpritesReady();
         return true;
@@ -105,7 +104,6 @@ Animation.prototype.ready = function() {
 
 
 Animation.prototype.buildAnimations = function() {
-console.log('Animation:buildAnimations: start');
     for (var n in this.list) {
         if (yespix.isString(this.list[n].extends) && this.list[this.list[n].extends]) {
             this.list[n] = this.extendAnimation(this.list[this.list[n].extends], this.list[n]);
@@ -181,17 +179,14 @@ Animation.prototype.extendAnimation = function(source, dest) {
 
 
 Animation.prototype.play = function(name, frame, force) {
-//console.log('Animation:play: start');
     frame = frame || 0;
     force = force || false;
 
     if (!this.list[name]) {
-//console.log('Animation:play: error');
         return false;
     }
 
     if (this.selectedAnimation != name || force) {
-//console.log('Animation:play: set animation');
         this.selectedAnimation = name;
         this.changeFrame(frame, force);
         return true;
@@ -201,12 +196,10 @@ Animation.prototype.play = function(name, frame, force) {
 
 
 Animation.prototype.changeFrame = function(frame, force) {
-//console.log('Animation.changeFrame: start');
     frame = frame || 0;
     force = force || false;
 
     if (!this.list[this.selectedAnimation] || !this.list[this.selectedAnimation].frames[frame]) {
-//console.log('Animation.changeFrame: error');
         return false;
     }
 
@@ -242,18 +235,14 @@ Animation.prototype.checkFrame = function() {
 
 
 Animation.prototype.nextFrame = function() {
-//console.log('Animation:nextFrame: start');
     if (!this.list[this.selectedAnimation]) {
-//console.log('Animation:nextFrame: error');
         return false;
     }
     var nextFrame = this.selectedFrame + 1;
     if (!this.list[this.selectedAnimation].frames[nextFrame]) {
         nextFrame = 0;
     }
-//console.log('Animation:nextFrame: nextFrame = '+nextFrame);
     if (nextFrame != this.selectedFrame) {
-//console.log('Animation:nextFrame: set selectedFrame');
         this.changeFrame(nextFrame);
     }
     return true;

@@ -185,14 +185,14 @@
 	// UNIT TEST ANIMATION
 	//////////////////////////////////////////////////////////////////////////////
 	// simple	
-	/*manager.add(new yespix.class.animation({
+	manager.add(new yespix.class.animation({
 		animation: {
 			defaultAnimation: 'runLeft',
 			defaultSprite: 'perso',
 			defaultDuration: 200,
 			sprites: { 
 				'perso': {
-					image: 'unit/image/perso.png', 
+					image: {src: 'unit/image/perso.png', scale: 5},
 					sprite: { width: 32, height: 32 }
 				}
 			},
@@ -200,7 +200,7 @@
 				'runLeft': { frames: [3, 4, 3, 5] }
 			}
 		}
-	}));*/
+	}));
 	//////////////////////////////////////////////////////////////////////////////
 	// flipX flipY
 	/*manager.add(new yespix.class.animation({
@@ -357,6 +357,14 @@
 	setTimeout(function () { manager.list[0].animation.play('runleft'); }, 3000);
 	setTimeout(function () { manager.list[0].animation.play('runright');  }, 6000);
 	*/
+	//////////////////////////////////////////////////////////////////////////////
+	var input = new Input();
+	var loop = new Loop(100);
+	loop.register(
+		function(loop, time) { manager.clear(); manager.draw(); }, 
+		function(loop, time) { }
+	).start();
+
 
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT TEST INPUT
