@@ -1,6 +1,7 @@
 
 TODO list:
-- bug: border radius on small rect
+- bug: infinite loop on loading animation
+- bug: strange border radius on small rect
 - bug: clipping with GfxManager zSort
 - dont use options reference after super() in entity init
 - Make a basic 2 ways player
@@ -9,6 +10,7 @@ TODO list:
 - load a level
 - use collision in a level
 - parallax move
+- rotation text
 
 - new event system to easily remove events and entities
 - optimize: use typed arrays when possible
