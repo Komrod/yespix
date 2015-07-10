@@ -1,5 +1,6 @@
 
 TODO list:
+- bug: use animation / sprite with collision
 - rotation text
 - rotation sprite
 - rotation animation

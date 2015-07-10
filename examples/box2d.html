@@ -30,7 +30,7 @@
                 defaultDuration: 200,
                 sprites: { 
                     'perso': {
-                        image: 'unit/image/perso.png', 
+                        image: {src: 'unit/image/perso.png', scale: 4},
                         sprite: { width: 32, height: 32 }
                     }
                 },
@@ -53,7 +53,8 @@
         // add to manager
         manager.add(rect);
 
-        //rect.collision = new Collision({offsetX: 2, width: 16, fixedRotation: false}, rect);
+        // add collision
+        rect.collision = new Collision({}, rect);
     }
 
     manager.load();
@@ -75,7 +76,7 @@
         function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
-            //manager.engine.world.DrawDebugData(); // draw debug
+            manager.engine.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
             //manager.engine.world.ClearForces();
         }, 
