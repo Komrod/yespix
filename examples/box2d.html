@@ -17,11 +17,11 @@
 
     // create ground
     manager.engine.createRect(0, 400, 640, 10, true);
-    for (var t=0; t<10; t++) {
+    for (var t=0; t<50; t++) {
         manager.engine.createRect(yespix.randInt(1,600), yespix.randInt(100,400), yespix.randInt(10,50), yespix.randInt(10,50), true);
     }
 
-    for (var t=0; t<10; t++) {
+    for (var t=0; t<1; t++) {
         // create entity
         var rect = new yespix.class.animation({
             animation: {
@@ -39,8 +39,8 @@
                 }
             },
             position: {
-                x: yespix.randInt(1,600), 
-                y: yespix.randInt(-10300,300), 
+                x: yespix.randInt(100,500), 
+                y: yespix.randInt(-1000,0), 
                 snapToPixel: true,
             }, 
 /*            aspect: {
@@ -54,7 +54,7 @@
         manager.add(rect);
 
         // add collision
-        rect.collision = new Collision({}, rect);
+        rect.collision = new Collision({offsetX: 48, offsetY: 24, width: 28, height: 86, fixedRotation: true}, rect);
     }
 
     manager.load();
@@ -76,7 +76,7 @@
         function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
-            manager.engine.world.DrawDebugData(); // draw debug
+            //manager.engine.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
             //manager.engine.world.ClearForces();
         }, 
@@ -86,7 +86,7 @@
         }
     ).start();
     
-    
+    console.log('manager = ', manager);
     </script>
     
   </body>

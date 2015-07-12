@@ -66,6 +66,7 @@ EngineBox2d.prototype.create = function(object) {
 	if (object.shape == 'rect') {
 		var position = object.getPosition();
 		var size = object.getSize();
+console.log('EngineBox2d:create: position = ', position, ', size = ', size);
 		return this.createRect(position.x, position.y, size.width, size.height, false, object);
 	}
 };

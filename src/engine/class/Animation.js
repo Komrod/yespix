@@ -20,6 +20,8 @@ function Animation(options, entity) {
         for (var n in options.sprites) {
             options.sprites[n] = new yespix.class.sprite(options.sprites[n]);
             options.sprites[n].manager = this;
+            options.sprites[n].position = this.entity.position;
+            options.sprites[n].aspect = this.entity.aspect;
         }
     };
     this.set(options, varDefault);

@@ -321,8 +321,9 @@ Image.prototype.draw = function(context) {
     }
 
     if (!this.entity.boundary.image || this.isChanged || this.entity.aspect.isChanged) {
-        this.entity.boundary.image = this.getBoundaryImage();
+        this.entity.boundary.image = this.getBoundaryImage();        
     }
+console.log('this.entity.boundary.image = ', this.entity.boundary.image);
     if (!this.entity.boundary.clip || this.isChanged || this.entity.aspect.isChanged) {
         this.entity.boundary.clip = this.getBoundaryClip();
     }
