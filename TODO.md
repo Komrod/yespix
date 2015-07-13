@@ -1,9 +1,6 @@
 
 TODO list:
-- bug: use animation / sprite with collision
 - rotation text
-- rotation sprite
-- rotation animation
 - bug: strange border radius on small rect
 - bug: clipping with GfxManager zSort
 - dont draw if aspect.isVisible = false
@@ -73,6 +70,9 @@ TODO list:
 
 
 DONE:
+- rotation sprite
+- rotation animation
+- bug: use animation / sprite with collision
 - bug: infinite loop on loading animation
 - bug: cant change aspect on image creation
 - rotation image

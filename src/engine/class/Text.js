@@ -48,10 +48,24 @@ Text.prototype.draw = function(context) {
     if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
     if (this.content == '') return true;
 	
+    var contextSaved = false;
+    if (this.entity.aspect.rotation != 0) {
+        var pivot = this.entity.getPivot();
+        contextSaved = true;
+        context.save();
+        context.translate(pivot.x, pivot.y - 2*this.size);
+        context.rotate(this.entity.position.rotation * Math.PI / 180);
+        context.translate(-pivot.x, -pivot.y + 2*this.size);
+    }
+
     if (this.wrapped && this.entity.aspect.width > 0) {
         this.drawWrapped(context);
     } else {
         this.drawText(context);
+    }
+
+    if (contextSaved) {
+        context.restore();
     }
 };
 

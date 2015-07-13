@@ -23,6 +23,7 @@
 
     for (var t=0; t<1; t++) {
         // create entity
+        /*
         var rect = new yespix.class.animation({
             animation: {
                 defaultAnimation: 'runLeft',
@@ -43,18 +44,16 @@
                 y: yespix.randInt(-1000,0), 
                 snapToPixel: true,
             }, 
-/*            aspect: {
-                width: 20,
-                height: 20
-            },*/
-        });
+        });*/
+        //var rect = new yespix.class.sprite({ image: { src: 'unit/image/perso.png', scale: 4}, sprite: { width: 32, height: 32 } });
+        var rect = new yespix.class.text({ position: {x: 300, y:0, rotation: 45}, text: {content: 'coucou', fillColor: '#234567'}});
         //rect.set({aspect: {width: 20, height: 20}, image: {autoSize: false}});
 
         // add to manager
         manager.add(rect);
 
         // add collision
-        rect.collision = new Collision({offsetX: 48, offsetY: 24, width: 28, height: 86, fixedRotation: true}, rect);
+        rect.collision = new Collision({offsetX: 0, offsetY: 0, width: 28, height: 10, fixedRotation: false}, rect);
     }
 
     manager.load();
@@ -71,20 +70,20 @@
    
     
     // register functions
-    loop.register(
+//    loop.register(
         // frame function
-        function(loop, time) { 
+//        function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
-            //manager.engine.world.DrawDebugData(); // draw debug
+            manager.engine.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
             //manager.engine.world.ClearForces();
-        }, 
+//        }, 
         // step function
-        function(loop, time) {  
-            manager.engine.world.Step(time/1000, 100, 100);
-        }
-    ).start();
+//        function(loop, time) {  
+//            manager.engine.world.Step(time/1000, 100, 100);
+//        }
+//    ).start();
     
     console.log('manager = ', manager);
     </script>
