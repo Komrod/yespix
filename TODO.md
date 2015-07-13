@@ -1,6 +1,5 @@
 
 TODO list:
-- bug: clipping with GfxManager zSort
 - dont draw if aspect.isVisible = false
 - dont use options reference after super() in entity init
 - Make a basic 2 ways player
@@ -30,7 +29,6 @@ TODO list:
 - optimize: tiled levelLayer to fix the drawImage speed on phone
 - center position with position.align ("center left", "top right" ...)
 - fix position of followed entity in the center of entity
-- key remanence (for jump)
 - disable key capture on phones
 - phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
@@ -73,6 +71,7 @@ TODO list:
 
 
 DONE:
+- bug: clipping with applyPhysics
 - rotation text // 2015-07-13
 - bug: strange border radius on small rect
 - rotation sprite
@@ -84,6 +83,7 @@ DONE:
 - rotation path
 - optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - use collision engine (box2d) // 2015-07-09
+- key remanence (for jump)
 - handle keypress
 - Facade for image, sound, video
 - auto detect when to set autoSize to false with set of width or height on video / image
