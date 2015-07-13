@@ -9,10 +9,14 @@ TODO list:
 - Impulse to move and jump player
 - Detect when on ground with player
 - load a level
+- pass rotation of an object to collision object
 - use collision in a level
 - parallax move
 
-- new event system to easily remove events and entities
+- put entities in yespix.entity and classes in yespix.class
+- remove entities and collision object
+- set isChanged=false after the draw function
+- optimize: 
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
 - optimize: try to use fixed length arrays (using new Array(1000))
