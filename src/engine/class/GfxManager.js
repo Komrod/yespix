@@ -97,7 +97,7 @@ GfxManager.prototype.remove = function() {
 
 GfxManager.prototype.sort = function() {
 	yespix.quickSort(this.list, function(a, b) {
-		if (a.position && b.position && a.position.z < b.position.z) {
+		if (a.position && b.position && a.position.z <= b.position.z) {
 			return true;
 		}
 		return false;

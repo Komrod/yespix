@@ -33,7 +33,7 @@ EngineBox2d.prototype.setManager = function(manager) {
 
 
 EngineBox2d.prototype.initDebug = function() {
-	//setup debug draw
+	// setup debug draw
 	this.debugDraw = new Box2D.Dynamics.b2DebugDraw();
 	this.debugDraw.SetSprite(this.context);
 	this.debugDraw.SetDrawScale(this.scale);
@@ -66,22 +66,12 @@ EngineBox2d.prototype.create = function(object) {
 	if (object.shape == 'rect') {
 		var position = object.getPosition();
 		var size = object.getSize();
-console.log('EngineBox2d:create: position = ', position, ', size = ', size);
 		return this.createRect(position.x, position.y, size.width, size.height, false, object);
 	}
 };
 
 
 EngineBox2d.prototype.createRect = function(x, y, width, height, static, options) {
-/*bodyDef.type = b2Body.b2_dynamicBody;
-fixDef.shape = new b2PolygonShape;
-fixDef.shape.SetAsBox(
-   Math.random() * 0.5 + 0.1 //half width
-,  Math.random() * 0.5 + 0.1 //half height
-);
-bodyDef.position.x = Math.random() * 25;
-bodyDef.position.y = Math.random() * 10;
-world.CreateBody(bodyDef).CreateFixture(fixDef);*/
 	static = static || false;
 	this.setToDefault();
 
