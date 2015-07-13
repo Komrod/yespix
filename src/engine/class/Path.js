@@ -40,7 +40,7 @@ Path.prototype.set = function(options, varDefault) {
 
 
 Path.prototype.getBorderRadius = function() {
-    if (this.entity.aspect.width >= this.borderRadius * 2 || this.entity.aspect.height >= this.borderRadius * 2) return this.borderRadius;
+    if (this.entity.aspect.width >= this.borderRadius * 2 && this.entity.aspect.height >= this.borderRadius * 2) return this.borderRadius;
     if (this.entity.aspect.height < this.entity.aspect.width) return this.entity.aspect.height / 2;
     return this.entity.aspect.width / 2;
 };

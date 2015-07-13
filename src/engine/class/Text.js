@@ -53,9 +53,10 @@ Text.prototype.draw = function(context) {
         var pivot = this.entity.getPivot();
         contextSaved = true;
         context.save();
-        context.translate(pivot.x, pivot.y - 2*this.size);
+        var size = context.measureText(this.content); // @TODO only works for unwrapped text (one line)
+        context.translate(pivot.x + size.width / 2, pivot.y + this.size);
         context.rotate(this.entity.position.rotation * Math.PI / 180);
-        context.translate(-pivot.x, -pivot.y + 2*this.size);
+        context.translate(- pivot.x - size.width / 2, - pivot.y - this.size);
     }
 
     if (this.wrapped && this.entity.aspect.width > 0) {

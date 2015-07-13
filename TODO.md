@@ -1,7 +1,5 @@
 
 TODO list:
-- rotation text
-- bug: strange border radius on small rect
 - bug: clipping with GfxManager zSort
 - dont draw if aspect.isVisible = false
 - dont use options reference after super() in entity init
@@ -13,6 +11,7 @@ TODO list:
 - use collision in a level
 - parallax move
 
+- bold text
 - put entities in yespix.entity and classes in yespix.class
 - remove entities and collision object
 - set isChanged=false after the draw function
@@ -74,6 +73,8 @@ TODO list:
 
 
 DONE:
+- rotation text // 2015-07-13
+- bug: strange border radius on small rect
 - rotation sprite
 - rotation animation
 - bug: use animation / sprite with collision
