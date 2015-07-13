@@ -5,7 +5,7 @@ yespix.define('path', {
     init: function(options) {
         options = options || {};
         this.super(options);
-        this.path = new Path(options.path || {}, this);
+        this.path = new Path(this.path || {}, this);
         this.isReady = true;
     },
 

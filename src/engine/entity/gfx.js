@@ -11,11 +11,11 @@ yespix.define('gfx', {
 
         this.isReady = false;
         
-        this.position = new Position(options.position || {}, this);
-        this.aspect = new Aspect(options.aspect || {}, this);
-        this.boundary = options.boundary || {};
-        this.prerender = options.prerender || null;
-        this.manager = options.manager || null;
+        this.position = new Position(this.position || {}, this);
+        this.aspect = new Aspect(this.aspect || {}, this);
+        this.boundary = this.boundary || {};
+        this.prerender = this.prerender || null;
+        this.manager = this.manager || null;
     },
 
     setManager: function(manager) {

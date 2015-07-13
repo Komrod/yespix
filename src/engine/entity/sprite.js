@@ -9,7 +9,7 @@ yespix.define('sprite', {
     init: function(options) {
         options = options || {};
         this.super(options);
-        this.sprite = new Sprite(options.sprite, this);
+        this.sprite = new Sprite(this.sprite, this);
     },
 
     load: function() {

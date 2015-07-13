@@ -12,7 +12,7 @@ yespix.define('sound', {
             options = {sound: {src: options}};
         }
         this.super(options);
-        this.sound = new Sound(options.sound || {}, this);
+        this.sound = new Sound(this.sound || {}, this);
 
     },
 

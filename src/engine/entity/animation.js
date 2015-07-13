@@ -9,7 +9,7 @@ yespix.define('animation', {
     init: function(options) {
         options = options || {};
         this.super(options);
-        this.animation = new Animation(options.animation, this);
+        this.animation = new Animation(this.animation, this);
     },
 
     load: function() {

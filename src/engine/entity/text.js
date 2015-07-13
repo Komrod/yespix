@@ -6,7 +6,7 @@ yespix.define('text', {
     init: function(options) {
         options = options || {};
         this.super(options);
-        this.text = new Text(options.text || {}, this);
+        this.text = new Text(this.text || {}, this);
 
         this.isReady = true;
     },

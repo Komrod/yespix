@@ -12,7 +12,7 @@ yespix.define('video', {
             options = {video: {src: options}};
         }
         this.super(options);
-        this.video = new Video(options.video || {}, this);
+        this.video = new Video(this.video || {}, this);
     },
 
 
