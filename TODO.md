@@ -1,7 +1,5 @@
 
 TODO list:
-- dont draw if aspect.isVisible = false
-- dont use options reference after super() in entity init
 - Make a basic 2 ways player
 - Impulse to move and jump player
 - Detect when on ground with player
@@ -12,6 +10,8 @@ TODO list:
 
 - bold text
 - put entities in yespix.entity and classes in yespix.class
+- physics engine files must start with "physics"
+- tween engine files must start with "tween"
 - remove entities and collision object
 - set isChanged=false after the draw function
 - optimize: 
@@ -71,6 +71,8 @@ TODO list:
 
 
 DONE:
+- dont use options reference after super() in entity init
+- dont draw if aspect.isVisible = false
 - bug: clipping with applyPhysics
 - rotation text // 2015-07-13
 - bug: strange border radius on small rect

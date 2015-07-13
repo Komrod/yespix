@@ -106,16 +106,14 @@
 	//manager.list[0].set({aspect: {width: 20, height: 20}});
 	//////////////////////////////////////////////////////////////////////////////
 	// clipping
-    manager.setEngine(new EngineBox2d());
-    //manager.engine.createRect(0, 400, 640, 10, true);
-	for (var t=0; t<2; t++) {
-		var image = new yespix.class.image({id: "0"+t, image: {src: 'unit/image/zardoz.png', scale: 2}, position: {x: yespix.randInt(100, 300), y: yespix.randInt(100, 300)}});
-		manager.add(image);
-		image.collision = new Collision({offsetX: 0, offsetY: 0, width: 10, height: 10}, image);
-	}
+	//for (var t=0; t<2; t++) {
+	//	var image = new yespix.class.image({id: "0"+t, image: {src: 'unit/image/zardoz.png', scale: 2}, position: {x: yespix.randInt(100, 300), y: yespix.randInt(100, 300)}, aspect: {isVisible: false}});
+	//	manager.add(image);
+	//	image.collision = new Collision({offsetX: 0, offsetY: 0, width: 10, height: 10}, image);
+	//}
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
-	
+	/*
 	var input = new Input();
 	var loop = new Loop(100);
 	loop.register(
@@ -136,6 +134,7 @@
 		function(loop, time) { 
 		}
 	).start();
+	*/
 	//////////////////////////////////////////////////////////////////////////////
 
 
@@ -468,6 +467,32 @@
 	).start();
 	*/
 	//////////////////////////////////////////////////////////////////////////////
+
+
+
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST ACTOR
+	//////////////////////////////////////////////////////////////////////////////
+	// simple
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	
+	var input = new Input();
+	var loop = new Loop(100);
+	loop.register(
+		function(loop, time) { 
+            manager.applyPhysics(); // apply position from physics engine
+            manager.clear(); // clear canvas
+            manager.engine.world.DrawDebugData(); // draw debug
+            manager.draw(); // draw entities
+		}, 
+		function(loop, time) { 
+			manager.engine.world.DrawDebugData(); // draw debug
+		}
+	).start();
+	
+	//////////////////////////////////////////////////////////////////////////////
+
 
 
 
