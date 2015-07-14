@@ -14,19 +14,19 @@ yespix.define('image', {
         }
         this.super(options);
         this.image = new Image(this.image, this);
+//console.log(yespix);
+//        yespix.extendEntity.image(this);
     },
 
-
+    
     load: function(src) {
         this.image.load(src);
     },
-    
 
     unload: function() {
         this.image.unload();
     },
     
-
     /**
      * Return True if something has changed (position, aspect ...)
      * @return {bool} 
@@ -36,7 +36,6 @@ yespix.define('image', {
         if (this.image && this.image.isChanged) return true;
         return false;
     },
-
 
     drawRender: function(context) {
         if (this.image) {
@@ -52,5 +51,6 @@ yespix.define('image', {
         }
         return list;
     },
+    
 });
 

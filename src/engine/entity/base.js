@@ -51,5 +51,10 @@ yespix.define('base', {
         return [];
     },
     
+    extend: function(entityClass) {
+        yespix.copy(entityClass.prototype, this);
+console.log(this);
+        this.init(this);
+    },
 });
 

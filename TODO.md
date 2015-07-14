@@ -1,8 +1,13 @@
 
 TODO list:
+- find a way to correctly mix the entities
+- init only once
+- keep super working on both entity class
+- Make an actor entity
 - Make a basic 2 ways player
 - Impulse to move and jump player
 - Detect when on ground with player
+- start player on ground / detects ground
 - load a level
 - pass rotation of an object to collision object
 - use collision in a level
@@ -12,7 +17,7 @@ TODO list:
 - put entities in yespix.entity and classes in yespix.class
 - physics engine files must start with "physics"
 - tween engine files must start with "tween"
-- remove entities and collision object
+- function to remove entities and collision object
 - set isChanged=false after the draw function
 - optimize: 
 - optimize: use typed arrays when possible

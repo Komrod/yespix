@@ -13,6 +13,42 @@
 
 	// create gfx manager
 	var manager = new GfxManager(true);
+    manager.setEngine(new EngineBox2d());
+
+	//////////////////////////////////////////////////////////////////////////////
+	// UNIT TEST ENTITY EXTENDS
+	//////////////////////////////////////////////////////////////////////////////
+	yespix.define('a1', { inheritClass: 'base', init: function(options) { }, test_a: function(str) { console.log('a1:test_a: '+str); }, test: function(str) { console.log('a1:test: '+str); } });
+	yespix.define('a2', { inheritClass: 'a1', init: function(options) { }, test_a: function(str) { console.log('a2:test_a: '+str); this.super(str); }, test: function(str) { console.log('a2:test: '+str); this.super(str); } });
+	yespix.define('b1', { inheritClass: 'base', init: function(options) { }, test_b: function(str) { console.log('b1:test_b: '+str); }, test: function(str) { console.log('b1:test: '+str); } });
+	yespix.define('b2', { inheritClass: 'b1', init: function(options) { }, test_b: function(str) { console.log('b2:test_b: '+str); this.super(str); }, test: function(str) { console.log('b2:test: '+str); this.super(str); } });
+
+	var actor = new yespix.class.a2();
+	actor.extend(yespix.class.b2);
+console.log(actor);	
+	actor.test_a('ok');
+	actor.test_b('ok');
+	actor.test('ok');
+	//actor.extend(yespix.class.actor);
+	//manager.add(actor);
+
+	// image+actor
+	//var actor = new yespix.class.image({image: 'unit/image/zardoz.png'});
+	//actor.extend(yespix.class.actor);
+	//manager.add(actor);
+	//////////////////////////////////////////////////////////////////////////////
+
+	//var actor = new yespix.class.actor({ image: 'unit/image/perso.png', sprite: { width: 32, height: 32 } });
+	//actor.extend(yespix.class.image);
+	//actor.extend(yespix.class.sprite);
+	//manager.add(actor);
+	
+//	actor.extend(yespix.class.image);
+console.log('actor = ', actor);
+
+
+
+
 
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT ElementList
@@ -475,6 +511,9 @@
 	//////////////////////////////////////////////////////////////////////////////
 	// simple
 	//////////////////////////////////////////////////////////////////////////////
+	//var actor = new yespix.class.actor({extendClasses: ['path'], position: {x: 100, y: 100}, aspect: {width: 100, height: 100}, collision: {width: 100, height: 100}, path: {fillColor: '#012345'}});
+	//manager.add(actor);
+
 	//////////////////////////////////////////////////////////////////////////////
 	
 	var input = new Input();
@@ -487,7 +526,7 @@
             manager.draw(); // draw entities
 		}, 
 		function(loop, time) { 
-			manager.engine.world.DrawDebugData(); // draw debug
+			manager.engine.world.Step(time/1000, 100, 100);
 		}
 	).start();
 	

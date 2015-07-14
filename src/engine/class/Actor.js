@@ -9,17 +9,21 @@ function Actor(options, entity) {
         isFalling: false,
         isJumping: false,
         isOnGround: false,
-        isAlive: true,
+        isIdle: true,
+
         shield: 0,
         life: 100,
         power: 100,
-        stamina: 100
+        stamina: 100,
+        level: 1
+
     };
 
     this.set(options, varDefault);
+
 }
 
-Aspect.prototype.set = function(options, varDefault) {
+Actor.prototype.set = function(options, varDefault) {
     yespix.copy(options, this, varDefault);
     
     this.isChanged = true;

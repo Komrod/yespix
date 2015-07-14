@@ -19,7 +19,8 @@ yespix.fn.init = function(options) {
 
     this.class = {};
     this.cache = {};
-    
+    this.extendEntity = {};
+
     if (this.options['init']) this.options['init']();
 
 

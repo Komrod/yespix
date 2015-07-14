@@ -28,6 +28,8 @@
             //this.trigger('ready');
         }
 
+        //yespix.extendEntity = {};
+
         /**
          * YESPIX prototype
          */

@@ -90,6 +90,9 @@ Collision.prototype.getSize = function() {
 
 
 Collision.prototype.applyPhysics = function() {
+    if (!this.object) {
+        return false;
+    }
     var position = this.object.GetBody().GetPosition();
     var size = this.getSize();
     var angle = this.object.GetBody().GetAngle();
@@ -102,4 +105,5 @@ Collision.prototype.applyPhysics = function() {
             rotation: degree
         }
     });
+    return true;
 }
