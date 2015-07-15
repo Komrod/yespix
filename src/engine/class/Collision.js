@@ -68,23 +68,19 @@ Collision.prototype.create = function() {
         return false;
     }
 
-    if (this.object) {
-        // TODO delete previous object
+    if (this.body) {
+        // TODO delete previous body
     }
 
-    this.object = this.engine.create(this);
+    this.body = this.engine.create(this);
     this.createGroundDetection();
 };
 
 
 Collision.prototype.createGroundDetection = function() {
 console.log('createGroundDetection');
-    this.engine.create({
-        shape: 'rect', 
-        isSensor: true, 
-        getPosition: function() { return {relativeX:0.5, relativeY: 1}; }, 
-        getSize: function() { return {width: 100 /*this.width * 0.8*/, height: 50}; }
-    }, this.object);
+    var size = this.getSize();
+    return this.engine.createFixture(0, 72, 110, 5, {isSensor: true}, this.body);
 };
 
 
@@ -106,22 +102,22 @@ Collision.prototype.getSize = function() {
 
 Collision.prototype.impulse = function(degrees, power) {
 
-    this.object.GetBody().ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.object.GetBody().GetWorldCenter());
+    this.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
 };
 
 
 Collision.prototype.force = function(degrees, power) {
-    this.object.GetBody().ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.object.GetBody().GetWorldCenter());
+    this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
 };
 
 
 Collision.prototype.applyPhysics = function() {
-    if (!this.object) {
+    if (!this.body) {
         return false;
     }
-    var position = this.object.GetBody().GetPosition();
+    var position = this.body.GetPosition();
     var size = this.getSize();
-    var angle = this.object.GetBody().GetAngle();
+    var angle = this.body.GetAngle();
     var degree = yespix.toDegree(angle);
 //console.log('angle = '+angle+', degree = '+degree);
     this.entity.set({

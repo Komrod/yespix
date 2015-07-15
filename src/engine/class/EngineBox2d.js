@@ -45,41 +45,25 @@ EngineBox2d.prototype.initDebug = function() {
 };
 
 
-EngineBox2d.prototype.setToDefault = function() {
-	this.fixDef.density = this.defaultDensity;
-	this.fixDef.friction = this.defaultFriction;
-	this.fixDef.restitution = this.defaultRestitution;
-	this.fixDef.isSensor = this.defaultIsSensor;
-	this.bodyDef.fixedRotation = this.defaultFixedRotation;
-}
-
-
-EngineBox2d.prototype.set = function(options) {
-	if (!yespix.isUndefined(options.fixedRotation)) {
-		this.bodyDef.fixedRotation = options.fixedRotation;
-	}
-	if (!yespix.isUndefined(options.restitution)) {
-		this.fixDef.restitution = options.restitution;
-		this.fixDef.isSensor = options.isSensor;
-		this.fixDef.friction = options.friction;
-		this.fixDef.density = options.density;
-	}
-};
-
-
-EngineBox2d.prototype.create = function(parameters, body) {
+EngineBox2d.prototype.create = function(parameters) {
 console.log('EngineBox2d:create: parameters.shape = ', parameters.shape);
 	if (parameters.shape == 'rect') {
 console.log('EngineBox2d:create: ok');
 		var position = parameters.getPosition();
 		var size = parameters.getSize();
 console.log('EngineBox2d:create: position = ', position, ', size = ', size);
-		return this.createRect(position.x, position.y, size.width, size.height, false, parameters, body);
+		
+		return this.createRect(position.x, position.y, size.width, size.height, false, parameters);
 	}
 };
 
 
-EngineBox2d.prototype.createRect = function(x, y, width, height, static, options, object) {
+EngineBox2d.prototype.createRect = function(x, y, width, height, static, parameters) {
+
+	var body = this.createBody(x, y, width, height, static, parameters);
+	this.createFixture(0.5, 0.5, width, height, parameters, body);
+	return body;
+	/*
 	static = static || false;
 	this.setToDefault();
 
@@ -100,16 +84,86 @@ EngineBox2d.prototype.createRect = function(x, y, width, height, static, options
 	} else {
 		return this.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
 	}
+	*/
+
 };
 
 
-EngineBox2d.prototype.createBody = function(x, y, width, height, static, options, object) {
-	
+EngineBox2d.prototype.createBody = function(x, y, width, height, static, parameters) {
+	parameters = parameters || {};
+	this.setBody(parameters);
+
+	if (static) this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+	else this.bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
+
+	this.bodyDef.position.x = x / this.scale + width / 2 / this.scale;
+	this.bodyDef.position.y = y / this.scale + height / 2 / this.scale;
+
+	return this.world.CreateBody(this.bodyDef);
 };
 
 
-EngineBox2d.prototype.createFixture = function(relativeX, relativeY, width, height, static, options, object) {
+EngineBox2d.prototype.setBody = function(parameters) {
 	
+	if (!yespix.isUndefined(parameters.fixedRotation)) {
+		this.bodyDef.fixedRotation = parameters.fixedRotation;
+	} else {
+		this.bodyDef.fixedRotation = this.defaultFixedRotation;
+	}
+};
+
+
+EngineBox2d.prototype.createFixture = function(offsetX, offsetY, width, height, parameters, body) {
+	parameters = parameters || {};
+	this.setFixture(parameters);
+	this.fixDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
+console.log('createFixture: setAsBox: offsetX = ', offsetX, ', offsetY = ', offsetY);
+	this.fixDef.shape.SetAsBox(width / 2 / this.scale, height / 2 / this.scale);
+	if (offsetX != 0 || offsetY != 0) {
+		this.moveShape(this.fixDef.shape, offsetX / this.scale, offsetY / this.scale);
+	}
+console.log(this.fixDef);
+	//body.CreateFixture(this.fixDef, 0);
+	// SetPosition (new b2Vec2(x,y) )
+	//this.fixDef.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
+	//body.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
+	//this.fixDef.shape.SetAsBox(12, 12, new Box2D.Common.Math.b2Vec2(-1000, 1000), 0);
+//	body.CreateFixture(this.fixDef, 1);
+
+	return body.CreateFixture(this.fixDef, 1);
+};
+
+
+EngineBox2d.prototype.moveShape = function(shape, x, y) {
+	for (var t=0; t<shape.m_vertices.length; t++) {
+		shape.m_vertices[t].x += x;
+		shape.m_vertices[t].y += y;
+	}
+console.log('apres shape = ', shape);
+};
+
+EngineBox2d.prototype.setFixture = function(parameters) {
+	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
+	if (!yespix.isUndefined(parameters.restitution)) {
+		this.fixDef.restitution = parameters.restitution;
+	} else {
+		this.fixDef.restitution = this.defaultRestitution;
+	}
+	if (!yespix.isUndefined(parameters.isSensor)) {
+		this.fixDef.isSensor = parameters.isSensor;
+	} else {
+		this.fixDef.isSensor = this.defaultIsSensor;
+	}
+	if (!yespix.isUndefined(parameters.friction)) {
+		this.fixDef.friction = parameters.friction;
+	} else {
+		this.fixDef.friction = this.defaultFriction;
+	}
+	if (!yespix.isUndefined(parameters.density)) {
+		this.fixDef.density = parameters.density;
+	} else {
+		this.fixDef.density = this.defaultDensity;
+	}
 };
 
 
@@ -123,7 +177,6 @@ EngineBox2d.prototype.createListener = function(beginContact, endContact) {
 EngineBox2d.prototype.getListener = function() {
 	return this.listener;
 };
-
 
 
 EngineBox2d.prototype.createCircle = function() {
