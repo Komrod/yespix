@@ -18,33 +18,20 @@
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT TEST ENTITY EXTENDS
 	//////////////////////////////////////////////////////////////////////////////
-	yespix.define('a1', { inheritClass: 'base', init: function(options) { }, test_a: function(str) { console.log('a1:test_a: '+str); }, test: function(str) { console.log('a1:test: '+str); } });
-	yespix.define('a2', { inheritClass: 'a1', init: function(options) { }, test_a: function(str) { console.log('a2:test_a: '+str); this.super(str); }, test: function(str) { console.log('a2:test: '+str); this.super(str); } });
-	yespix.define('b1', { inheritClass: 'base', init: function(options) { }, test_b: function(str) { console.log('b1:test_b: '+str); }, test: function(str) { console.log('b1:test: '+str); } });
-	yespix.define('b2', { inheritClass: 'b1', init: function(options) { }, test_b: function(str) { console.log('b2:test_b: '+str); this.super(str); }, test: function(str) { console.log('b2:test: '+str); this.super(str); } });
-
-	var actor = new yespix.class.a2();
-	actor.extend(yespix.class.b2);
-console.log(actor);	
-	actor.test_a('ok');
-	actor.test_b('ok');
-	actor.test('ok');
-	//actor.extend(yespix.class.actor);
-	//manager.add(actor);
-
 	// image+actor
-	//var actor = new yespix.class.image({image: 'unit/image/zardoz.png'});
-	//actor.extend(yespix.class.actor);
-	//manager.add(actor);
+	var object = new yespix.class.image({image: 'unit/image/zardoz.png'});
+	object.actor = new yespix.class.actor2w({}, object);
+	object.collision = new Collision({offsetX: 10, offsetY: 5, width: 130, height: 145, engine: manager.engine, fixedRotation: true}, object);
+	manager.add(object);
 	//////////////////////////////////////////////////////////////////////////////
+    manager.engine.createRect(0, 400, 640, 10, true);
 
 	//var actor = new yespix.class.actor({ image: 'unit/image/perso.png', sprite: { width: 32, height: 32 } });
 	//actor.extend(yespix.class.image);
 	//actor.extend(yespix.class.sprite);
 	//manager.add(actor);
-	
 //	actor.extend(yespix.class.image);
-console.log('actor = ', actor);
+console.log('object = ', object);
 
 
 
@@ -480,9 +467,10 @@ console.log('actor = ', actor);
 	var input = new Input();
 	var loop = new Loop(1);
 	loop.register(
-		function(loop, time) { if (input.key('ctrl-a')) console.log('ok'); }, 
+		function(loop, time) { if (input.key('right')) console.log('ok'); }, 
 		function(loop, time) { }
 	).start();
+	setInterval(function () { console.log(input.key('left'), input);   }, 5000);
 	*/
 
 
@@ -523,7 +511,7 @@ console.log('actor = ', actor);
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
             manager.engine.world.DrawDebugData(); // draw debug
-            manager.draw(); // draw entities
+            //manager.draw(); // draw entities
 		}, 
 		function(loop, time) { 
 			manager.engine.world.Step(time/1000, 100, 100);
@@ -547,7 +535,6 @@ console.log('actor = ', actor);
 
 	
 	
-	//setInterval(function () { console.log('key "'+key+'" = ', input.key(key));   }, 4000);
 	
 	// draw every entity in the manager
 	/*manager.when('ready', function(e) {

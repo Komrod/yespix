@@ -102,9 +102,6 @@ module.exports = function(grunt) {
                     // core start
                     '../engine/template/core_start.js',
 
-                    // extend
-                    '../engine/entity/extend/*.js',
-
                     // core
                     '../engine/core/*.js',
 
@@ -122,7 +119,10 @@ module.exports = function(grunt) {
                     '../engine/entity/sprite.js',
                     '../engine/entity/video.js',
                     '../engine/entity/animation.js',
+
+                    // classes
                     '../engine/entity/actor.js',
+                    '../engine/entity/actor2w.js',
 
                     // entities end
                     '../engine/template/entities_end.js',

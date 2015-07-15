@@ -19,15 +19,15 @@ function Input(options) {
         e = e || window.event;
 
         // get the key code
-        var code = e.key.charCodeAt(0);
+        e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
 
-        if (input.data.ids[parseInt(code)]) {
-            clearTimeout(input.data.ids[parseInt(code)]);
+        if (input.data.ids[parseInt(e.inputCode)]) {
+            clearTimeout(input.data.ids[parseInt(e.inputCode)]);
         }
 
         // main key pressed
-        input.data.pressed[parseInt(code)] = true;
-        input.data.hold[parseInt(code)] = true;
+        input.data.pressed[parseInt(e.inputCode)] = true;
+        input.data.hold[parseInt(e.inputCode)] = true;
 
         // special key pressed
         if (e.ctrlKey) input.data.hold[input.data.special['ctrl']] = true;
@@ -47,11 +47,11 @@ function Input(options) {
         e = e || window.event;
 
         // get the key code
-        var code = e.key.charCodeAt(0);
+        e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
 
         // main key pressed
-        input.data.up[parseInt(code)] = true;
-        input.data.hold[parseInt(code)] = false;
+        input.data.up[parseInt(e.inputCode)] = true;
+        input.data.hold[parseInt(e.inputCode)] = false;
 
         // special key pressed
         if (e.ctrlKey) input.data.hold[input.data.special['ctrl']] = true;
@@ -62,15 +62,15 @@ function Input(options) {
         else input.data.hold[input.data.special['shift']] = false;
 
 
-        if (input.data.ids[parseInt(code)]) {
-            clearTimeout(input.data.ids[parseInt(code)]);
+        if (input.data.ids[parseInt(e.inputCode)]) {
+            clearTimeout(input.data.ids[parseInt(e.inputCode)]);
         }
         setTimeout(function() {
             // main key pressed
-            input.data.up[parseInt(code)] = false;
-            input.data.pressed[parseInt(code)] = false;
-            input.data.down[parseInt(code)] = false;
-            input.data.hold[parseInt(code)] = false;
+            input.data.up[parseInt(e.inputCode)] = false;
+            input.data.pressed[parseInt(e.inputCode)] = false;
+            input.data.down[parseInt(e.inputCode)] = false;
+            input.data.hold[parseInt(e.inputCode)] = false;
 
             // special key pressed
             input.data.hold[input.data.special['ctrl']] = false;
@@ -87,14 +87,15 @@ function Input(options) {
         // get the event
         e = e || window.event;
         // get the key code
-        var code = e.key.charCodeAt(0);
+        e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
 
-        if (input.data.ids[parseInt(code)]) {
-            clearTimeout(input.data.ids[parseInt(code)]);
+//console.log('keypress: e=', e);
+        if (input.data.ids[parseInt(e.inputCode)]) {
+            clearTimeout(input.data.ids[parseInt(e.inputCode)]);
         }
 
         // main key pressed
-        input.data.pressed[parseInt(code)] = true;
+        input.data.pressed[parseInt(e.inputCode)] = true;
     };
 
     /**

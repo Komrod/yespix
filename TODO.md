@@ -1,10 +1,11 @@
 
 TODO list:
-- find a way to correctly mix the entities
-- init only once
-- keep super working on both entity class
 - Make an actor entity
+- Rename all options as properties
+- make a function defineEntity and defineClass
 - Make a basic 2 ways player
+- make a player state in Input class
+- enable / disable debug of physics
 - Impulse to move and jump player
 - Detect when on ground with player
 - start player on ground / detects ground
@@ -12,7 +13,9 @@ TODO list:
 - pass rotation of an object to collision object
 - use collision in a level
 - parallax move
+- light engine
 
+- extends to reverse an animation
 - bold text
 - put entities in yespix.entity and classes in yespix.class
 - physics engine files must start with "physics"
@@ -41,7 +44,7 @@ TODO list:
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
-- draw text based on image for characters
+- draw text based on letters from image
 - typewritter: text showing letter by letter with sound
 - container entity
 - button entity

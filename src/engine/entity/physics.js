@@ -1,5 +1,6 @@
 
 
+/*
 function Collision(options, entity) {
 
     options = options || {};
@@ -24,13 +25,10 @@ function Collision(options, entity) {
         offsetY: 0,
         width: 0,
         height: 0,
-	    type: 'dynamic', // "static" / "dynamic"
+        type: 'dynamic', // "static" / "dynamic"
         shape: 'rect', // "rect"
-	    fixedRotation: false,
-        density: 1.0,
-        friction: 0.9,
-        restitution: 0.05,
-        isSensor: false,
+        fixedRotation: false,
+        restitution: 0.2
     };
 
     this.set(options, varDefault);
@@ -69,22 +67,10 @@ Collision.prototype.create = function() {
     }
 
     if (this.object) {
-        // TODO delete previous object
+        // TODO delete the object
     }
 
     this.object = this.engine.create(this);
-    this.createGroundDetection();
-};
-
-
-Collision.prototype.createGroundDetection = function() {
-console.log('createGroundDetection');
-    this.engine.create({
-        shape: 'rect', 
-        isSensor: true, 
-        getPosition: function() { return {relativeX:0.5, relativeY: 1}; }, 
-        getSize: function() { return {width: 100 /*this.width * 0.8*/, height: 50}; }
-    }, this.object);
 };
 
 
@@ -102,17 +88,6 @@ Collision.prototype.getSize = function() {
         height: this.height || this.entity.aspect.height
     };        
 }
-
-
-Collision.prototype.impulse = function(degrees, power) {
-
-    this.object.GetBody().ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.object.GetBody().GetWorldCenter());
-};
-
-
-Collision.prototype.force = function(degrees, power) {
-    this.object.GetBody().ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.object.GetBody().GetWorldCenter());
-};
 
 
 Collision.prototype.applyPhysics = function() {
@@ -133,3 +108,60 @@ Collision.prototype.applyPhysics = function() {
     });
     return true;
 }
+
+*/
+yespix.define('physics', {
+
+
+    init: function(options, entity) {
+        options = options || {};
+        if (entity) this.entity = entity;
+
+        var varDefault = {
+            isAttacking: false,
+            isFalling: false,
+            isJumping: false,
+            isOnGround: false,
+            isIdle: true,
+
+            shield: 0,
+            life: 100,
+            power: 100,
+            stamina: 100,
+            level: 1
+
+        };
+
+        this.set(options, varDefault);
+    },
+
+
+    set: function(properties, varDefault) {
+        yespix.copy(properties, this, varDefault);
+
+        this.entity.event(
+            {
+                type: 'change',
+                from: this,
+                fromClass: 'actor',
+                entity: this.entity,
+                properties: properties
+            }
+        );
+
+    },
+
+
+    event: function(event) {
+        if (this.entity) this.entity.event(event);
+        return true;
+    },
+
+
+    prepare: function() {
+console.log('actor: ok');
+
+    },
+
+
+});

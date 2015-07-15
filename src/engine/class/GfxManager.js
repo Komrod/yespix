@@ -34,6 +34,7 @@ GfxManager.prototype.applyPhysics = function() {
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
+    	if (this.list[t].actor) this.list[t].actor.prepare();
     	if (this.list[t].collision) this.list[t].collision.applyPhysics();
     }
     return true;

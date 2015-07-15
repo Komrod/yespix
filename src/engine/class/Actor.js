@@ -1,4 +1,5 @@
 
+/*
 function Actor(options, entity) {
 
     options = options || {};
@@ -20,13 +21,12 @@ function Actor(options, entity) {
     };
 
     this.set(options, varDefault);
-
 }
+
 
 Actor.prototype.set = function(options, varDefault) {
     yespix.copy(options, this, varDefault);
     
-    this.isChanged = true;
     this.entity.event(
         {
             type: 'change',
@@ -38,3 +38,12 @@ Actor.prototype.set = function(options, varDefault) {
     );
 }
 
+
+Actor.prototype.step = function() {
+    if (!this.entity) {
+        return false;
+    }
+
+}
+
+*/

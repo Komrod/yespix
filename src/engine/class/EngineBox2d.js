@@ -14,6 +14,7 @@ function EngineBox2d(options) {
 	this.fixDef.density = this.defaultDensity = options.density || 1.0;
 	this.fixDef.friction = this.defaultFriction = options.friction || 0.5;
 	this.fixDef.restitution = this.defaultRestitution = options.restitution || 0.2;
+	this.fixDef.isSensor = this.defaultIsSensor = options.isSensor || false;
 
 	this.bodyDef = new Box2D.Dynamics.b2BodyDef;
 	this.bodyDef.fixedRotation = this.defaultFixedRotation = options.fixedRotation || false;
@@ -48,6 +49,7 @@ EngineBox2d.prototype.setToDefault = function() {
 	this.fixDef.density = this.defaultDensity;
 	this.fixDef.friction = this.defaultFriction;
 	this.fixDef.restitution = this.defaultRestitution;
+	this.fixDef.isSensor = this.defaultIsSensor;
 	this.bodyDef.fixedRotation = this.defaultFixedRotation;
 }
 
@@ -58,20 +60,26 @@ EngineBox2d.prototype.set = function(options) {
 	}
 	if (!yespix.isUndefined(options.restitution)) {
 		this.fixDef.restitution = options.restitution;
+		this.fixDef.isSensor = options.isSensor;
+		this.fixDef.friction = options.friction;
+		this.fixDef.density = options.density;
 	}
 };
 
 
-EngineBox2d.prototype.create = function(object) {
-	if (object.shape == 'rect') {
-		var position = object.getPosition();
-		var size = object.getSize();
-		return this.createRect(position.x, position.y, size.width, size.height, false, object);
+EngineBox2d.prototype.create = function(parameters, body) {
+console.log('EngineBox2d:create: parameters.shape = ', parameters.shape);
+	if (parameters.shape == 'rect') {
+console.log('EngineBox2d:create: ok');
+		var position = parameters.getPosition();
+		var size = parameters.getSize();
+console.log('EngineBox2d:create: position = ', position, ', size = ', size);
+		return this.createRect(position.x, position.y, size.width, size.height, false, parameters, body);
 	}
 };
 
 
-EngineBox2d.prototype.createRect = function(x, y, width, height, static, options) {
+EngineBox2d.prototype.createRect = function(x, y, width, height, static, options, object) {
 	static = static || false;
 	this.setToDefault();
 
@@ -87,8 +95,35 @@ EngineBox2d.prototype.createRect = function(x, y, width, height, static, options
 		this.set(options);
 	}
 
-	return this.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
+	if (object) {
+		return object.GetBody().CreateFixture(this.fixDef);
+	} else {
+		return this.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
+	}
 };
+
+
+EngineBox2d.prototype.createBody = function(x, y, width, height, static, options, object) {
+	
+};
+
+
+EngineBox2d.prototype.createFixture = function(relativeX, relativeY, width, height, static, options, object) {
+	
+};
+
+
+EngineBox2d.prototype.createListener = function(beginContact, endContact) {
+	this.listener = new Box2D.Dynamics.b2ContactListener;
+	this.listener.BeginContact = beginContact;
+	this.listener.EndContact = endContact;
+	return this.listener;
+};
+
+EngineBox2d.prototype.getListener = function() {
+	return this.listener;
+};
+
 
 
 EngineBox2d.prototype.createCircle = function() {
