@@ -9,9 +9,9 @@ yespix.define('actor2w', {
     init: function(options, entity) {
         this.super(options, entity);
 
-        this.speedWalk = this.speedWalk || 1000;
-        this.speedJump = this.speedJump || 8000;
-        this.speedAir = this.speedAir || 50;
+        this.speedWalk = this.speedWalk || 600;
+        this.speedJump = this.speedJump || 3000;
+        this.speedAir = this.speedAir || 300;
         this.speedMax = this.speedMax || 20;
 
         this.frictionAir = this.frictionAir || 0;
@@ -149,6 +149,10 @@ yespix.define('actor2w', {
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
             this.isOnGround = true;
+            
+            var vel = this.entity.collision.body.GetLinearVelocity();
+            vel.y = 0;
+            this.entity.collision.body.SetLinearVelocity(vel);
         }
     },
 
