@@ -53,5 +53,15 @@ yespix.define('actor', {
 
     },
 
+    createPhysics: function() {
+        return null;
+    },
+
+    actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
+    },
+
+    actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
+    }
+
 
 });

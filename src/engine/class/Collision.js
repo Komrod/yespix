@@ -10,7 +10,6 @@ function Collision(options, entity) {
 
     if (entity) {
         this.entity = entity;
-//console.log('Collision: entity = ', entity);
         if (!options.engine) {
             if (entity.engine) {
                 this.setEngine(entity.engine);
@@ -27,14 +26,14 @@ function Collision(options, entity) {
 	    type: 'dynamic', // "static" / "dynamic"
         shape: 'rect', // "rect"
 	    fixedRotation: false,
+        
         density: 1.0,
-        friction: 0.9,
-        restitution: 0.05,
+        friction: 0.2,
+        restitution: 0.0,
         isSensor: false,
     };
 
     this.set(options, varDefault);
-//console.log('Collision:this.engine = ', this.engine);
     if (this.engine) {
         this.create();
     }
@@ -72,15 +71,11 @@ Collision.prototype.create = function() {
         // TODO delete previous body
     }
 
-    this.body = this.engine.create(this);
-    this.createGroundDetection();
-};
-
-
-Collision.prototype.createGroundDetection = function() {
-console.log('createGroundDetection');
-    var size = this.getSize();
-    return this.engine.createFixture(0, 72, 110, 5, {isSensor: true}, this.body);
+    if (this.entity.actor) {
+        this.body = this.entity.actor.createPhysics(this);
+    } else {
+        this.body = this.engine.create(this);
+    }
 };
 
 
@@ -100,14 +95,25 @@ Collision.prototype.getSize = function() {
 }
 
 
-Collision.prototype.impulse = function(degrees, power) {
-
-    this.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+Collision.prototype.impulse = function(degrees, power, linear) {
+    linear = linear || false;
+console.log('collision:impulse: start, degrees = '+degrees+', power = '+power);
+    if (linear) {
+        this.body.ApplyLinearImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+    } else {
+        this.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+    }
 };
 
 
-Collision.prototype.force = function(degrees, power) {
-    this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+Collision.prototype.force = function(degrees, power, linear) {
+    linear = linear || false;
+console.log('collision:force: start, degrees = '+degrees+', power = '+power);
+    if (linear) {
+        this.body.ApplyLinearForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+    } else {
+        this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+    }
 };
 
 
@@ -129,3 +135,31 @@ Collision.prototype.applyPhysics = function() {
     });
     return true;
 }
+
+Collision.prototype.collisionBeginContact = function(contact, myFixture, otherBody, otherFixture) {
+    if (this.entity.actor) {
+        this.entity.actor.actorBeginContact(contact, myFixture, otherBody, otherFixture);
+    }
+};
+
+Collision.prototype.collisionEndContact = function(contact, myFixture, otherBody, otherFixture) {
+    if (this.entity.actor) {
+        this.entity.actor.actorEndContact(contact, myFixture, otherBody, otherFixture);
+    }
+};
+
+Collision.prototype.setFriction = function(friction, fixture) {
+    if (!fixture) {
+        var fixture = this.body.GetFixtureList();
+        while (fixture) {
+            fixture.SetFriction(friction);
+            fixture = fixture.m_next;
+        }
+    } else {
+        fixture.SetFriction(friction);
+    }
+};
+
+Collision.prototype.setDensity = function(density, fixture) {
+    density;
+};

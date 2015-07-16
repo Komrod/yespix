@@ -1,9 +1,10 @@
 
 TODO list:
-- Make an actor entity
+- Make a basic 2 ways player
+- Detect if on ground
+- change actor collision
 - Rename all options as properties
 - make a function defineEntity and defineClass
-- Make a basic 2 ways player
 - make a player state in Input class
 - enable / disable debug of physics
 - Impulse to move and jump player
@@ -79,6 +80,7 @@ TODO list:
 
 
 DONE:
+- Make an actor entity // 16-07-2015
 - dont use options reference after super() in entity init
 - dont draw if aspect.isVisible = false
 - bug: clipping with applyPhysics

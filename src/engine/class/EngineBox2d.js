@@ -45,84 +45,62 @@ EngineBox2d.prototype.initDebug = function() {
 };
 
 
-EngineBox2d.prototype.create = function(parameters) {
-console.log('EngineBox2d:create: parameters.shape = ', parameters.shape);
-	if (parameters.shape == 'rect') {
-console.log('EngineBox2d:create: ok');
-		var position = parameters.getPosition();
-		var size = parameters.getSize();
-console.log('EngineBox2d:create: position = ', position, ', size = ', size);
-		
-		return this.createRect(position.x, position.y, size.width, size.height, false, parameters);
+EngineBox2d.prototype.create = function(collision) {
+	if (collision.shape == 'rect') {
+		var position = collision.getPosition();
+		var size = collision.getSize();
+		return this.createRect(position.x, position.y, size.width, size.height, collision);
 	}
 };
 
 
-EngineBox2d.prototype.createRect = function(x, y, width, height, static, parameters) {
-
-	var body = this.createBody(x, y, width, height, static, parameters);
-	this.createFixture(0.5, 0.5, width, height, parameters, body);
+EngineBox2d.prototype.createRect = function(x, y, width, height, collision) {
+	var body = this.createBody(x, y, width, height, collision);
+	this.createFixture(0.5, 0.5, width, height, collision, body);
 	return body;
-	/*
-	static = static || false;
-	this.setToDefault();
-
-	if (static) this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-	else this.bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-	
-	this.fixDef.shape = new Box2D.Collision.Shapes.b2PolygonShape;
-	this.fixDef.shape.SetAsBox(width / 2 / this.scale, height / 2 / this.scale);
-	this.bodyDef.position.x = x / this.scale + width / 2 / this.scale;
-	this.bodyDef.position.y = y / this.scale + height / 2 / this.scale;
-
-	if (options) {
-		this.set(options);
-	}
-
-	if (object) {
-		return object.GetBody().CreateFixture(this.fixDef);
-	} else {
-		return this.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
-	}
-	*/
-
 };
 
 
-EngineBox2d.prototype.createBody = function(x, y, width, height, static, parameters) {
-	parameters = parameters || {};
-	this.setBody(parameters);
+EngineBox2d.prototype.createBody = function(x, y, width, height, collision) {
+	collision = collision || {};
+	this.setBody(collision);
 
-	if (static) this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+	if (collision.type == 'static') this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
 	else this.bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
 
 	this.bodyDef.position.x = x / this.scale + width / 2 / this.scale;
 	this.bodyDef.position.y = y / this.scale + height / 2 / this.scale;
 
-	return this.world.CreateBody(this.bodyDef);
+	var body = this.world.CreateBody(this.bodyDef);
+
+	if (collision.entity) {
+		body.SetUserData({collision: collision, entity: collision.entity});
+	}
+
+	return body;
 };
 
 
-EngineBox2d.prototype.setBody = function(parameters) {
+EngineBox2d.prototype.setBody = function(collision) {
 	
-	if (!yespix.isUndefined(parameters.fixedRotation)) {
-		this.bodyDef.fixedRotation = parameters.fixedRotation;
+	if (!yespix.isUndefined(collision.fixedRotation)) {
+		this.bodyDef.fixedRotation = collision.fixedRotation;
 	} else {
 		this.bodyDef.fixedRotation = this.defaultFixedRotation;
 	}
 };
 
 
-EngineBox2d.prototype.createFixture = function(offsetX, offsetY, width, height, parameters, body) {
-	parameters = parameters || {};
-	this.setFixture(parameters);
+EngineBox2d.prototype.createFixture = function(offsetX, offsetY, width, height, collision, body) {
+	collision = collision || {};
+	this.setFixture(collision);
 	this.fixDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-console.log('createFixture: setAsBox: offsetX = ', offsetX, ', offsetY = ', offsetY);
+//console.log('createFixture: setAsBox: offsetX = ', offsetX, ', offsetY = ', offsetY);
 	this.fixDef.shape.SetAsBox(width / 2 / this.scale, height / 2 / this.scale);
 	if (offsetX != 0 || offsetY != 0) {
 		this.moveShape(this.fixDef.shape, offsetX / this.scale, offsetY / this.scale);
 	}
-console.log(this.fixDef);
+//console.log(this.fixDef);
 	//body.CreateFixture(this.fixDef, 0);
 	// SetPosition (new b2Vec2(x,y) )
 	//this.fixDef.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
@@ -130,7 +108,17 @@ console.log(this.fixDef);
 	//this.fixDef.shape.SetAsBox(12, 12, new Box2D.Common.Math.b2Vec2(-1000, 1000), 0);
 //	body.CreateFixture(this.fixDef, 1);
 
-	return body.CreateFixture(this.fixDef, 1);
+	var fixture = body.CreateFixture(this.fixDef, 1);
+//console.log('createFixture: create fixture: collision = ', collision);
+
+	if (collision.userData) {
+//console.log('createFixture: set user data')		;
+		//fixture.m_userData = collision.userData;
+		fixture.SetUserData(collision.userData);
+	}
+//console.log('createFixture: GetUserData = ', fixture.GetUserData(), ', fixture = ', fixture);
+
+	return fixture;
 };
 
 
@@ -139,28 +127,29 @@ EngineBox2d.prototype.moveShape = function(shape, x, y) {
 		shape.m_vertices[t].x += x;
 		shape.m_vertices[t].y += y;
 	}
-console.log('apres shape = ', shape);
+//console.log('apres shape = ', shape);
 };
 
-EngineBox2d.prototype.setFixture = function(parameters) {
-	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
-	if (!yespix.isUndefined(parameters.restitution)) {
-		this.fixDef.restitution = parameters.restitution;
+
+EngineBox2d.prototype.setFixture = function(collision) {
+	//this.fixDef = new Box2D.Dynamics.b2FixtureDef;
+	if (!yespix.isUndefined(collision.restitution)) {
+		this.fixDef.restitution = collision.restitution;
 	} else {
 		this.fixDef.restitution = this.defaultRestitution;
 	}
-	if (!yespix.isUndefined(parameters.isSensor)) {
-		this.fixDef.isSensor = parameters.isSensor;
+	if (!yespix.isUndefined(collision.isSensor)) {
+		this.fixDef.isSensor = collision.isSensor;
 	} else {
 		this.fixDef.isSensor = this.defaultIsSensor;
 	}
-	if (!yespix.isUndefined(parameters.friction)) {
-		this.fixDef.friction = parameters.friction;
+	if (!yespix.isUndefined(collision.friction)) {
+		this.fixDef.friction = collision.friction;
 	} else {
 		this.fixDef.friction = this.defaultFriction;
 	}
-	if (!yespix.isUndefined(parameters.density)) {
-		this.fixDef.density = parameters.density;
+	if (!yespix.isUndefined(collision.density)) {
+		this.fixDef.density = collision.density;
 	} else {
 		this.fixDef.density = this.defaultDensity;
 	}
@@ -168,14 +157,26 @@ EngineBox2d.prototype.setFixture = function(parameters) {
 
 
 EngineBox2d.prototype.createListener = function(beginContact, endContact) {
+//console.log('createListener');
 	this.listener = new Box2D.Dynamics.b2ContactListener;
+	beginContact = beginContact || this.beginContact;
+	endContact = endContact || this.endContact;
 	this.listener.BeginContact = beginContact;
 	this.listener.EndContact = endContact;
+	this.world.SetContactListener(this.listener);
 	return this.listener;
 };
 
+
 EngineBox2d.prototype.getListener = function() {
 	return this.listener;
+};
+
+
+EngineBox2d.prototype.removetListener = function() {
+	this.listener.BeginContact = null;
+	this.listener.EndContact = null;
+	this.listener = null;
 };
 
 
@@ -189,4 +190,29 @@ EngineBox2d.prototype.createCircle = function() {
 	world.CreateBody(bodyDef).CreateFixture(fixDef);*/
 };
 
+
+EngineBox2d.prototype.beginContact = function(contact) {
+	var data = null;
+	data = contact.GetFixtureA().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionBeginContact(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB());
+	}
+	data = contact.GetFixtureB().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionBeginContact(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB());
+	}
+};
+
+
+EngineBox2d.prototype.endContact = function(contact) {
+	var data = null;
+	data = contact.GetFixtureA().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionEndContact(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB());
+	}
+	data = contact.GetFixtureB().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionEndContact(contact, contact.GetFixtureB(), contact.GetFixtureA().GetBody(), contact.GetFixtureA());
+	}
+};
 
