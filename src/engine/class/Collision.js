@@ -29,7 +29,7 @@ function Collision(options, entity) {
         
         density: 1.0,
         friction: 0.2,
-        restitution: 0.0,
+        restitution: 0.2,
         linearDamping: 0.1,
         isSensor: false,
     };

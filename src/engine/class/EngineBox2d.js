@@ -12,7 +12,7 @@ function EngineBox2d(options) {
 
 	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
 	this.fixDef.density = this.defaultDensity = options.density || 1.0;
-	this.fixDef.friction = this.defaultFriction = options.friction || 0.5;
+	this.fixDef.friction = this.defaultFriction = options.friction || 0.8;
 	this.fixDef.restitution = this.defaultRestitution = options.restitution || 0.2;
 	this.fixDef.isSensor = this.defaultIsSensor = options.isSensor || false;
 

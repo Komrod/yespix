@@ -13,11 +13,12 @@ yespix.define('actor2w', {
         this.speedJump = this.speedJump || 8;
         this.speedUp = this.speedUp || 0.25;
         this.speedAir = this.speedAir || 3;
-        this.speedMax = this.speedMax || 2;
+        this.speedXMax = this.speedXMax || 2;
+        this.speedYMax = this.speedYMax || 4;
 
         this.frictionAir = this.frictionAir || 0;
         this.frictionGround = this.frictionGround || 0.2;
-        this.frictionIdle = this.frictionIdle || 10;
+        this.frictionIdle = this.frictionIdle || 1;
     },
 
 
@@ -39,8 +40,13 @@ yespix.define('actor2w', {
         }
 
         var vel = this.entity.collision.body.GetLinearVelocity();
-        if (Math.abs(vel.x) > this.speedMax) {            
-            vel.x = (vel.x > 0 ? 1 : -1) * this.speedMax;
+        if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedYMax) {
+            if (Math.abs(vel.x) > this.speedXMax) {            
+                vel.x = (vel.x > 0 ? 1 : -1) * this.speedXMax;
+            }
+            if (Math.abs(vel.y) > this.speedYMax) {
+                vel.y = (vel.y > 0 ? 1 : -1) * this.speedYMax;
+            }
             this.entity.collision.body.SetLinearVelocity(vel);
         }
 
