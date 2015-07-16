@@ -19,25 +19,60 @@
 	// UNIT TEST ENTITY EXTENDS
 	//////////////////////////////////////////////////////////////////////////////
 	// image+actor
-	var object = new yespix.class.image({image: 'unit/image/zardoz.png'});
+	var object = new yespix.class.image(
+		{
+			image: 
+			{
+				src: 'unit/image/zardoz.png', 
+				snapToPixel: true
+			}
+		});
 	
 	object.actor = new yespix.class.actor2w({}, object);
 	
 	object.collision = new Collision(
 		{
-			offsetX: 10, 
-			offsetY: 5, 
-			width: 130, 
-			height: 145, 
+			offsetX: 10,
+			offsetY: 5,
+			width: 130,
+			height: 145,
 			engine: manager.engine, 
 			fixedRotation: true,
-			friction: 0.8
+			friction: 0.8,
+			linearDamping: 1.0
+		}, object);
+
+	manager.add(object);
+
+
+	object = new yespix.class.image(
+		{
+			image: 
+			{
+				src: 'unit/image/zardoz.png', 
+				snapToPixel: true
+			},
+			aspect:
+			{
+				width: 20,
+				height: 40
+			},
+			position: 
+			{
+				x: 200
+			}
+		});
+	
+	object.collision = new Collision(
+		{
+			engine: manager.engine, 
 		}, object);
 
 	manager.add(object);
 
 	//////////////////////////////////////////////////////////////////////////////
     manager.engine.createRect(0, 400, 640, 10, {type: 'static'});
+
 
 	//var actor = new yespix.class.actor({ image: 'unit/image/perso.png', sprite: { width: 32, height: 32 } });
 	//actor.extend(yespix.class.image);
@@ -525,6 +560,7 @@ console.log('object = ', object);
             manager.clear(); // clear canvas
             manager.engine.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
+            manager.engine.world.ClearForces();
 		}, 
 		function(loop, time) { 
 			manager.engine.world.Step(time/1000, 100, 100);

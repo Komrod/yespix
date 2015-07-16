@@ -30,6 +30,7 @@ function Collision(options, entity) {
         density: 1.0,
         friction: 0.2,
         restitution: 0.0,
+        linearDamping: 0.1,
         isSensor: false,
     };
 
@@ -97,7 +98,6 @@ Collision.prototype.getSize = function() {
 
 Collision.prototype.impulse = function(degrees, power, linear) {
     linear = linear || false;
-console.log('collision:impulse: start, degrees = '+degrees+', power = '+power);
     if (linear) {
         this.body.ApplyLinearImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
     } else {
@@ -108,7 +108,6 @@ console.log('collision:impulse: start, degrees = '+degrees+', power = '+power);
 
 Collision.prototype.force = function(degrees, power, linear) {
     linear = linear || false;
-console.log('collision:force: start, degrees = '+degrees+', power = '+power);
     if (linear) {
         this.body.ApplyLinearForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
     } else {
@@ -125,7 +124,6 @@ Collision.prototype.applyPhysics = function() {
     var size = this.getSize();
     var angle = this.body.GetAngle();
     var degree = yespix.toDegree(angle);
-//console.log('angle = '+angle+', degree = '+degree);
     this.entity.set({
         position: {
             x: (position.x - size.width / 2 / this.engine.scale) * this.engine.scale - this.offsetX,

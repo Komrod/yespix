@@ -9,10 +9,11 @@ yespix.define('actor2w', {
     init: function(options, entity) {
         this.super(options, entity);
 
-        this.speedWalk = this.speedWalk || 600;
-        this.speedJump = this.speedJump || 3000;
-        this.speedAir = this.speedAir || 300;
-        this.speedMax = this.speedMax || 20;
+        this.speedWalk = this.speedWalk || 6;
+        this.speedJump = this.speedJump || 8;
+        this.speedUp = this.speedUp || 0.25;
+        this.speedAir = this.speedAir || 3;
+        this.speedMax = this.speedMax || 2;
 
         this.frictionAir = this.frictionAir || 0;
         this.frictionGround = this.frictionGround || 0.2;
@@ -42,6 +43,7 @@ yespix.define('actor2w', {
             vel.x = (vel.x > 0 ? 1 : -1) * this.speedMax;
             this.entity.collision.body.SetLinearVelocity(vel);
         }
+
         if (input.key('up')) {
             if (this.isOnGround) {
                 this.jump();
@@ -103,8 +105,12 @@ yespix.define('actor2w', {
         if (this.isOnGround || !this.entity.collision) {
             return false;
         }
+        var vel = this.entity.collision.body.GetLinearVelocity();
+        if (vel.y>-2) {
+            return false;
+        }
         this.isIdle = false;
-        this.entity.collision.impulse(-90, this.speedAir);
+        this.entity.collision.impulse(-90, this.speedUp);
     },
 
     airMoveLeft: function () {

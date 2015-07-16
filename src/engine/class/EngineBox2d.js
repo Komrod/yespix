@@ -4,11 +4,11 @@ function EngineBox2d(options) {
 	options = options || {};
 
 	this.world = new Box2D.Dynamics.b2World(
-	     new Box2D.Common.Math.b2Vec2(0, 20) // gravity
+	     new Box2D.Common.Math.b2Vec2(0, 10) // gravity
 	  ,  true // allow sleep
 	);
 
-	this.scale = options.scale || 10;
+	this.scale = options.scale || 100;
 
 	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
 	this.fixDef.density = this.defaultDensity = options.density || 1.0;
@@ -18,6 +18,7 @@ function EngineBox2d(options) {
 
 	this.bodyDef = new Box2D.Dynamics.b2BodyDef;
 	this.bodyDef.fixedRotation = this.defaultFixedRotation = options.fixedRotation || false;
+	this.bodyDef.linearDamping = this.defaultLinearDamping = options.linearDamping || 0.1;
 }
 
 
@@ -87,6 +88,11 @@ EngineBox2d.prototype.setBody = function(collision) {
 		this.bodyDef.fixedRotation = collision.fixedRotation;
 	} else {
 		this.bodyDef.fixedRotation = this.defaultFixedRotation;
+	}
+	if (!yespix.isUndefined(collision.linearDamping)) {
+		this.bodyDef.linearDamping = collision.linearDamping;
+	} else {
+		this.bodyDef.linearDamping = this.defaultLinearDamping;
 	}
 };
 
