@@ -4,21 +4,24 @@ function EngineBox2d(options) {
 	options = options || {};
 
 	this.world = new Box2D.Dynamics.b2World(
-	     new Box2D.Common.Math.b2Vec2(0, 10) // gravity
+	     new Box2D.Common.Math.b2Vec2(0, 20) // gravity
 	  ,  true // allow sleep
 	);
+	//this.world.ContinuousPhysics(true);
 
-	this.scale = options.scale || 100;
-
-	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
-	this.fixDef.density = this.defaultDensity = options.density || 1.0;
-	this.fixDef.friction = this.defaultFriction = options.friction || 0.8;
-	this.fixDef.restitution = this.defaultRestitution = options.restitution || 0.2;
-	this.fixDef.isSensor = this.defaultIsSensor = options.isSensor || false;
+	this.scale = options.scale || 30;
 
 	this.bodyDef = new Box2D.Dynamics.b2BodyDef;
 	this.bodyDef.fixedRotation = this.defaultFixedRotation = options.fixedRotation || false;
 	this.bodyDef.linearDamping = this.defaultLinearDamping = options.linearDamping || 0.1;
+	this.bodyDef.isBullet = this.defaultIsBullet = options.isBullet || false;
+
+	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
+	this.fixDef.density = this.defaultDensity = options.density || 1.0;
+	this.fixDef.friction = this.defaultFriction = options.friction || 0.2;
+	this.fixDef.restitution = this.defaultRestitution = options.restitution || 0.2;
+	this.fixDef.isSensor = this.defaultIsSensor = options.isSensor || false;
+
 }
 
 
@@ -39,7 +42,7 @@ EngineBox2d.prototype.initDebug = function() {
 	this.debugDraw = new Box2D.Dynamics.b2DebugDraw();
 	this.debugDraw.SetSprite(this.context);
 	this.debugDraw.SetDrawScale(this.scale);
-	this.debugDraw.SetFillAlpha(0.3);
+	this.debugDraw.SetFillAlpha(0.1);
 	this.debugDraw.SetLineThickness(1.0);
 	this.debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit | Box2D.Dynamics.b2DebugDraw.e_jointBit);
 	this.world.SetDebugDraw(this.debugDraw);
@@ -94,6 +97,12 @@ EngineBox2d.prototype.setBody = function(collision) {
 	} else {
 		this.bodyDef.linearDamping = this.defaultLinearDamping;
 	}
+	if (!yespix.isUndefined(collision.isBullet)) {
+		this.bodyDef.isBullet = collision.isBullet;
+	} else {
+		this.bodyDef.isBullet = this.defaultIsBullet;
+	}
+console.log('setBody: bodyDef = ', this.bodyDef);
 };
 
 
@@ -162,13 +171,20 @@ EngineBox2d.prototype.setFixture = function(collision) {
 };
 
 
-EngineBox2d.prototype.createListener = function(beginContact, endContact) {
+EngineBox2d.prototype.createListener = function(beginContact, endContact, preSolve, postSolve) {
 //console.log('createListener');
 	this.listener = new Box2D.Dynamics.b2ContactListener;
+	
 	beginContact = beginContact || this.beginContact;
 	endContact = endContact || this.endContact;
+	preSolve = preSolve || this.preSolve;
+	postSolve = postSolve || this.postSolve;
+
 	this.listener.BeginContact = beginContact;
 	this.listener.EndContact = endContact;
+	this.listener.PreSolve = preSolve;
+	this.listener.PostSolve = postSolve;
+
 	this.world.SetContactListener(this.listener);
 	return this.listener;
 };
@@ -219,6 +235,32 @@ EngineBox2d.prototype.endContact = function(contact) {
 	data = contact.GetFixtureB().GetBody().GetUserData();
 	if (data && data.entity && data.entity.collision) {
 		data.entity.collision.collisionEndContact(contact, contact.GetFixtureB(), contact.GetFixtureA().GetBody(), contact.GetFixtureA());
+	}
+};
+
+
+EngineBox2d.prototype.preSolve = function(contact, old) {
+	var data = null;
+	data = contact.GetFixtureA().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionPreSolve(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB(), old);
+	}
+	data = contact.GetFixtureB().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionPreSolve(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB(), old);
+	}
+};
+
+
+EngineBox2d.prototype.postSolve = function(contact, impulse) {
+	var data = null;
+	data = contact.GetFixtureA().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionPostSolve(contact, contact.GetFixtureA(), contact.GetFixtureB().GetBody(), contact.GetFixtureB(), impulse);
+	}
+	data = contact.GetFixtureB().GetBody().GetUserData();
+	if (data && data.entity && data.entity.collision) {
+		data.entity.collision.collisionPostSolve(contact, contact.GetFixtureB(), contact.GetFixtureA().GetBody(), contact.GetFixtureA(), impulse);
 	}
 };
 

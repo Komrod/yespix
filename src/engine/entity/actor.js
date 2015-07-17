@@ -61,7 +61,13 @@ yespix.define('actor', {
     },
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
-    }
+    },
+
+    actorPreSolve: function(contact, myFixture, otherBody, otherFixture, old) {
+    },
+
+    actorPostSolve: function(contact, myFixture, otherBody, otherFixture, impact) {
+    },
 
 
 });

@@ -23,15 +23,17 @@ function Collision(options, entity) {
         offsetY: 0,
         width: 0,
         height: 0,
-	    type: 'dynamic', // "static" / "dynamic"
+	    type: 'dynamic', // "static" / "dynamic" /  "kinetic" @TODO
         shape: 'rect', // "rect"
-	    fixedRotation: false,
-        
+
         density: 1.0,
         friction: 0.2,
-        restitution: 0.2,
-        linearDamping: 0.1,
+        restitution: 0.0,
+        linearDamping: 0.2,
+
         isSensor: false,
+        fixedRotation: false,
+        isBullet: false,
     };
 
     this.set(options, varDefault);
@@ -134,6 +136,7 @@ Collision.prototype.applyPhysics = function() {
     return true;
 }
 
+
 Collision.prototype.collisionBeginContact = function(contact, myFixture, otherBody, otherFixture) {
     if (this.entity.actor) {
         this.entity.actor.actorBeginContact(contact, myFixture, otherBody, otherFixture);
@@ -145,6 +148,19 @@ Collision.prototype.collisionEndContact = function(contact, myFixture, otherBody
         this.entity.actor.actorEndContact(contact, myFixture, otherBody, otherFixture);
     }
 };
+
+Collision.prototype.collisionPreSolve = function(contact, myFixture, otherBody, otherFixture, old) {
+    if (this.entity.actor) {
+        this.entity.actor.actorPreSolve(contact, myFixture, otherBody, otherFixture, old);
+    }
+};
+
+Collision.prototype.collisionPostSolve = function(contact, myFixture, otherBody, otherFixture, impact) {
+    if (this.entity.actor) {
+        this.entity.actor.actorPostSolve(contact, myFixture, otherBody, otherFixture, impact);
+    }
+};
+
 
 Collision.prototype.setFriction = function(friction, fixture) {
     if (!fixture) {

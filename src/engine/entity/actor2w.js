@@ -9,21 +9,33 @@ yespix.define('actor2w', {
     init: function(options, entity) {
         this.super(options, entity);
 
-        this.speedWalk = this.speedWalk || 6;
-        this.speedJump = this.speedJump || 8;
-        this.speedUp = this.speedUp || 0.25;
-        this.speedAir = this.speedAir || 3;
-        this.speedXMax = this.speedXMax || 2;
-        this.speedYMax = this.speedYMax || 4;
+        this.speedWalk = this.speedWalk || 0.9;
+        this.speedJump = this.speedJump || 12;
+        this.speedUp = this.speedUp || 0.12;
+        this.speedAir = this.speedAir || 0.15;
+        this.speedXMax = this.speedXMax || 10;
+        this.speedYMax = this.speedYMax || 10;
 
-        this.frictionAir = this.frictionAir || 0;
-        this.frictionGround = this.frictionGround || 0.2;
-        this.frictionIdle = this.frictionIdle || 1;
+        this.frictionAir = this.frictionAir || 1;
+        this.frictionGround = this.frictionGround || 5;
+        this.frictionIdle = this.frictionIdle || 5;
+
+        this.groundTouch = 0;
     },
 
 
     prepare: function() {
         this.isIdle = true;
+        if (this.groundTouch > 0) {
+            if (!this.isOnGround) {
+                var vel = this.entity.collision.body.GetLinearVelocity();
+                vel.y = 0;
+                this.entity.collision.body.SetLinearVelocity(vel);
+            }
+            this.isOnGround = true;
+        } else {
+            this.isOnGround = false;
+        }
 
         if (input.key('right')) {
             if (this.isOnGround) {
@@ -112,7 +124,7 @@ yespix.define('actor2w', {
             return false;
         }
         var vel = this.entity.collision.body.GetLinearVelocity();
-        if (vel.y>-2) {
+        if (vel.y > -(this.speedJump2 * 1)) {
             return false;
         }
         this.isIdle = false;
@@ -148,23 +160,27 @@ yespix.define('actor2w', {
         var body = collision.engine.create(collision);
         if (this.listener) {
             var size = collision.getSize();
-            collision.engine.createFixture(0, size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
-            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
-            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
-            collision.engine.createFixture(size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallRight'}}, body);
+            collision.engine.createFixture(0, size.height / 2, size.width * 0.99, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+//            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
+//            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
+//            collision.engine.createFixture(size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallRight'}}, body);
         }
         return body;
     },
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
+if (otherBody.GetType() == 2) {
+console.log('actorBeginContact: with dynamic object ------------------------------------------------');
+}
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
-            this.isOnGround = true;
-            
-            var vel = this.entity.collision.body.GetLinearVelocity();
-            vel.y = 0;
-            this.entity.collision.body.SetLinearVelocity(vel);
+            this.groundTouch++;
+console.log('actorBeginContact: groundTouch++: '+this.groundTouch);
+//var vel = myFixture.GetBody().GetLinearVelocity();
+//console.log('actorBeginContact: velocity = ', vel);
+        } else {
+console.log('actorBeginContact: NOT GROUND: myData = ', myData);
         }
     },
 
@@ -172,8 +188,50 @@ yespix.define('actor2w', {
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
-            this.isOnGround = false;
+            this.groundTouch--;
+            if (this.groundTouch<0) {
+                this.groundTouch = 0;
+            }
+console.log('actorEndContact: groundTouch--: '+this.groundTouch);
+//var vel = myFixture.GetBody().GetLinearVelocity();
+//console.log('actorBeginContact: velocity = ', vel);
         }
+        /*
+        var myData = myFixture.GetUserData();
+        if (myData && myData.type == 'ground') {
+            this.isOnGround = false;
+        }*/
+//var vel = myFixture.GetBody().GetLinearVelocity();
+//console.log('actorEndContact: velocity = ', vel);
     },
+
+    actorPreSolve: function(contact, myFixture, otherBody, otherFixture, old) {
+/*        this.beforeContact = {
+            myVel: myFixture.GetBody().GetLinearVelocity(),
+            otherVel: otherBody.GetLinearVelocity()
+        };*/
+//console.log('actorPreSolve: myVel = ', this.beforeContact.myVel);
+    },
+
+    actorPostSolve: function(contact, myFixture, otherBody, otherFixture, impact) {
+/*        if (this.beforeContact) {
+            var myVel = myFixture.GetBody().GetLinearVelocity();
+if (myVel.y > 0.1 || myVel.y <-0.1) {
+console.log('actorPostSolve: before myVel = ', this.beforeContact.myVel);
+console.log('actorPostSolve: myVel = ', myVel); }
+            var otherVel = otherBody.GetLinearVelocity();
+            var newVel = null;
+            if (Math.abs(this.beforeContact.myVel.x - myVel.x) > 0.2 && Math.abs(this.beforeContact.otherVel.x - otherVel.x) > 0.2) {
+                newVel = this.beforeContact.myVel;
+            }
+            if (Math.abs(this.beforeContact.myVel.y - myVel.y) > 0.2 && Math.abs(this.beforeContact.otherVel.y - otherVel.y) > 0.2) {
+                newVel = this.beforeContact.myVel;
+            }
+            if (newVel) {
+console.log('Set new vel: ', newVel);
+                this.entity.collision.body.SetLinearVelocity(newVel);
+            }
+        }*/
+    }
 
 });
