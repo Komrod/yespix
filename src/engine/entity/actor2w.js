@@ -16,8 +16,8 @@ yespix.define('actor2w', {
         this.speedXMax = this.speedXMax || 10;
         this.speedYMax = this.speedYMax || 10;
 
-        this.frictionAir = this.frictionAir || 1;
-        this.frictionGround = this.frictionGround || 5;
+        this.frictionAir = this.frictionAir || 0.01;
+        this.frictionGround = this.frictionGround || 2;
         this.frictionIdle = this.frictionIdle || 5;
 
         this.groundTouch = 0;
@@ -160,7 +160,7 @@ yespix.define('actor2w', {
         var body = collision.engine.create(collision);
         if (this.listener) {
             var size = collision.getSize();
-            collision.engine.createFixture(0, size.height / 2, size.width * 0.99, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+            collision.engine.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
 //            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
 //            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
 //            collision.engine.createFixture(size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallRight'}}, body);
@@ -186,13 +186,30 @@ console.log('actorBeginContact: NOT GROUND: myData = ', myData);
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
+console.log('actorEndContact: --------------------------------------');
+console.log('actorEndContact: start, groundTouch = '+this.groundTouch);
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
             this.groundTouch--;
-            if (this.groundTouch<0) {
+//            if (this.groundTouch <= 0) {
                 this.groundTouch = 0;
-            }
+                var edge = myFixture.GetBody().GetContactList();
+var count = 1;                
+                while (edge) {
+console.log('actorEndContact: edge '+count+' = ', edge.contact.IsTouching());
+console.log('actorEndContact: B.isMyFix='+(edge.contact.GetFixtureB() == myFixture ? 'TRUE' : 'FALSE')+', A.NotSameBody='+(edge.contact.GetFixtureA().GetBody() != myFixture.GetBody() ? 'TRUE' : 'FALSE'));
+                    if (edge.contact.IsTouching() && edge.contact.GetFixtureA() == myFixture && edge.contact.GetFixtureB().GetBody() != myFixture.GetBody() 
+                        && otherFixture != edge.contact.GetFixtureB()) {
+                        this.groundTouch++;
+//                    } else if (next.contact.GetFixtureB() == myFixture && next.contact.GetFixtureA().GetBody() != myFixture.GetBody()) {
+//                        this.groundTouch++;
+                    }
+count++;                    
+                    edge = edge.next;
+                }
+//            }
 console.log('actorEndContact: groundTouch--: '+this.groundTouch);
+console.log('actorEndContact: --------------------------------------');
 //var vel = myFixture.GetBody().GetLinearVelocity();
 //console.log('actorBeginContact: velocity = ', vel);
         }

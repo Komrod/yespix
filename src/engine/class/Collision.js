@@ -174,6 +174,25 @@ Collision.prototype.setFriction = function(friction, fixture) {
     }
 };
 
+
 Collision.prototype.setDensity = function(density, fixture) {
-    density;
+    if (!fixture) {
+        var fixture = this.body.GetFixtureList();
+        while (fixture) {
+            fixture.SetDensity(density);
+            fixture = fixture.m_next;
+        }
+    } else {
+        fixture.SetDensity(density);
+    }
+    this.body.ResetMassData();
+};
+
+
+Collision.prototype.getLinearVelocity = function() {
+    return this.body.GetLinearVelocity();
+};
+
+Collision.prototype.setLinearVelocity = function(vel) {
+    return this.body.SetLinearVelocity(vel);
 };
