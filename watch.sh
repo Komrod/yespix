@@ -6,5 +6,5 @@
 cd src/grunt/ && grunt && grunt dog
 
 #
-# To install grunt and necessary packages, run src/grunt/install.sh
+# To install grunt and necessary packages, run install.sh
 #

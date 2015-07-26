@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
     /**
-     * List of pgrunt packages
+     * List of grunt packages
      */
     var packages = [
         'grunt-contrib-uglify',
@@ -52,7 +52,11 @@ module.exports = function(grunt) {
             out: {
                 src: [
                       '../engine/core/*.js',
-                      '../engine/entities/*.js'
+                      '../engine/core/**/*.js',
+                      '../engine/entity/*.js',
+                      '../engine/entity/**/*.js',
+                      '../engine/class/*.js',
+                      '../engine/class/**/*.js'
                 ]
             }
         },
@@ -61,14 +65,15 @@ module.exports = function(grunt) {
         {
             all: {
                 src : [
-                    '../engine/core/*.js',
-                    '../engine/entities/*.js',
-                    '../engine/yespix.js'
+                    '../engine/core/**/*.js',
+                    '../engine/entity/**/*.js',
+                    '../engine/class/**/*.js',
+                    '../../build/yespix.js'
                     ]
             },
             yp: {
                 src : [
-                    '../engine/yespix.js'
+                    '../../build/yespix.js'
                     ]
             }
         },
@@ -79,7 +84,7 @@ module.exports = function(grunt) {
                 force: true,
             },
             build: {
-                src: ['../engine/yespix.min.js', '../engine/yespix.js'],
+                src: ['../../build/yespix.min.js', '../../build/yespix.js'],
             }
         },
 
@@ -90,18 +95,42 @@ module.exports = function(grunt) {
                     banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
                 },
                 src: [
-                    // core
+
+                    // classes
+                    '../engine/class/*.js',
+
+                    // core start
                     '../engine/template/core_start.js',
+
+                    // core
                     '../engine/core/*.js',
 
-                    // entities
+                    // entities start
                     '../engine/template/entities_start.js',
-                    '../engine/entities/*.js',
+
+                    // entities
+                    '../engine/entity/base.js',
+                    '../engine/entity/gfx.js',
+                    '../engine/entity/canvas.js',
+                    '../engine/entity/path.js',
+                    '../engine/entity/text.js',
+                    '../engine/entity/image.js',
+                    '../engine/entity/sound.js',
+                    '../engine/entity/sprite.js',
+                    '../engine/entity/video.js',
+                    '../engine/entity/animation.js',
+
+                    // classes
+                    '../engine/entity/actor.js',
+                    '../engine/entity/actor2w.js',
+
+                    // entities end
                     '../engine/template/entities_end.js',
                     
-                    '../engine/template/core_end.js',
+                    // core end
+                    '../engine/template/core_end.js', 
                 ],
-                dest: '../engine/yespix.js',
+                dest: '../../build/yespix.js',
                 nonull: true,
             }
         },
@@ -110,14 +139,21 @@ module.exports = function(grunt) {
         uglify: {
             minify: {
                 files: [{
-                    '../engine/yespix.min.js': '../engine/yespix.js'
+                    '../../build/yespix.min.js': '../../build/yespix.js'
                 }]
             }
         },
 
         watch: {
             scripts: {
-                files: ['../engine/core/*.js', '../engine/entities/*.js'],
+                files: [
+                    '../engine/core/*.js', 
+                    '../engine/core/**/*.js', 
+                    '../engine/entity/*.js',
+                    '../engine/entity/**/*.js',
+                    '../engine/class/*.js',
+                    '../engine/class/**/*.js'
+                    ],
                 tasks: ['default'],
                 options: {
                     spawn: false,

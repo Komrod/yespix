@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="qunit.js"></script>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+
+test( "Engine general functions", function() {
+	console.log('');
+	var yp = yespix(), n, t;
+
+	// randFloat
+	ok( yp.randFloat, "randFloat :: exists!");
+	n = yp.randFloat(0, 1);
+	ok( n >= 0 && n <= 1 && n % 1 !== 0, "randFloat :: ok!");
+
+	// randInt
+	ok( yp.randInt, "randInt :: exists!" );
+	n = yp.randInt(0, 1);
+	ok( n >= 0 && n <= 1 && n % 1 === 0, "randInt :: ok!" );
+
+	// unique
+	n = [1, 2, 3];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = [1, 2, 3, 3, 3, 3, 3];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = [1, 1, 1, 1, 1, 2, 3];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = ["a", "the quick fox jumps over the lazy dog", "azerty", "a", "azerty"];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = [0, "the quick fox jumps over the lazy dog", "azerty", "azerty", 0, 0];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = [0, "the quick fox jumps over the lazy dog", "azerty", "azerty", 0, 0];
+	ok( yp.unique(n).length == 3, "unique :: array length must be 3");
+	n = [{a: "test"}, {a: "test"}, {a: "test"}];
+	ok( yp.unique(n).length == 1, "unique :: array length must be 1");
+
+	// file path
+	n = [
+			{ src: '/var/dir/nofile/', getExtension: '', getDir: '/var/dir/nofile/', getFilename: '', getNoExtension: '' },
+			{ src: 'just_a_file.txt', getExtension: 'txt', getDir: '', getFilename: 'just_a_file.txt', getNoExtension: 'just_a_file' },
+			{ src: 'dir/just_a_file.txt', getExtension: 'txt', getDir: 'dir/', getFilename: 'just_a_file.txt', getNoExtension: 'just_a_file' },
+			{ src: '&é"\'(-è_çà)=$^*ù!:;,.<>', getExtension: '<>', getDir: '', getFilename: '&é"\'(-è_çà)=$^*ù!:;,.<>', getNoExtension: '&é"\'(-è_çà)=$^*ù!:;,' },
+			{ src: '', getExtension: '', getDir: '', getFilename: '', getNoExtension: '' },
+			{ src: 'dir/multiple.file.extension.ahead.zip', getExtension: 'zip', getDir: 'dir/', getFilename: 'multiple.file.extension.ahead.zip', getNoExtension: 'multiple.file.extension.ahead' },
+		];
+	for (t = 0; t<n.length; t++)
+	{
+		ok( yp.getExtension(n[t].src) == n[t].getExtension, 'getExtension :: wrong result for "'+n[t].src+'"');
+		ok( yp.getNoExtension(n[t].src) == n[t].getNoExtension, 'getNoExtension :: wrong result for "'+n[t].src+'"');
+		ok( yp.getDir(n[t].src) == n[t].getDir, 'getDir :: wrong result for "'+n[t].src+'"');
+		ok( yp.getFilename(n[t].src) == n[t].getFilename, 'getFilename :: wrong result for "'+n[t].src+'"');
+	}
+
+	// variable types
+	n = [
+			{ var: 'string', isFunction: false, isBoolean: false, isInt: false, isString: true, isArray: false, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: 123, isFunction: false, isBoolean: false, isInt: true, isString: false, isArray: false, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: yp, isFunction: false, isBoolean: false, isInt: false, isString: false, isArray: false, isUndefined: false, isRegexp: false, isObject: true },
+			{ var: function() {}, isFunction: true, isBoolean: false, isInt: false, isString: false, isArray: false, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: ok, isFunction: true, isBoolean: false, isInt: false, isString: false, isArray: false, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: false, isFunction: false, isBoolean: true, isInt: false, isString: false, isArray: false, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: [], isFunction: false, isBoolean: false, isInt: false, isString: false, isArray: true, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: new Array(), isFunction: false, isBoolean: false, isInt: false, isString: false, isArray: true, isUndefined: false, isRegexp: false, isObject: false },
+			{ var: yp.opopopop, isFunction: false, isBoolean: false, isInt: false, isString: false, isArray: false, isUndefined: true, isRegexp: false, isObject: false },
+			{ var: /.*/, isFunction: false, isBoolean: false, isInt: false, isString: false, isArray: false, isUndefined: false, isRegexp: true, isObject: true },
+		];
+	for (t = 0; t<n.length; t++)
+	{
+		ok( yp.isFunction(n[t].var) == n[t].isFunction, 'isFunction :: wrong result for "'+n[t].var+'"');
+		ok( yp.isBoolean(n[t].var) == n[t].isBoolean, 'isBoolean :: wrong result for "'+n[t].var+'"');
+		ok( yp.isInt(n[t].var) == n[t].isInt, 'isInt :: wrong result for "'+n[t].var+'"');
+		ok( yp.isString(n[t].var) == n[t].isString, 'isString :: wrong result for "'+n[t].var+'"');
+		ok( yp.isArray(n[t].var) == n[t].isArray, 'isArray :: wrong result for "'+n[t].var+'"');
+		ok( yp.isUndefined(n[t].var) == n[t].isUndefined, 'isUndefined :: wrong result for "'+n[t].var+'"');
+		ok( yp.isRegexp(n[t].var) == n[t].isRegexp, 'isRegexp :: wrong result for "'+n[t].var+'"');
+		ok( yp.isObject(n[t].var) == n[t].isObject, 'isObject :: wrong result for "'+n[t].var+'"');
+	}
+
+	// inArray
+	n = [1, 10, 100, 0.789, "unit", {a: "test"}, true, "0", "1"];
+	ok( yp.inArray(n, 1), 'inArray :: error');
+	ok( !yp.inArray(n, 0), 'inArray :: error');
+	ok( !yp.inArray(n, 0.00), 'inArray :: error');
+	ok( yp.inArray(n, "0"), 'inArray :: error');
+	ok( yp.inArray(n, "1"), 'inArray :: error');
+	ok( yp.inArray(n, "unit"), 'inArray :: error');
+	ok( !yp.inArray(n, "test"), 'inArray :: error');
+	ok( yp.inArray(n, 0.789), 'inArray :: error');
+	ok( yp.inArray(n, 100), 'inArray :: error');
+	ok( !yp.inArray(n, false), 'inArray :: error');
+	ok( yp.inArray(n, true), 'inArray :: error');
+	ok( !yp.inArray(n, {b: "test"}), 'inArray :: error');
+
+});
+
+	</script>
+</body>
+</html>

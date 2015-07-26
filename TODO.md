@@ -1,5 +1,29 @@
 
 TODO list:
+- Make a basic 2 ways player
+- Detect if on ground
+- change actor collision
+- Rename all options as properties
+- make a function defineEntity and defineClass
+- make a player state in Input class
+- enable / disable debug of physics
+- Impulse to move and jump player
+- Detect when on ground with player
+- start player on ground / detects ground
+- load a level
+- pass rotation of an object to collision object
+- use collision in a level
+- parallax move
+- light engine
+
+- extends to reverse an animation
+- bold text
+- put entities in yespix.entity and classes in yespix.class
+- physics engine files must start with "physics"
+- tween engine files must start with "tween"
+- function to remove entities and collision object
+- set isChanged=false after the draw function
+- optimize: 
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
 - optimize: try to use fixed length arrays (using new Array(1000))
@@ -11,12 +35,9 @@ TODO list:
 - optimize: add the collision box to _box
 - optimize: use clearRect to clear faster the canvas
 - optimize: Z sort function only sort the changed entities
-- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
 - optimize: tiled levelLayer to fix the drawImage speed on phone
-- center position with positionAlign ("center left", "top right" ...)
-- examples and build folders in the root project
+- center position with position.align ("center left", "top right" ...)
 - fix position of followed entity in the center of entity
-- key remanence (for jump)
 - disable key capture on phones
 - phone mode: disable keys, set fullscreen
 - calculate vector from a position to another position
@@ -24,13 +45,12 @@ TODO list:
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
 - create moveOnGround() for actor, set position on ground on startUp
-- draw text based on image
+- draw text based on letters from image
 - typewritter: text showing letter by letter with sound
 - container entity
 - button entity
 - Separate the fall down / jump up animation of a character
 
-- add a setImageScale function
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - make a debug panel where you can change variables and see entities
 - fix collision between entities
@@ -59,6 +79,57 @@ TODO list:
 - make the Chuck game
 
 
+DONE:
+- Make an actor entity // 16-07-2015
+- dont use options reference after super() in entity init
+- dont draw if aspect.isVisible = false
+- bug: clipping with applyPhysics
+- rotation text // 2015-07-13
+- bug: strange border radius on small rect
+- rotation sprite
+- rotation animation
+- bug: use animation / sprite with collision
+- bug: infinite loop on loading animation
+- bug: cant change aspect on image creation
+- rotation image
+- rotation path
+- optimize: use hack rounding for snapToPixel: rounded = ~~ (0.5 + somenum)
+- use collision engine (box2d) // 2015-07-09
+- key remanence (for jump)
+- handle keypress
+- Facade for image, sound, video
+- auto detect when to set autoSize to false with set of width or height on video / image
+- make an animation class // 2015-07-02
+- video entity
+- adapt sprite to image scale
+- error event with sound
+- function to clear canvas in GfxManager
+- make the main loop possible
+- make a sprite sheet class
+- single sound in an entity sound and class Sound
+- single image in an entity image and class Image // 2015-06-25
+- error event with image
+- multiple sound, and sound.select
+- load sound and image when needed
+- load image when call load
+- multiple image, and image.select
+- bug: pause sound and restart at the same location
+- make a sound class
+- snap to pixel
+- flip image // 2015-05-29
+- scaled image
+- fixed image width/height and change width/height
+- multiple images for an entity
+- make a Loader class
+- bug: multiple image entities does not show
+- make an image class
+- Text, wrapped text
+- rectangle, rounded rectangle, circle, ellipse
+- make a position class
+- examples and build folders in the root project
+- new engine
+
+
 LATER:
 - line in path object must not override box content // TODO a line box and a fill box
 - the level follow changes the aimed position relative to the entity speed
@@ -70,7 +141,11 @@ LATER:
 - bug with pixelSize level from 3 and up
 
 
-DONE:
+
+OLD_DONE:
+- init function must be called only once
+- do an inherit and extend system
+v0.1.0.0
 - bug: draw debug on chuck
 - bug: cant draw spawned anim after image is in cache 
 - use cache when load the same image
@@ -167,12 +242,11 @@ DONE:
 
 
 CANCELED:
-- create a sprite entity from anim enity // anim is doing the trick
+- create a sprite entity from anim entity // anim is doing the trick
 - override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 
 
 PENDING:
-- do real js classes with prototype for entity classes
 - do a partial draw for each gfx entities
 - prerender canvas for the partial draw
 - function xload which try to execute an action depending the extension of the loaded file (execute a .js script, add .css file to document ...)

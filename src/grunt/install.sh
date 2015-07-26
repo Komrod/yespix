@@ -5,6 +5,8 @@
 #
 
 npm install grunt
+npm install -g grunt
 npm install grunt-cli
+npm install -g grunt-cli
 npm install grunt-shell --save-dev
 grunt packupdate

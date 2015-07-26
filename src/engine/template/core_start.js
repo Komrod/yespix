@@ -18,14 +18,22 @@
          * YESPIX contructor. Handles the engine initialisation with options and trigger the "ready" event
          */
         function yespix(options) {
+            // the function always return an object
             if (!(this instanceof yespix)) return new yespix(options);
+
+            // process the options
             this.init(options);
-            this.trigger('ready');
+
+            window.yespix = this;
+            //this.trigger('ready');
         }
+
+        //yespix.extendEntity = {};
 
         /**
          * YESPIX prototype
          */
         yespix.fn = yespix.prototype;
 
+        window.yespix = yespix;
         

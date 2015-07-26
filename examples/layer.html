@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../engine/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+<script type="text/javascript">
+	
+	var yp = yespix({canvas: {width: 600, height: 400}, fps: 60});
+    
+	yp.spawn('fps', {fpsOnlyStats: true, fpsAverageTime: 100});
+
+
+    for (var x=0; x<600; x=x+1) {
+        for (var y=200; y<204; y=y+1) {
+            yp.spawn('layer',
+                {
+                    x: x,
+                    y: y,
+                    images: 'zardoz/image/zardoz_small.png',
+                    imageScale: 4
+                });
+        }
+    }
+
+
+    function switchDebug(name)
+    {
+        name = name || '';
+        var options = {};
+        var value = !document['options_debug'+name];
+        document['options_debug'+name] = value;
+        options['debug'+name] = value;
+        console.log('set debug'+name+' property to value "'+value+'"');
+        yespix.find().prop(options);
+    }
+
+    function switchAlpha()
+    {
+        var options = {};
+        var value = !document['options_alpha'] ? 1 : 0;
+        document['options_alpha'] = value;
+        options['alpha'] = value;
+        console.log('set alpha property to value "'+value+'"');
+        yespix.find().prop(options);
+    }
+
+</script>
+<br/>
+<input value="Move" onClick="switchMove()" href="javascript:void(0)" type="button">
+<input value="Debug" onClick="switchDebug()" href="javascript:void(0)" type="button">
+<input value="Alpha" onClick="switchAlpha();" href="javascript:void(0)" type="button">
+<input value="Position" onClick="switchDebug('Position');" href="javascript:void(0)" type="button">
+<input value="Image" onClick="switchDebug('Image');" href="javascript:void(0)" type="button">
+<input value="Collision" onClick="switchDebug('Collision');" href="javascript:void(0)" type="button">
+<input value="Move" onClick="switchDebug('Move');" href="javascript:void(0)" type="button">
+</body>
+</html>
