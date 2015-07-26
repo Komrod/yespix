@@ -18,16 +18,16 @@ function GfxManager(canvas, list) {
     this.isReady = true;
 }
 
-GfxManager.prototype.setEngine = function(engine) {
-	this.engine = engine;
-	if (this.engine.setManager) {
-		engine.setManager(this);
+GfxManager.prototype.setPhysics = function(physics) {
+	this.physics = physics;
+	if (this.physics.setManager) {
+		physics.setManager(this);
 	}
 };
 
 
 GfxManager.prototype.applyPhysics = function() {
-	if (!this.engine) {
+	if (!this.physics) {
 		return false;
 	}
 

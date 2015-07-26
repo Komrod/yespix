@@ -4,17 +4,17 @@ function Collision(options, entity) {
 
     options = options || {};
     
-    if (options.engine) {
-        this.setEngine(options.engine);
+    if (options.physics) {
+        this.setPhysics(options.physics);
     }
 
     if (entity) {
         this.entity = entity;
-        if (!options.engine) {
-            if (entity.engine) {
-                this.setEngine(entity.engine);
-            } else if (entity.manager && entity.manager.engine) {
-                this.setEngine(entity.manager.engine);
+        if (!options.physics) {
+            if (entity.physics) {
+                this.setEngine(entity.physics);
+            } else if (entity.manager && entity.manager.physics) {
+                this.setEngine(entity.manager.physics);
             }
         }
     }
@@ -37,19 +37,24 @@ function Collision(options, entity) {
     };
 
     this.set(options, varDefault);
-    if (this.engine) {
+    if (this.physics) {
         this.create();
+        this.isReady = true;
     }
 }
 
 
-Collision.prototype.setEngine = function(engine) {
-    this.engine = engine;
+Collision.prototype.setPhysics = function(physics) {
+    this.physics = physics;
 };
 
 
 Collision.prototype.set = function(options, varDefault) {
     yespix.copy(options, this, varDefault);
+
+    if (this.body) {
+
+    }
 
     this.isChanged = true;
     this.entity.event(
@@ -66,7 +71,7 @@ Collision.prototype.set = function(options, varDefault) {
 
 Collision.prototype.create = function() {
 //console.log('collision:create: this = ', this);
-    if (!this.engine) {
+    if (!this.physics) {
         return false;
     }
 
@@ -77,7 +82,7 @@ Collision.prototype.create = function() {
     if (this.entity.actor) {
         this.body = this.entity.actor.createPhysics(this);
     } else {
-        this.body = this.engine.create(this);
+        this.body = this.physics.create(this);
     }
 };
 
@@ -101,9 +106,9 @@ Collision.prototype.getSize = function() {
 Collision.prototype.impulse = function(degrees, power, linear) {
     linear = linear || false;
     if (linear) {
-        this.body.ApplyLinearImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+        this.physics.applyLinearImpulse(this.body, degrees, power);
     } else {
-        this.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+        this.physics.applyImpulse(this.body, degrees, power);
     }
 };
 
@@ -111,9 +116,9 @@ Collision.prototype.impulse = function(degrees, power, linear) {
 Collision.prototype.force = function(degrees, power, linear) {
     linear = linear || false;
     if (linear) {
-        this.body.ApplyLinearForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+        this.physics.applyLinearForce(this.body, degrees, power);
     } else {
-        this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.body.GetWorldCenter());
+        this.physics.applyForce(this.body, degrees, power);
     }
 };
 
@@ -122,14 +127,13 @@ Collision.prototype.applyPhysics = function() {
     if (!this.body) {
         return false;
     }
-    var position = this.body.GetPosition();
+    var position = this.physics.getPosition(this.body);
     var size = this.getSize();
-    var angle = this.body.GetAngle();
-    var degree = yespix.toDegree(angle);
+    var degree = this.physics.getAngleDegree(this.body);
     this.entity.set({
         position: {
-            x: (position.x - size.width / 2 / this.engine.scale) * this.engine.scale - this.offsetX,
-            y: (position.y - size.height / 2 / this.engine.scale) * this.engine.scale - this.offsetY,
+            x: (position.x - size.width / 2 / this.physics.scale) * this.physics.scale - this.offsetX,
+            y: (position.y - size.height / 2 / this.physics.scale) * this.physics.scale - this.offsetY,
             rotation: degree
         }
     });
@@ -157,12 +161,15 @@ Collision.prototype.collisionPreSolve = function(contact, myFixture, otherBody, 
 
 Collision.prototype.collisionPostSolve = function(contact, myFixture, otherBody, otherFixture, impact) {
     if (this.entity.actor) {
-        this.entity.actor.actorPostSolve(contact, myFixture, otherBody, otherFixture, impact);
+        this.entity.actor.actorPostSolve(contact, myFixture, otherBody, otherFixture, impact)
     }
 };
 
 
 Collision.prototype.setFriction = function(friction, fixture) {
+
+    return this.physics.setFriction(this.body, friction, fixture);
+    /*
     if (!fixture) {
         var fixture = this.body.GetFixtureList();
         while (fixture) {
@@ -172,10 +179,13 @@ Collision.prototype.setFriction = function(friction, fixture) {
     } else {
         fixture.SetFriction(friction);
     }
+    */
 };
 
 
 Collision.prototype.setDensity = function(density, fixture) {
+    return this.physics.setDensity(this.body, density, fixture);
+    /*
     if (!fixture) {
         var fixture = this.body.GetFixtureList();
         while (fixture) {
@@ -186,13 +196,15 @@ Collision.prototype.setDensity = function(density, fixture) {
         fixture.SetDensity(density);
     }
     this.body.ResetMassData();
+    */
 };
 
 
 Collision.prototype.getLinearVelocity = function() {
-    return this.body.GetLinearVelocity();
+    return this.physics.getLinearVelocity(this.body);
 };
 
 Collision.prototype.setLinearVelocity = function(vel) {
-    return this.body.SetLinearVelocity(vel);
+    return this.physics.setLinearVelocity(this.body, vel);
 };
+

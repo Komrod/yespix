@@ -102,7 +102,6 @@ EngineBox2d.prototype.setBody = function(collision) {
 	} else {
 		this.bodyDef.isBullet = this.defaultIsBullet;
 	}
-console.log('setBody: bodyDef = ', this.bodyDef);
 };
 
 
@@ -110,12 +109,10 @@ EngineBox2d.prototype.createFixture = function(offsetX, offsetY, width, height, 
 	collision = collision || {};
 	this.setFixture(collision);
 	this.fixDef.shape = new Box2D.Collision.Shapes.b2PolygonShape();
-//console.log('createFixture: setAsBox: offsetX = ', offsetX, ', offsetY = ', offsetY);
 	this.fixDef.shape.SetAsBox(width / 2 / this.scale, height / 2 / this.scale);
 	if (offsetX != 0 || offsetY != 0) {
 		this.moveShape(this.fixDef.shape, offsetX / this.scale, offsetY / this.scale);
 	}
-//console.log(this.fixDef);
 	//body.CreateFixture(this.fixDef, 0);
 	// SetPosition (new b2Vec2(x,y) )
 	//this.fixDef.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
@@ -263,4 +260,79 @@ EngineBox2d.prototype.postSolve = function(contact, impulse) {
 		data.entity.collision.collisionPostSolve(contact, contact.GetFixtureB(), contact.GetFixtureA().GetBody(), contact.GetFixtureA(), impulse);
 	}
 };
+
+
+EngineBox2d.prototype.setFriction = function(body, friction, fixture) {
+    if (!fixture) {
+        var fixture = body.GetFixtureList();
+        while (fixture) {
+            fixture.SetFriction(friction);
+            fixture = fixture.m_next;
+        }
+    } else {
+        fixture.SetFriction(friction);
+    }
+    return true;
+};
+
+
+EngineBox2d.prototype.setDensity = function(body, density, fixture) {
+    if (!fixture) {
+        var fixture = body.GetFixtureList();
+        while (fixture) {
+            fixture.SetDensity(density);
+            fixture = fixture.m_next;
+        }
+    } else {
+        fixture.SetDensity(density);
+    }
+    body.ResetMassData();
+    return true;
+};
+
+
+EngineBox2d.prototype.getLinearVelocity = function(body) {
+    return body.GetLinearVelocity();
+};
+
+EngineBox2d.prototype.setLinearVelocity = function(body, vel) {
+    return body.SetLinearVelocity(vel);
+};
+
+EngineBox2d.prototype.vec2 = function(x, y) {
+	return new Box2D.Common.Math.b2Vec2(x, y);
+};
+
+EngineBox2d.prototype.applyLinearImpulse = function(body, degrees, power) {
+	return body.ApplyLinearImpulse(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
+};
+
+EngineBox2d.prototype.applyImpulse = function(body, degrees, power) {
+	return body.ApplyImpulse(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
+};
+
+EngineBox2d.prototype.applyLinearForce = function(body, degrees, power) {
+	return body.ApplyLinearForce(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
+};
+
+EngineBox2d.prototype.applyForce = function(body, degrees, power) {
+	return body.ApplyForce(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
+};
+
+EngineBox2d.prototype.getCenter = function(body) {
+	return body.GetWorldCenter();
+};
+
+EngineBox2d.prototype.getPosition = function(body) {
+	return body.GetPosition();
+};
+
+EngineBox2d.prototype.getAngleDegree = function(body) {
+    return yespix.toDegree(body.GetAngle());
+};
+
+EngineBox2d.prototype.getAngleRad = function(body) {
+    return body.GetAngle();
+};
+
 

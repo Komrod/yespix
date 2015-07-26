@@ -25,12 +25,16 @@ yespix.define('actor2w', {
 
 
     prepare: function() {
+        if (!this.entity.collision.isReady) {
+            return false;
+        }
+        
         this.isIdle = true;
         if (this.groundTouch > 0) {
             if (!this.isOnGround) {
-                var vel = this.entity.collision.body.GetLinearVelocity();
+                var vel = this.entity.collision.getLinearVelocity();
                 vel.y = 0;
-                this.entity.collision.body.SetLinearVelocity(vel);
+                this.entity.collision.setLinearVelocity(vel);
             }
             this.isOnGround = true;
         } else {
@@ -51,7 +55,7 @@ yespix.define('actor2w', {
             }
         }
 
-        var vel = this.entity.collision.body.GetLinearVelocity();
+        var vel = this.entity.collision.getLinearVelocity();
         if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedYMax) {
             if (Math.abs(vel.x) > this.speedXMax) {            
                 vel.x = (vel.x > 0 ? 1 : -1) * this.speedXMax;
@@ -59,7 +63,7 @@ yespix.define('actor2w', {
             if (Math.abs(vel.y) > this.speedYMax) {
                 vel.y = (vel.y > 0 ? 1 : -1) * this.speedYMax;
             }
-            this.entity.collision.body.SetLinearVelocity(vel);
+            this.entity.collision.setLinearVelocity(vel);
         }
 
         if (input.key('up')) {
@@ -92,9 +96,9 @@ yespix.define('actor2w', {
         if (!this.isOnGround) {
             return false;
         }
-        var vel = this.entity.collision.body.GetLinearVelocity();
+        var vel = this.entity.collision.getLinearVelocity();
         vel.y = 0;
-        this.entity.collision.body.SetLinearVelocity(vel);
+        this.entity.collision.setLinearVelocity(vel);
 
         this.isIdle = false;
         this.entity.collision.impulse(-90, this.speedJump);
@@ -151,16 +155,16 @@ yespix.define('actor2w', {
 
     createPhysics: function(collision) {
         if (!this.listener) {
-            this.listener = collision.engine.getListener();
+            this.listener = collision.physics.getListener();
             if (!this.listener) {
-                this.listener = collision.engine.createListener();
+                this.listener = collision.physics.createListener();
             }
         }
         collision.userData = {collision: collision, entity: this.entity, type: 'body'};
-        var body = collision.engine.create(collision);
+        var body = collision.physics.create(collision);
         if (this.listener) {
             var size = collision.getSize();
-            collision.engine.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+            collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
 //            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
 //            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
 //            collision.engine.createFixture(size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallRight'}}, body);
@@ -170,85 +174,33 @@ yespix.define('actor2w', {
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
-if (otherBody.GetType() == 2) {
-console.log('actorBeginContact: with dynamic object ------------------------------------------------');
-}
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
             this.groundTouch++;
-console.log('actorBeginContact: groundTouch++: '+this.groundTouch);
-//var vel = myFixture.GetBody().GetLinearVelocity();
-//console.log('actorBeginContact: velocity = ', vel);
-        } else {
-console.log('actorBeginContact: NOT GROUND: myData = ', myData);
         }
     },
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
-console.log('actorEndContact: --------------------------------------');
-console.log('actorEndContact: start, groundTouch = '+this.groundTouch);
         var myData = myFixture.GetUserData();
         if (myData && myData.type == 'ground') {
             this.groundTouch--;
-//            if (this.groundTouch <= 0) {
                 this.groundTouch = 0;
                 var edge = myFixture.GetBody().GetContactList();
-var count = 1;                
                 while (edge) {
-console.log('actorEndContact: edge '+count+' = ', edge.contact.IsTouching());
-console.log('actorEndContact: B.isMyFix='+(edge.contact.GetFixtureB() == myFixture ? 'TRUE' : 'FALSE')+', A.NotSameBody='+(edge.contact.GetFixtureA().GetBody() != myFixture.GetBody() ? 'TRUE' : 'FALSE'));
                     if (edge.contact.IsTouching() && edge.contact.GetFixtureA() == myFixture && edge.contact.GetFixtureB().GetBody() != myFixture.GetBody() 
                         && otherFixture != edge.contact.GetFixtureB()) {
                         this.groundTouch++;
-//                    } else if (next.contact.GetFixtureB() == myFixture && next.contact.GetFixtureA().GetBody() != myFixture.GetBody()) {
-//                        this.groundTouch++;
                     }
-count++;                    
                     edge = edge.next;
                 }
-//            }
-console.log('actorEndContact: groundTouch--: '+this.groundTouch);
-console.log('actorEndContact: --------------------------------------');
-//var vel = myFixture.GetBody().GetLinearVelocity();
-//console.log('actorBeginContact: velocity = ', vel);
         }
-        /*
-        var myData = myFixture.GetUserData();
-        if (myData && myData.type == 'ground') {
-            this.isOnGround = false;
-        }*/
-//var vel = myFixture.GetBody().GetLinearVelocity();
-//console.log('actorEndContact: velocity = ', vel);
     },
 
     actorPreSolve: function(contact, myFixture, otherBody, otherFixture, old) {
-/*        this.beforeContact = {
-            myVel: myFixture.GetBody().GetLinearVelocity(),
-            otherVel: otherBody.GetLinearVelocity()
-        };*/
-//console.log('actorPreSolve: myVel = ', this.beforeContact.myVel);
     },
 
     actorPostSolve: function(contact, myFixture, otherBody, otherFixture, impact) {
-/*        if (this.beforeContact) {
-            var myVel = myFixture.GetBody().GetLinearVelocity();
-if (myVel.y > 0.1 || myVel.y <-0.1) {
-console.log('actorPostSolve: before myVel = ', this.beforeContact.myVel);
-console.log('actorPostSolve: myVel = ', myVel); }
-            var otherVel = otherBody.GetLinearVelocity();
-            var newVel = null;
-            if (Math.abs(this.beforeContact.myVel.x - myVel.x) > 0.2 && Math.abs(this.beforeContact.otherVel.x - otherVel.x) > 0.2) {
-                newVel = this.beforeContact.myVel;
-            }
-            if (Math.abs(this.beforeContact.myVel.y - myVel.y) > 0.2 && Math.abs(this.beforeContact.otherVel.y - otherVel.y) > 0.2) {
-                newVel = this.beforeContact.myVel;
-            }
-            if (newVel) {
-console.log('Set new vel: ', newVel);
-                this.entity.collision.body.SetLinearVelocity(newVel);
-            }
-        }*/
     }
 
 });
