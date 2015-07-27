@@ -70,7 +70,6 @@ Collision.prototype.set = function(options, varDefault) {
 
 
 Collision.prototype.create = function() {
-//console.log('collision:create: this = ', this);
     if (!this.physics) {
         return false;
     }
@@ -206,5 +205,21 @@ Collision.prototype.getLinearVelocity = function() {
 
 Collision.prototype.setLinearVelocity = function(vel) {
     return this.physics.setLinearVelocity(this.body, vel);
+};
+
+Collision.prototype.getTouchList = function(fixture) {
+    return this.physics.getTouchList(this.body, fixture);
+};
+
+Collision.prototype.setUserData = function(data, fixture) {
+    if (!fixture) {
+        return this.physics.setUserData(this.body, object);
+    } else {
+        return this.physics.setUserData(fixture, object);
+    }
+};
+
+Collision.prototype.getUserData = function(fixture) {
+    return this.physics.getUserData(fixture);
 };
 

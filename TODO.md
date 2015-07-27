@@ -23,7 +23,7 @@ TODO list:
 - tween engine files must start with "tween"
 - function to remove entities and collision object
 - set isChanged=false after the draw function
-- optimize: 
+- minimum speed for objects in physics engine
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
 - optimize: try to use fixed length arrays (using new Array(1000))

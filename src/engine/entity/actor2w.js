@@ -29,6 +29,14 @@ yespix.define('actor2w', {
             return false;
         }
         
+        this.checkState();
+        this.checkInput();
+        this.checkSpeed();
+
+        this.super();
+    },
+
+    checkState: function() {
         this.isIdle = true;
         if (this.groundTouch > 0) {
             if (!this.isOnGround) {
@@ -40,21 +48,9 @@ yespix.define('actor2w', {
         } else {
             this.isOnGround = false;
         }
+    },
 
-        if (input.key('right')) {
-            if (this.isOnGround) {
-                this.walkRight();
-            } else {
-                this.airMoveRight();
-            }
-        } else if (input.key('left')) {
-            if (this.isOnGround) {
-                this.walkLeft();
-            } else {
-                this.airMoveLeft();
-            }
-        }
-
+    checkSpeed: function() {
         var vel = this.entity.collision.getLinearVelocity();
         if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedYMax) {
             if (Math.abs(vel.x) > this.speedXMax) {            
@@ -64,14 +60,6 @@ yespix.define('actor2w', {
                 vel.y = (vel.y > 0 ? 1 : -1) * this.speedYMax;
             }
             this.entity.collision.setLinearVelocity(vel);
-        }
-
-        if (input.key('up')) {
-            if (this.isOnGround) {
-                this.jump();
-            } else {
-                this.airMoveUp();
-            }
         }
 
         if (this.isOnGround) {
@@ -87,8 +75,29 @@ yespix.define('actor2w', {
                 this.entity.collision.setFriction(this.frictionAir);
             }
         }
+    },
 
-        this.super();
+    checkInput: function() {
+        if (input.key('right')) {
+            if (this.isOnGround) {
+                this.walkRight();
+            } else {
+                this.airMoveRight();
+            }
+        } else if (input.key('left')) {
+            if (this.isOnGround) {
+                this.walkLeft();
+            } else {
+                this.airMoveLeft();
+            }
+        }
+        if (input.key('up')) {
+            if (this.isOnGround) {
+                this.jump();
+            } else {
+                this.airMoveUp();
+            }
+        }
     },
 
 
@@ -156,44 +165,38 @@ yespix.define('actor2w', {
     createPhysics: function(collision) {
         if (!this.listener) {
             this.listener = collision.physics.getListener();
-            if (!this.listener) {
-                this.listener = collision.physics.createListener();
-            }
         }
-        collision.userData = {collision: collision, entity: this.entity, type: 'body'};
+        collision.setUserData({collision: collision, entity: this.entity, type: 'body'});
+
         var body = collision.physics.create(collision);
         if (this.listener) {
             var size = collision.getSize();
-            collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+            // ground fixture is a sensor at the bottom of the rectangle
+            var groundFixture = collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+
 //            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
 //            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
 //            collision.engine.createFixture(size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallRight'}}, body);
         }
+
         return body;
     },
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
-        var myData = myFixture.GetUserData();
+        var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {
+            // just add 1
             this.groundTouch++;
         }
     },
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
-        var myData = myFixture.GetUserData();
+        var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {
-            this.groundTouch--;
-                this.groundTouch = 0;
-                var edge = myFixture.GetBody().GetContactList();
-                while (edge) {
-                    if (edge.contact.IsTouching() && edge.contact.GetFixtureA() == myFixture && edge.contact.GetFixtureB().GetBody() != myFixture.GetBody() 
-                        && otherFixture != edge.contact.GetFixtureB()) {
-                        this.groundTouch++;
-                    }
-                    edge = edge.next;
-                }
+            // update groundTouch so we are sure it's the right count
+            this.groundTouch = (this.entity.collision.getTouchList(myFixture)).length;
         }
     },
 

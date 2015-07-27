@@ -393,12 +393,12 @@ if (window.performance.now) {
 
 
 // Converts from degrees to radians.
-yespix.fn.toRadian = function(degrees) {
-  return degrees * Math.PI / 180;
+yespix.fn.degreeToRadian = function(d) {
+  return d * Math.PI / 180;
 };
  
 // Converts from radians to degrees.
-yespix.fn.toDegree = function(radians) {
-  return radians * 180 / Math.PI;
+yespix.fn.radianToDegree = function(r) {
+  return r * 180 / Math.PI;
 };
 

@@ -49,8 +49,6 @@ yespix.define('actor', {
 
 
     prepare: function() {
-//console.log('actor: ok');
-
     },
 
     createPhysics: function() {

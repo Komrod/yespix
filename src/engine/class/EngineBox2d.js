@@ -7,7 +7,6 @@ function EngineBox2d(options) {
 	     new Box2D.Common.Math.b2Vec2(0, 20) // gravity
 	  ,  true // allow sleep
 	);
-	//this.world.ContinuousPhysics(true);
 
 	this.scale = options.scale || 30;
 
@@ -113,22 +112,12 @@ EngineBox2d.prototype.createFixture = function(offsetX, offsetY, width, height, 
 	if (offsetX != 0 || offsetY != 0) {
 		this.moveShape(this.fixDef.shape, offsetX / this.scale, offsetY / this.scale);
 	}
-	//body.CreateFixture(this.fixDef, 0);
-	// SetPosition (new b2Vec2(x,y) )
-	//this.fixDef.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
-	//body.SetPosition(new Box2D.Common.Math.b2Vec2(relativeX, relativeY));
-	//this.fixDef.shape.SetAsBox(12, 12, new Box2D.Common.Math.b2Vec2(-1000, 1000), 0);
-//	body.CreateFixture(this.fixDef, 1);
 
 	var fixture = body.CreateFixture(this.fixDef, 1);
-//console.log('createFixture: create fixture: collision = ', collision);
 
 	if (collision.userData) {
-//console.log('createFixture: set user data')		;
-		//fixture.m_userData = collision.userData;
 		fixture.SetUserData(collision.userData);
 	}
-//console.log('createFixture: GetUserData = ', fixture.GetUserData(), ', fixture = ', fixture);
 
 	return fixture;
 };
@@ -139,7 +128,6 @@ EngineBox2d.prototype.moveShape = function(shape, x, y) {
 		shape.m_vertices[t].x += x;
 		shape.m_vertices[t].y += y;
 	}
-//console.log('apres shape = ', shape);
 };
 
 
@@ -169,7 +157,6 @@ EngineBox2d.prototype.setFixture = function(collision) {
 
 
 EngineBox2d.prototype.createListener = function(beginContact, endContact, preSolve, postSolve) {
-//console.log('createListener');
 	this.listener = new Box2D.Dynamics.b2ContactListener;
 	
 	beginContact = beginContact || this.beginContact;
@@ -188,6 +175,9 @@ EngineBox2d.prototype.createListener = function(beginContact, endContact, preSol
 
 
 EngineBox2d.prototype.getListener = function() {
+    if (!this.listener) {
+        this.createListener();
+    }
 	return this.listener;
 };
 
@@ -295,44 +285,99 @@ EngineBox2d.prototype.getLinearVelocity = function(body) {
     return body.GetLinearVelocity();
 };
 
+
 EngineBox2d.prototype.setLinearVelocity = function(body, vel) {
     return body.SetLinearVelocity(vel);
 };
+
 
 EngineBox2d.prototype.vec2 = function(x, y) {
 	return new Box2D.Common.Math.b2Vec2(x, y);
 };
 
+
 EngineBox2d.prototype.applyLinearImpulse = function(body, degrees, power) {
 	return body.ApplyLinearImpulse(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
 };
+
 
 EngineBox2d.prototype.applyImpulse = function(body, degrees, power) {
 	return body.ApplyImpulse(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
 };
 
+
 EngineBox2d.prototype.applyLinearForce = function(body, degrees, power) {
 	return body.ApplyLinearForce(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
 };
+
 
 EngineBox2d.prototype.applyForce = function(body, degrees, power) {
 	return body.ApplyForce(this.vec2(Math.cos(degrees * (Math.PI / 180)) * power, Math.sin(degrees * (Math.PI / 180)) * power), this.getCenter(body));
 };
 
+
 EngineBox2d.prototype.getCenter = function(body) {
 	return body.GetWorldCenter();
 };
+
 
 EngineBox2d.prototype.getPosition = function(body) {
 	return body.GetPosition();
 };
 
+
 EngineBox2d.prototype.getAngleDegree = function(body) {
-    return yespix.toDegree(body.GetAngle());
+    return yespix.radianToDegree(body.GetAngle());
 };
+
 
 EngineBox2d.prototype.getAngleRad = function(body) {
     return body.GetAngle();
 };
 
+
+EngineBox2d.prototype.getTouchList = function(body, fixture) {
+    var edge = fixture.GetBody().GetContactList();
+    var list = new Array();
+    
+    while (edge) {
+        if (edge.contact.IsTouching()) {
+        	if (!fixture) {
+	        	if (edge.contact.GetFixtureA().GetBody() == body) {
+	        		list.push({contact: edge.contact, body: edge.contact.GetFixtureB().GetBody(), fixture: edge.contact.GetFixtureB()});
+	        	} else if (edge.contact.GetFixtureB().GetBody() == body) {
+	        		list.push({contact: edge.contact, body: edge.contact.GetFixtureA().GetBody(), fixture: edge.contact.GetFixtureA()});
+	            }
+        	} else if (edge.contact.GetFixtureA() == fixture) {
+        		list.push({contact: edge.contact, body: edge.contact.GetFixtureB().GetBody(), fixture: edge.contact.GetFixtureB()});
+        	} else if (edge.contact.GetFixtureB() == fixture) {
+        		list.push({contact: edge.contact, body: edge.contact.GetFixtureA().GetBody(), fixture: edge.contact.GetFixtureA()});
+            }
+        }
+        edge = edge.next;
+    }
+
+    return list;
+};
+
+
+EngineBox2d.prototype.getUserData = function(object) {
+    object = object || this.body;
+    if (object.GetUserData) {
+    	return object.GetUserData();
+    } else {
+    	return object.userData;
+    }
+};
+
+
+EngineBox2d.prototype.setUserData = function(data, object) {
+    object = object || this.body;
+	if (object.SetUserData) {
+		return object.SetUserData(data);
+	} else {
+    	object.userData = data;
+    	return true;
+   	}
+};
 

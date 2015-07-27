@@ -243,7 +243,7 @@ Input.prototype.specialKey = function(s, type) {
 
 
 Input.prototype.keyDisable = function() {
-    return false;
+    return false; // @TODO
 };
 
 
