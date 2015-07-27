@@ -10,8 +10,9 @@ yespix.define('actor2w', {
         this.super(options, entity);
 
         this.speedWalk = this.speedWalk || 0.9;
-        this.speedJump = this.speedJump || 12;
-        this.speedUp = this.speedUp || 0.12;
+        this.speedJump = this.speedJump || 6;
+        this.speedUp = this.speedUp || 0.2;
+        this.speedTimeJump = this.speedTimeJump || 0.6;
         this.speedAir = this.speedAir || 0.15;
         this.speedXMax = this.speedXMax || 10;
         this.speedYMax = this.speedYMax || 10;
@@ -20,7 +21,7 @@ yespix.define('actor2w', {
         this.frictionGround = this.frictionGround || 2;
         this.frictionIdle = this.frictionIdle || 5;
 
-        this.groundTouch = 0;
+        this.groundTouch = -20;
     },
 
 
@@ -51,6 +52,8 @@ yespix.define('actor2w', {
     },
 
     checkSpeed: function() {
+
+        // change speed
         var vel = this.entity.collision.getLinearVelocity();
         if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedYMax) {
             if (Math.abs(vel.x) > this.speedXMax) {            
@@ -62,6 +65,7 @@ yespix.define('actor2w', {
             this.entity.collision.setLinearVelocity(vel);
         }
 
+        // change friction
         if (this.isOnGround) {
             if (this.isIdle) {
                 this.entity.collision.setFriction(this.frictionIdle);
@@ -105,6 +109,7 @@ yespix.define('actor2w', {
         if (!this.isOnGround) {
             return false;
         }
+        this.timeJump = +new Date();
         var vel = this.entity.collision.getLinearVelocity();
         vel.y = 0;
         this.entity.collision.setLinearVelocity(vel);
@@ -133,13 +138,16 @@ yespix.define('actor2w', {
 
 
     airMoveUp: function () {
-        if (this.isOnGround || !this.entity.collision) {
+//console.log((+new Date() < this.timeJump + this.speedTimeJump * 1000), '+new Date() = ', (+new Date()), ', this.timeJump = ', yespix.precision(this.timeJump, 4)
+//    , ' this.speedTimeJump = ', yespix.precision(this.speedTimeJump * 1000, 4), ', + = ', yespix.precision(this.timeJump + this.speedTimeJump, 4));
+        if (this.isOnGround || !this.entity.collision || (+new Date() > this.timeJump + this.speedTimeJump * 1000)) {
             return false;
         }
+        /*
         var vel = this.entity.collision.body.GetLinearVelocity();
-        if (vel.y > -(this.speedJump2 * 1)) {
+        if (vel.y > -(this.speedJump * this.timeJump)) {
             return false;
-        }
+        }*/
         this.isIdle = false;
         this.entity.collision.impulse(-90, this.speedUp);
     },
@@ -172,7 +180,7 @@ yespix.define('actor2w', {
         if (this.listener) {
             var size = collision.getSize();
             // ground fixture is a sensor at the bottom of the rectangle
-            var groundFixture = collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+            this.groundFixture = collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
 
 //            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
 //            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);
@@ -184,20 +192,25 @@ yespix.define('actor2w', {
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
+        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+        /*
         var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {
             // just add 1
             this.groundTouch++;
-        }
+
+        }*/
     },
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
+        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+        /*
         var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {
             // update groundTouch so we are sure it's the right count
             this.groundTouch = (this.entity.collision.getTouchList(myFixture)).length;
-        }
+        }*/
     },
 
     actorPreSolve: function(contact, myFixture, otherBody, otherFixture, old) {

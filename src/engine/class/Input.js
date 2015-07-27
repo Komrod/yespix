@@ -4,7 +4,7 @@ function Input(options) {
     // init the options
     options = options || {};
 
-    this.persistence = options.persistence || 200;
+    this.persistence = options.persistence || 100;
     this.doc = options.document || document;
 
     var input = this;

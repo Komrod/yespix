@@ -1,8 +1,7 @@
 
 TODO list:
-- Make a basic 2 ways player
-- Detect if on ground
-- change actor collision
+- possible to change actor collision and speed
+- make an actor creation tool
 - Rename all options as properties
 - make a function defineEntity and defineClass
 - make a player state in Input class
@@ -80,6 +79,9 @@ TODO list:
 
 
 DONE:
+- bug: sometimes actor2w doesnt detect ground
+- Detect if on ground
+- Make a basic 2 ways player
 - Make an actor entity // 16-07-2015
 - dont use options reference after super() in entity init
 - dont draw if aspect.isVisible = false

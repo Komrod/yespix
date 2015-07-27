@@ -402,3 +402,8 @@ yespix.fn.radianToDegree = function(r) {
   return r * 180 / Math.PI;
 };
 
+// Converts from radians to degrees.
+yespix.fn.precision = function(f, precision) {
+    if (!f) return false;
+  return parseFloat(f.toFixed(precision)); 
+};
