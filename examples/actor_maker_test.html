@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <script src="engines/box2d.js"></script>
+		<script src="../build/yespix.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+
+yespix();
+
+var worldOptions = {
+	gravity: 10,
+	scale: 50,
+	friction: 0.1,
+	linearDamping: 0.1,
+	restitution: 0,
+	density: 1
+};
+var actorOptions = {
+	speedWalk: 0.65,
+	speedJump: 6,
+	speedUp: 0.2,
+	speedTimeJump: 0.4,
+	speedAir: 0.1,
+	speedXMax: 10,
+	speedYMax: 10,
+	frictionAir: 0.1,
+	frictionGround: 0.1,
+	frictionIdle: 0.1
+};
+var collisionOptions = {
+	offsetX: 0,
+	offsetY: 0,
+	width: 50,
+	height: 100,
+	linearDamping: 1,
+	restitution: 0,
+	density: 1,
+	fixedRotation: true,
+	isBullet: true
+};
+
+var physics = new EngineBox2d(worldOptions);
+collisionOptions.physics = physics;
+var player = new yespix.class.gfx({});
+player.actor = new yespix.class.actor2w(actorOptions, player);
+player.collision = new Collision(collisionOptions, player);
+
+var manager = new GfxManager(true);
+manager.setPhysics(physics);
+manager.add(player);
+var input = new Input();
+var loop = new Loop(100);
+loop.register(
+	function(loop, time) { 
+		manager.applyPhysics();
+		manager.clear();
+        manager.physics.world.DrawDebugData();
+	}, 
+	function(loop, time) { 
+		manager.physics.world.Step(time/1000, 500, 50);
+	}
+).start();
+
+manager.physics.createRect(0, 400, 640, 10, {type: 'static'});
+
+
+
+		</script>
+	</body>
+</html>

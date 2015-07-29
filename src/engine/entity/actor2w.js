@@ -9,24 +9,24 @@ yespix.define('actor2w', {
     init: function(options, entity) {
         this.super(options, entity);
 
-        this.speedWalk = this.speedWalk || 0.9;
-        this.speedJump = this.speedJump || 6;
-        this.speedUp = this.speedUp || 0.2;
-        this.speedTimeJump = this.speedTimeJump || 0.6;
-        this.speedAir = this.speedAir || 0.15;
-        this.speedXMax = this.speedXMax || 10;
-        this.speedYMax = this.speedYMax || 10;
+        if (yespix.isUndefined(this.speedWalk)) this.speedWalk = 0.4;
+        if (yespix.isUndefined(this.speedJump)) this.speedJump = 6;
+        if (yespix.isUndefined(this.speedUp)) this.speedUp = 0.2;
+        if (yespix.isUndefined(this.speedTimeJump)) this.speedTimeJump = 0.4;
+        if (yespix.isUndefined(this.speedAir)) this.speedAir = 0.15;
+        if (yespix.isUndefined(this.speedXMax)) this.speedXMax = 10;
+        if (yespix.isUndefined(this.speedYMax)) this.speedYMax = 10;
 
-        this.frictionAir = this.frictionAir || 0.01;
-        this.frictionGround = this.frictionGround || 2;
-        this.frictionIdle = this.frictionIdle || 5;
+        if (yespix.isUndefined(this.frictionAir)) this.frictionAir = 0.01;
+        if (yespix.isUndefined(this.frictionGround)) this.frictionGround = 2;
+        if (yespix.isUndefined(this.frictionIdle)) this.frictionIdle = 5;
 
-        this.groundTouch = -20;
+        this.groundTouch = 0;
     },
 
 
     prepare: function() {
-        if (!this.entity.collision.isReady) {
+        if (!this.entity.collision || !this.entity.collision.isReady) {
             return false;
         }
         
@@ -38,6 +38,9 @@ yespix.define('actor2w', {
     },
 
     checkState: function() {
+
+        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+
         this.isIdle = true;
         if (this.groundTouch > 0) {
             if (!this.isOnGround) {
@@ -192,7 +195,7 @@ yespix.define('actor2w', {
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
-        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+        //this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
         /*
         var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {
@@ -204,7 +207,7 @@ yespix.define('actor2w', {
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
-        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+        //this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
         /*
         var myData = this.entity.collision.getUserData(myFixture);
         if (myData && myData.type == 'ground') {

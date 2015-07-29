@@ -1,13 +1,12 @@
 
 TODO list:
-- possible to change actor collision and speed
+- change actor collision and speed
 - make an actor creation tool
+- bug: player with wall on left can jump forever
 - Rename all options as properties
 - make a function defineEntity and defineClass
 - make a player state in Input class
 - enable / disable debug of physics
-- Impulse to move and jump player
-- Detect when on ground with player
 - start player on ground / detects ground
 - load a level
 - pass rotation of an object to collision object
@@ -79,8 +78,9 @@ TODO list:
 
 
 DONE:
+- Impulse to move and jump player
+- Detect when on ground with player
 - bug: sometimes actor2w doesnt detect ground
-- Detect if on ground
 - Make a basic 2 ways player
 - Make an actor entity // 16-07-2015
 - dont use options reference after super() in entity init

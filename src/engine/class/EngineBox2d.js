@@ -3,23 +3,33 @@
 function EngineBox2d(options) {
 	options = options || {};
 
-	this.world = new Box2D.Dynamics.b2World(
-	     new Box2D.Common.Math.b2Vec2(0, 20) // gravity
-	  ,  true // allow sleep
-	);
+	var varDefault = {
+		gravity: 20,
+		allowSleep: true,
+		scale: 30,
+		fixedRotation: false,
+		linearDamping: 0.1,
+		isBullet: false,
+		density: 1.0,
+		friction: 0.2,
+		restitution: 0.2,
+		isSensor: false
+	};
 
-	this.scale = options.scale || 30;
+	yespix.copy(options, this, varDefault);
+
+	this.world = new Box2D.Dynamics.b2World(new Box2D.Common.Math.b2Vec2(0, this.gravity), this.allowSleep);
 
 	this.bodyDef = new Box2D.Dynamics.b2BodyDef;
-	this.bodyDef.fixedRotation = this.defaultFixedRotation = options.fixedRotation || false;
-	this.bodyDef.linearDamping = this.defaultLinearDamping = options.linearDamping || 0.1;
-	this.bodyDef.isBullet = this.defaultIsBullet = options.isBullet || false;
+	this.bodyDef.fixedRotation = this.fixedRotation; 
+	this.bodyDef.linearDamping = this.linearDamping;
+	this.bodyDef.isBullet = this.isBullet;
 
 	this.fixDef = new Box2D.Dynamics.b2FixtureDef;
-	this.fixDef.density = this.defaultDensity = options.density || 1.0;
-	this.fixDef.friction = this.defaultFriction = options.friction || 0.2;
-	this.fixDef.restitution = this.defaultRestitution = options.restitution || 0.2;
-	this.fixDef.isSensor = this.defaultIsSensor = options.isSensor || false;
+	this.fixDef.density = this.density;
+	this.fixDef.friction = this.friction;
+	this.fixDef.restitution = this.restitution;
+	this.fixDef.isSensor = this.isSensor;
 
 }
 
@@ -89,17 +99,17 @@ EngineBox2d.prototype.setBody = function(collision) {
 	if (!yespix.isUndefined(collision.fixedRotation)) {
 		this.bodyDef.fixedRotation = collision.fixedRotation;
 	} else {
-		this.bodyDef.fixedRotation = this.defaultFixedRotation;
+		this.bodyDef.fixedRotation = this.fixedRotation;
 	}
 	if (!yespix.isUndefined(collision.linearDamping)) {
 		this.bodyDef.linearDamping = collision.linearDamping;
 	} else {
-		this.bodyDef.linearDamping = this.defaultLinearDamping;
+		this.bodyDef.linearDamping = this.linearDamping;
 	}
 	if (!yespix.isUndefined(collision.isBullet)) {
 		this.bodyDef.isBullet = collision.isBullet;
 	} else {
-		this.bodyDef.isBullet = this.defaultIsBullet;
+		this.bodyDef.isBullet = this.isBullet;
 	}
 };
 
@@ -136,22 +146,22 @@ EngineBox2d.prototype.setFixture = function(collision) {
 	if (!yespix.isUndefined(collision.restitution)) {
 		this.fixDef.restitution = collision.restitution;
 	} else {
-		this.fixDef.restitution = this.defaultRestitution;
+		this.fixDef.restitution = this.restitution;
 	}
 	if (!yespix.isUndefined(collision.isSensor)) {
 		this.fixDef.isSensor = collision.isSensor;
 	} else {
-		this.fixDef.isSensor = this.defaultIsSensor;
+		this.fixDef.isSensor = this.isSensor;
 	}
 	if (!yespix.isUndefined(collision.friction)) {
 		this.fixDef.friction = collision.friction;
 	} else {
-		this.fixDef.friction = this.defaultFriction;
+		this.fixDef.friction = this.friction;
 	}
 	if (!yespix.isUndefined(collision.density)) {
 		this.fixDef.density = collision.density;
 	} else {
-		this.fixDef.density = this.defaultDensity;
+		this.fixDef.density = this.density;
 	}
 };
 

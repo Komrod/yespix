@@ -2,6 +2,9 @@
 
 function GfxManager(canvas, list) {
 	
+	this.reset(canvas, list);
+	return;
+	
 	// init
 	this.canvas = null;
 	this.context = null;
@@ -185,6 +188,25 @@ GfxManager.prototype.trigger = function(eventName, event) {
 
 GfxManager.prototype.clear = function() {
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	return true;
+};
+
+GfxManager.prototype.reset = function(canvas, list) {
+	// init
+	this.canvas = null;
+	this.context = null;
+
+	// set the canvas
+	if (canvas === true) this.setCanvas(yespix.createCanvas(true));
+	else if (canvas) this.setCanvas(canvas);
+
+	// set the list
+    this.list = list || [];
+    this.events = {};
+
+    this.isZSorted = false;
+    this.isReady = true;
+
 	return true;
 };
 

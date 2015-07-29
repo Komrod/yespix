@@ -89,7 +89,6 @@ function Input(options) {
         // get the key code
         e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
 
-//console.log('keypress: e=', e);
         if (input.data.ids[parseInt(e.inputCode)]) {
             clearTimeout(input.data.ids[parseInt(e.inputCode)]);
         }

@@ -26,8 +26,8 @@ function Collision(options, entity) {
 	    type: 'dynamic', // "static" / "dynamic" /  "kinetic" @TODO
         shape: 'rect', // "rect"
 
-        density: 1.0,
-        friction: 0.2,
+        density: 0.1,
+        friction: 0.1,
         restitution: 0.0,
         linearDamping: 0.2,
 
@@ -39,7 +39,6 @@ function Collision(options, entity) {
     this.set(options, varDefault);
     if (this.physics) {
         this.create();
-        this.isReady = true;
     }
 }
 
@@ -83,6 +82,7 @@ Collision.prototype.create = function() {
     } else {
         this.body = this.physics.create(this);
     }
+    this.isReady = true;
 };
 
 
@@ -99,7 +99,7 @@ Collision.prototype.getSize = function() {
         width: this.width || this.entity.aspect.width,
         height: this.height || this.entity.aspect.height
     };        
-}
+};
 
 
 Collision.prototype.impulse = function(degrees, power, linear) {
@@ -146,17 +146,20 @@ Collision.prototype.collisionBeginContact = function(contact, myFixture, otherBo
     }
 };
 
+
 Collision.prototype.collisionEndContact = function(contact, myFixture, otherBody, otherFixture) {
     if (this.entity.actor) {
         this.entity.actor.actorEndContact(contact, myFixture, otherBody, otherFixture);
     }
 };
 
+
 Collision.prototype.collisionPreSolve = function(contact, myFixture, otherBody, otherFixture, old) {
     if (this.entity.actor) {
         this.entity.actor.actorPreSolve(contact, myFixture, otherBody, otherFixture, old);
     }
 };
+
 
 Collision.prototype.collisionPostSolve = function(contact, myFixture, otherBody, otherFixture, impact) {
     if (this.entity.actor) {
@@ -166,36 +169,12 @@ Collision.prototype.collisionPostSolve = function(contact, myFixture, otherBody,
 
 
 Collision.prototype.setFriction = function(friction, fixture) {
-
     return this.physics.setFriction(this.body, friction, fixture);
-    /*
-    if (!fixture) {
-        var fixture = this.body.GetFixtureList();
-        while (fixture) {
-            fixture.SetFriction(friction);
-            fixture = fixture.m_next;
-        }
-    } else {
-        fixture.SetFriction(friction);
-    }
-    */
 };
 
 
 Collision.prototype.setDensity = function(density, fixture) {
     return this.physics.setDensity(this.body, density, fixture);
-    /*
-    if (!fixture) {
-        var fixture = this.body.GetFixtureList();
-        while (fixture) {
-            fixture.SetDensity(density);
-            fixture = fixture.m_next;
-        }
-    } else {
-        fixture.SetDensity(density);
-    }
-    this.body.ResetMassData();
-    */
 };
 
 
@@ -203,21 +182,25 @@ Collision.prototype.getLinearVelocity = function() {
     return this.physics.getLinearVelocity(this.body);
 };
 
+
 Collision.prototype.setLinearVelocity = function(vel) {
     return this.physics.setLinearVelocity(this.body, vel);
 };
+
 
 Collision.prototype.getTouchList = function(fixture) {
     return this.physics.getTouchList(this.body, fixture);
 };
 
+
 Collision.prototype.setUserData = function(data, fixture) {
     if (!fixture) {
-        return this.physics.setUserData(this.body, object);
+        return this.physics.setUserData(this.body, data);
     } else {
-        return this.physics.setUserData(fixture, object);
+        return this.physics.setUserData(fixture, data);
     }
 };
+
 
 Collision.prototype.getUserData = function(fixture) {
     return this.physics.getUserData(fixture);
