@@ -183,7 +183,7 @@ yespix.define('actor2w', {
         if (this.listener) {
             var size = collision.getSize();
             // ground fixture is a sensor at the bottom of the rectangle
-            this.groundFixture = collision.physics.createFixture(0, size.height / 2, size.width * 1.0, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
+            this.groundFixture = collision.physics.createFixture(0, size.height / 2, size.width * 0.98, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ground'}}, body);
 
 //            collision.engine.createFixture(0, -size.height / 2, size.width * 0.8, 5, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'ceil'}}, body);
 //            collision.engine.createFixture(-size.width / 2, 0, 5, size.height * 0.8, {isSensor: true, userData: {collision: collision, entity: this.entity, type: 'wallLeft'}}, body);

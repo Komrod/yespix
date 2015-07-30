@@ -69,7 +69,7 @@ EngineBox2d.prototype.create = function(collision) {
 
 EngineBox2d.prototype.createRect = function(x, y, width, height, collision) {
 	var body = this.createBody(x, y, width, height, collision);
-	this.createFixture(0.5, 0.5, width, height, collision, body);
+	this.createFixture(0, 0, width, height, collision, body);
 	return body;
 };
 

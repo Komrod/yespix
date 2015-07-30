@@ -2,7 +2,7 @@
 TODO list:
 - bug: player with wall on left can jump forever
 - use step(time) for actors instead of prepare
-- dont accelerate walk / air move when reachin a correct speed
+- dont accelerate walk / air move when reaching a correct speed
 - Rename all options as properties
 - make a function defineEntity and defineClass
 - make a player state in Input class
