@@ -1,6 +1,5 @@
 
 TODO list:
-- bug: player with wall on left can jump forever
 - use step(time) for actors instead of prepare
 - dont accelerate walk / air move when reaching a correct speed
 - Rename all options as properties
@@ -75,6 +74,7 @@ TODO list:
 
 
 DONE:
+- bug: player with wall on left can jump forever
 - make a moving platform
 - make an actor creation tool
 - Impulse to move and jump player

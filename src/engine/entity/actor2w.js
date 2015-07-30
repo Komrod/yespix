@@ -14,8 +14,7 @@ yespix.define('actor2w', {
         if (yespix.isUndefined(this.speedUp)) this.speedUp = 0.2;
         if (yespix.isUndefined(this.speedTimeJump)) this.speedTimeJump = 0.4;
         if (yespix.isUndefined(this.speedAir)) this.speedAir = 0.15;
-        if (yespix.isUndefined(this.speedXMax)) this.speedXMax = 10;
-        if (yespix.isUndefined(this.speedYMax)) this.speedYMax = 10;
+        if (yespix.isUndefined(this.speedMax)) this.speedMax = 10;
 
         if (yespix.isUndefined(this.frictionAir)) this.frictionAir = 0.01;
         if (yespix.isUndefined(this.frictionGround)) this.frictionGround = 2;
@@ -25,40 +24,33 @@ yespix.define('actor2w', {
     },
 
 
-    prepare: function() {
+    step: function(time) {
         if (!this.entity.collision || !this.entity.collision.isReady) {
             return false;
         }
         
-        this.checkState();
-        this.checkInput();
-        this.checkSpeed();
+        this.checkState(time);
+        this.checkInput(time);
+        this.checkSpeed(time);
 
         this.super();
     },
 
-    checkState: function() {
-
+    checkState: function(time) {
         this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
-
         this.isIdle = true;
         if (this.groundTouch > 0) {
-            if (!this.isOnGround) {
-                var vel = this.entity.collision.getLinearVelocity();
-                vel.y = 0;
-                this.entity.collision.setLinearVelocity(vel);
-            }
             this.isOnGround = true;
         } else {
             this.isOnGround = false;
         }
     },
 
-    checkSpeed: function() {
+    checkSpeed: function(time) {
 
         // change speed
         var vel = this.entity.collision.getLinearVelocity();
-        if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedYMax) {
+        if (Math.abs(vel.x) > this.speedXMax || Math.abs(vel.y) > this.speedMax) {
             if (Math.abs(vel.x) > this.speedXMax) {            
                 vel.x = (vel.x > 0 ? 1 : -1) * this.speedXMax;
             }
@@ -84,31 +76,31 @@ yespix.define('actor2w', {
         }
     },
 
-    checkInput: function() {
+    checkInput: function(time) {
         if (input.key('right')) {
             if (this.isOnGround) {
-                this.walkRight();
+                this.walkRight(time);
             } else {
-                this.airMoveRight();
+                this.airMoveRight(time);
             }
         } else if (input.key('left')) {
             if (this.isOnGround) {
-                this.walkLeft();
+                this.walkLeft(time);
             } else {
-                this.airMoveLeft();
+                this.airMoveLeft(time);
             }
         }
         if (input.key('up')) {
             if (this.isOnGround) {
-                this.jump();
+                this.jump(time);
             } else {
-                this.airMoveUp();
+                this.airMoveUp(time);
             }
         }
     },
 
 
-    jump: function() {
+    jump: function(time) {
         if (!this.isOnGround) {
             return false;
         }
@@ -122,25 +114,33 @@ yespix.define('actor2w', {
     },
 
 
-    walkLeft: function () {
+    walkLeft: function (time) {
         if (!this.isOnGround || !this.entity.collision) {
             return false;
         }
-        this.isIdle = false;
-        this.entity.collision.impulse(180, this.speedWalk);
-    },
-
-
-    walkRight: function () {
-        if (!this.isOnGround || !this.entity.collision) {
+        var vel = this.entity.collision.getLinearVelocity();
+        if (Math.abs(vel.x)>this.speedWalk) {
             return false;
         }
         this.isIdle = false;
-        this.entity.collision.impulse(0, this.speedWalk);
+        this.entity.collision.impulse(180, this.speedWalk * time / 1000);
     },
 
 
-    airMoveUp: function () {
+    walkRight: function (time) {
+        if (!this.isOnGround || !this.entity.collision) {
+            return false;
+        }
+        var vel = this.entity.collision.getLinearVelocity();
+        if (Math.abs(vel.x)>this.speedWalk) {
+            return false;
+        }
+        this.isIdle = false;
+        this.entity.collision.impulse(0, this.speedWalk * time / 1000);
+    },
+
+
+    airMoveUp: function (time) {
 //console.log((+new Date() < this.timeJump + this.speedTimeJump * 1000), '+new Date() = ', (+new Date()), ', this.timeJump = ', yespix.precision(this.timeJump, 4)
 //    , ' this.speedTimeJump = ', yespix.precision(this.speedTimeJump * 1000, 4), ', + = ', yespix.precision(this.timeJump + this.speedTimeJump, 4));
         if (this.isOnGround || !this.entity.collision || (+new Date() > this.timeJump + this.speedTimeJump * 1000)) {
@@ -155,21 +155,29 @@ yespix.define('actor2w', {
         this.entity.collision.impulse(-90, this.speedUp);
     },
 
-    airMoveLeft: function () {
+    airMoveLeft: function (time) {
         if (this.isOnGround || !this.entity.collision) {
             return false;
         }
+        var vel = this.entity.collision.getLinearVelocity();
+        if (Math.abs(vel.x)>this.speedAir) {
+            return false;
+        }
         this.isIdle = false;
-        this.entity.collision.impulse(180, this.speedAir);
+        this.entity.collision.impulse(180, this.speedAir * time / 1000);
     },
 
 
-    airMoveRight: function () {
+    airMoveRight: function (time) {
         if (this.isOnGround || !this.entity.collision) {
             return false;
         }
+        var vel = this.entity.collision.getLinearVelocity();
+        if (Math.abs(vel.x)>this.speedAir) {
+            return false;
+        }
         this.isIdle = false;
-        this.entity.collision.impulse(0, this.speedAir);
+        this.entity.collision.impulse(0, this.speedAir * time / 1000);
     },
 
 
@@ -195,29 +203,16 @@ yespix.define('actor2w', {
 
 
     actorBeginContact: function(contact, myFixture, otherBody, otherFixture) {
-        //this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
-        /*
-        var myData = this.entity.collision.getUserData(myFixture);
-        if (myData && myData.type == 'ground') {
-            // just add 1
-            this.groundTouch++;
-
-        }*/
     },
 
 
     actorEndContact: function(contact, myFixture, otherBody, otherFixture) {
-        //this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
-        /*
-        var myData = this.entity.collision.getUserData(myFixture);
-        if (myData && myData.type == 'ground') {
-            // update groundTouch so we are sure it's the right count
-            this.groundTouch = (this.entity.collision.getTouchList(myFixture)).length;
-        }*/
     },
+
 
     actorPreSolve: function(contact, myFixture, otherBody, otherFixture, old) {
     },
+
 
     actorPostSolve: function(contact, myFixture, otherBody, otherFixture, impact) {
     }

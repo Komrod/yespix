@@ -4,7 +4,7 @@ function GfxManager(canvas, list) {
 	
 	this.reset(canvas, list);
 	return;
-	
+
 	// init
 	this.canvas = null;
 	this.context = null;
@@ -29,7 +29,7 @@ GfxManager.prototype.setPhysics = function(physics) {
 };
 
 
-GfxManager.prototype.applyPhysics = function() {
+GfxManager.prototype.applyPhysics = function(time) {
 	if (!this.physics) {
 		return false;
 	}
@@ -37,7 +37,7 @@ GfxManager.prototype.applyPhysics = function() {
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
-    	if (this.list[t].actor) this.list[t].actor.prepare();
+    	if (this.list[t].actor) this.list[t].actor.step(time);
     	if (this.list[t].collision) this.list[t].collision.applyPhysics();
     }
     return true;

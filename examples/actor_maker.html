@@ -440,7 +440,7 @@ body {
 	// register tick and frame functions
 	loop.register(
 		function(loop, time) { 
-            manager.applyPhysics(); // apply position from physics engine
+            manager.applyPhysics(time); // apply position from physics engine
             //platform
 	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));
 	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));

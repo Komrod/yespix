@@ -48,7 +48,7 @@ yespix.define('actor', {
     },
 
 
-    prepare: function() {
+    step: function(time) {
     },
 
     createPhysics: function() {
