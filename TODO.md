@@ -1,8 +1,8 @@
 
 TODO list:
-- change actor collision and speed
-- make an actor creation tool
 - bug: player with wall on left can jump forever
+- use step(time) for actors instead of prepare
+- dont accelerate walk / air move when reachin a correct speed
 - Rename all options as properties
 - make a function defineEntity and defineClass
 - make a player state in Input class
@@ -38,7 +38,6 @@ TODO list:
 - fix position of followed entity in the center of entity
 - disable key capture on phones
 - phone mode: disable keys, set fullscreen
-- calculate vector from a position to another position
 - stop and resume time
 - make movement relative to time, not frame
 - remove entity._instances array = obsolete
@@ -55,8 +54,6 @@ TODO list:
 - animate properties
 - draw polygon, line, elipse, star
 - draw SVG image
-- rotation
-- parent rotation affects children
 - duplicate, add, remove image
 - use Object.create in the mixin() function
 - function key() detects if any key is pressed
@@ -78,6 +75,8 @@ TODO list:
 
 
 DONE:
+- make a moving platform
+- make an actor creation tool
 - Impulse to move and jump player
 - Detect when on ground with player
 - bug: sometimes actor2w doesnt detect ground
@@ -244,14 +243,11 @@ v0.1.0.0
 
 
 CANCELED:
-- create a sprite entity from anim entity // anim is doing the trick
-- override the yespix function to do something else after init // cant instanciate new YESPIX object after that
 
 
 PENDING:
 - do a partial draw for each gfx entities
 - prerender canvas for the partial draw
-- function xload which try to execute an action depending the extension of the loaded file (execute a .js script, add .css file to document ...)
 
 
 

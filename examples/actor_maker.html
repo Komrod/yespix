@@ -6,7 +6,7 @@
 		<style>
 
 body {
-	background-color: #789;
+	background-color: #fff;
 }
 
 
@@ -256,10 +256,16 @@ body {
 
 	    // blocs
 	    manager.physics.createRect(400, 350, 100, 50, {type: 'static'});
-	    manager.physics.createRect(550, 280, 100, 50, {type: 'static'});
+	    manager.physics.createRect(550, 320, 100, 20, {type: 'static'});
+	    manager.physics.createRect(0, 300, 20, 100, {type: 'static'});
 
 	    // moving platform
-	    manager.physics.createRect(200, 350, 50, 20, {type: 'kinetic'});
+	    //var platform = manager.physics.createRect(200, 350, 50, 20, {type: 'kinematic'});
+		var platform = new yespix.class.gfx({position: {x: 150, y: 380}});
+		platform.actor = new yespix.class.actorPlatform({type: 'linear', to: {y: -200}, speed: 0.5}, platform);
+		platform.collision = new Collision({type: 'kinematic', width: 50, height: 20, physics: manager.physics}, platform);
+		manager.add(platform);
+
 
 		// add random blocs
 		for (var t=0; t<5; t++) {
@@ -270,8 +276,8 @@ body {
 						height: yespix.randInt(10, 60)
 					},
 					position: {
-						x: yespix.randInt(100, 600),
-						y: yespix.randInt(0, -500)
+						x: yespix.randInt(150, 300),
+						y: yespix.randInt(0, -1500)
 					}
 				});
 			object.collision = new Collision({ physics: manager.physics }, object);
@@ -317,9 +323,15 @@ body {
 		str += String.fromCharCode(13);
 		str += 'yespix();' + String.fromCharCode(13);
 		str += String.fromCharCode(13);
+		str += '///////////////////////////////////////////////////////////////' + String.fromCharCode(13);
+		str += String.fromCharCode(13);
 		str += 'var worldOptions = ' + formatObject(worldOptions) + ';' + String.fromCharCode(13);
+		str += String.fromCharCode(13);
 		str += 'var actorOptions = ' + formatObject(actorOptions) + ';' + String.fromCharCode(13);
+		str += String.fromCharCode(13);
 		str += 'var collisionOptions = ' + formatObject(collisionOptions) + ';' + String.fromCharCode(13);
+		str += String.fromCharCode(13);
+		str += '///////////////////////////////////////////////////////////////' + String.fromCharCode(13);
 		str += String.fromCharCode(13);
 		str += 'var physics = new EngineBox2d(worldOptions);' + String.fromCharCode(13);
 		str += 'collisionOptions.physics = physics;' + String.fromCharCode(13);
@@ -347,23 +359,6 @@ body {
 		str += String.fromCharCode(13);
 
 		document.getElementById('code').innerHTML = str;
-
-
-/*		
-	    // get actor options
-		actorOptions = getActor();
-
-		// get collision options
-		collisionOptions = getCollision();
-		collisionOptions.physics = manager.physics;
-		collisionOptions.fixedRotation = true;
-		collisionOptions.isBullet = true;
-
-		// create player
-		var player = new yespix.class.gfx({position: {x: 50, y: 200}});
-		player.actor = new yespix.class.actor2w(actorOptions, player);
-		player.collision = new Collision(collisionOptions, player);
-*/
 	}
 
 
@@ -446,6 +441,10 @@ body {
 	loop.register(
 		function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
+            //platform
+	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));
+	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));
+
             manager.clear(); // clear canvas
             manager.physics.world.DrawDebugData(); // draw debug
             // manager.physics.world.ClearForces();

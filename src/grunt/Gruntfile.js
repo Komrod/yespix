@@ -123,6 +123,7 @@ module.exports = function(grunt) {
                     // classes
                     '../engine/entity/actor.js',
                     '../engine/entity/actor2w.js',
+                    '../engine/entity/actorPlatform.js',
 
                     // entities end
                     '../engine/template/entities_end.js',

@@ -78,8 +78,13 @@ EngineBox2d.prototype.createBody = function(x, y, width, height, collision) {
 	collision = collision || {};
 	this.setBody(collision);
 
-	if (collision.type == 'static') this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
-	else this.bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
+	if (collision.type == 'static') {
+		this.bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;
+	} else if (collision.type == 'kinematic') {
+		this.bodyDef.type = Box2D.Dynamics.b2Body.b2_kinematicBody;
+	} else {
+		this.bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
+	}
 
 	this.bodyDef.position.x = x / this.scale + width / 2 / this.scale;
 	this.bodyDef.position.y = y / this.scale + height / 2 / this.scale;

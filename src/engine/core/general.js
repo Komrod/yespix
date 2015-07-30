@@ -380,8 +380,9 @@ yespix.fn.async = function(fn, parameters, callback) {
 };
 
 
+yespix.fn.startTime = +new Date();
+
 if (window.performance.now) {
-    yespix.fn.startTime = +new Date();
     yespix.fn.getTime = function() {
         return this.startTime + window.performance.now();
     };
@@ -392,18 +393,13 @@ if (window.performance.now) {
 }
 
 
-// Converts from degrees to radians.
+// Converts from degree to radian
 yespix.fn.degreeToRadian = function(d) {
   return d * Math.PI / 180;
 };
  
-// Converts from radians to degrees.
+// Converts from radian to degree
 yespix.fn.radianToDegree = function(r) {
   return r * 180 / Math.PI;
 };
 
-// Converts from radians to degrees.
-yespix.fn.precision = function(f, precision) {
-    if (!f) return false;
-  return parseFloat(f.toFixed(precision)); 
-};

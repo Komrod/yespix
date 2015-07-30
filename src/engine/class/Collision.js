@@ -206,3 +206,9 @@ Collision.prototype.getUserData = function(fixture) {
     return this.physics.getUserData(fixture);
 };
 
+
+Collision.prototype.vec2 = function(x, y) {
+    return this.physics.vec2(x, y);
+};
+
+
