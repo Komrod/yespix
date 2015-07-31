@@ -1,23 +1,20 @@
 
 TODO list:
-- make a function defineEntity and defineClass
-- put entities in yespix.entity and classes in yespix.class
-- kick back object when walking on it
 - make a player state in Input class
 - enable / disable debug of physics
 - prerender class
 - start player on ground / detects ground
-- load a level
-- pass rotation of an object to collision object
+- make a level entity
+- pass rotation of an object to collision object at init
 - use collision in a level
-- parallax move
-- light engine
+- parallax image move
+- texture entity
 
 - extends to reverse an animation
+- getTouchList must returns only fixtures that touches body and ground sensor
 - bold text
-- physics engine files must start with "physics"
-- tween engine files must start with "tween"
 - function to remove entities and collision object
+- light engine
 - set isChanged=false after the draw function
 - minimum speed for objects in physics engine
 - optimize: use typed arrays when possible
@@ -73,6 +70,12 @@ TODO list:
 
 
 DONE:
+- physics engine files must start with "physics" // 31-07-2015
+- tween engine files must start with "tween"
+- kick back object when walking
+- kick down object when jumping
+- make a function defineEntity and defineClass
+- put entities in yespix.entity and classes in yespix.class
 - Rename all options as properties
 - dont accelerate walk / air move when reaching a correct speed
 - use step(time) for actors instead of prepare

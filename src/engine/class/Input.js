@@ -4,6 +4,8 @@ function Input(properties) {
     // init the properties
     properties = properties || {};
 
+    this.states = {};
+    
     this.persistence = properties.persistence || 100;
     this.doc = properties.document || document;
 
@@ -251,6 +253,16 @@ Input.prototype.reset = function() {
     this.data.hold = {};
     this.data.down = {};
     this.data.up = {};
+};
+
+
+Input.prototype.addState = function(entityName, keys) {
+    // keys = { 'jump': 'up', 'goLeft': 'left', 'goRight': 'right'}
+    this.states[entityName] = keys;
+};
+
+Input.prototype.state = function(entityName, actionName) {
+    return this.key(this.states[entityName][actionName]);
 };
 
 

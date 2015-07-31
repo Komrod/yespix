@@ -236,6 +236,7 @@ body {
 
 	    // get actor options
 		actorOptions = getActor();
+		actorOptions.input = input;
 
 		// get collision options
 		collisionOptions = getCollision();
@@ -245,7 +246,7 @@ body {
 
 		// create player
 		var player = new yespix.entity.gfx({position: {x: 50, y: 200}});
-		player.actor = new yespix.class.actor2w(actorOptions, player);
+		player.actor = new yespix.class.player2w(actorOptions, player);
 		player.collision = new yespix.class.collision(collisionOptions, player);
 		manager.add(player);
 
@@ -260,7 +261,6 @@ body {
 	    manager.physics.createRect(0, 300, 20, 100, {type: 'static'});
 
 	    // moving platform
-	    //var platform = manager.physics.createRect(200, 350, 50, 20, {type: 'kinematic'});
 		var platform = new yespix.entity.gfx({position: {x: 150, y: 380}});
 		platform.actor = new yespix.class.actorPlatform({type: 'linear', to: {y: -200}, speed: 0.5}, platform);
 		platform.collision = new yespix.class.collision({type: 'kinematic', width: 50, height: 20, physics: manager.physics}, platform);

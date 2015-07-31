@@ -127,6 +127,7 @@ module.exports = function(grunt) {
                     // classes with inheritance
                     '../engine/class/actor.js',
                     '../engine/class/actor2w.js',
+                    '../engine/class/player2w.js',
                     '../engine/class/actorPlatform.js',
 
                     // entities

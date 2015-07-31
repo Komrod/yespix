@@ -19,8 +19,6 @@ yespix.defineClass('actor2w', {
         if (yespix.isUndefined(this.frictionAir)) this.frictionAir = 0.01;
         if (yespix.isUndefined(this.frictionGround)) this.frictionGround = 2;
         if (yespix.isUndefined(this.frictionIdle)) this.frictionIdle = 5;
-
-        this.groundTouch = 0;
     },
 
 
@@ -30,21 +28,22 @@ yespix.defineClass('actor2w', {
         }
         
         this.checkState(time);
-        this.checkInput(time);
         this.checkSpeed(time);
 
         this.super();
     },
 
+
     checkState: function(time) {
-        this.groundTouch = (this.entity.collision.getTouchList(this.groundFixture)).length;
+        this.groundList = this.entity.collision.getTouchList(this.groundFixture);
         this.isIdle = true;
-        if (this.groundTouch > 0) {
+        if (this.groundList.length > 0) {
             this.isOnGround = true;
         } else {
             this.isOnGround = false;
         }
     },
+
 
     checkSpeed: function(time) {
 
@@ -76,31 +75,8 @@ yespix.defineClass('actor2w', {
         }
     },
 
-    checkInput: function(time) {
-        if (input.key('right')) {
-            if (this.isOnGround) {
-                this.walkRight(time);
-            } else {
-                this.airMoveRight(time);
-            }
-        } else if (input.key('left')) {
-            if (this.isOnGround) {
-                this.walkLeft(time);
-            } else {
-                this.airMoveLeft(time);
-            }
-        }
-        if (input.key('up')) {
-            if (this.isOnGround) {
-                this.jump(time);
-            } else {
-                this.airMoveUp(time);
-            }
-        }
-    },
 
-
-    jump: function(time) {
+     jump: function(time) {
         if (!this.isOnGround) {
             return false;
         }
@@ -111,6 +87,17 @@ yespix.defineClass('actor2w', {
 
         this.isIdle = false;
         this.entity.collision.impulse(-90, this.speedJump);
+        this.pushGround(90, this.speedJump / 10);
+    },
+
+
+    pushGround: function(degree, power) {
+        if (!this.groundList) {
+            this.groundList = this.entity.collision.getTouchList(this.groundFixture);
+        }
+        for (var t=0; t<this.groundList.length; t++) {
+            this.entity.collision.physics.applyImpulse(this.groundList[t].body, degree, power);
+        }
     },
 
 
@@ -124,6 +111,7 @@ yespix.defineClass('actor2w', {
         }
         this.isIdle = false;
         this.entity.collision.impulse(180, this.speedWalk * time / 1000);
+        this.pushGround(0, this.speedWalk * time / 1000 / 5);
     },
 
 
@@ -137,6 +125,7 @@ yespix.defineClass('actor2w', {
         }
         this.isIdle = false;
         this.entity.collision.impulse(0, this.speedWalk * time / 1000);
+        this.pushGround(180, this.speedWalk * time / 1000 / 5);
     },
 
 
@@ -154,6 +143,7 @@ yespix.defineClass('actor2w', {
         this.isIdle = false;
         this.entity.collision.impulse(-90, this.speedUp);
     },
+
 
     airMoveLeft: function (time) {
         if (this.isOnGround || !this.entity.collision) {
@@ -217,4 +207,6 @@ yespix.defineClass('actor2w', {
     actorPostSolve: function(contact, myFixture, otherBody, otherFixture, impact) {
     }
 
+
 });
+
