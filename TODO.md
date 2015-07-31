@@ -1,9 +1,9 @@
 
 TODO list:
-- use step(time) for actors instead of prepare
-- dont accelerate walk / air move when reaching a correct speed
 - Rename all options as properties
 - make a function defineEntity and defineClass
+- put entities in yespix.entity and classes in yespix.class
+- kick back object when walking on it
 - make a player state in Input class
 - enable / disable debug of physics
 - start player on ground / detects ground
@@ -15,7 +15,6 @@ TODO list:
 
 - extends to reverse an animation
 - bold text
-- put entities in yespix.entity and classes in yespix.class
 - physics engine files must start with "physics"
 - tween engine files must start with "tween"
 - function to remove entities and collision object
@@ -74,6 +73,8 @@ TODO list:
 
 
 DONE:
+- dont accelerate walk / air move when reaching a correct speed
+- use step(time) for actors instead of prepare
 - bug: player with wall on left can jump forever
 - make a moving platform
 - make an actor creation tool
