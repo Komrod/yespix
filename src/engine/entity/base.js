@@ -16,9 +16,9 @@ yespix.define('base', {
      * Initilize the entity object. The original code of the function is called for the class name of
      * the entity and each ancestor classes
      */
-    init: function(options) {
-        options = options || {};
-	    yespix.copy(options, this);
+    init: function(properties) {
+        properties = properties || {};
+	    yespix.copy(properties, this);
         return true;
     },
 

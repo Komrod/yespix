@@ -6,9 +6,9 @@ yespix.define('sprite', {
     inheritClass: 'image',
 
 
-    init: function(options) {
-        options = options || {};
-        this.super(options);
+    init: function(properties) {
+        properties = properties || {};
+        this.super(properties);
         this.sprite = new Sprite(this.sprite, this);
     },
 

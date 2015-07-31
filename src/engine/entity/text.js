@@ -3,9 +3,9 @@
 yespix.define('text', {
     inheritClass: 'gfx',
 
-    init: function(options) {
-        options = options || {};
-        this.super(options);
+    init: function(properties) {
+        properties = properties || {};
+        this.super(properties);
         this.text = new Text(this.text || {}, this);
 
         this.isReady = true;

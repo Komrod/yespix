@@ -1,8 +1,8 @@
 
 
-function Sprite(options, entity) {
+function Sprite(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) {
         this.entity = entity;
     }
@@ -17,7 +17,7 @@ function Sprite(options, entity) {
         selectedIndex: 0,
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 
     this.isLoading = false;
     this.isReady =  false;
@@ -30,15 +30,15 @@ function Sprite(options, entity) {
 }
 
 
-Sprite.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Sprite.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.entity.event(
         {
             type: 'change',
             entity: this.entity,
             from: this,
             fromClass: 'Sprite',
-            properties: options
+            properties: properties
         }
     );
 };

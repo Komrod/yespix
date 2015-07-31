@@ -1,11 +1,11 @@
 
 
-function Sound(options, entity) {
+function Sound(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
-    if (yespix.isString(options)) {
-        options = {src: options};
+    if (yespix.isString(properties)) {
+        properties = {src: properties};
     }
 
     var varDefault = {
@@ -15,7 +15,7 @@ function Sound(options, entity) {
         src: '',
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 
     this.isLoading =  false;
     this.isReady = false;
@@ -33,8 +33,8 @@ function Sound(options, entity) {
 // new yespix.class.sound({ sound: { src: '', autoPlay: true});
 // entity.sound.play();
 
-Sound.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Sound.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entity.event(
         {
@@ -42,7 +42,7 @@ Sound.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Sound',
-            properties: options
+            properties: properties
         }
     );
 };

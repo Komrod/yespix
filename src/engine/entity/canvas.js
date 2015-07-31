@@ -2,52 +2,52 @@ yespix.define('canvas', {
 
     inheritClass: 'base',
 
-    init: function(options) {
+    init: function(properties) {
         // call ancestor class function
-        this.super(options);
+        this.super(properties);
 
-        // init options
-        if (options === true) {
-            options = {
+        // init properties
+        if (properties === true) {
+            properties = {
                 autoAppend: true,
                 width: 640,
                 height: 480
             };
         } else {
-            options = options || {};
+            properties = properties || {};
         }
 
-        options.width = options.width || 0;
-        options.height = options.height || 0;
+        properties.width = properties.width || 0;
+        properties.height = properties.height || 0;
 
-        this.document = options.document || yespix.document;
-        this.window = options.window || yespix.window;
+        this.document = properties.document || yespix.document;
+        this.window = properties.window || yespix.window;
 
         // apply relative width and height
-        if (yespix.contains(options.width, '%') || yespix.contains(options.height, '%')) {
-            if (yespix.contains(options.width, '%')) {
+        if (yespix.contains(properties.width, '%') || yespix.contains(properties.height, '%')) {
+            if (yespix.contains(properties.width, '%')) {
                 var defaultWidth = this.window.innerWidth || this.document.documentElement.clientWidth || this.document.body.clientWidth;
-                options.width = defaultWidth * parseFloat(width.replace('%', '')) / 100;
+                properties.width = defaultWidth * parseFloat(width.replace('%', '')) / 100;
             }
-            if (yespix.contains(options.height, '%')) {
+            if (yespix.contains(properties.height, '%')) {
                 var defaultHeight = this.window.innerWidth || this.document.documentElement.clientHeight || this.document.body.clientHeight;
-                options.height = defaultHeight * parseFloat(height.replace('%', '')) / 100;
+                properties.height = defaultHeight * parseFloat(height.replace('%', '')) / 100;
             }
         }
 
         // more init
-        options.className = options.className || '';
-        options.id = options.id || '';
+        properties.className = properties.className || '';
+        properties.id = properties.id || '';
 
         // create aspect
         this.aspect = new Aspect();
 
         // create element
-        this.element = options.canvas || this.create(options);
+        this.element = properties.canvas || this.create(properties);
 
         // append
         if (this.element) {
-            if (options.autoAppend) this.append();
+            if (properties.autoAppend) this.append();
         }
     },
 
@@ -69,15 +69,15 @@ yespix.define('canvas', {
         }
     },
 
-    create: function(options) {
+    create: function(properties) {
         var canvas = this.document.createElement('canvas');
         if (this.aspect) {
             canvas.width = this.aspect.width;
             canvas.height = this.aspect.height;
         }
-        if (options) {
-            if (options.id) canvas.id = options.id;
-            if (options.className) canvas.className = options.className;
+        if (properties) {
+            if (properties.id) canvas.id = properties.id;
+            if (properties.className) canvas.className = properties.className;
         }
         return canvas;
     },

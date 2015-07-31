@@ -362,7 +362,7 @@ yespix.define('level', 'gfx,move', {
         this.ready();
     },
 
-    follow: function(entity, options) {
+    follow: function(entity, properties) {
         if (!entity) {
             console.error('follow :: invalid entity to follow')
             return false;
@@ -370,15 +370,15 @@ yespix.define('level', 'gfx,move', {
 
         this.childAdd(entity);
 
-        options = options || {};
-        if (yespix.isUndefined(options.positionX)) options.positionX = 0.5;
-        if (yespix.isUndefined(options.positionY)) options.positionY = 0.5;
-        if (yespix.isUndefined(options.speedX)) options.speedX = 1;
-        if (yespix.isUndefined(options.speedY)) options.speedY = 0.02;
+        properties = properties || {};
+        if (yespix.isUndefined(properties.positionX)) properties.positionX = 0.5;
+        if (yespix.isUndefined(properties.positionY)) properties.positionY = 0.5;
+        if (yespix.isUndefined(properties.speedX)) properties.speedX = 1;
+        if (yespix.isUndefined(properties.speedY)) properties.speedY = 0.02;
 
-        this.followOptions = options;
+        this.followOptions = properties;
 
-        if (options.resetOnStart) this.followReset(entity);
+        if (properties.resetOnStart) this.followReset(entity);
 
         entity.on('moveEnd', function(e) {
             if (e.entity && e.entity._parent) e.entity._parent.followEntity(e.entity);

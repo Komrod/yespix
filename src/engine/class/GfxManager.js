@@ -145,15 +145,15 @@ GfxManager.prototype.getAssets = function() {
 };
 
 
-GfxManager.prototype.loadAssets = function(options) {
-	options = options || {};
+GfxManager.prototype.loadAssets = function(properties) {
+	properties = properties || {};
 	var manager = this;
-	if (!options.complete) {
-		options.complete = function(event) {
+	if (!properties.complete) {
+		properties.complete = function(event) {
 			manager.load();
 		}
 	}
-	this.loader = new Loader(options, this.getAssets());
+	this.loader = new Loader(properties, this.getAssets());
 	this.loader.execute();
 };
 

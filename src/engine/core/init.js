@@ -8,29 +8,29 @@
  * Initialisation of the YESPIX engine
  * @method init
  */
-yespix.fn.init = function(options) {
+yespix.fn.init = function(properties) {
 
     // current version of the engine
     this.version = "0.0.14";
 
-    // store the options
-    this.options = options || {};
+    // store the properties
+    this.properties = properties || {};
 
 
     this.class = {};
     this.cache = {};
     this.extendEntity = {};
 
-    if (this.options['init']) this.options['init']();
+    if (this.properties['init']) this.properties['init']();
 
 
     // set document and window
-    this.document = this.options["document"] || document;
-    this.window = this.options["window"] || window;
+    this.document = this.properties["document"] || document;
+    this.window = this.properties["window"] || window;
 
     initEntities(this);
 
-    if (this.options['ready']) this.options['ready']();
+    if (this.properties['ready']) this.properties['ready']();
 
     return this;
 };

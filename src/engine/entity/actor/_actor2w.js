@@ -58,7 +58,7 @@
                 'right': 'right',
             },
 
-            actorInit: function(options) {},
+            actorInit: function(properties) {},
 
             init: function() {},
 

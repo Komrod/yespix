@@ -1,11 +1,11 @@
 
-function Input(options) {
+function Input(properties) {
 
-    // init the options
-    options = options || {};
+    // init the properties
+    properties = properties || {};
 
-    this.persistence = options.persistence || 100;
-    this.doc = options.document || document;
+    this.persistence = properties.persistence || 100;
+    this.doc = properties.document || document;
 
     var input = this;
 

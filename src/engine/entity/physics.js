@@ -1,18 +1,18 @@
 
 
 /*
-function Collision(options, entity) {
+function Collision(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     
-    if (options.engine) {
-        this.setEngine(options.engine);
+    if (properties.engine) {
+        this.setEngine(properties.engine);
     }
 
     if (entity) {
         this.entity = entity;
 //console.log('Collision: entity = ', entity);
-        if (!options.engine) {
+        if (!properties.engine) {
             if (entity.engine) {
                 this.setEngine(entity.engine);
             } else if (entity.manager && entity.manager.engine) {
@@ -31,7 +31,7 @@ function Collision(options, entity) {
         restitution: 0.2
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 //console.log('Collision:this.engine = ', this.engine);
     if (this.engine) {
         this.create();
@@ -44,8 +44,8 @@ Collision.prototype.setEngine = function(engine) {
 };
 
 
-Collision.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Collision.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
 
     this.isChanged = true;
     this.entity.event(
@@ -54,7 +54,7 @@ Collision.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Collision',
-            properties: options
+            properties: properties
         }
     );
 };
@@ -113,8 +113,8 @@ Collision.prototype.applyPhysics = function() {
 yespix.define('physics', {
 
 
-    init: function(options, entity) {
-        options = options || {};
+    init: function(properties, entity) {
+        properties = properties || {};
         if (entity) this.entity = entity;
 
         var varDefault = {
@@ -132,7 +132,7 @@ yespix.define('physics', {
 
         };
 
-        this.set(options, varDefault);
+        this.set(properties, varDefault);
     },
 
 

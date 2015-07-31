@@ -6,12 +6,12 @@ yespix.define('sound', {
     inheritClass: 'base',
 
 
-    init: function(options) {
-        var options = options || {};
-        if (yespix.isString(options)) {
-            options = {sound: {src: options}};
+    init: function(properties) {
+        var properties = properties || {};
+        if (yespix.isString(properties)) {
+            properties = {sound: {src: properties}};
         }
-        this.super(options);
+        this.super(properties);
         this.sound = new Sound(this.sound || {}, this);
 
     },

@@ -6,9 +6,9 @@ yespix.define('animation', {
     inheritClass: 'image',
 
 
-    init: function(options) {
-        options = options || {};
-        this.super(options);
+    init: function(properties) {
+        properties = properties || {};
+        this.super(properties);
         this.animation = new Animation(this.animation, this);
     },
 

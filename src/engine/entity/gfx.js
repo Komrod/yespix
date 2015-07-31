@@ -4,10 +4,10 @@
 yespix.define('gfx', {
     inheritClass: 'base',
 
-    init: function(options) {
-        options = options || {};
+    init: function(properties) {
+        properties = properties || {};
 
-        this.super(options);
+        this.super(properties);
 
         this.isReady = false;
         

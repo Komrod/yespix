@@ -1,8 +1,8 @@
 
 
-function Text(options, entity) {
+function Text(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
 
     var varDefault = {
@@ -24,12 +24,12 @@ function Text(options, entity) {
 
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 }
 
 
-Text.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Text.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
 
     this.isChanged = true;
     this.entity.event(
@@ -38,7 +38,7 @@ Text.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Text',
-            properties: options
+            properties: properties
         }
     );
 };

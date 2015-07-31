@@ -1,11 +1,11 @@
 
 
-function Image(options, entity) {
+function Image(properties, entity) {
     
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
-    if (yespix.isString(options)) {
-        options = {src: options};
+    if (yespix.isString(properties)) {
+        properties = {src: properties};
     }
     
     var varDefault = {
@@ -17,7 +17,7 @@ function Image(options, entity) {
         offsetY: 0
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 
     this.isLoading = false;
     this.isReady =  false;
@@ -30,10 +30,10 @@ function Image(options, entity) {
 }
 
 
-Image.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Image.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    if (!yespix.isUndefined(options.scale) && options.scale != 1) {
+    if (!yespix.isUndefined(properties.scale) && properties.scale != 1) {
         if (this.isReady) {
             this.load(this.element.source);
         }
@@ -44,7 +44,7 @@ Image.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Image',
-            properties: options
+            properties: properties
         }
     );
 };

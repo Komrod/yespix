@@ -1,8 +1,8 @@
 
 
-function Animation(options, entity) {
+function Animation(properties, entity) {
     
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
     
     var varDefault = {
@@ -16,22 +16,22 @@ function Animation(options, entity) {
         selectedSprite: ''
     };
 
-    if (options.sprites) {
-        for (var n in options.sprites) {
-            options.sprites[n] = new yespix.class.sprite(options.sprites[n]);
-            options.sprites[n].manager = this;
-            options.sprites[n].position = this.entity.position;
-            options.sprites[n].aspect = this.entity.aspect;
+    if (properties.sprites) {
+        for (var n in properties.sprites) {
+            properties.sprites[n] = new yespix.class.sprite(properties.sprites[n]);
+            properties.sprites[n].manager = this;
+            properties.sprites[n].position = this.entity.position;
+            properties.sprites[n].aspect = this.entity.aspect;
         }
     };
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
     this.isReady =  false;
     this.nextTime = 0;
 }
 
 
-Animation.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Animation.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entity.event(
         {
@@ -39,7 +39,7 @@ Animation.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Animation',
-            properties: options
+            properties: properties
         }
     );
 };

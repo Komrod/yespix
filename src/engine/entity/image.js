@@ -6,13 +6,13 @@ yespix.define('image', {
     inheritClass: 'gfx',
 
 
-    init: function(options) {
-//console.log('isString options = ', yespix.isString(options), options);        
-        options = options || {};
-        if (yespix.isString(options)) {
-            options = {image: {src: options}};
+    init: function(properties) {
+//console.log('isString properties = ', yespix.isString(properties), properties);        
+        properties = properties || {};
+        if (yespix.isString(properties)) {
+            properties = {image: {src: properties}};
         }
-        this.super(options);
+        this.super(properties);
         this.image = new Image(this.image, this);
 //console.log(yespix);
 //        yespix.extendEntity.image(this);

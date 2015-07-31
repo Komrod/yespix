@@ -1,16 +1,16 @@
 
-function Loader(options, files) {
+function Loader(properties, files) {
 
     // init the fileList
-    // init the options
-    options = options || {};
+    // init the properties
+    properties = properties || {};
 
-    this.complete = options['complete'] || function(event) {};
-    this.error = options['error'] || function(event) {};
-    this.progress = options['progress'] || function(event) {};
-    this.success = options['success'] || function(event) {};
+    this.complete = properties['complete'] || function(event) {};
+    this.error = properties['error'] || function(event) {};
+    this.progress = properties['progress'] || function(event) {};
+    this.success = properties['success'] || function(event) {};
 
-    this.maxDownload = options['maxDownload'] || 0;
+    this.maxDownload = properties['maxDownload'] || 0;
 
     this.files = files || [];
 

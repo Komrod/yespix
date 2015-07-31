@@ -6,8 +6,8 @@ yespix.define('actor2w', {
     inheritClass: 'actor',
 
 
-    init: function(options, entity) {
-        this.super(options, entity);
+    init: function(properties, entity) {
+        this.super(properties, entity);
 
         if (yespix.isUndefined(this.speedWalk)) this.speedWalk = 0.4;
         if (yespix.isUndefined(this.speedJump)) this.speedJump = 6;

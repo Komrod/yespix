@@ -1,7 +1,7 @@
 
-function Aspect(options, entity) {
+function Aspect(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
 
     var varDefault = {
@@ -21,11 +21,11 @@ function Aspect(options, entity) {
         clipHeight: 0
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 }
 
-Aspect.prototype.set = function(options, varDefault) {
-    if (options.width || options.height) {
+Aspect.prototype.set = function(properties, varDefault) {
+    if (properties.width || properties.height) {
         if (this.entity && this.entity.image) {
             if (this.entity.image.set) {
                 this.entity.image.set({autoSize: false});
@@ -42,7 +42,7 @@ Aspect.prototype.set = function(options, varDefault) {
         }
     }
     
-    yespix.copy(options, this, varDefault);
+    yespix.copy(properties, this, varDefault);
     
     this.isChanged = true;
     this.entity.event(
@@ -51,7 +51,7 @@ Aspect.prototype.set = function(options, varDefault) {
             from: this,
             fromClass: 'Aspect',
             entity: this.entity,
-            properties: options
+            properties: properties
         }
     );
 }

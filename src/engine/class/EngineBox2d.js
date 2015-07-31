@@ -1,7 +1,7 @@
 
 
-function EngineBox2d(options) {
-	options = options || {};
+function EngineBox2d(properties) {
+	properties = properties || {};
 
 	var varDefault = {
 		gravity: 20,
@@ -16,7 +16,7 @@ function EngineBox2d(options) {
 		isSensor: false
 	};
 
-	yespix.copy(options, this, varDefault);
+	yespix.copy(properties, this, varDefault);
 
 	this.world = new Box2D.Dynamics.b2World(new Box2D.Common.Math.b2Vec2(0, this.gravity), this.allowSleep);
 

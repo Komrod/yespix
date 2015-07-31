@@ -1,9 +1,9 @@
-function Speed(options, entity) {
+function Speed(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
 
-    this.x = options.x || 0;
-    this.y = options.y || 0;
+    this.x = properties.x || 0;
+    this.y = properties.y || 0;
 
     this.entity = entity;
 }

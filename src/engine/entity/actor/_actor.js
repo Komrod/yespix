@@ -10,7 +10,7 @@ yespix.define('actor', 'anim, move, collision', {
     actorSpeedMin: 0.05,
     actorDirection: '',
     actorAnims: {},
-    actorInit: function(options) {},
+    actorInit: function(properties) {},
     init: function() {
 
     },

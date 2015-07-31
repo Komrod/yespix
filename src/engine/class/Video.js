@@ -1,11 +1,11 @@
 
 
-function Video(options, entity) {
+function Video(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
-    if (yespix.isString(options)) {
-        options = {src: options};
+    if (yespix.isString(properties)) {
+        properties = {src: properties};
     }
 
     var varDefault = {
@@ -16,7 +16,7 @@ function Video(options, entity) {
         src: '',
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 
     this.isLoading =  false;
     this.isReady = false;
@@ -29,8 +29,8 @@ function Video(options, entity) {
 }
 
 
-Video.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Video.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entity.event(
         {
@@ -38,7 +38,7 @@ Video.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Video',
-            properties: options
+            properties: properties
         }
     );
 };

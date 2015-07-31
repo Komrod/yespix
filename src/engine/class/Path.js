@@ -1,8 +1,8 @@
 
 
-function Path(options, entity) {
+function Path(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
 
     var varDefault = {
@@ -20,12 +20,12 @@ function Path(options, entity) {
         vertex: 4
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 }
 
 
-Path.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Path.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entity.event(
         {
@@ -33,7 +33,7 @@ Path.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Path',
-            properties: options
+            properties: properties
         }
     );
 };

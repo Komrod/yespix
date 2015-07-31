@@ -1,7 +1,7 @@
 
-function Position(options, entity) {
+function Position(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     if (entity) this.entity = entity;
 
 
@@ -19,17 +19,17 @@ function Position(options, entity) {
     };
 
     this.isZSorted = false;
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
 }
 
 
-Position.prototype.set = function(options, varDefault) {
-    if (!yespix.isUndefined(options.z) && options.z != this.z
-        || !yespix.isUndefined(options.globalZ) && options.globalZ != this.globalZ)
+Position.prototype.set = function(properties, varDefault) {
+    if (!yespix.isUndefined(properties.z) && properties.z != this.z
+        || !yespix.isUndefined(properties.globalZ) && properties.globalZ != this.globalZ)
     {
         this.isZSorted = false;
     }
-    yespix.copy(options, this, varDefault);
+    yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entity.event(
         {
@@ -37,7 +37,7 @@ Position.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Position',
-            properties: options
+            properties: properties
         }
     );
 }

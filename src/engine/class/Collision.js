@@ -1,16 +1,16 @@
 
 
-function Collision(options, entity) {
+function Collision(properties, entity) {
 
-    options = options || {};
+    properties = properties || {};
     
-    if (options.physics) {
-        this.setPhysics(options.physics);
+    if (properties.physics) {
+        this.setPhysics(properties.physics);
     }
 
     if (entity) {
         this.entity = entity;
-        if (!options.physics) {
+        if (!properties.physics) {
             if (entity.physics) {
                 this.setEngine(entity.physics);
             } else if (entity.manager && entity.manager.physics) {
@@ -36,7 +36,7 @@ function Collision(options, entity) {
         isBullet: false,
     };
 
-    this.set(options, varDefault);
+    this.set(properties, varDefault);
     if (this.physics) {
         this.create();
     }
@@ -48,8 +48,8 @@ Collision.prototype.setPhysics = function(physics) {
 };
 
 
-Collision.prototype.set = function(options, varDefault) {
-    yespix.copy(options, this, varDefault);
+Collision.prototype.set = function(properties, varDefault) {
+    yespix.copy(properties, this, varDefault);
 
     if (this.body) {
 
@@ -62,7 +62,7 @@ Collision.prototype.set = function(options, varDefault) {
             entity: this.entity,
             from: this,
             fromClass: 'Collision',
-            properties: options
+            properties: properties
         }
     );
 };

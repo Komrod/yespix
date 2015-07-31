@@ -6,8 +6,8 @@ yespix.define('actorPlatform', {
     inheritClass: 'actor',
 
 
-    init: function(options, entity) {
-        this.super(options, entity);
+    init: function(properties, entity) {
+        this.super(properties, entity);
 
         if (yespix.isUndefined(this.speed)) {
             this.speed = 1;

@@ -3,8 +3,8 @@
 yespix.define('actor', {
 
 
-    init: function(options, entity) {
-        options = options || {};
+    init: function(properties, entity) {
+        properties = properties || {};
         if (entity) this.entity = entity;
 
         var varDefault = {
@@ -22,7 +22,7 @@ yespix.define('actor', {
 
         };
 
-        this.set(options, varDefault);
+        this.set(properties, varDefault);
     },
 
 

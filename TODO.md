@@ -1,6 +1,5 @@
 
 TODO list:
-- Rename all options as properties
 - make a function defineEntity and defineClass
 - put entities in yespix.entity and classes in yespix.class
 - kick back object when walking on it
@@ -73,6 +72,7 @@ TODO list:
 
 
 DONE:
+- Rename all options as properties
 - dont accelerate walk / air move when reaching a correct speed
 - use step(time) for actors instead of prepare
 - bug: player with wall on left can jump forever

@@ -2,9 +2,9 @@ yespix.define('path', {
 
     inheritClass: 'gfx',
 
-    init: function(options) {
-        options = options || {};
-        this.super(options);
+    init: function(properties) {
+        properties = properties || {};
+        this.super(properties);
         this.path = new Path(this.path || {}, this);
         this.isReady = true;
     },

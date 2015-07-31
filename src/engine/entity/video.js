@@ -6,12 +6,12 @@ yespix.define('video', {
     inheritClass: 'gfx',
 
 
-    init: function(options) {
-        var options = options || {};
-        if (yespix.isString(options)) {
-            options = {video: {src: options}};
+    init: function(properties) {
+        var properties = properties || {};
+        if (yespix.isString(properties)) {
+            properties = {video: {src: properties}};
         }
-        this.super(options);
+        this.super(properties);
         this.video = new Video(this.video || {}, this);
     },
 
