@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	    <script src="engines/box2d.js"></script>
+	    <script src="lib/box2d.min.js"></script>
 		<script src="../build/yespix.js"></script>
 		<style>
 
@@ -201,7 +201,7 @@ body {
 	function getActor() {
 		var object = {};
 		var type = 'actor';
-		var names = new Array('speedWalk', 'speedJump', 'speedUp', 'speedTimeJump', 'speedAir', 'speedXMax', 'speedYMax', 'frictionAir', 'frictionGround', 'frictionIdle');
+		var names = new Array('speedWalk', 'speedJump', 'speedUp', 'speedTimeJump', 'speedAir', 'speedMax', 'frictionAir', 'frictionGround', 'frictionIdle');
 		for (var t=0; t<names.length; t++) {
 			var id = type + '-' + names[t];
 			var value = parseFloat(document.getElementById(id).value);
@@ -373,26 +373,25 @@ body {
 	<div class="panel">
 		<h2>Actor</h2>
 		<script>
-		createVar('actor', 'speedWalk', 	 0.40, 0.05);
+		createVar('actor', 'speedWalk', 	 0.40, 0.10);
 		createVar('actor', 'speedJump', 	 6.00, 0.10);
-		createVar('actor', 'speedUp',   	 0.20, 0.01);
-		createVar('actor', 'speedTimeJump',  0.40, 0.05);
-		createVar('actor', 'speedAir', 		 0.15, 0.05);
-		createVar('actor', 'speedXMax', 	 10.0, 1.00);
-		createVar('actor', 'speedYMax', 	 10.0, 1.00);
-		createVar('actor', 'frictionAir', 	 0.10, 0.01);
+		createVar('actor', 'speedUp',   	 0.20, 0.10);
+		createVar('actor', 'speedTimeJump',  0.40, 0.10);
+		createVar('actor', 'speedAir', 		 0.15, 0.10);
+		createVar('actor', 'speedMax',	 	 10.0, 0.10);
+		createVar('actor', 'frictionAir', 	 0.10, 0.10);
 		createVar('actor', 'frictionGround', 2.00, 0.10);
-		createVar('actor', 'frictionIdle', 	 5.00, 0.50);
+		createVar('actor', 'frictionIdle', 	 5.00, 0.10);
 		</script>
 	</div>
 
 	<div class="panel">
 		<h2>Collision</h2>
 		<script>
-		createVar('collision', 'offsetX', 	     0.00, 5.00);
-		createVar('collision', 'offsetY', 	     0.00, 5.00);
-		createVar('collision', 'width',   	    50.00, 5.00);
-		createVar('collision', 'height',       100.00, 5.00);
+		createVar('collision', 'offsetX', 	     0.00, 0.10);
+		createVar('collision', 'offsetY', 	     0.00, 0.10);
+		createVar('collision', 'width',   	    50.00, 0.10);
+		createVar('collision', 'height',       100.00, 0.10);
 		createVar('collision', 'linearDamping',  1.00, 0.10);
 		createVar('collision', 'restitution', 	 0.00, 0.10);
 		createVar('collision', 'density', 	     0.00, 0.10);
@@ -402,10 +401,10 @@ body {
 	<div class="panel">
 		<h2>World</h2>
 		<script>
-		createVar('world', 'gravity', 	    20.00, 1.00);
-		createVar('world', 'scale',         30.00, 1.00);
+		createVar('world', 'gravity', 	    20.00, 0.10);
+		createVar('world', 'scale',         30.00, 0.10);
 		createVar('world', 'friction',       0.10, 0.10);
-		createVar('world', 'linearDamping',  0.10, 0.05);
+		createVar('world', 'linearDamping',  0.10, 0.10);
 		createVar('world', 'restitution', 	 0.10, 0.10);
 		createVar('world', 'density', 	     0.10, 0.10);
 		</script>
