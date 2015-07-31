@@ -308,3 +308,5 @@ Loader.prototype.update = function() {
     this.globalStats.mixedProgress = (this.globalStats.countProgress + this.globalStats.byteProgress) / 2;
 };
 
+
+yespix.defineClass('loader', Loader);

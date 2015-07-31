@@ -212,3 +212,4 @@ Collision.prototype.vec2 = function(x, y) {
 };
 
 
+yespix.defineClass('collision', Collision);

@@ -96,9 +96,6 @@ module.exports = function(grunt) {
                 },
                 src: [
 
-                    // classes
-                    '../engine/class/*.js',
-
                     // core start
                     '../engine/template/core_start.js',
 
@@ -107,6 +104,30 @@ module.exports = function(grunt) {
 
                     // entities start
                     '../engine/template/entities_start.js',
+
+                    // classes
+                    '../engine/class/animation.js',
+                    '../engine/class/aspect.js',
+                    '../engine/class/collision.js',
+                    '../engine/class/elementList.js',
+                    '../engine/class/gfxManager.js',
+                    '../engine/class/image.js',
+                    '../engine/class/input.js',
+                    '../engine/class/loader.js',
+                    '../engine/class/loop.js',
+                    '../engine/class/path.js',
+                    '../engine/class/physicsBox2d.js',
+                    '../engine/class/position.js',
+                    '../engine/class/sound.js',
+                    '../engine/class/speed.js',
+                    '../engine/class/sprite.js',
+                    '../engine/class/text.js',
+                    '../engine/class/video.js',
+
+                    // classes with inheritance
+                    '../engine/class/actor.js',
+                    '../engine/class/actor2w.js',
+                    '../engine/class/actorPlatform.js',
 
                     // entities
                     '../engine/entity/base.js',
@@ -119,11 +140,6 @@ module.exports = function(grunt) {
                     '../engine/entity/sprite.js',
                     '../engine/entity/video.js',
                     '../engine/entity/animation.js',
-
-                    // classes
-                    '../engine/entity/actor.js',
-                    '../engine/entity/actor2w.js',
-                    '../engine/entity/actorPlatform.js',
 
                     // entities end
                     '../engine/template/entities_end.js',

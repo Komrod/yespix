@@ -89,3 +89,4 @@ Loop.prototype.register = function(frameFunction, stepFunction) {
     return this;
 };
 
+yespix.defineClass('loop', Loop);

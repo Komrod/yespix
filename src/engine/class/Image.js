@@ -373,6 +373,7 @@ Image.prototype.getBoundaryClip = function() {
     return clip;
 };
 
+yespix.defineClass('image', Image);
 
 /*
     Create an image:

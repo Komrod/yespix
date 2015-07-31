@@ -1,6 +1,6 @@
 
 
-yespix.define('sprite', {
+yespix.defineEntity('sprite', {
 
 
     inheritClass: 'image',
@@ -9,7 +9,7 @@ yespix.define('sprite', {
     init: function(properties) {
         properties = properties || {};
         this.super(properties);
-        this.sprite = new Sprite(this.sprite, this);
+        this.sprite = new yespix.class.sprite(this.sprite, this);
     },
 
     load: function() {

@@ -161,3 +161,4 @@ ElementList.prototype.remove = function(index) {
 
 
 
+yespix.defineClass('elementList', ElementList);

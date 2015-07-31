@@ -5,6 +5,7 @@ TODO list:
 - kick back object when walking on it
 - make a player state in Input class
 - enable / disable debug of physics
+- prerender class
 - start player on ground / detects ground
 - load a level
 - pass rotation of an object to collision object

@@ -1,7 +1,7 @@
 /**
  * @class entity.gfx
  */
-yespix.define('gfx', {
+yespix.defineEntity('gfx', {
     inheritClass: 'base',
 
     init: function(properties) {
@@ -11,8 +11,8 @@ yespix.define('gfx', {
 
         this.isReady = false;
         
-        this.position = new Position(this.position || {}, this);
-        this.aspect = new Aspect(this.aspect || {}, this);
+        this.position = new yespix.class.position(this.position || {}, this);
+        this.aspect = new yespix.class.aspect(this.aspect || {}, this);
         this.boundary = this.boundary || {};
         this.prerender = this.prerender || null;
         this.manager = this.manager || null;

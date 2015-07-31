@@ -1,6 +1,6 @@
 
 
-yespix.define('image', {
+yespix.defineEntity('image', {
 
 
     inheritClass: 'gfx',
@@ -13,7 +13,7 @@ yespix.define('image', {
             properties = {image: {src: properties}};
         }
         this.super(properties);
-        this.image = new Image(this.image, this);
+        this.image = new yespix.class.image(this.image, this);
 //console.log(yespix);
 //        yespix.extendEntity.image(this);
     },

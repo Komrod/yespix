@@ -211,3 +211,6 @@ Sound.prototype.hasEnded = function() {
     if (!this.element) return false;
     return this.element.ended;
 };
+
+
+yespix.defineClass('sound', Sound);

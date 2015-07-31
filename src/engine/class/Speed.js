@@ -13,3 +13,5 @@ Speed.prototype.set = function(speed) {
     if (speed.x || speed.x === 0) this.x = speed.x;
     if (speed.y || speed.y === 0) this.y = speed.y;
 }
+
+yespix.defineClass('speed', Speed);

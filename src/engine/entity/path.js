@@ -1,11 +1,11 @@
-yespix.define('path', {
+yespix.defineEntity('path', {
 
     inheritClass: 'gfx',
 
     init: function(properties) {
         properties = properties || {};
         this.super(properties);
-        this.path = new Path(this.path || {}, this);
+        this.path = new yespix.class.path(this.path || {}, this);
         this.isReady = true;
     },
 

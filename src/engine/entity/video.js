@@ -1,6 +1,6 @@
 
 
-yespix.define('video', {
+yespix.defineEntity('video', {
 
 
     inheritClass: 'gfx',
@@ -12,7 +12,7 @@ yespix.define('video', {
             properties = {video: {src: properties}};
         }
         this.super(properties);
-        this.video = new Video(this.video || {}, this);
+        this.video = new yespix.class.video(this.video || {}, this);
     },
 
 

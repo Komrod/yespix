@@ -1,12 +1,12 @@
 
 
-yespix.define('text', {
+yespix.defineEntity('text', {
     inheritClass: 'gfx',
 
     init: function(properties) {
         properties = properties || {};
         this.super(properties);
-        this.text = new Text(this.text || {}, this);
+        this.text = new yespix.class.text(this.text || {}, this);
 
         this.isReady = true;
     },

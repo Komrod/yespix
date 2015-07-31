@@ -1,4 +1,4 @@
-yespix.define('canvas', {
+yespix.defineEntity('canvas', {
 
     inheritClass: 'base',
 
@@ -40,7 +40,7 @@ yespix.define('canvas', {
         properties.id = properties.id || '';
 
         // create aspect
-        this.aspect = new Aspect();
+        this.aspect = new yespix.class.aspect();
 
         // create element
         this.element = properties.canvas || this.create(properties);

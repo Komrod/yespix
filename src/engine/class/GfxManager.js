@@ -210,3 +210,4 @@ GfxManager.prototype.reset = function(canvas, list) {
 	return true;
 };
 
+yespix.defineClass('gfxManager', GfxManager);

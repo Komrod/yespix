@@ -1,6 +1,6 @@
 
 
-yespix.define('sound', {
+yespix.defineEntity('sound', {
 
 
     inheritClass: 'base',
@@ -12,7 +12,7 @@ yespix.define('sound', {
             properties = {sound: {src: properties}};
         }
         this.super(properties);
-        this.sound = new Sound(this.sound || {}, this);
+        this.sound = new yespix.class.sound(this.sound || {}, this);
 
     },
 

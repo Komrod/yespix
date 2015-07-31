@@ -254,3 +254,4 @@ Input.prototype.reset = function() {
 };
 
 
+yespix.defineClass('input', Input);

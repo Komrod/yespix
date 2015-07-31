@@ -281,3 +281,7 @@ Video.prototype.getBoundaryClip = function() {
     if (!clip.height) clip.height = this.element.videoHeight;
     return clip;
 };
+
+
+yespix.defineClass('video', Video);
+

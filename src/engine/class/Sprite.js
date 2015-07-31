@@ -201,3 +201,5 @@ Sprite.prototype.event = function(event) {
     return true;
 };
 
+yespix.defineClass('sprite', Sprite);
+

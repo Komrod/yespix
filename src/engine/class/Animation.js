@@ -1,5 +1,4 @@
 
-
 function Animation(properties, entity) {
     
     properties = properties || {};
@@ -250,4 +249,6 @@ Animation.prototype.nextFrame = function() {
     return true;
 };
 
+
+yespix.defineClass('animation', Animation);
 

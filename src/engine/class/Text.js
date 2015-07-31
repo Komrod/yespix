@@ -117,3 +117,5 @@ Text.prototype.drawWrapped = function(context) {
     return true;
 };
 
+
+yespix.defineClass('text', Text);

@@ -188,3 +188,5 @@ Path.prototype.drawEllipse = function(context) {
 };
 
 
+yespix.defineClass('path', Path);
+

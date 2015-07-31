@@ -41,3 +41,6 @@ Position.prototype.set = function(properties, varDefault) {
         }
     );
 }
+
+
+yespix.defineClass('position', Position);

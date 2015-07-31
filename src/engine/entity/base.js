@@ -6,7 +6,7 @@
  */
 
 
-yespix.define('base', {
+yespix.defineEntity('base', {
 
     
     ///////////////////////////////// Main functions ////////////////////////////////

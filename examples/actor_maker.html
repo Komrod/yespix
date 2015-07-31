@@ -232,7 +232,7 @@ body {
 
 		// create physics
 		worldOptions = getWorld();
-	    manager.setPhysics(new EngineBox2d(worldOptions));
+	    manager.setPhysics(new yespix.class.physicsBox2d(worldOptions));
 
 	    // get actor options
 		actorOptions = getActor();
@@ -244,9 +244,9 @@ body {
 		collisionOptions.isBullet = true;
 
 		// create player
-		var player = new yespix.class.gfx({position: {x: 50, y: 200}});
+		var player = new yespix.entity.gfx({position: {x: 50, y: 200}});
 		player.actor = new yespix.class.actor2w(actorOptions, player);
-		player.collision = new Collision(collisionOptions, player);
+		player.collision = new yespix.class.collision(collisionOptions, player);
 		manager.add(player);
 
 
@@ -261,15 +261,15 @@ body {
 
 	    // moving platform
 	    //var platform = manager.physics.createRect(200, 350, 50, 20, {type: 'kinematic'});
-		var platform = new yespix.class.gfx({position: {x: 150, y: 380}});
+		var platform = new yespix.entity.gfx({position: {x: 150, y: 380}});
 		platform.actor = new yespix.class.actorPlatform({type: 'linear', to: {y: -200}, speed: 0.5}, platform);
-		platform.collision = new Collision({type: 'kinematic', width: 50, height: 20, physics: manager.physics}, platform);
+		platform.collision = new yespix.class.collision({type: 'kinematic', width: 50, height: 20, physics: manager.physics}, platform);
 		manager.add(platform);
 
 
 		// add random blocs
 		for (var t=0; t<5; t++) {
-			object = new yespix.class.gfx(
+			object = new yespix.entity.gfx(
 				{
 					aspect: {
 						width: yespix.randInt(10, 60),
@@ -280,7 +280,7 @@ body {
 						y: yespix.randInt(0, -1500)
 					}
 				});
-			object.collision = new Collision({ physics: manager.physics }, object);
+			object.collision = new yespix.class.collision({ physics: manager.physics }, object);
 			manager.add(object);
 		}
 
@@ -333,17 +333,17 @@ body {
 		str += String.fromCharCode(13);
 		str += '///////////////////////////////////////////////////////////////' + String.fromCharCode(13);
 		str += String.fromCharCode(13);
-		str += 'var physics = new EngineBox2d(worldOptions);' + String.fromCharCode(13);
+		str += 'var physics = new yespix.class.engineBox2d(worldOptions);' + String.fromCharCode(13);
 		str += 'collisionOptions.physics = physics;' + String.fromCharCode(13);
-		str += 'var player = new yespix.class.gfx({});' + String.fromCharCode(13);
+		str += 'var player = new yespix.entity.gfx({});' + String.fromCharCode(13);
 		str += 'player.actor = new yespix.class.actor2w(actorOptions, player);' + String.fromCharCode(13);
-		str += 'player.collision = new Collision(collisionOptions, player);' + String.fromCharCode(13);
+		str += 'player.collision = new yespix.class.collision(collisionOptions, player);' + String.fromCharCode(13);
 		str += String.fromCharCode(13);
-		str += 'var manager = new GfxManager(true);' + String.fromCharCode(13);
+		str += 'var manager = new yespix.class.gfxManager(true);' + String.fromCharCode(13);
 		str += 'manager.setPhysics(physics);' + String.fromCharCode(13);
 		str += 'manager.add(player);' + String.fromCharCode(13);
-		str += 'var input = new Input();' + String.fromCharCode(13);
-		str += 'var loop = new Loop(100);' + String.fromCharCode(13);
+		str += 'var input = new yespix.class.input();' + String.fromCharCode(13);
+		str += 'var loop = new yespix.class.loop(100);' + String.fromCharCode(13);
 		str += 'loop.register(' + String.fromCharCode(13);
 		str += '	function(loop, time) { ' + String.fromCharCode(13);
         str += '		manager.applyPhysics();' + String.fromCharCode(13);
@@ -429,13 +429,13 @@ body {
 	yespix();
 
 	// create gfx manager
-	var manager = new GfxManager(canvas);
+	var manager = new yespix.class.gfxManager(canvas);
 
     // create input
-	var input = new Input();
+	var input = new yespix.class.input();
 
 	// create loop
-	var loop = new Loop(100);
+	var loop = new yespix.class.loop(100);
 
 	// register tick and frame functions
 	loop.register(

@@ -56,3 +56,4 @@ Aspect.prototype.set = function(properties, varDefault) {
     );
 }
 
+yespix.defineClass('aspect', Aspect);
