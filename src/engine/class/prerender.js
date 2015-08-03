@@ -11,7 +11,6 @@ function Prerender(parameters, entity) {
         updateOnReady: true,
         updateOnSize: true,
         updateOnRotation: false,
-        updateOn: true,
     };
 
     if (properties === false || parameters === false) {
@@ -37,12 +36,18 @@ Prerender.prototype.set = function(properties, varDefault) {
 };
 
 
-Prerender.prototype.update = function() {
-	// @todo update prerender canvas from entity
+Prerender.prototype.update = function(type) {
+	if (!type || type == 'ready' && this.updateOnReady || type == 'size' && this.updateOnSize || type == 'rotation' && this.updateOnRotation)
+	{
+		// @todo update prerender canvas from entity
+	}
 };
+
 
 Prerender.prototype.draw = function(context) {
 	// @todo draw prerender canvas to context
 };
 
+
 yespix.defineClass('prerender', Prerender);
+
