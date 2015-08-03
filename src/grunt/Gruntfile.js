@@ -123,6 +123,7 @@ module.exports = function(grunt) {
                     '../engine/class/sprite.js',
                     '../engine/class/text.js',
                     '../engine/class/video.js',
+                    '../engine/class/prerender.js',
 
                     // classes with inheritance
                     '../engine/class/actor.js',
