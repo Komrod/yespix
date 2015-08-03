@@ -13,7 +13,8 @@ function PhysicsBox2d(properties) {
 		density: 1.0,
 		friction: 0.2,
 		restitution: 0.2,
-		isSensor: false
+		isSensor: false,
+		debug: false
 	};
 
 	yespix.copy(properties, this, varDefault);
@@ -42,7 +43,9 @@ PhysicsBox2d.prototype.setManager = function(manager) {
     if (manager.context) {
     	this.context = manager.context;
     }
-    this.initDebug();
+    if (this.debug) {
+    	this.initDebug();
+    }
 };
 
 
@@ -55,6 +58,13 @@ PhysicsBox2d.prototype.initDebug = function() {
 	this.debugDraw.SetLineThickness(1.0);
 	this.debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit | Box2D.Dynamics.b2DebugDraw.e_jointBit);
 	this.world.SetDebugDraw(this.debugDraw);
+};
+
+PhysicsBox2d.prototype.drawDebug = function() {
+	if (!this.debug) {
+		this.initDebug();
+	}
+	this.world.DrawDebugData();
 };
 
 

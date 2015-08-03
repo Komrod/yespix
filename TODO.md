@@ -1,7 +1,5 @@
 
 TODO list:
-- make a player state in Input class
-- enable / disable debug of physics
 - prerender class
 - start player on ground / detects ground
 - make a level entity
@@ -70,6 +68,8 @@ TODO list:
 
 
 DONE:
+- enable / disable debug of physics
+- make a player state in Input class
 - physics engine files must start with "physics" // 31-07-2015
 - tween engine files must start with "tween"
 - kick back object when walking

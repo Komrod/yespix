@@ -232,6 +232,7 @@ body {
 
 		// create physics
 		worldOptions = getWorld();
+		//worldOptions.debug = true;
 	    manager.setPhysics(new yespix.class.physicsBox2d(worldOptions));
 
 	    // get actor options
@@ -318,7 +319,9 @@ body {
 		collisionOptions.isBullet = true;
 
 		var actorOptions = getActor();
+
 		var worldOptions = getWorld();
+		//worldOptions.debug = true;
 
 		str += String.fromCharCode(13);
 		str += 'yespix();' + String.fromCharCode(13);
@@ -440,16 +443,11 @@ body {
 	loop.register(
 		function(loop, time) { 
             manager.applyPhysics(time); // apply position from physics engine
-            //platform
-	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));
-	    	//manager.physics.setLinearVelocity(platform, manager.physics.vec2(0, -0.5));
-
             manager.clear(); // clear canvas
-            manager.physics.world.DrawDebugData(); // draw debug
-            // manager.physics.world.ClearForces();
+            manager.drawDebug(); // draw debug
 		}, 
 		function(loop, time) { 
-			manager.physics.world.Step(time/1000, 500, 50);
+			manager.step(time);
 		}
 	);
 

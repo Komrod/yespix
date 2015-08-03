@@ -43,6 +43,15 @@ GfxManager.prototype.applyPhysics = function(time) {
     return true;
 };
 
+GfxManager.prototype.drawDebug = function() {
+	this.physics.drawDebug();
+};
+
+GfxManager.prototype.step = function(time) {
+	this.physics.world.Step(time/1000, 500, 50);
+};
+
+
 
 GfxManager.prototype.setCanvas = function(canvas) {
 	this.canvas = canvas;

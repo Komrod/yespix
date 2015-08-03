@@ -51,6 +51,7 @@ yespix.defineClass('player2w', {
                 this.airMoveLeft(time);
             }
         }
+        
         if (this.state('jump')) {
             if (this.isOnGround) {
                 this.jump(time);
