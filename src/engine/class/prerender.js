@@ -35,12 +35,15 @@ Prerender.prototype.set = function(properties, varDefault) {
     );
 };
 
+Prerender.prototype.trigger = function(name) {
+	if (name == 'ready' && this.updateOnReady || name == 'size' && this.updateOnSize || name == 'rotation' && this.updateOnRotation)
+	{
+		this.update();
+	}
+};
 
 Prerender.prototype.update = function(type) {
-	if (!type || type == 'ready' && this.updateOnReady || type == 'size' && this.updateOnSize || type == 'rotation' && this.updateOnRotation)
-	{
-		// @todo update prerender canvas from entity
-	}
+	// @todo update prerender canvas from entity
 };
 
 
