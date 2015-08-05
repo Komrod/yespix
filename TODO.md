@@ -1,6 +1,7 @@
 
 TODO list:
 - prerender class
+- make a FPS entity
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init

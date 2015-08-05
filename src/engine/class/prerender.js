@@ -18,6 +18,9 @@ function Prerender(parameters, entity) {
     }
 
     this.set(properties, varDefault);
+
+    this.canvas = myDocument.createElement('canvas');
+    this.updateCanvasSize();
 }
 
 
@@ -35,6 +38,25 @@ Prerender.prototype.set = function(properties, varDefault) {
     );
 };
 
+
+Prerender.prototype.updateCanvasSize = function() {
+	if (this.entity.aspect) {
+		if (this.entity.aspect.width) {
+			this.canvas.width = this.entity.aspect.width;
+		}
+		if (this.entity.aspect.height) {
+			this.canvas.height = this.entity.aspect.height;
+		}
+	}
+};
+
+
+Prerender.prototype.use = function() {
+	
+};
+
+
+
 Prerender.prototype.trigger = function(name) {
 	if (name == 'ready' && this.updateOnReady || name == 'size' && this.updateOnSize || name == 'rotation' && this.updateOnRotation)
 	{
@@ -42,8 +64,10 @@ Prerender.prototype.trigger = function(name) {
 	}
 };
 
+
 Prerender.prototype.update = function(type) {
-	// @todo update prerender canvas from entity
+    this.updateCanvasSize();
+	this.entity.draw(this.canvas);
 };
 
 

@@ -17,7 +17,8 @@ function Path(properties, entity) {
 
         borderRadius: 0,
         type: 'rect',
-        vertex: 4
+
+        vertex: 4 // @TODO
     };
 
     this.set(properties, varDefault);

@@ -52,6 +52,12 @@ yespix.defineEntity('gfx', {
         //if (!this.canDrawBox(context)) return false;
 
         // pre render on canvas
+        if (this.prerender) {
+            if (this.prerender.use()) {
+                return true;
+            }
+        }
+
         /*if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
 
             // if changed, update the pre render canvas
