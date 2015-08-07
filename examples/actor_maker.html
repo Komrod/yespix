@@ -445,6 +445,7 @@ body {
             manager.applyPhysics(time); // apply position from physics engine
             manager.clear(); // clear canvas
             manager.drawDebug(); // draw debug
+            manager.drawFps(time);
 		}, 
 		function(loop, time) { 
 			manager.step(time);

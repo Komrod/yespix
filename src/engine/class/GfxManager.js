@@ -83,6 +83,20 @@ GfxManager.prototype.draw = function(context) {
 };
 
 
+GfxManager.prototype.drawFps = function(ms) {
+	if (!this.context) {
+		return false;
+	}
+
+	if (!this.fps) {
+		this.fps = new yespix.entity.fps();
+	}
+  	this.fps.drawRender(this.context, ms);
+
+    return true;
+};
+
+
 GfxManager.prototype.add = function() {
 	for (var t = 0; t < arguments.length; t++) {
 		arguments[t].manager = this;
