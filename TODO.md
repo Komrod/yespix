@@ -1,7 +1,6 @@
 
 TODO list:
-- prerender class
-- make a FPS entity
+- Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init
@@ -9,12 +8,15 @@ TODO list:
 - parallax image move
 - texture entity
 
+- input click, hold, mouse position
 - extends to reverse an animation
 - getTouchList must returns only fixtures that touches body and ground sensor
 - bold text
 - function to remove entities and collision object
 - light engine
 - set isChanged=false after the draw function
+- make a flat render function for gfx (prerender)
+- optimize: use prerender for path
 - minimum speed for objects in physics engine
 - optimize: use typed arrays when possible
 - optimize: remove dictionnary mode on entities (remove delete)
@@ -69,6 +71,8 @@ TODO list:
 
 
 DONE:
+- prerender class
+- make a FPS entity
 - enable / disable debug of physics
 - make a player state in Input class
 - physics engine files must start with "physics" // 31-07-2015

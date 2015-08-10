@@ -60,12 +60,14 @@ Loop.prototype.stop = function() {
 
 
 Loop.prototype.step = function() {
+
     var loops = false; // set to true if frame loop is called at least once
 
     this.time = yespix.getTime();
-    if (this.time - this.tickNext > 60 * this.ms) {
+    if (this.time - this.tickNext > 10 * this.ms) {
         this.tickNext = this.time - this.ms;
     }
+
     while (this.time > this.tickNext) {
         this.tickNext += this.ms;
         loops = true;

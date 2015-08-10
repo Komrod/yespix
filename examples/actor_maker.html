@@ -269,7 +269,7 @@ body {
 
 
 		// add random blocs
-		for (var t=0; t<5; t++) {
+		for (var t=0; t<50; t++) {
 			object = new yespix.entity.gfx(
 				{
 					aspect: {
@@ -437,18 +437,18 @@ body {
 	var input = new yespix.class.input();
 
 	// create loop
-	var loop = new yespix.class.loop(100);
+	var loop = new yespix.class.loop(30);
 
 	// register tick and frame functions
 	loop.register(
 		function(loop, time) { 
-            manager.applyPhysics(time); // apply position from physics engine
             manager.clear(); // clear canvas
             manager.drawDebug(); // draw debug
             manager.drawFps(time);
 		}, 
 		function(loop, time) { 
 			manager.step(time);
+            manager.applyPhysics(time); // apply position from physics engine
 		}
 	);
 
