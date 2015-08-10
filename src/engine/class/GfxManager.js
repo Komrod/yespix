@@ -44,6 +44,7 @@ GfxManager.prototype.applyPhysics = function(time) {
 };
 
 GfxManager.prototype.drawDebug = function() {
+	this.context.lineWidth = 1;
 	this.physics.drawDebug();
 };
 

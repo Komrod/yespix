@@ -1,6 +1,5 @@
 
 TODO list:
-- Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init
@@ -71,7 +70,8 @@ TODO list:
 
 
 DONE:
-- prerender class
+- Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
+- prerender class (not complete)
 - make a FPS entity
 - enable / disable debug of physics
 - make a player state in Input class
