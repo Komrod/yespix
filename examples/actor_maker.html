@@ -417,7 +417,6 @@ body {
 <div class="line" style="margin-top: 20px;">
 	<input type="button" class="start" value="Restart" onclick="start();" style="margin-top: -20px;" />
 	<input type="button" class="start" value="Get the code" onclick="code();" style="margin-top: -20px;" />
-
 	<textarea rows="20" cols="100" id="code" style="margin-top: 40px; clear: both;"></textarea>
 </div>
 
@@ -437,7 +436,7 @@ body {
 	var input = new yespix.class.input();
 
 	// create loop
-	var loop = new yespix.class.loop(30);
+	var loop = new yespix.class.loop(60);
 
 	// register tick and frame functions
 	loop.register(

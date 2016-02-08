@@ -32,6 +32,9 @@ yespix.defineEntity('fps', {
         if (yespix.isUndefined(this.border)) {
             this.border = 5;
         }
+        if (yespix.isUndefined(this.limit)) {
+            this.limit = true;
+        }
 
         if (this.background !== false) {
             this.background = new yespix.entity.path({
@@ -113,6 +116,13 @@ yespix.defineEntity('fps', {
 
     },
 
+    limitFps: function(fps) {
+        fps = parseFloat(fps);
+        if (this.limit) {
+            return fps > 60 ? 60 : fps.toFixed(1);
+        }
+        return fps.toFixed(1);
+    },
 
     drawRender: function(context, ms) {
         if (ms) {
@@ -137,7 +147,7 @@ yespix.defineEntity('fps', {
                     min = this.data[t];
                 }
                 if (this.data[t] > max) {
-                    max = this.data[t];
+                    max = this.limitFps(this.data[t]);
                 }
                 total += this.data[t];
                 count++;
@@ -166,7 +176,7 @@ yespix.defineEntity('fps', {
             for (t = 0; t < this.data.length; t++) {
                 stats.lineWidth += width / this.recordMax;
                 stats.count++;
-                stats.total += this.data[t] / max;
+                stats.total += this.limitFps(this.data[t]) / max;
 
                 if (stats.lineWidth >= 0.1) {
                     context.lineWidth = stats.lineWidth;
@@ -188,13 +198,13 @@ yespix.defineEntity('fps', {
         if (!this.text) {
             this.text = {
                 time: +new Date(),
-                minMax: min.toFixed(1) + ' < ' + max.toFixed(1),
-                avg: (total / count).toFixed(1) + ' fps'
+                minMax: this.limitFps(min) + ' < ' + this.limitFps(max),
+                avg: this.limitFps(total / count) + ' fps'
             };
             if (ms <= 0) {
                 this.text.fps = '0 fps';
             } else {
-                this.text.fps = (1000 / ms).toFixed(1) + ' fps';
+                this.text.fps = this.limitFps(1000 / ms) + ' fps';
             }
         }
 
