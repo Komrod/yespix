@@ -17,7 +17,7 @@ function Animation(properties, entity) {
 
     if (properties.sprites) {
         for (var n in properties.sprites) {
-            properties.sprites[n] = new yespix.class.sprite(properties.sprites[n]);
+            properties.sprites[n] = new yespix.class.sprite(properties.sprites[n], entity);
             properties.sprites[n].manager = this;
             properties.sprites[n].position = this.entity.position;
             properties.sprites[n].aspect = this.entity.aspect;
