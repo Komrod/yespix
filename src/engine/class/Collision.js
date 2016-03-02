@@ -12,9 +12,9 @@ function Collision(properties, entity) {
         this.entity = entity;
         if (!properties.physics) {
             if (entity.physics) {
-                this.setEngine(entity.physics);
+                this.setPhysics(entity.physics);
             } else if (entity.manager && entity.manager.physics) {
-                this.setEngine(entity.manager.physics);
+                this.setPhysics(entity.manager.physics);
             }
         }
     }
