@@ -1,12 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script type="text/javascript" src="../engine/yespix.js"></script>
+	<script type="text/javascript" src="../build/yespix.js"></script>
 </head>
 <body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: true, fps: 60});
+
+	var canvas = document.getElementById('canvas');
+
+	// init yespix
+	yespix();
+
+	// create gfx manager
+	var manager = new yespix.class.gfxManager(canvas);
+
+	for (var t=0; t<100; t++) {
+		var rect = new yespix.entity.path({
+			aspect: {
+				width: 100,
+				height: 100
+			},
+			position: {
+				x: 100,
+				y: 100
+			},
+			path: {
+				borderRadius: 20,
+				lineWidth: 10
+			}
+		});
+	}
+	manager.add(rect);
+
+	// create loop
+	var loop = new yespix.class.loop(40);
+
+	// register tick and frame functions
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            //manager.drawDebug(); // draw debug
+            manager.drawFps(time);
+		}, 
+		function(loop, time) { 
+			//manager.step(time);
+            //manager.applyPhysics(time); // apply position from physics engine
+		}
+	).start();
+
+
+/*	
+	yespix({canvas: true, fps: 60});
 
 	yp.spawn('rect, actor2w',
 	{
@@ -17,7 +66,7 @@
 		rectColor: '#19D1FF',
 		
 	});
-
+*/
 
 </script>
 

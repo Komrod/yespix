@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>Box2D Javascript Fun : 00 : Most Basic Box2D Example</title>
         <script src="../build/yespix.js"></script>
-        <script src="engines/box2d.js"></script>
+        <script src="lib/box2d.min.js"></script>
     </head>
     <body>
 <script>
@@ -12,19 +12,20 @@
 
     // init yespix engine
     yespix();
-    var manager = new GfxManager(true);
-    manager.setEngine(new EngineBox2d());
+//console.log(yespix.class);
+    var manager = new yespix.class.gfxManager(true);
+    manager.setPhysics(new yespix.class.physicsBox2d());
 
     // create ground
-    manager.engine.createRect(0, 400, 640, 10, true);
+    manager.physics.createRect(0, 400, 640, 10, true);
     for (var t=0; t<50; t++) {
-        manager.engine.createRect(yespix.randInt(1,600), yespix.randInt(100,400), yespix.randInt(10,50), yespix.randInt(10,50), true);
+        manager.physics.createRect(yespix.randInt(1,600), yespix.randInt(100,400), yespix.randInt(10,50), yespix.randInt(10,50), true);
     }
 
     for (var t=0; t<1; t++) {
+
         // create entity
-        /*
-        var rect = new yespix.class.animation({
+        var rect = new yespix.entity.animation({
             animation: {
                 defaultAnimation: 'runLeft',
                 defaultSprite: 'perso',
@@ -44,22 +45,22 @@
                 y: yespix.randInt(-1000,0), 
                 snapToPixel: true,
             }, 
-        });*/
+        });
         //var rect = new yespix.class.sprite({ image: { src: 'unit/image/perso.png', scale: 4}, sprite: { width: 32, height: 32 } });
-        var rect = new yespix.class.text({ position: {x: 300, y:0, rotation: 45}, text: {content: 'coucou', fillColor: '#234567'}});
+        //var rect = new yespix.entity.text({ position: {x: 300, y:0, rotation: 45}, text: {content: 'coucou', fillColor: '#234567'}});
         //rect.set({aspect: {width: 20, height: 20}, image: {autoSize: false}});
 
         // add to manager
         manager.add(rect);
 
         // add collision
-        rect.collision = new Collision({offsetX: 0, offsetY: 0, width: 28, height: 10, fixedRotation: false}, rect);
+        rect.collision = new yespix.class.collision({offsetX: 0, offsetY: 0, width: 28, height: 10, fixedRotation: false}, rect);
     }
 
     manager.load();
 
     // create the loop
-    var loop = new Loop(100);
+    var loop = new yespix.class.loop(100);
 
     /*
     manager.engine.world.Step(10, 100, 100);
@@ -70,20 +71,20 @@
    
     
     // register functions
-//    loop.register(
+    loop.register(
         // frame function
-//        function(loop, time) { 
+        function(loop, time) { 
             manager.applyPhysics(); // apply position from physics engine
             manager.clear(); // clear canvas
-            manager.engine.world.DrawDebugData(); // draw debug
+            manager.physics.world.DrawDebugData(); // draw debug
             manager.draw(); // draw entities
             //manager.engine.world.ClearForces();
-//        }, 
+        }, 
         // step function
-//        function(loop, time) {  
-//            manager.engine.world.Step(time/1000, 100, 100);
-//        }
-//    ).start();
+        function(loop, time) {  
+            manager.physics.world.Step(time/1000, 100, 100);
+        }
+    ).start();
     
     console.log('manager = ', manager);
     </script>

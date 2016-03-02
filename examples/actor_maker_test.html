@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	    <script src="engines/box2d.js"></script>
+	    <script src="lib/box2d.min.js"></script>
 		<script src="../build/yespix.js"></script>
 	</head>
 	<body>
@@ -10,26 +10,29 @@
 
 yespix();
 
+///////////////////////////////////////////////////////////////
+
 var worldOptions = {
-	gravity: 10,
-	scale: 50,
+	gravity: 20,
+	scale: 30,
 	friction: 0.1,
 	linearDamping: 0.1,
-	restitution: 0,
-	density: 1
+	restitution: 0.1,
+	density: 0.1
 };
+
 var actorOptions = {
-	speedWalk: 0.65,
-	speedJump: 6,
-	speedUp: 0.2,
-	speedTimeJump: 0.4,
-	speedAir: 0.1,
-	speedXMax: 10,
-	speedYMax: 10,
-	frictionAir: 0.1,
-	frictionGround: 0.1,
-	frictionIdle: 0.1
+	speedWalk: 1.7,
+	speedJump: 0.2,
+	speedUp: 0.1,
+	speedTimeJump: 0.3,
+	speedAir: 0.05,
+	speedMax: 10,
+	frictionAir: 0.3,
+	frictionGround: 2,
+	frictionIdle: 5
 };
+
 var collisionOptions = {
 	offsetX: 0,
 	offsetY: 0,
@@ -37,27 +40,29 @@ var collisionOptions = {
 	height: 100,
 	linearDamping: 1,
 	restitution: 0,
-	density: 1,
+	density: 0,
 	fixedRotation: true,
 	isBullet: true
 };
 
-var physics = new EngineBox2d(worldOptions);
-collisionOptions.physics = physics;
-var player = new yespix.class.gfx({});
-player.actor = new yespix.class.actor2w(actorOptions, player);
-player.collision = new Collision(collisionOptions, player);
+///////////////////////////////////////////////////////////////
 
-var manager = new GfxManager(true);
+var physics = new yespix.class.physicsBox2d(worldOptions);
+collisionOptions.physics = physics;
+actorOptions.input = new yespix.class.input();
+var player = new yespix.entity.gfx({});
+player.actor = new yespix.class.player2w(actorOptions, player);
+player.collision = new yespix.class.collision(collisionOptions, player);
+
+var manager = new yespix.class.gfxManager(true);
 manager.setPhysics(physics);
 manager.add(player);
-var input = new Input();
-var loop = new Loop(100);
+var loop = new yespix.class.loop(100);
 loop.register(
 	function(loop, time) { 
 		manager.applyPhysics();
 		manager.clear();
-        manager.physics.world.DrawDebugData();
+        manager.drawDebug();
 	}, 
 	function(loop, time) { 
 		manager.physics.world.Step(time/1000, 500, 50);
@@ -65,7 +70,6 @@ loop.register(
 ).start();
 
 manager.physics.createRect(0, 400, 640, 10, {type: 'static'});
-
 
 
 		</script>
