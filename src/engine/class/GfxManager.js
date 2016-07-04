@@ -84,13 +84,14 @@ GfxManager.prototype.draw = function(context) {
 };
 
 
-GfxManager.prototype.drawFps = function(ms) {
+GfxManager.prototype.drawFps = function(ms, max) {
 	if (!this.context) {
 		return false;
 	}
 
 	if (!this.fps) {
 		this.fps = new yespix.entity.fps();
+		this.fps.max = 30;
 	}
   	this.fps.drawRender(this.context, ms);
 

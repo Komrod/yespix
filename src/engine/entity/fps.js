@@ -23,6 +23,9 @@ yespix.defineEntity('fps', {
 
         this.super(properties);
 
+        if (yespix.isUndefined(this.max)) {
+            this.max = 60;
+        }
         if (yespix.isUndefined(this.recordMax)) {
             this.recordMax = 1000;
         }
@@ -99,6 +102,7 @@ yespix.defineEntity('fps', {
     },
 
 
+
     /**
      * Return True if something has changed (position, aspect ...)
      * @return {bool} 
@@ -119,9 +123,13 @@ yespix.defineEntity('fps', {
     limitFps: function(fps) {
         fps = parseFloat(fps);
         if (this.limit) {
-            return fps > 60 ? 60 : fps.toFixed(1);
+            if (fps > this.max) fps = this.max;
+            else fps = Math.round(fps*10)/10;
+            //if (fps > )
+        } else {
+            fps = Math.round(fps*10)/10;
         }
-        return fps.toFixed(1);
+        return fps;
     },
 
     drawRender: function(context, ms) {
@@ -153,7 +161,6 @@ yespix.defineEntity('fps', {
                 count++;
             }
         }
-//if (ms<9) { console.log(ms); this.fuck(); }
 
         context.lineWidth = 1;
         context.strokeStyle = '#ff0000';

@@ -37,7 +37,7 @@
 	manager.add(rect);
 
 	// create loop
-	var loop = new yespix.class.loop(40);
+	var loop = new yespix.class.loop(30);
 
 	// register tick and frame functions
 	loop.register(
@@ -45,7 +45,7 @@
             manager.clear(); // clear canvas
             manager.draw(); // draw debug
             //manager.drawDebug(); // draw debug
-            manager.drawFps(time);
+            manager.drawFps(time, 30);
 		}, 
 		function(loop, time) { 
 			//manager.step(time);
@@ -53,20 +53,6 @@
 		}
 	).start();
 
-
-/*	
-	yespix({canvas: true, fps: 60});
-
-	yp.spawn('rect, actor2w',
-	{
-		x: 50,
-		y: 50,
-		width: 50,
-		height: 50,
-		rectColor: '#19D1FF',
-		
-	});
-*/
 
 </script>
 
