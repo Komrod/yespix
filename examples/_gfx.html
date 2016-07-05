@@ -4,9 +4,14 @@
 	<script type="text/javascript" src="../build/yespix.js"></script>
 </head>
 <body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
 <script type="text/javascript">
 	
-	var yp = yespix({canvas: true, fps: 60});
+    var canvas = document.getElementById('canvas');
+    yespix();
+    var manager = new yespix.class.gfxManager(canvas);
     
 	
     yp.spawn('rect',
