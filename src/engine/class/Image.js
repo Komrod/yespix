@@ -12,7 +12,7 @@ function Image(properties, entity) {
         src: '',  // source and params of the images
         scale: 1.0, // default original loading scale of the images
         autoSize: true, // default change the size of the entity.aspect when element ready
-        autoLoad: false,
+        autoLoad: true,
         offsetX: 0,
         offsetY: 0
     };

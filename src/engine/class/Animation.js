@@ -7,7 +7,7 @@ function Animation(properties, entity) {
     var varDefault = {
         defaultAnimation: '',
         defaultSprite: '',
-        defaultDuration: '',
+        defaultDuration: 100,
         defaultPriority: 0,
 
         selectedFrame: '',
@@ -23,6 +23,7 @@ function Animation(properties, entity) {
             properties.sprites[n].aspect = this.entity.aspect;
         }
     };
+console.log('properties = ', properties);
     this.set(properties, varDefault);
     this.isReady =  false;
     this.nextTime = 0;
@@ -106,6 +107,10 @@ Animation.prototype.ready = function() {
 
 Animation.prototype.buildAnimations = function() {
     for (var n in this.list) {
+        if (this.defaultAnimation == '') {
+            this.defaultAnimation = n;
+        }
+
         if (yespix.isString(this.list[n].extends) && this.list[this.list[n].extends]) {
             this.list[n] = this.extendAnimation(this.list[this.list[n].extends], this.list[n]);
             continue;
@@ -164,6 +169,8 @@ Animation.prototype.buildAnimations = function() {
             }
         }
     }
+console.log('end :: buildAnimations', this);  
+
     this.play(this.defaultAnimation, 0, true);
 };
 
@@ -236,9 +243,17 @@ Animation.prototype.checkFrame = function() {
 
 
 Animation.prototype.nextFrame = function() {
+    // animation is not ready
+    if (!this.isReady || !this.list) {
+//this.getSpritesReady();
+        return false;
+    }
+
+    // animation does not exist
     if (!this.list[this.selectedAnimation]) {
         return false;
     }
+
     var nextFrame = this.selectedFrame + 1;
     if (!this.list[this.selectedAnimation].frames[nextFrame]) {
         nextFrame = 0;

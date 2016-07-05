@@ -14,14 +14,17 @@ yespix.defineEntity('animation', {
 
     load: function() {
         this.animation.load();
+console.log('load animation');        
+        this.super();
     },
     
-
+/*
     drawRender: function(context) {
         if (this.animation && this.animation.isReady) {
             this.image.draw(context);
         }
     },
+*/
 
     event: function(event) {
         return this.super(event);

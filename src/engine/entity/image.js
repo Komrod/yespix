@@ -14,8 +14,6 @@ yespix.defineEntity('image', {
         }
         this.super(properties);
         this.image = new yespix.class.image(this.image, this);
-//console.log(yespix);
-//        yespix.extendEntity.image(this);
     },
 
     
