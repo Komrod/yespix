@@ -7,6 +7,10 @@ TODO list:
 - parallax image move
 - texture entity
 
+- polygon of any number of sides
+- fix Fps (cap 30)
+- add a property to path : align = inside / outside / center
+- automatically add entity by passing the manager instance
 - input click, hold, mouse position
 - extends to reverse an animation
 - getTouchList must returns only fixtures that touches body and ground sensor
