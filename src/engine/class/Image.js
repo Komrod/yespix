@@ -54,7 +54,8 @@ Image.prototype.set = function(properties, varDefault) {
 // Takes an image and a scaling factor and returns the scaled image
 // The original image is drawn into an offscreen canvas of the same size
 // and copied, pixel by pixel into another offscreen canvas with the 
-// new size.
+// new size. In some browsers it mitchrome, dur to a security restriction, we try to copy the 
+// scaled image with drawImage.
  */
 Image.prototype.resize = function(img, scale) {
     if (!scale) return img;
@@ -67,25 +68,44 @@ Image.prototype.resize = function(img, scale) {
     orig.height = img.height;
     var origCtx = orig.getContext('2d');
     origCtx.drawImage(img, 0, 0);
-    var origPixels = origCtx.getImageData(0, 0, img.width, img.height);
 
-    var scaled = document.createElement('canvas');
-    scaled.width = widthScaled;
-    scaled.height = heightScaled;
-    var scaledCtx = scaled.getContext('2d');
-    var scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
+    try {
+        // error with Canvas tainted by cross-origin data here
+        var origPixels = origCtx.getImageData(0, 0, img.width, img.height); 
 
-    for (var y = 0; y < heightScaled; y++) {
-        for (var x = 0; x < widthScaled; x++) {
-            var index = (Math.floor(y / scale) * img.width + Math.floor(x / scale)) * 4;
-            var indexScaled = (y * widthScaled + x) * 4;
-            scaledPixels.data[indexScaled] = origPixels.data[index];
-            scaledPixels.data[indexScaled + 1] = origPixels.data[index + 1];
-            scaledPixels.data[indexScaled + 2] = origPixels.data[index + 2];
-            scaledPixels.data[indexScaled + 3] = origPixels.data[index + 3];
+        var scaled = document.createElement('canvas');
+        scaled.width = widthScaled;
+        scaled.height = heightScaled;
+        var scaledCtx = scaled.getContext('2d');
+
+        // error with Canvas tainted by cross-origin data also here
+        var scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
+
+        for (var y = 0; y < heightScaled; y++) {
+            for (var x = 0; x < widthScaled; x++) {
+                var index = (Math.floor(y / scale) * img.width + Math.floor(x / scale)) * 4;
+                var indexScaled = (y * widthScaled + x) * 4;
+                scaledPixels.data[indexScaled] = origPixels.data[index];
+                scaledPixels.data[indexScaled + 1] = origPixels.data[index + 1];
+                scaledPixels.data[indexScaled + 2] = origPixels.data[index + 2];
+                scaledPixels.data[indexScaled + 3] = origPixels.data[index + 3];
+            }
         }
+        scaledCtx.putImageData(scaledPixels, 0, 0);
+    } catch(err) {
+        var scaled = document.createElement('canvas');
+        scaled.width = widthScaled;
+        scaled.height = heightScaled;
+        var scaledCtx = scaled.getContext('2d');
+
+        // try to get rid of blured pixels
+        scaledCtx.webkitImageSmoothingEnabled = false;
+        scaledCtx.mozImageSmoothingEnabled = false;
+        scaledCtx.imageSmoothingEnabled = false;
+
+        scaledCtx.drawImage(img, 0, 0, widthScaled, heightScaled);
     }
-    scaledCtx.putImageData(scaledPixels, 0, 0);
+
     return scaled;
 };
 
