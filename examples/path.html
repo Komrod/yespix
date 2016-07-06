@@ -16,29 +16,6 @@
 	var manager = new yespix.class.gfxManager(canvas);
 
 
-	var tweenable = new Tweenable();
-	var tweenOptions = {
-		from: { rotation: 0, color : '#ff0000', alpha: 1.0 },
-		to:   { rotation: 360, color : '#00ffff', alpha: 0.0 },
-		duration: 3000,
-		easing: 'bounce',
-		step: function (state) {
-			if (s1) {
-				s1.position.rotation = state.rotation;
-			}
-			if (s2) {
-				s2.aspect.alpha = state.alpha;
-			}
-			if (s3) {
-				s3.path.fillColor = state.color;
-			}
-		},
-		finish: function (state) {
-    		this.tween(tweenOptions);
-	  	}
-	};
-	tweenable.tween(tweenOptions);
-
 	// squares
 	manager.add(new yespix.entity.path({
 		aspect: {
@@ -351,15 +328,126 @@
 	}));
 
 
+	// line type
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30,
+			alpha: 0.5
+		},
+		position: {
+			x: 30,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'inside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30,
+			alpha: 0.5
+		},
+		position: {
+			x: 90,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'center'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30,
+			alpha: 0.5
+		},
+		position: {
+			x: 150,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'outside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 380,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			align: 'outside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 440,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			align: 'inside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 500,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			align: 'center'
+		}
+	}));
 
+
+	var tweenable = new Tweenable();
+	var tweenOptions = {
+		from: { rotation: 0, color : '#ff0000', alpha: 1.0 },
+		to:   { rotation: 360, color : '#00ffff', alpha: 0.0 },
+		duration: 3000,
+		easing: 'bounce',
+		step: function (state) {
+			s1.position.rotation = state.rotation;
+			s2.aspect.alpha = state.alpha;
+			s3.path.fillColor = state.color;
+		},
+		finish: function (state) {
+			var tmp = tweenOptions.from;
+			tweenOptions.from = tweenOptions.to;
+			tweenOptions.to = tmp;
+    		this.tween(tweenOptions);
+	  	}
+	};
+	tweenable.tween(tweenOptions);
 
 	// create loop
-	var loop = new yespix.class.loop(30);
+	var loop = new yespix.class.loop(60);
 	loop.register(
 		function(loop, time) { 
             manager.clear(); // clear canvas
             manager.draw(); // draw debug
-            manager.drawFps(time, 30);
+            manager.drawFps(time, 60);
 		}, 
 		function(loop, time) { 
 		}

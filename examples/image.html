@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+    <script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+    var canvas = document.getElementById('canvas');
+    yespix();
+    var manager = new yespix.class.gfxManager(canvas);
+
+
+
+
+
+    // flip
+    manager.add(new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 30,
+            y: 100
+        }
+    }));
+    manager.add(new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 200,
+            y: 100
+        },
+        aspect: {
+            flipX: true
+        }
+    }));
+    manager.add(new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 30,
+            y: 270
+        },
+        aspect: {
+            flipY: true
+        }
+    }));
+    manager.add(new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 200,
+            y: 270
+        },
+        aspect: {
+            flipX: true,
+            flipY: true
+        }
+    }));
+
+
+    // width height
+    var s1 = new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 370,
+            y: 100
+        },
+        aspect: {
+            width: 75,
+            height: 75
+        }
+    });
+    manager.add(s1);
+
+
+    // snap to pixel
+    var s2 = new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 370,
+            y: 270,
+            snapToPixel: true
+        },
+        aspect: {
+            width: 75,
+            height: 75
+        }
+    });
+    manager.add(s2);
+
+
+    // rotation and alpha
+    var s3 = new yespix.entity.image({
+        image: 'zardoz/image/zardoz_small.png',
+        position: {
+            x: 480,
+            y: 100
+        },
+        aspect: {
+            width: 75,
+            height: 75
+        }
+    });
+    manager.add(s3);
+
+
+    // scale
+    var options = {
+        image: {
+            src: 'zardoz/image/preload_4.png'
+        },
+        position: {
+            x: 600,
+            y: 100
+        },
+        aspect: {
+            alpha: 0.3
+        }
+    };
+    for (var t=1; t<10; t++) {
+        var octo = new yespix.entity.image(options);
+        octo.image.scale = t;
+        manager.add(octo);
+    }
+
+
+
+
+    // create loop
+    var loop = new yespix.class.loop(60);
+    loop.register(
+        function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+        }, 
+        function(loop, time) { 
+        }
+    ).start();
+   
+ 
+    var tweenable = new Tweenable();
+    var tweenOptions = {
+        from: { rotation: 0, y1 : 100, y2: 270, alpha: 1.0 },
+        to:   { rotation: 360, y1 : 170, y2: 340, alpha: 0.0 },
+        duration: 3000,
+        easing: 'bounce',
+        step: function (state) {
+            s1.position.y = state.y1;
+            s2.position.y = state.y2;
+            s3.aspect.alpha = state.alpha;
+            s3.position.rotation = state.rotation;
+        },
+        finish: function (state) {
+            this.tween(tweenOptions);
+        }
+    };
+    tweenable.tween(tweenOptions);
+
+
+</script>
+</body>
+</html>

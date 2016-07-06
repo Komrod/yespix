@@ -91,6 +91,8 @@ GfxManager.prototype.drawFps = function(ms, max) {
 
 	if (!this.fps) {
 		this.fps = new yespix.entity.fps();
+	}
+	if (max) {
 		this.fps.max = max;
 	}
   	this.fps.drawRender(this.context, ms);
