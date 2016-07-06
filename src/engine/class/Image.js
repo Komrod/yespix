@@ -51,14 +51,17 @@ Image.prototype.set = function(properties, varDefault) {
 
 
 /**
-// Takes an image and a scaling factor and returns the scaled image
-// The original image is drawn into an offscreen canvas of the same size
-// and copied, pixel by pixel into another offscreen canvas with the 
-// new size. In some browsers it mitchrome, dur to a security restriction, we try to copy the 
-// scaled image with drawImage.
+ * Takes an image and a scaling factor and returns the scaled image
+ * The original image is drawn into an offscreen canvas of the same size
+ * and copied, pixel by pixel into another offscreen canvas with the 
+ * new size. In some browsers it crashes due to a security restriction 
+ * (in chrome), in that case we try to copy the scaled image with drawImage.
  */
 Image.prototype.resize = function(img, scale) {
-    if (!scale) return img;
+    
+    if (!scale || parseFloat(scale) == 1) {
+        return img;
+    }
     
     var widthScaled = img.width * scale;
     var heightScaled = img.height * scale;
