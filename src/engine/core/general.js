@@ -39,7 +39,7 @@ yespix.fn.clone = function(obj) {
 
 /**
  * Copy source properties into dest object. Properties in varDefault are used as default values.
- * @method clone
+ * @method copy
  *
  */
 yespix.fn.copy = function(source, dest, varDefault) {
