@@ -1,5 +1,10 @@
 
 TODO list:
+- fix Fps (cap 30)
+- add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
+- make load function chainable
+- automatically add entity by passing the manager instance
+
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init
@@ -7,10 +12,12 @@ TODO list:
 - parallax image move
 - texture entity
 
+Delayed:
 - polygon of any number of sides
-- fix Fps (cap 30)
-- add a property to path : align = inside / outside / center
-- automatically add entity by passing the manager instance
+- gradient background color for path
+- star path with any number of branches
+
+
 - input click, hold, mouse position
 - extends to reverse an animation
 - getTouchList must returns only fixtures that touches body and ground sensor
