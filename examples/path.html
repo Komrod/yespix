@@ -328,12 +328,11 @@
 	}));
 
 
-	// line type
+	// line type top
 	manager.add(new yespix.entity.path({
 		aspect: {
 			width: 30,
-			height: 30,
-			alpha: 0.5
+			height: 30
 		},
 		position: {
 			x: 30,
@@ -341,14 +340,14 @@
 		},
 		path: {
 			lineWidth: 10,
-			lineAlign: 'inside'
+			lineAlign: 'inside',
+			lineLayer: 'top'
 		}
 	}));
 	manager.add(new yespix.entity.path({
 		aspect: {
 			width: 30,
-			height: 30,
-			alpha: 0.5
+			height: 30
 		},
 		position: {
 			x: 90,
@@ -356,14 +355,14 @@
 		},
 		path: {
 			lineWidth: 10,
-			lineAlign: 'center'
+			lineAlign: 'center',
+			lineLayer: 'top'
 		}
 	}));
 	manager.add(new yespix.entity.path({
 		aspect: {
 			width: 30,
-			height: 30,
-			alpha: 0.5
+			height: 30
 		},
 		position: {
 			x: 150,
@@ -371,22 +370,165 @@
 		},
 		path: {
 			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'top'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 210,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'inside',
+			lineLayer: 'top',
+			borderRadius: 8
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 270,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'center',
+			lineLayer: 'top',
+			borderRadius: 8
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 330,
+			y: 280
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'top',
+			borderRadius: 8
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 390,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'inside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 450,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'center'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 510,
+			y: 280
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
 			lineAlign: 'outside'
 		}
 	}));
 	manager.add(new yespix.entity.path({
 		aspect: {
 			width: 30,
-			height: 30
+			height: 60
 		},
 		position: {
-			x: 380,
-			y: 280
+			x: 570,
+			y: 265
 		},
 		path: {
 			type: 'circle',
 			lineWidth: 10,
-			align: 'outside'
+			lineAlign: 'inside'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 60
+		},
+		position: {
+			x: 630,
+			y: 265
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'center'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 60
+		},
+		position: {
+			x: 690,
+			y: 265
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'outside'
+		}
+	}));
+
+
+	// line type bottom
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 30,
+			y: 340
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'inside',
+			lineLayer: 'top',
+			lineLayer: 'bottom'
 		}
 	}));
 	manager.add(new yespix.entity.path({
@@ -395,13 +537,14 @@
 			height: 30
 		},
 		position: {
-			x: 440,
-			y: 280
+			x: 90,
+			y: 340
 		},
 		path: {
-			type: 'circle',
 			lineWidth: 10,
-			align: 'inside'
+			lineAlign: 'center',
+			lineLayer: 'top',
+			lineLayer: 'bottom'
 		}
 	}));
 	manager.add(new yespix.entity.path({
@@ -410,15 +553,167 @@
 			height: 30
 		},
 		position: {
-			x: 500,
-			y: 280
+			x: 150,
+			y: 340
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'top',
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 210,
+			y: 340
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'inside',
+			lineLayer: 'top',
+			borderRadius: 8,
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 270,
+			y: 340
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'center',
+			lineLayer: 'top',
+			borderRadius: 8,
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 330,
+			y: 340
+		},
+		path: {
+			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'top',
+			borderRadius: 8,
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 390,
+			y: 340
 		},
 		path: {
 			type: 'circle',
 			lineWidth: 10,
-			align: 'center'
+			lineAlign: 'inside',
+			lineLayer: 'bottom'
 		}
 	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 450,
+			y: 340
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'center'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 30
+		},
+		position: {
+			x: 510,
+			y: 340
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 60
+		},
+		position: {
+			x: 570,
+			y: 370
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'inside',
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 60
+		},
+		position: {
+			x: 630,
+			y: 370
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'center',
+			lineLayer: 'bottom'
+		}
+	}));
+	manager.add(new yespix.entity.path({
+		aspect: {
+			width: 30,
+			height: 60
+		},
+		position: {
+			x: 690,
+			y: 370
+		},
+		path: {
+			type: 'circle',
+			lineWidth: 10,
+			lineAlign: 'outside',
+			lineLayer: 'bottom'
+		}
+	}));
+
+
+
+
+
 
 
 	var tweenable = new Tweenable();

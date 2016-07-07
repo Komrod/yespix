@@ -122,7 +122,7 @@ Path.prototype.drawRect = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             context.beginPath();
             context.rect(this.entity.position.x - this._pathPosition, this.entity.position.y - this._pathPosition, this.entity.aspect.width + this._pathPosition*2, this.entity.aspect.height + this._pathPosition*2);
-            this.pathDrawn = true;
+            this._pathDrawn = true;
             this.drawLine(context);
         }
     }
@@ -132,7 +132,7 @@ Path.prototype.drawRect = function(context) {
         if (!this._pathSame || !this._pathDrawn) {
             context.beginPath();
             context.rect(this.entity.position.x, this.entity.position.y, this.entity.aspect.width, this.entity.aspect.height);
-            this.pathDrawn = true;
+            this._pathDrawn = true;
         }
         this.drawFill(context);
     }
@@ -142,47 +142,78 @@ Path.prototype.drawRect = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             if (!this._pathSame || !this._pathDrawn) {
                 context.beginPath();
-                context.rect(this.entity.position.x - this._pathPosition, this.entity.position.y - this._pathPosition, this.entity.aspect.width + this._pathPosition/2, this.entity.aspect.height + this._pathPosition/2);
+                context.rect(this.entity.position.x - this._pathPosition, this.entity.position.y - this._pathPosition, this.entity.aspect.width + this._pathPosition*2, this.entity.aspect.height + this._pathPosition*2);
                 this.pathDrawn = true;
             }
 
             this.drawLine(context);
         }
     }
+
+};
+
+
+Path.prototype.drawRectRadiusPath = function(context, radius, position) {
+
+    // draw path
+    context.beginPath();
+    context.moveTo(this.entity.position.x + radius, this.entity.position.y - position);
+    
+    context.lineTo(this.entity.position.x + this.entity.aspect.width - radius, this.entity.position.y - position);
+    context.quadraticCurveTo(this.entity.position.x + this.entity.aspect.width + position, this.entity.position.y - position, this.entity.position.x + this.entity.aspect.width + position, this.entity.position.y + radius);
+    
+    context.lineTo(this.entity.position.x + this.entity.aspect.width + position, this.entity.position.y + this.entity.aspect.height - radius);
+    context.quadraticCurveTo(this.entity.position.x + this.entity.aspect.width + position, this.entity.position.y + this.entity.aspect.height + position, this.entity.position.x + this.entity.aspect.width - radius, this.entity.position.y + this.entity.aspect.height + position);
+    
+    context.lineTo(this.entity.position.x + radius, this.entity.position.y + this.entity.aspect.height + position);
+    context.quadraticCurveTo(this.entity.position.x - position, this.entity.position.y + this.entity.aspect.height + position, this.entity.position.x - position, this.entity.position.y + this.entity.aspect.height - radius);
+    
+    context.lineTo(this.entity.position.x - position, this.entity.position.y + radius);
+    context.quadraticCurveTo(this.entity.position.x - position, this.entity.position.y - position, this.entity.position.x + radius, this.entity.position.y - position);
+
 };
 
 
 Path.prototype.drawRectRadius = function(context) {
 
-    var radius = this.getBorderRadius();
+    this._pathDrawn = false;
+    this._pathSame = !(this.lineWidth > 0);
+    if (this.lineAlign == 'outside') {
+        this._pathPosition = this.lineWidth/2;
+    } else if (this.lineAlign == 'inside') {
+        this._pathPosition = -this.lineWidth/2;
+    } else {
+        this._pathPosition = 0;
+    }
 
-    // draw path
-    context.beginPath();
-    context.moveTo(this.entity.position.x + radius, this.entity.position.y);
-    context.lineTo(this.entity.position.x + this.entity.aspect.width - radius, this.entity.position.y);
-    context.quadraticCurveTo(this.entity.position.x + this.entity.aspect.width, this.entity.position.y, this.entity.position.x + this.entity.aspect.width, this.entity.position.y + radius);
-    context.lineTo(this.entity.position.x + this.entity.aspect.width, this.entity.position.y + this.entity.aspect.height - radius);
-    context.quadraticCurveTo(this.entity.position.x + this.entity.aspect.width, this.entity.position.y + this.entity.aspect.height, this.entity.position.x + this.entity.aspect.width - radius, this.entity.position.y + this.entity.aspect.height);
-    context.lineTo(this.entity.position.x + radius, this.entity.position.y + this.entity.aspect.height);
-    context.quadraticCurveTo(this.entity.position.x, this.entity.position.y + this.entity.aspect.height, this.entity.position.x, this.entity.position.y + this.entity.aspect.height - radius);
-    context.lineTo(this.entity.position.x, this.entity.position.y + radius);
-    context.quadraticCurveTo(this.entity.position.x, this.entity.position.y, this.entity.position.x + radius, this.entity.position.y);
+    this._radius = this.getBorderRadius();
 
     // draw line bottom
     if (this.lineLayer == 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            this._pathDrawn = false;
+            this.drawRectRadiusPath(context, this._radius, this._pathPosition);
             this.drawLine(context);
+            this._pathDrawn = true;
         }
     }
 
     // draw fill
     if (this.fillColor != '') {
+        if (!this._pathSame || !this._pathDrawn) {
+            this.drawRectRadiusPath(context, this._radius, 0);
+            this._pathDrawn = true;
+        }
         this.drawFill(context);
     }
 
     // draw line top
     if (this.lineLayer != 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            if (!this._pathSame || !this._pathDrawn) {
+                this.drawRectRadiusPath(context, this._radius, this._pathPosition);
+                this._pathDrawn = true;
+            }
             this.drawLine(context);
         }
     }
@@ -192,55 +223,97 @@ Path.prototype.drawRectRadius = function(context) {
 
 Path.prototype.drawCircle = function(context) {
 
-    // draw path
-    context.beginPath();
-    var radius = this.entity.aspect.width / 2;
-    context.arc(this.entity.position.x + radius, this.entity.position.y + radius, radius, 0, 2 * Math.PI, false);
+    this._pathDrawn = false;
+    this._pathSame = !(this.lineWidth > 0);
+    if (this.lineAlign == 'outside') {
+        this._pathPosition = this.lineWidth/2;
+    } else if (this.lineAlign == 'inside') {
+        this._pathPosition = -this.lineWidth/2;
+    } else {
+        this._pathPosition = 0;
+    }
+    this._radius = this.entity.aspect.width / 2;
 
-    // draw line bottom
+    // draw path
     if (this.lineLayer == 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            context.beginPath();
+            context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
             this.drawLine(context);
+            this._pathDrawn = true;
         }
     }
 
     // draw fill
     if (this.fillColor != '') {
+        if (!this._pathSame || !this._pathDrawn) {
+            context.beginPath();
+            context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius, 0, 2 * Math.PI, false);
+            this._pathDrawn = true;
+        }
         this.drawFill(context);
     }
 
     // draw line top
     if (this.lineLayer != 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            if (!this._pathSame || !this._pathDrawn) {
+                context.beginPath();
+                context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
+                this._pathDrawn = true;
+            }
             this.drawLine(context);
         }
     }
 };
 
 
+
 Path.prototype.drawEllipse = function(context) {
 
+    this._pathDrawn = false;
+    this._pathSame = !(this.lineWidth > 0);
+    if (this.lineAlign == 'outside') {
+        this._pathPosition = this.lineWidth/2;
+    } else if (this.lineAlign == 'inside') {
+        this._pathPosition = -this.lineWidth/2;
+    } else {
+        this._pathPosition = 0;
+    }
+
     // draw path
-    context.beginPath();
-    var radiusX = this.entity.aspect.width / 2
-        ,radiusY = this.entity.aspect.height / 2;
-    context.ellipse(this.entity.position.x + radiusX, this.entity.position.y + radiusY, radiusX, radiusY, 0, 0, 2 * Math.PI, false);
+    this._radiusX = this.entity.aspect.width / 2;
+    this._radiusY = this.entity.aspect.height / 2;
+
 
     // draw line bottom
     if (this.lineLayer == 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            context.beginPath();
+            context.ellipse(this.entity.position.x + this._radiusX, this.entity.position.y + this._radiusY, this._radiusX + this._pathPosition, this._radiusY + this._pathPosition, 0, 0, 2 * Math.PI, false);
             this.drawLine(context);
+            this._pathDrawn = true;
         }
     }
 
     // draw fill
     if (this.fillColor != '') {
+        if (!this._pathSame || !this._pathDrawn) {
+            context.beginPath();
+            context.ellipse(this.entity.position.x + this._radiusX, this.entity.position.y + this._radiusY, this._radiusX, this._radiusY, 0, 0, 2 * Math.PI, false);
+            this._pathDrawn = true;
+        }
         this.drawFill(context);
     }
 
     // draw line top
     if (this.lineLayer != 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
+            if (!this._pathSame || !this._pathDrawn) {
+                context.beginPath();
+                context.ellipse(this.entity.position.x + this._radiusX, this.entity.position.y + this._radiusY, this._radiusX + this._pathPosition, this._radiusY + this._pathPosition, 0, 0, 2 * Math.PI, false);
+                this._pathDrawn = true;
+            }
             this.drawLine(context);
         }
     }
