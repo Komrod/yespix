@@ -1,6 +1,5 @@
 
 TODO list:
-- fix Fps (cap 30)
 - add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
 - make load function chainable
 - automatically add entity by passing the manager instance
@@ -81,6 +80,7 @@ Delayed:
 
 
 DONE:
+- fix Fps (cap 30)
 - Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
 - prerender class (not complete)
 - make a FPS entity
