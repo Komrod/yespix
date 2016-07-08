@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+	// normal
+	manager.add(new yespix.entity.sprite({
+		image: 'chuck/squares.png',
+		position: {
+			x: 30,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 0
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: 'chuck/squares.png',
+		position: {
+			x: 80,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 1
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: 'chuck/squares.png',
+		position: {
+			x: 130,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 2
+		}
+	}));
+
+	manager.add(new yespix.entity.sprite({
+		aspect: {
+			flipX: true
+		},
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 180,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 3
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		aspect: {
+			flipY: true
+		},
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 230,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 4
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		aspect: {
+			flipX: true,
+			flipY: true
+		},
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 280,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 5
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 330,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 6,
+			x: 16,
+			y: 16
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 380,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 7,
+			maxCols: 3
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			rotation: 45,
+			x: 430,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 8
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		aspect: {
+			alpha: 0.5
+		},
+		image: {
+			src: 'chuck/squares.png',
+		},
+		position: {
+			x: 480,
+			y: 100
+		},
+		sprite: {
+			selectedIndex: 9
+		}
+	}));
+
+
+	// change size
+	manager.add(new yespix.entity.sprite({
+		image: 'chuck/squares.png',
+		position: {
+			x: 30,
+			y: 200
+		},
+		sprite: {
+			selectedIndex: 1,
+			width: 64,
+			height: 64
+		}
+	}));
+	manager.add(new yespix.entity.sprite({
+		image: {
+			src: 'chuck/squares.png',
+			scale: 2.0
+		},
+		position: {
+			x: 150,
+			y: 200
+		},
+		sprite: {
+			selectedIndex: 2
+		}
+	}));
+
+	// 
+	manager.add(new yespix.entity.sprite({
+		image: 'chuck/squares.png',
+		position: {
+			x: 30,
+			y: 200
+		},
+		sprite: {
+			selectedIndex: 1,
+			width: 64,
+			height: 64
+		}
+	}));
+
+
+
+
+
+
+/*
+	var tweenable = new Tweenable();
+	var tweenOptions = {
+		from: { rotation: 0, color : '#ff0000', alpha: 1.0 },
+		to:   { rotation: 360, color : '#00ffff', alpha: 0.0 },
+		duration: 3000,
+		easing: 'bounce',
+		step: function (state) {
+			s1.position.rotation = state.rotation;
+			s2.aspect.alpha = state.alpha;
+			s3.path.fillColor = state.color;
+		},
+		finish: function (state) {
+			var tmp = tweenOptions.from;
+			tweenOptions.from = tweenOptions.to;
+			tweenOptions.to = tmp;
+    		this.tween(tweenOptions);
+	  	}
+	};
+	tweenable.tween(tweenOptions);
+*/
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) { 
+		}
+	).start();
+
+
+</script>
+
+</body>
+</html>
