@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	    <script src="engines/box2d.js"></script>
+	    <script src="lib/Box2d.min.js"></script>
 		<script src="../build/yespix.js"></script>
 	</head>
 	<body style="background-color: #789;">
@@ -12,8 +12,8 @@
 	yespix();
 
 	// create gfx manager
-	var manager = new GfxManager(true);
-    manager.setPhysics(new EngineBox2d());
+	var manager = new yespix.class.gfxManager(true);
+    manager.setPhysics(new yespix.class.physicsBox2d());
 
 	//////////////////////////////////////////////////////////////////////////////
 	// UNIT TEST ENTITY EXTENDS

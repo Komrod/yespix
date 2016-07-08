@@ -1,6 +1,6 @@
 
 function Animation(properties, entity) {
-    
+console.log('Animation::init');    
     properties = properties || {};
     if (entity) this.entity = entity;
     
@@ -23,11 +23,11 @@ function Animation(properties, entity) {
             properties.sprites[n].aspect = this.entity.aspect;
         }
     };
-console.log('properties = ', properties);
+console.log('properties = ', properties);    
     this.set(properties, varDefault);
     this.isReady =  false;
     this.nextTime = 0;
-}
+};
 
 
 Animation.prototype.set = function(properties, varDefault) {
@@ -55,6 +55,7 @@ Animation.prototype.unload = function() {
 
 
 Animation.prototype.load = function() {
+console.log('Animation::load ');
     if (this.isReady) {
         return true;
     }
@@ -66,6 +67,7 @@ Animation.prototype.load = function() {
 
 
 Animation.prototype.event = function(event) {
+console.log('Animation::event ', event);
     if (event.type == 'ready') {
         this.getSpritesReady();
         return true;
@@ -106,6 +108,7 @@ Animation.prototype.ready = function() {
 
 
 Animation.prototype.buildAnimations = function() {
+console.log('buildAnimations');
     for (var n in this.list) {
         if (this.defaultAnimation == '') {
             this.defaultAnimation = n;

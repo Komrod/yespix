@@ -13,9 +13,9 @@ yespix.defineEntity('animation', {
     },
 
     load: function() {
+console.log('animation::load');        
         this.animation.load();
-console.log('load animation');        
-        this.super();
+//        this.super();
     },
     
 /*
