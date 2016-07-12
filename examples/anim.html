@@ -13,11 +13,6 @@
     yespix();
     var manager = new yespix.class.gfxManager(canvas);
 
-/*
-    var image = new yespix.entity.image('chuck/player.png')
-    manager.add(image);
-*/
-
 
     manager.add(new yespix.entity.animation({
         position: {
@@ -27,22 +22,273 @@
         aspect: {
             alpha: 0.1,
         },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
         animation: {
+            defaultAnimation: 'idle',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
             sprites: {
-                def: {
+                perso: {
                     width: 32,
-                    height: 48,
+                    height: 40,
                 }
             },
-            image: {
-                src: 'chuck/player.png',
-                scale: 2.0,
+            list: {
+                idle: {
+                    frames: [0, 1, 2, 3, 4, 5, 6]
+                }
+            },
+        }
+    }));
+
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 175,
+            y: 100
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'punch_right',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                punch_right: {
+
+                    frames: [8, 9, 10, 11, 12]
+                }
+            },
+        }
+    }));
+
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 250,
+            y: 100
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'punch_left',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                punch_left: {
+
+                    frames: [16, 17, 18, 19, 20]
+                }
+            },
+        }
+    }));
+
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 325,
+            y: 100
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    frames: [24, 25, 26, 27, 28 ,29, 30, 31]
+                }
+            },
+        }
+    }));
+
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 100,
+            y: 175
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    flipX: true,
+                    frames: [24, 25, 26, 27, 28 ,29, 30, 31]
+                }
+            },
+        }
+    }));
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 175,
+            y: 190
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    flipY: true,
+                    frames: [24, 25, 26, 27, 28 ,29, 30, 31]
+                }
+            },
+        }
+    }));
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 250,
+            y: 190
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    flipX: true,
+                    flipY: true,
+                    frames: [24, 25, 26, 27, 28 ,29, 30, 31]
+                }
             },
         }
     }));
 
 
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 100,
+            y: 250
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    from: 24,
+                    length: 8
+                }
+            },
+        }
+    }));
 
+    manager.add(new yespix.entity.animation({
+        position: {
+            x: 175,
+            y: 280
+        },
+        aspect: {
+            alpha: 0.1,
+        },
+        image: {
+            src: 'chuck/player.png'
+        },
+        animation: {
+            defaultAnimation: 'run',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                run: {
+                    from: 24,
+                    length: 8
+                }
+            },
+        }
+    }));
 
 
 /*
