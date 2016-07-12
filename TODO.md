@@ -1,7 +1,6 @@
 
 TODO list:
-- add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
-- make load function chainable
+- make the animation entity work
 - automatically add entity by passing the manager instance
 
 - start player on ground / detects ground
@@ -16,7 +15,7 @@ Delayed:
 - gradient background color for path
 - star path with any number of branches
 
-- bug: sprite out of range selectedIndex cause the all image to be drawn
+- bug: sprite out of range selectedIndex cause the whole image to be drawn
 - input click, hold, mouse position
 - extends to reverse an animation
 - getTouchList must returns only fixtures that touches body and ground sensor
@@ -80,6 +79,7 @@ Delayed:
 
 
 DONE:
+- add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
 - fix Fps (cap 30)
 - Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
 - prerender class (not complete)
