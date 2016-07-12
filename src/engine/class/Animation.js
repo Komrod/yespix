@@ -1,6 +1,5 @@
 
 function Animation(properties, entity) {
-console.log('Animation::init');    
     properties = properties || {};
     if (entity) this.entity = entity;
     
@@ -12,7 +11,9 @@ console.log('Animation::init');
 
         selectedFrame: '',
         selectedAnimation: '',
-        selectedSprite: ''
+        selectedSprite: '',
+
+        autoLoad: true
     };
 
     if (properties.sprites) {
@@ -23,10 +24,13 @@ console.log('Animation::init');
             properties.sprites[n].aspect = this.entity.aspect;
         }
     };
-console.log('properties = ', properties);    
     this.set(properties, varDefault);
     this.isReady =  false;
     this.nextTime = 0;
+
+    if (this.autoLoad) {
+        this.load();
+    }
 };
 
 
@@ -55,7 +59,6 @@ Animation.prototype.unload = function() {
 
 
 Animation.prototype.load = function() {
-console.log('Animation::load ');
     if (this.isReady) {
         return true;
     }
@@ -67,8 +70,8 @@ console.log('Animation::load ');
 
 
 Animation.prototype.event = function(event) {
-console.log('Animation::event ', event);
-    if (event.type == 'ready') {
+
+    if (event.type == 'ready' && event.fromClass == 'Image') {
         this.getSpritesReady();
         return true;
     }
@@ -81,6 +84,7 @@ Animation.prototype.getSpritesReady = function() {
         return true;
     }
     for (var n in this.sprites) {
+        this.sprites[n].load();
         if (!this.sprites[n].isReady) return false;
     }
     this.ready();
@@ -108,7 +112,6 @@ Animation.prototype.ready = function() {
 
 
 Animation.prototype.buildAnimations = function() {
-console.log('buildAnimations');
     for (var n in this.list) {
         if (this.defaultAnimation == '') {
             this.defaultAnimation = n;
@@ -136,10 +139,24 @@ console.log('buildAnimations');
         }
         if (!this.list[n].frames) {
             this.list[n].frames = [];
-            continue;
         }
 
         var len = this.list[n].frames.length;
+
+        if (len == 0 && this.list[n].length > 0) {
+            if (!yespix.isUndefined(this.list[n].from)) {
+                this.list[n].frames.push(this.list[n].from);
+            } else {
+                this.list[n].frames.push(0);
+            }
+            if (this.list[n].length > 1) {
+                for (var i = 1; i<this.list[n].length; i++) {
+                    this.list[n].frames.push(this.list[n].frames[0]+i);
+                }
+            }
+            len = this.list[n].frames.length;
+        }
+
         for (var i = 0; i<len; i++) {
             if (yespix.isInt(this.list[n].frames[i])) {
                 this.list[n].frames[i] = {
@@ -170,10 +187,9 @@ console.log('buildAnimations');
                     this.list[n].frames[i].flipY = this.list[n].flipY;
                 }
             }
+
         }
     }
-console.log('end :: buildAnimations', this);  
-
     this.play(this.defaultAnimation, 0, true);
 };
 
@@ -221,15 +237,10 @@ Animation.prototype.changeFrame = function(frame, force) {
 
         // select 
         this.entity.boundary = {};
-        this.sprites[this.selectedSprite].sprite.select(this.list[this.selectedAnimation].frames[frame].frame);
+        this.sprites[this.selectedSprite].select(this.list[this.selectedAnimation].frames[frame].frame);
         this.entity.image = this.sprites[this.selectedSprite].image;
-        this.sprites[this.selectedSprite].set({
-            aspect: 
-            {
-                flipX: this.list[this.selectedAnimation].frames[frame].flipX,
-                flipY: this.list[this.selectedAnimation].frames[frame].flipY
-            }
-        });
+        this.entity.aspect.flipX = this.list[this.selectedAnimation].frames[frame].flipX;
+        this.entity.aspect.flipY = this.list[this.selectedAnimation].frames[frame].flipY;
         return true;
     }
     return false;
@@ -248,7 +259,6 @@ Animation.prototype.checkFrame = function() {
 Animation.prototype.nextFrame = function() {
     // animation is not ready
     if (!this.isReady || !this.list) {
-//this.getSpritesReady();
         return false;
     }
 

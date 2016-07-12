@@ -10,12 +10,11 @@ yespix.defineEntity('animation', {
         properties = properties || {};
         this.super(properties);
         this.animation = new yespix.class.animation(this.animation, this);
+
     },
 
     load: function() {
-console.log('animation::load');        
         this.animation.load();
-//        this.super();
     },
     
 /*
@@ -27,6 +26,9 @@ console.log('animation::load');
 */
 
     event: function(event) {
+        if (this.animation.event) {
+            this.animation.event(event);    
+        }
         return this.super(event);
     },
 

@@ -5,6 +5,9 @@ function Sprite(properties, entity) {
     properties = properties || {};
     if (entity) {
         this.entity = entity;
+        if (!properties.image && entity.image) {
+            properties.image = entity.image;
+        }
     }
 
     var varDefault = {
@@ -183,8 +186,7 @@ Sprite.prototype.prepare = function() {
         };
         this.entity.aspect.set(aspect);
     }
-    if (
-        this.entity.image.offsetX != this.selected.offsetX
+    if (this.entity.image.offsetX != this.selected.offsetX
         || this.entity.image.offsetY != this.selected.offsetY
         ) {
         var image = {
