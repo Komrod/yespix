@@ -9,10 +9,12 @@
          * Contributors of StackOverflow
          *
          */
+        
 
         /**
          * @class yespix
          */
+        
 
         /**
          * YESPIX contructor. Handles the engine initialisation with properties and trigger the "ready" event
@@ -28,7 +30,6 @@
             //this.trigger('ready');
         }
 
-        //yespix.extendEntity = {};
 
         /**
          * YESPIX prototype
