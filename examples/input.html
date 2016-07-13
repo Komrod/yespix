@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<div style="border: 50px solid #146; margin: 50px; width: 800px;">
+    <canvas width="800" height="600" id="canvas"></canvas>
+</div>
+<script type="text/javascript">
+	
+
+    var canvas = document.getElementById('canvas');
+    yespix();
+    var manager = new yespix.class.gfxManager(canvas);
+
+
+    var circle = new yespix.entity.path({
+        position: {
+            x: 400,
+            y: 300
+        },
+        aspect: {
+            alpha: 0.1,
+            width: 50,
+            height: 50
+        },
+        path: {
+            type: 'circle'
+
+        },
+        manager: manager
+    });
+
+
+    var input = new yespix.class.input({canvas: canvas});
+
+
+    // create loop
+    var loop = new yespix.class.loop(60);
+
+    var mouseState = {
+        x: null,
+        y: null
+    };
+
+    function cursorMove() {
+        if (input.mouseState) {
+            if (input.mouseState.x != mouseState.x || input.mouseState.y != mouseState.y) {
+                mouseState = input.mouseState;
+                circle.position.x = mouseState.x;
+                circle.position.y = mouseState.y;
+            }
+        }
+    }
+
+
+    // register tick and frame functions
+    loop.register(
+        function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            //manager.drawDebug(); // draw debug
+            manager.drawFps(time, 60);
+        }, 
+        function(loop, time) { 
+            cursorMove();
+            //manager.step(time);
+            //manager.applyPhysics(time); // apply position from physics engine
+        }
+    ).start();
+
+
+   
+ 
+</script>
+</body>
+</html>

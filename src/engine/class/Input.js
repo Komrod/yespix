@@ -7,8 +7,18 @@ function Input(properties) {
     this.states = {};
     
     this.persistence = properties.persistence || 100;
-    this.doc = properties.document || document;
 
+
+    this.enableKey(properties.document);
+    if (properties.canvas) {
+        this.enableMouse(properties.canvas);
+    }
+
+}
+
+Input.prototype.enableKey = function(doc) {
+
+    this.doc = doc || document;
     var input = this;
 
     /**
@@ -167,6 +177,67 @@ function Input(properties) {
     };
 
 };
+
+
+
+Input.prototype.enableMouse = function(canvas) {
+    
+    this.setCanvas(canvas);
+    var input = this;
+
+    this.canvas.onmousedown = function(e) {
+        input.mouseEvent('down', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+    };
+    this.canvas.onmouseup = function(e) {
+        input.mouseEvent('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+    };
+    this.canvas.onmousemove = function(e) {
+        input.mouseEvent('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+    };
+
+};
+
+
+
+Input.prototype.setCanvas = function(canvas) {
+    this.canvas = canvas;
+
+    var offsetLeft = 0;
+    var offsetTop = 0;
+    do {
+        if (!isNaN(canvas.offsetLeft)) {
+            offsetLeft += canvas.offsetLeft;
+        }
+        if (!isNaN(canvas.offsetTop)) {
+            offsetTop += canvas.offsetTop;
+        }
+    } while (canvas = canvas.offsetParent);
+    this.canvasOffset = {
+        x: offsetLeft, 
+        y: offsetTop
+    };
+};
+
+
+Input.prototype.mouseEvent = function(type, properties) {
+    if (!type) {
+        this.mouseState = {
+            click: false,
+            drag: false,
+            x: 0,
+            y: 0
+        }
+    }
+    console.log(type, properties);
+
+    this.mouseState = {
+        click: false,
+        drag: false,
+        x: properties.x,
+        y: properties.y
+    }
+};
+
 
 
 /**
