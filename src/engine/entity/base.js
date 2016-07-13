@@ -19,6 +19,11 @@ yespix.defineEntity('base', {
     init: function(properties) {
         properties = properties || {};
 	    yespix.copy(properties, this);
+        
+        if (this.manager) {
+            this.manager.add(this);
+        }
+
         return true;
     },
 
