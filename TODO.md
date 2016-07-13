@@ -1,19 +1,16 @@
 
 TODO list:
-- make the animation entity work
-- automatically add entity by passing the manager instance
+- make the input keyboard work
+- make the player work
+- link player and physics engine
 
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init
 - use collision in a level
 - parallax image move
-- texture entity
-
-Delayed:
-- polygon of any number of sides
-- gradient background color for path
-- star path with any number of branches
+- texture entity (handled by the canvas)
+- Make a camera entity
 
 - bug: sprite out of range selectedIndex cause the whole image to be drawn
 - input click, hold, mouse position
@@ -78,7 +75,15 @@ Delayed:
 - make the Chuck game
 
 
+Delayed:
+- polygon of any number of sides
+- gradient background color for path
+- star path with any number of branches
+
+
 DONE:
+- automatically add entity by passing the manager instance
+- make the animation entity work // 12-07-2016
 - add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
 - fix Fps (cap 30)
 - Bug: when context.lineWidth is changed, debug of physicsBox2d is changed
