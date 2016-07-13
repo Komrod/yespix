@@ -260,7 +260,7 @@
         }
     }));
 
-    manager.add(new yespix.entity.animation({
+    new yespix.entity.animation({
         position: {
             x: 175,
             y: 280
@@ -287,8 +287,9 @@
                     length: 8
                 }
             },
-        }
-    }));
+        },
+        manager: manager
+    });
 
 
 /*
