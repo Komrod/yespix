@@ -11,6 +11,7 @@ function Path(properties, entity) {
         lineAlpha: 1.0,
         lineAlign: 'center',
         lineLayer: 'top',
+        lineCap: 'butt',
 
         fillColor: '#ffffff',
         fillAlpha: 1.0,
@@ -22,6 +23,7 @@ function Path(properties, entity) {
     };
 
     this.set(properties, varDefault);
+console.log('path created ', this);    
 }
 
 
@@ -47,10 +49,11 @@ Path.prototype.getBorderRadius = function() {
 };
 
 
-Path.prototype.drawLine = function(context) {
+Path.prototype.drawBorder = function(context) {
     context.globalAlpha = this.entity.aspect.alpha * this.lineAlpha;
     context.lineWidth = this.lineWidth;
     context.strokeStyle = this.lineColor;
+    context.lineCap = this.lineCap;
     context.stroke();
 };
 
@@ -75,8 +78,11 @@ Path.prototype.draw = function(context) {
         context.rotate(this.entity.position.rotation * Math.PI / 180);
         context.translate(-pivot.x, -pivot.y);
     }
-
+//console.log('this.type = '+this.type);
     switch (this.type) {
+        case 'line':
+            this.drawLine(context);
+            break;
         case 'rect':
             if (this.getBorderRadius() > 0) {
                 this.drawRectRadius(context);
@@ -104,6 +110,16 @@ Path.prototype.draw = function(context) {
     }
 };
 
+Path.prototype.drawLine = function(context) {
+//console.log('drawLine: ok');        
+    if (this.lineColor != '' && this.lineWidth > 0) {
+//console.log('drawLine: draw ', this.entity.position);        
+        context.beginPath();
+        context.moveTo(this.entity.position.x, this.entity.position.y);
+        context.lineTo(this.entity.position.toX, this.entity.position.toY);
+        this.drawBorder(context);
+    }
+};
 
 Path.prototype.drawRect = function(context) {
 
@@ -123,7 +139,7 @@ Path.prototype.drawRect = function(context) {
             context.beginPath();
             context.rect(this.entity.position.x - this._pathPosition, this.entity.position.y - this._pathPosition, this.entity.aspect.width + this._pathPosition*2, this.entity.aspect.height + this._pathPosition*2);
             this._pathDrawn = true;
-            this.drawLine(context);
+            this.drawBorder(context);
         }
     }
 
@@ -146,7 +162,7 @@ Path.prototype.drawRect = function(context) {
                 this.pathDrawn = true;
             }
 
-            this.drawLine(context);
+            this.drawBorder(context);
         }
     }
 
@@ -193,7 +209,7 @@ Path.prototype.drawRectRadius = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             this._pathDrawn = false;
             this.drawRectRadiusPath(context, this._radius, this._pathPosition);
-            this.drawLine(context);
+            this.drawBorder(context);
             this._pathDrawn = true;
         }
     }
@@ -214,7 +230,7 @@ Path.prototype.drawRectRadius = function(context) {
                 this.drawRectRadiusPath(context, this._radius, this._pathPosition);
                 this._pathDrawn = true;
             }
-            this.drawLine(context);
+            this.drawBorder(context);
         }
     }
 
@@ -239,7 +255,7 @@ Path.prototype.drawCircle = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             context.beginPath();
             context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
-            this.drawLine(context);
+            this.drawBorder(context);
             this._pathDrawn = true;
         }
     }
@@ -262,7 +278,7 @@ Path.prototype.drawCircle = function(context) {
                 context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
                 this._pathDrawn = true;
             }
-            this.drawLine(context);
+            this.drawBorder(context);
         }
     }
 };
@@ -291,7 +307,7 @@ Path.prototype.drawEllipse = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             context.beginPath();
             context.ellipse(this.entity.position.x + this._radiusX, this.entity.position.y + this._radiusY, this._radiusX + this._pathPosition, this._radiusY + this._pathPosition, 0, 0, 2 * Math.PI, false);
-            this.drawLine(context);
+            this.drawBorder(context);
             this._pathDrawn = true;
         }
     }
@@ -314,7 +330,7 @@ Path.prototype.drawEllipse = function(context) {
                 context.ellipse(this.entity.position.x + this._radiusX, this.entity.position.y + this._radiusY, this._radiusX + this._pathPosition, this._radiusY + this._pathPosition, 0, 0, 2 * Math.PI, false);
                 this._pathDrawn = true;
             }
-            this.drawLine(context);
+            this.drawBorder(context);
         }
     }
 

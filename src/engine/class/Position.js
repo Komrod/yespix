@@ -11,6 +11,9 @@ function Position(properties, entity) {
         z: 1.0,
         globalZ: 1.0, // @TODO
 
+        toX: 0,
+        toY: 0,
+
         rotation: 0,
         pivotX: 0,
         pivotY: 0,
