@@ -56,5 +56,10 @@ yespix.defineEntity('base', {
         return [];
     },
     
+    destroy: function() {
+        if (this.manager) {
+            this.manager.remove(this);
+        }
+    }
 });
 

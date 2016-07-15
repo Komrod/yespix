@@ -228,7 +228,7 @@ Input.prototype.mouseEvent = function(type, properties) {
             y: 0
         }
     }
-    console.log(type, properties);
+//console.log(type, properties);
 
     this.mouseState = {
         click: false,
