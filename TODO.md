@@ -1,8 +1,13 @@
 
 TODO list:
-- make the input keyboard work
+- add path line type
+- bug on destroy / remove from manager
+- bug in GfxManager: adding entities is slower and slower with many entities
+- add pad controler
+- make a tween class for base entity
 - make the player work
 - link player and physics engine
+- example with sounds
 
 - start player on ground / detects ground
 - make a level entity
@@ -82,6 +87,7 @@ Delayed:
 
 
 DONE:
+- make the input keyboard work
 - automatically add entity by passing the manager instance
 - make the animation entity work // 12-07-2016
 - add properties to path : lineAlign = inside / outside / center, lineLayer = top / bottom
