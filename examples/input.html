@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="../build/yespix.js"></script>
+    <script type="text/javascript" src="lib/shifty.min.js"></script>
 </head>
 <body style="background-color: #456;">
 
@@ -28,7 +29,6 @@
         },
         path: {
             type: 'circle'
-
         },
         manager: manager
     });
@@ -45,12 +45,52 @@
         y: null
     };
 
+    var list = [];
+    var index = 0;
+
     function cursorMove() {
         if (input.mouseState) {
             if (input.mouseState.x != mouseState.x || input.mouseState.y != mouseState.y) {
+                list.push(new yespix.entity.path({
+                    position: {
+                        x: mouseState.x,
+                        y: mouseState.y,
+                        toX: input.mouseState.x,
+                        toY: input.mouseState.y
+                    },
+                    aspect: {
+                        alpha: 1.0
+                    },
+                    path: {
+                        type: 'line',
+                        lineColor: '#123456',
+                        lineWidth: 10,
+                        lineCap: 'round'
+                    },
+                    manager: manager
+                }));
+                index = list.length-1;
+
+                (function(index) {
+                    var tweenable = new Tweenable();
+                    var tweenOptions = {
+                        from: { color : '#123456', alpha: 1.0 },
+                        to:   { color : '#FF0000', alpha: 0.9 },
+                        duration: 1000,
+                        easing: 'easeInCubic',
+                        step: function (state) {
+                            list[index].aspect.alpha = state.alpha;
+                            list[index].path.lineColor = state.color;
+                        },
+                        finish: function (state) {
+                        }
+                    };
+                    tweenable.tween(tweenOptions);
+                })(index);
                 mouseState = input.mouseState;
-                circle.position.x = mouseState.x;
-                circle.position.y = mouseState.y;
+                circle.position.x = mouseState.x-25;
+                circle.position.y = mouseState.y-25;
+
             }
         }
     }
@@ -59,13 +99,13 @@
     // register tick and frame functions
     loop.register(
         function(loop, time) { 
+            cursorMove();
             manager.clear(); // clear canvas
             manager.draw(); // draw debug
             //manager.drawDebug(); // draw debug
             manager.drawFps(time, 60);
         }, 
         function(loop, time) { 
-            cursorMove();
             //manager.step(time);
             //manager.applyPhysics(time); // apply position from physics engine
         }
