@@ -19,10 +19,14 @@ function Path(properties, entity) {
         borderRadius: 0,
         type: 'rect',
 
-        vertex: 4 // @TODO
+        points: []
     };
 
     this.set(properties, varDefault);
+
+    if (this.point) {
+        this.setPoint(this.point);
+    }
 console.log('path created ', this);    
 }
 
@@ -39,6 +43,30 @@ Path.prototype.set = function(properties, varDefault) {
             properties: properties
         }
     );
+};
+
+
+Path.prototype.setPoints = function(points) {
+    this.points = [];
+    if (yespix.isObject(points)) {
+        this.addPoint({x: 0, y:0});
+        this.addPoint(points);
+        return true;
+    }
+    for (var t=0; t<points.length; t++) {
+        this.addPoint(points[t]);
+    }
+    return true;
+};
+
+Path.prototype.addPoint = function(point) {
+    if (!point.x) {
+        point.x = 0;
+    }
+    if (!point.y) {
+        point.y = 0;
+    }
+    this.points.push(point);
 };
 
 
@@ -116,7 +144,7 @@ Path.prototype.drawLine = function(context) {
 //console.log('drawLine: draw ', this.entity.position);        
         context.beginPath();
         context.moveTo(this.entity.position.x, this.entity.position.y);
-        context.lineTo(this.entity.position.toX, this.entity.position.toY);
+        context.lineTo(this.points[0].x + this.entity.position.x, this.points[0].y + this.entity.position.y);
         this.drawBorder(context);
     }
 };

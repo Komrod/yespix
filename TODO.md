@@ -1,6 +1,6 @@
 
 TODO list:
-- add path line type
+- add multiple lines type to path
 - bug on destroy / remove from manager
 - bug in GfxManager: adding entities is slower and slower with many entities
 - add pad controler
@@ -87,6 +87,7 @@ Delayed:
 
 
 DONE:
+- add path line type
 - make the input keyboard work
 - automatically add entity by passing the manager instance
 - make the animation entity work // 12-07-2016
