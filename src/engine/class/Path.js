@@ -24,10 +24,9 @@ function Path(properties, entity) {
 
     this.set(properties, varDefault);
 
-    if (this.point) {
-        this.setPoint(this.point);
+    if (this.points) {
+        this.setPoints(this.points);
     }
-console.log('path created ', this);    
 }
 
 
@@ -106,7 +105,6 @@ Path.prototype.draw = function(context) {
         context.rotate(this.entity.position.rotation * Math.PI / 180);
         context.translate(-pivot.x, -pivot.y);
     }
-//console.log('this.type = '+this.type);
     switch (this.type) {
         case 'line':
             this.drawLine(context);
@@ -139,15 +137,43 @@ Path.prototype.draw = function(context) {
 };
 
 Path.prototype.drawLine = function(context) {
-//console.log('drawLine: ok');        
     if (this.lineColor != '' && this.lineWidth > 0) {
-//console.log('drawLine: draw ', this.entity.position);        
-        context.beginPath();
-        context.moveTo(this.entity.position.x, this.entity.position.y);
-        context.lineTo(this.points[0].x + this.entity.position.x, this.points[0].y + this.entity.position.y);
-        this.drawBorder(context);
+        if (this.points) {
+            if (this.points.length == 0) {
+                return true;
+            }
+            context.beginPath();
+            context.moveTo(this.points[0].x + this.entity.position.x, this.points[0].y + this.entity.position.y);
+            if (this.points.length == 1) {
+                context.lineTo(this.points[0].x + this.entity.position.x, this.points[0].y + this.entity.position.y);
+                this.drawBorder(context);
+                return true;
+            }
+            for (var t=1; t<this.points.length; t++) {
+                context.lineTo(this.points[t].x + this.entity.position.x, this.points[t].y + this.entity.position.y);
+            }
+            this.drawBorder(context);
+        }
     }
 };
+
+
+Path.prototype.drawPloygonPath = function(context) {
+    if (this.lineColor != '' && this.lineWidth > 0) {
+        if (this.points) {
+            if (this.points.length < 3) {
+                return true;
+            }
+            context.beginPath();
+            context.moveTo(this.points[0].x + this.entity.position.x, this.points[0].y + this.entity.position.y);
+            for (var t=1; t<this.points.length; t++) {
+                context.lineTo(this.points[t].x + this.entity.position.x, this.points[t].y + this.entity.position.y);
+            }
+            context.closePath();
+        }
+    }
+};
+
 
 Path.prototype.drawRect = function(context) {
 
@@ -190,6 +216,32 @@ Path.prototype.drawRect = function(context) {
                 this.pathDrawn = true;
             }
 
+            this.drawBorder(context);
+        }
+    }
+
+};
+
+
+Path.prototype.drawPolygon = function(context) {
+
+    this.drawPloygonPath(context);
+
+    // draw line bottom
+    if (this.lineLayer == 'bottom') {
+        if (this.lineColor != '' && this.lineWidth > 0) {
+            this.drawBorder(context);
+        }
+    }
+
+    // draw fill
+    if (this.fillColor != '') {
+        this.drawFill(context);
+    }
+
+    // draw line top
+    if (this.lineLayer != 'bottom') {
+        if (this.lineColor != '' && this.lineWidth > 0) {
             this.drawBorder(context);
         }
     }

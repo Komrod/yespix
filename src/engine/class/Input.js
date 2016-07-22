@@ -194,6 +194,10 @@ Input.prototype.enableMouse = function(canvas) {
     this.canvas.onmousemove = function(e) {
         input.mouseEvent('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
+    this.canvas.onmouseleave = function(e) {
+        input.mouseEvent('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.mouseEvent('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+    };
 
 };
 
