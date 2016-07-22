@@ -54,9 +54,7 @@
                 list.push(new yespix.entity.path({
                     position: {
                         x: mouseState.x,
-                        y: mouseState.y,
-                        toX: input.mouseState.x,
-                        toY: input.mouseState.y
+                        y: mouseState.y
                     },
                     aspect: {
                         alpha: 1.0
@@ -65,7 +63,8 @@
                         type: 'line',
                         lineColor: '#123456',
                         lineWidth: 10,
-                        lineCap: 'round'
+                        lineCap: 'round',
+                        points: {x: input.mouseState.x - mouseState.x, y: input.mouseState.y - mouseState.y}
                     },
                     manager: manager
                 }));
