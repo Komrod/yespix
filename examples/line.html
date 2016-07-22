@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+	// line
+	new yespix.entity.path({
+		position: {
+			x: 30,
+			y: 100
+		},
+		path: {
+			type: 'line',
+			lineWidth: 6,
+			lineColor: '#ff0000',
+			points: {x: 0,y: 20}
+		},
+		manager: manager
+	});
+
+	// line
+	new yespix.entity.path({
+		position: {
+			x: 130,
+			y: 100
+		},
+		path: {
+			type: 'line',
+			lineWidth: 10,
+			lineColor: '#00ff00',
+			points: [
+				{x: 0,y: 20},
+				{x: 20,y: 0},
+			]
+		},
+		manager: manager
+	});
+
+	// line
+	new yespix.entity.path({
+		position: {
+			x: 230,
+			y: 100
+		},
+		path: {
+			type: 'line',
+			lineCap: 'round',
+			lineWidth: 2,
+			lineColor: '#0000ff',
+			points: [
+				{x: 0,y: 0},
+				{x: 10,y: 10},
+				{x: 0,y: 10},
+				{x: 10,y: 0},
+				{x: 0,y: 0},
+				{x: 10,y: 10}
+			]
+		},
+		manager: manager
+	});
+
+	// line
+	new yespix.entity.path({
+		aspect: {
+			alpha: 0.3
+		},
+		position: {
+			x: 330,
+			y: 100
+		},
+		path: {
+			type: 'line',
+			lineCap: 'round',
+			lineWidth: 5,
+			lineColor: '#0000ff',
+			points: [
+				{x: 0,y: 0},
+				{x: 0,y: 10},
+				{x: 10,y: 0},
+				{x: 10,y: 10},
+				{x: 20,y: 0},
+				{x: 20,y: 10},
+				{x: 30,y: 0},
+				{x: 30,y: 10},
+				{x: 40,y: 0}
+			]
+		},
+		manager: manager
+	});
+
+	// polygon
+	new yespix.entity.path({
+		aspect: {
+			alpha: 0.3
+		},
+		position: {
+			x: 30,
+			y: 200
+		},
+		path: {
+			type: 'polygon',
+			lineWidth: 5,
+			lineColor: '#0000ff',
+			points: [
+				{x: 0,y: 0},
+				{x: 30,y: 0},
+				{x: 30,y: 30},
+				{x: 0,y: 30}
+			]
+		},
+		manager: manager
+	});
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) { 
+		}
+	).start();
+
+
+</script>
+
+</body>
+</html>
