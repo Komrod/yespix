@@ -1,13 +1,13 @@
 
 TODO list:
-- add multiple lines type to path
-- bug on destroy / remove from manager
 - bug in GfxManager: adding entities is slower and slower with many entities
 - add pad controler
 - make a tween class for base entity
 - make the player work
 - link player and physics engine
 - example with sounds
+- fill with linear and radial gradient for path
+- fill path with image
 
 - start player on ground / detects ground
 - make a level entity
@@ -87,6 +87,9 @@ Delayed:
 
 
 DONE:
+- bug on destroy / remove from manager
+- add mouse leave event for input
+- add multiple lines to path
 - add path line type
 - make the input keyboard work
 - automatically add entity by passing the manager instance
