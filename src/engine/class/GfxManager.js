@@ -103,9 +103,22 @@ GfxManager.prototype.drawFps = function(ms, max) {
 
 GfxManager.prototype.add = function() {
 	for (var t = 0; t < arguments.length; t++) {
+
 		arguments[t].manager = this;
-	    this.list.push(arguments[t]);
-	    this.isZSorted = false;
+
+		var len = this.list.length;
+		var added = false;
+		for (var u=0; u<len; u++) {
+			if (this.list[u].position.z > arguments[t].position.z) {
+				this.list.splice(u, 0, arguments[t]);
+				added = true;
+				break;
+			}
+		}
+		if (!added) {
+		    this.list.push(arguments[t]);
+		}
+
 	    if (!arguments[t].isReady) {
 	    	this.isReady = false;
 	    }
@@ -137,6 +150,14 @@ GfxManager.prototype.sort = function() {
     this.isZSorted = true;
 };
 
+/**
+ * Find the z sort position of an entity
+ * @param  {entity} The entity
+ * @return {integer} Index position
+ */
+GfxManager.prototype.findZSortPosition = function(entity) {
+
+};
 
 GfxManager.prototype.event = function(event) {
 	if (event.type == 'ready') {

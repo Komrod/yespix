@@ -1,6 +1,6 @@
 
 TODO list:
-- bug in GfxManager: adding entities is slower and slower with many entities
+- check dynamical change of z position
 - add pad controler
 - make a tween class for base entity
 - make the player work
@@ -87,6 +87,7 @@ Delayed:
 
 
 DONE:
+- bug in GfxManager: adding entities is slower and slower with many entities
 - bug on destroy / remove from manager
 - add mouse leave event for input
 - add multiple lines to path
