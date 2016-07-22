@@ -118,7 +118,7 @@ GfxManager.prototype.remove = function() {
 	for (var t = 0; t < arguments.length; t++) {
 		for (var u = this.list.length-1; u >=0; u--) {
 			if (this.list[u] == arguments[t]) {
-				this.list = this.list.splice(u, 1);
+				this.list.splice(u, 1);
 		    }
 		}
 	}	
