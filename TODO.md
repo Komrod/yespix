@@ -1,7 +1,9 @@
 
 TODO list:
+- event class
+- use event class to handle inputs
 - check dynamical change of z position
-- add pad controler
+- add pad controler inputs
 - make a tween class for base entity
 - make the player work
 - link player and physics engine
@@ -9,13 +11,15 @@ TODO list:
 - fill with linear and radial gradient for path
 - fill path with image
 
+- Trace for next collision with a vector / line
 - start player on ground / detects ground
 - make a level entity
 - pass rotation of an object to collision object at init
 - use collision in a level
 - parallax image move
 - texture entity (handled by the canvas)
-- Make a camera entity
+- Make a camera entity (zoom, )
+- Make a video entity
 
 - bug: sprite out of range selectedIndex cause the whole image to be drawn
 - input click, hold, mouse position

@@ -186,17 +186,22 @@ Input.prototype.enableMouse = function(canvas) {
     var input = this;
 
     this.canvas.onmousedown = function(e) {
-        input.mouseEvent('down', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+console.log('down ', e);        
+        input.mouseDo('down', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmouseup = function(e) {
-        input.mouseEvent('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.mouseDo('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmousemove = function(e) {
-        input.mouseEvent('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.mouseDo('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmouseleave = function(e) {
-        input.mouseEvent('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
-        input.mouseEvent('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.mouseDo('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.mouseDo('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+    };
+    this.canvas.onmousewheel = function(e) {
+console.log('wheel ', e);        
+//        input.mouseDo('wheel', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
 
 };
@@ -220,22 +225,27 @@ Input.prototype.setCanvas = function(canvas) {
         x: offsetLeft, 
         y: offsetTop
     };
+    this.mouseDo();
 };
 
 
-Input.prototype.mouseEvent = function(type, properties) {
+Input.prototype.mouseDo = function(type, properties) {
     if (!type) {
         this.mouseState = {
-            click: false,
-            drag: false,
+            clicked: false,
+            button: false,
             x: 0,
             y: 0
         }
     }
 //console.log(type, properties);
-
+    var clicked = false;
+    if (type == 'down') {
+        clicked = true;
+    }
     this.mouseState = {
-        click: false,
+        right: clicked,
+        left: clicked,
         drag: false,
         x: properties.x,
         y: properties.y

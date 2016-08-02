@@ -1,102 +1,127 @@
 
 
 /**
- * Handle events and transmit events to parent
+ * Handle events and propagate events to entity
  * @param {object} params  Parameters in an object
- * @param {object} parent Parent object
+ * @param {object} entity Entity object
  */
-function Event(params, parent) {
-    params = params || {};
-    
-    if (parent) {
-        this.parent = parent;
+function EventHandler(entity) {
+    if (entity) {
+        this.entity = entity;
     }
 
-    var varDefault = {
-    };
-
-    this.set(params, varDefault);
-
     this.list = {};
+    this.index = 0;
 }
 
 
 /**
- * Get the element at index or get the selected element
+ * Get the list
  * @param  {int} index Index
  * @return {object} The element
  */
-Event.prototype.getList = function(eventName, name) {
-    if (this.list[name]) {
-        return this.list[name];
+EventHandler.prototype.getList = function(eventName) {
+    if (this.list[eventName]) {
+        return this.list[eventName];
     }
-    return {};
+    return false;
 };
 
 
 /**
- * Add an element at an index in the list. 
+ * Link a function to an event in the list, chainable
  * @param {int|string} params Index as integer or string
  * @param {int|string} index Optional, index of the element as integer or string
  */
-ElementList.prototype.add = function(eventName, function, name) {
+EventHandler.prototype.link = function(eventName, fct, name) {
 
-
-    if (this.list[eventName]) {
-        this.list[eventName] = [];
+    if (!this.list[eventName]) {
+        this.list[eventName] = {};
     }
-    
-    element.index = index;
-    element.hasError = false;
-    element.isReady = false;
-    element.isLoading = false;
-    element.manager = this;
 
-    this.list[index] = element;
-    this.nextIndex++;
+    if (!name) {
+        name = this.index+'';
+        this.index++;
+        while (this.list[eventName][name]) {
+            name = this.index+'';
+            this.index++;
+        }
+    } else  {
+        name = name + '';
+    }
+
+    this.list[eventName][name] = fct;
+
+    return name;
+};
+
+
+EventHandler.prototype.create = function(type) {
+    var event = {
+        propagation: true,
+        time: new Date().getTime(),
+        type: type
+    };
+
+    if (this.parent) {
+        event.parent = this.parent;
+    }
+
+    return event;
+};
+
+
+EventHandler.prototype.trigger = function(event, name) {
     
-    if (element.addEventListener) {
-        for (var t=0; t<this.events.length; t++) {
-            element.addEventListener(this.events[t], this.event, true);
+    if (!event || !event.type) {
+        return false;
+    }
+
+    if (this.list[event.type]) {
+        if (name) {
+            if (this.list[event.type][name]) {
+                this.list[event.type][name](event);
+            }
+        } else {
+            for (var n in this.list[event.type]) {
+                this.list[event.type][n](event);
+            }
+        }
+
+    }
+
+    // propagation to entity
+    if (event.propagation && this.entity && this.entity.manager && this.entity.manager.event) {
+            this.parent.entity.event(event);
         }
     }
-
-    if (this.selected === null) {
-        this.selected = element;
-        this.selectedIndex = index;
-    }
-    return this;
-};
-
-ElementList.prototype.trigger = function(event) {
-};
-
-ElementList.prototype.event = function(event) {
-    if (this.target && this.target.manager && this.target.manager.manager) {
-        this.manager.manager.event(event.type, event);
-    }
 };
 
 
-ElementList.prototype.remove = function(index) {
-    if (!this.list[index]) return this;
+EventHandler.prototype.unlink = function(eventName, name) {
 
-    var element = this.list[index];
-    if (this.selected == element) {
-        this.selected = null;
-        this.selectedIndex = null;
-    }
-    
-    for (var t=0; t<this.events.length; t++) {
-        element.removeEventListener(this.events[t], this.event, true);
+    if (!this.list[eventName] || !name) {
+        this.list[eventName] = {};
+        return true;
     }
 
-    this.list[index].manager = null;
-    this.list[index] = null;
-    delete(this.list[index]);
-    return this;
+    delete this.list[eventName][name];
+    // might use null instead
+    //this.list[eventName][name] = null;
+};
+
+
+EventHandler.prototype.clear = function() {
+
+    for (var eventName in this.list) {
+        for (var name in this.list[eventName]) {
+            delete this.list[eventName][name];
+        }
+        delete this.list[eventName];
+    }
+    delete this.list;
 };
 
 
 
-yespix.defineClass('elementList', ElementList);
+yespix.defineClass('event', Event);
