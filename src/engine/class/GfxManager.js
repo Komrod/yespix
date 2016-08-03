@@ -15,8 +15,8 @@ function GfxManager(canvas, list) {
 
 	// set the list
     this.list = list || [];
-    this.events = {};
-
+    this.event = new yespix.class.eventHandler();
+    
     this.isZSorted = false;
     this.isReady = true;
 }
@@ -159,7 +159,8 @@ GfxManager.prototype.findZSortPosition = function(entity) {
 
 };
 
-GfxManager.prototype.event = function(event) {
+GfxManager.prototype.trigger = function(event) {
+console.log('GfxManager:trigger ', event);
 	if (event.type == 'ready') {
 		if (this.getReady()) {
 			this.isReady = true;
@@ -220,8 +221,7 @@ GfxManager.prototype.each = function(fn) {
 
 
 GfxManager.prototype.when = function(eventName, fn) {
-	if (!this.events[eventName]) this.events[eventName] = new Array();
-	this.events[eventName].push(fn);
+	this.event.add()
 };
 
 

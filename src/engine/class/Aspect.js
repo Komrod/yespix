@@ -45,7 +45,7 @@ Aspect.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     
     this.isChanged = true;
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             from: this,

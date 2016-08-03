@@ -1,6 +1,7 @@
 
 TODO list:
 - event class
+- apply event class to entity
 - use event class to handle inputs
 - check dynamical change of z position
 - add pad controler inputs

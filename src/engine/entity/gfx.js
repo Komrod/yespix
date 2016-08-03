@@ -136,11 +136,7 @@ yespix.defineEntity('gfx', {
     },
 
 
-    /**
-     * Event: some properties of the entity have changed
-     */
-    event: function(event) {
-        if (!this.manager) return;
+    trigger: function(event) {
         switch (event.type+':'+event.fromClass) {
             case 'change:Position':
                 if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {

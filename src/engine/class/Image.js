@@ -38,7 +38,7 @@ Image.prototype.set = function(properties, varDefault) {
             this.load(this.element.source);
         }
     }
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,
@@ -287,7 +287,7 @@ Image.prototype.ready = function() {
         }
     }
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'ready',
             from: this,
@@ -310,7 +310,7 @@ Image.prototype.error = function() {
     this.element.isReady = false;
     this.element.hasError = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'error',
             from: this,

@@ -29,7 +29,7 @@ yespix.defineEntity('physics', {
     set: function(properties, varDefault) {
         yespix.copy(properties, this, varDefault);
 
-        this.entity.event(
+        this.entity.trigger(
             {
                 type: 'change',
                 from: this,
@@ -42,8 +42,8 @@ yespix.defineEntity('physics', {
     },
 
 
-    event: function(event) {
-        if (this.entity) this.entity.event(event);
+    trigger: function(event) {
+        if (this.entity) this.entity.trigger(event);
         return true;
     },
 

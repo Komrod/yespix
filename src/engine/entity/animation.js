@@ -17,17 +17,9 @@ yespix.defineEntity('animation', {
         this.animation.load();
     },
     
-/*
-    drawRender: function(context) {
-        if (this.animation && this.animation.isReady) {
-            this.image.draw(context);
-        }
-    },
-*/
-
-    event: function(event) {
-        if (this.animation.event) {
-            this.animation.event(event);    
+    trigger: function(event) {
+        if (this.animation.trigger) {
+            this.animation.trigger(event);    
         }
         return this.super(event);
     },

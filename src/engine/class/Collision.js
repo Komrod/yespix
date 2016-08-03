@@ -56,7 +56,7 @@ Collision.prototype.set = function(properties, varDefault) {
     }
 
     this.isChanged = true;
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,

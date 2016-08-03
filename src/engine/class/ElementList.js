@@ -47,7 +47,7 @@ ElementList.prototype.set = function(params, index) {
         yespix.copy(params, this.list[index]);
         this.isChanged = true;
         if (this.manager) {
-            this.manager.event(
+            this.manager.trigger(
                 {
                     type: 'changeElement',
                     from: this,

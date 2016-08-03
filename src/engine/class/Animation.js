@@ -37,7 +37,7 @@ function Animation(properties, entity) {
 Animation.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,
@@ -69,7 +69,7 @@ Animation.prototype.load = function() {
 };
 
 
-Animation.prototype.event = function(event) {
+Animation.prototype.trigger = function(event) {
 
     if (event.type == 'ready' && event.fromClass == 'Image') {
         this.getSpritesReady();
@@ -100,7 +100,7 @@ Animation.prototype.ready = function() {
 
     this.entity.isReady = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'ready',
             from: this,

@@ -32,7 +32,7 @@ function Video(properties, entity) {
 Video.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,
@@ -116,7 +116,7 @@ Video.prototype.ready = function() {
             this.entity.aspect.height = this.element.videoHeight;
         }
     }
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'ready',
             from: this,
@@ -143,7 +143,7 @@ Video.prototype.error = function() {
     this.element.isReady = false;
     this.element.hasError = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'error',
             from: this,

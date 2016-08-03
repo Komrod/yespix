@@ -35,7 +35,7 @@ function Sprite(properties, entity) {
 
 Sprite.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,
@@ -151,7 +151,7 @@ Sprite.prototype.load = function() {
     }
     this.isReady = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'ready',
             entity: this.entity,
@@ -197,11 +197,12 @@ Sprite.prototype.prepare = function() {
     }
 };
 
-
-Sprite.prototype.event = function(event) {
-    if (this.entity) return this.entity.event(event);
+/*
+Sprite.prototype.trigger = function(event) {
+    if (this.entity) return this.entity.trigger(event);
     return true;
 };
+*/
 
 yespix.defineClass('sprite', Sprite);
 

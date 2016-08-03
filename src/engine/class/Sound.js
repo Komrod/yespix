@@ -36,7 +36,7 @@ function Sound(properties, entity) {
 Sound.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'change',
             entity: this.entity,
@@ -112,7 +112,7 @@ Sound.prototype.ready = function() {
     this.element.isReady = false;
     this.element.hasError = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'ready',
             from: this,
@@ -139,7 +139,7 @@ Sound.prototype.error = function() {
     this.element.isReady = false;
     this.element.hasError = true;
 
-    this.entity.event(
+    this.entity.trigger(
         {
             type: 'error',
             from: this,

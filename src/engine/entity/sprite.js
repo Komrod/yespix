@@ -23,7 +23,7 @@ yespix.defineEntity('sprite', {
         }
     },
 
-    event: function(event) {
+    trigger: function(event) {
         if (event.type == 'ready' && event.fromClass == 'Image') {
             this.sprite.load();
         }

@@ -1,7 +1,7 @@
 
 
 /**
- * Handle events and propagate events to entity
+ * Handle events 
  * @param {object} params  Parameters in an object
  * @param {object} entity Entity object
  */
@@ -55,7 +55,7 @@ EventHandler.prototype.link = function(eventName, fct, name) {
     return name;
 };
 
-
+/*
 EventHandler.prototype.create = function(type) {
     var event = {
         propagation: true,
@@ -63,13 +63,13 @@ EventHandler.prototype.create = function(type) {
         type: type
     };
 
-    if (this.parent) {
-        event.parent = this.parent;
+    if (this.entity) {
+        event.entity = this.entity;
     }
 
     return event;
 };
-
+*/
 
 EventHandler.prototype.trigger = function(event, name) {
     
@@ -89,25 +89,23 @@ EventHandler.prototype.trigger = function(event, name) {
         }
 
     }
-
-    // propagation to entity
-    if (event.propagation && this.entity && this.entity.manager && this.entity.manager.event) {
-            this.parent.entity.event(event);
-        }
-    }
 };
 
 
 EventHandler.prototype.unlink = function(eventName, name) {
 
-    if (!this.list[eventName] || !name) {
+    if (!this.list[eventName]) {
+        return false;
+    }
+    if (!name) {
         this.list[eventName] = {};
         return true;
     }
 
     delete this.list[eventName][name];
-    // might use null instead
-    //this.list[eventName][name] = null;
+    return true;
+    // might use null instead, delete is slow
+    // this.list[eventName][name] = null;
 };
 
 
@@ -124,4 +122,4 @@ EventHandler.prototype.clear = function() {
 
 
 
-yespix.defineClass('event', Event);
+yespix.defineClass('eventHandler', EventHandler);

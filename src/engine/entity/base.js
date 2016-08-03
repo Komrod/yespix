@@ -24,6 +24,8 @@ yespix.defineEntity('base', {
             this.manager.add(this);
         }
 
+        this.event = new yespix.class.eventHandler();
+console.log('base:init ', this);        
         return true;
     },
 
@@ -44,10 +46,15 @@ yespix.defineEntity('base', {
 
 
     /**
-     * Event: some properties of the entity have changed
+     * Trigger an event and pass it to the event handler
      */
-    event: function(event) {
-    	if (this.manager) this.manager.event(event);
+    trigger: function(event) {
+console.log('base:trigger ', event);        
+        // execute functions linked to the event
+        if (this.event) this.event.trigger(event);
+
+        //
+        if (this.manager) this.manager.trigger(event);
     	return true;
     },
 
