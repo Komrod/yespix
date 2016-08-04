@@ -160,7 +160,6 @@ GfxManager.prototype.findZSortPosition = function(entity) {
 };
 
 GfxManager.prototype.trigger = function(event) {
-console.log('GfxManager:trigger ', event);
 	if (event.type == 'ready') {
 		if (this.getReady()) {
 			this.isReady = true;
@@ -219,21 +218,6 @@ GfxManager.prototype.each = function(fn) {
 	}
 };
 
-
-GfxManager.prototype.when = function(eventName, fn) {
-	this.event.add()
-};
-
-
-GfxManager.prototype.trigger = function(eventName, event) {
-	if (!this.events[eventName]) return false;
-	var len = this.events[eventName].length;
-	for (var t=0; t<len; t++) {
-		this.events[eventName][t](event);
-	}
-	return true;
-};
-
 GfxManager.prototype.clear = function() {
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	return true;
@@ -250,7 +234,7 @@ GfxManager.prototype.reset = function(canvas, list) {
 
 	// set the list
     this.list = list || [];
-    this.events = {};
+    this.event = new yespix.class.eventHandler();
 
     this.isZSorted = false;
     this.isReady = true;
