@@ -1,7 +1,6 @@
 
 TODO list:
-- event class
-- apply event class to entity
+- delete unused grunt folder
 - use event class to handle inputs
 - check dynamical change of z position
 - add pad controler inputs
@@ -92,6 +91,8 @@ Delayed:
 
 
 DONE:
+- event class
+- apply event class to entity
 - bug in GfxManager: adding entities is slower and slower with many entities
 - bug on destroy / remove from manager
 - add mouse leave event for input
