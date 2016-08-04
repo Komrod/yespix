@@ -1,8 +1,8 @@
 
 TODO list:
-- delete unused grunt folder
 - use event class to handle inputs
 - check dynamical change of z position
+- check events in yespix (on, when, trigger, event, events)
 - add pad controler inputs
 - make a tween class for base entity
 - make the player work
@@ -91,6 +91,7 @@ Delayed:
 
 
 DONE:
+- delete unused grunt folder
 - event class
 - apply event class to entity
 - bug in GfxManager: adding entities is slower and slower with many entities

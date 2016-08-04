@@ -35,7 +35,16 @@
 
 
     var input = new yespix.class.input({canvas: canvas});
-
+    input.when('keydown', function(e) {
+        if (input.key('a-z')) {
+            console.log('a-z');
+        }
+    });
+    input.when('keypress', function(e) {
+        if (input.key('a-z')) {
+            console.log('a-z');
+        }
+    });
 
     // create loop
     var loop = new yespix.class.loop(60);
@@ -49,6 +58,7 @@
     var index = 0;
 
     function cursorMove() {
+        /*
         if (input.mouseState) {
             if (input.mouseState.x != mouseState.x || input.mouseState.y != mouseState.y) {
                 list.push(new yespix.entity.path({
@@ -74,14 +84,15 @@
                     var tweenable = new Tweenable();
                     var tweenOptions = {
                         from: { color : '#123456', alpha: 1.0 },
-                        to:   { color : '#FF0000', alpha: 0.9 },
+                        to:   { color : '#FF0000', alpha: 0.0 },
                         duration: 1000,
                         easing: 'easeInCubic',
                         step: function (state) {
-                            list[index].aspect.alpha = state.alpha;
-                            list[index].path.lineColor = state.color;
+                            list[index].aspect.set(state); //alpha = state.alpha;
+                            list[index].path.set(state); //lineColor = state.color;
                         },
                         finish: function (state) {
+                            list[index].destroy();
                         }
                     };
                     tweenable.tween(tweenOptions);
@@ -91,7 +102,7 @@
                 circle.position.y = mouseState.y-25;
 
             }
-        }
+        }*/
     }
 
 

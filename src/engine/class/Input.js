@@ -58,31 +58,39 @@ function Input(properties) {
         scrollLock: 145
     };
 
+    this.mouseMap = {
+        left: 0,
+        wheel: 1,
+        right: 2
+    }
+
     this.enableKey(properties.document);
     if (properties.canvas) {
         //this.enableMouse(properties.canvas);
     }
 }
 
-Input.prototype.onkey = function(e, b) {
+Input.prototype.onKey = function(e, b) {
     // get the event
     e = e || window.event;
 
     // get the key code
-    e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
+//    e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
+    e.inputCode = e.key.charCodeAt(0);
 
     // main key 
-    input.state.key[parseInt(e.inputCode)] = b;
-
+    this.state.key[parseInt(e.inputCode)] = b;
+//console.log(e, this.state.key);        
+//console.log('this.state.key['+parseInt(e.inputCode)+'] = '+b+';');
     // special key 
-    if (e.ctrlKey) input.state.key[input.keyMap['ctrl']] = true;
-    else input.state.key[input.keyMap['ctrl']] = false;
-    if (e.altKey) input.state.key[input.keyMap['alt']] = true;
-    else input.state.key[input.keyMap['alt']] = false;
-    if (e.shiftKey) input.state.key[input.keyMap['shift']] = true;
-    else input.state.key[input.keyMap['shift']] = false;
+    if (e.ctrlKey) this.state.key[this.keyMap['ctrl']] = true;
+    else this.state.key[this.keyMap['ctrl']] = false;
+    if (e.altKey) this.state.key[this.keyMap['alt']] = true;
+    else this.state.key[this.keyMap['alt']] = false;
+    if (e.shiftKey) this.state.key[this.keyMap['shift']] = true;
+    else this.state.key[this.keyMap['shift']] = false;
 
-    input.trigger(e);
+    this.trigger(e);
 
 };
 
@@ -92,15 +100,15 @@ Input.prototype.enableKey = function(doc) {
     var input = this;
 
     this.doc.onkeydown = function(e) {
-        input.onkey(e, true);
+        input.onKey(e, true);
     };
 
     this.doc.onkeyup = function(e) {
-        input.onkey(e, false);
+        input.onKey(e, false);
     };
 
     this.doc.onkeypress = function(e) {
-        input.onkey(e, false);
+        input.onKey(e, true);
     };
 
     this.doc.onblur = function(e) {
@@ -108,35 +116,42 @@ Input.prototype.enableKey = function(doc) {
     };
 };
 
-Input.prototype.trigger = function(e) {
-console.log('Input:trigger ', e);    
-    this.event.trigger(e);
-}
+
+Input.prototype.trigger = function(event, name) {
+    this.event.trigger(event, name);
+};
+
+Input.prototype.when = function(eventName, fct, name) {
+    this.event.link(eventName, fct, name);
+};
+
+Input.prototype.unlink = function(eventName, name) {
+    this.event.trigger(eventName, name);
+};
 
 
-/*
 Input.prototype.enableMouse = function(canvas) {
     
     this.setCanvas(canvas);
     var input = this;
 
     this.canvas.onmousedown = function(e) {
-console.log('down ', e);        
-        input.mouseDo('down', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.onMouse(e, true); //'down', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmouseup = function(e) {
-        input.mouseDo('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.onMouse(e, false); //'up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmousemove = function(e) {
-        input.mouseDo('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.onMouse(e);
     };
     this.canvas.onmouseleave = function(e) {
-        input.mouseDo('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
-        input.mouseDo('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.onMouse(e);
+//        input.onMouse('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+//        input.mouseDo('up', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
     };
     this.canvas.onmousewheel = function(e) {
-console.log('wheel ', e);        
 //        input.mouseDo('wheel', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
+        input.onMouse(e);
     };
 
 };
@@ -164,7 +179,8 @@ Input.prototype.setCanvas = function(canvas) {
 };
 
 
-Input.prototype.mouseDo = function(type, properties) {
+Input.prototype.onMouse = function(event) {
+console.log(event); return;
     if (!type) {
         this.mouseState = {
             clicked: false,
@@ -187,7 +203,7 @@ Input.prototype.mouseDo = function(type, properties) {
     }
 };
 
-*/
+
 
 
 /**
