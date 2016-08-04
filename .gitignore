@@ -220,7 +220,6 @@ pip-log.txt
 ## grunt
 #############
 
-src/grunt/node_modules/*
 node_modules/*
 
 
