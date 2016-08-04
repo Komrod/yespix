@@ -6,5 +6,5 @@
 grunt && grunt dog
 
 #
-# To install grunt and necessary packages, run install.sh
+# To install grunt and necessary packages, run "npm install"
 #
