@@ -1,6 +1,5 @@
 
 TODO list:
-- use event class to handle inputs
 - check dynamical change of z position
 - check events in yespix (on, when, trigger, event, events)
 - add pad controler inputs
@@ -91,6 +90,7 @@ Delayed:
 
 
 DONE:
+- use event class to handle inputs
 - delete unused grunt folder
 - event class
 - apply event class to entity
