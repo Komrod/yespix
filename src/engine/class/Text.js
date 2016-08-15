@@ -73,6 +73,7 @@ Text.prototype.draw = function(context) {
 
 Text.prototype.drawText = function(context) {
     // draw fill
+    context.font = this.size+'px '+this.font;
     if (this.fillColor != '' && this.fillAlpha > 0) {
         this.drawFill(context);
     }
