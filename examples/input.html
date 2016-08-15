@@ -10,7 +10,13 @@
     <canvas width="800" height="600" id="canvas" style="cursor: none;"></canvas>
 </div>
 <script type="text/javascript">
+
 	
+//var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+//if (gamepads) console.log(gamepads); else console.log('no');
+//setInterval(function() { console.log(input.gamepads); }, 2000);
+
+
 
     var canvas = document.getElementById('canvas');
     yespix();
@@ -35,7 +41,7 @@
 
     var position = {};
 
-    var input = new yespix.class.input({key: document, mouse: canvas});
+    var input = new yespix.class.input({key: document, mouse: canvas, gamepad: true});
     input.when('mousemove', function(e) {
         cursorMove(e);
     });
@@ -93,15 +99,65 @@
         }
     }
 
+    var square = new yespix.entity.path({
+        position: {
+            x: 100,
+            y: 100
+        },
+        aspect: {
+            width: 100,
+            height: 100
+        },
+        path: {
+            type: 'rect',
+            lineColor: '#333',
+            lineWidth: 1,
+            fillColor: '#990000'
+        },
+        manager: manager
+    });
+    var eText = new yespix.entity.text({
+        position: {
+            x: 130,
+            y: 110,
+            z: 100
+        },
+        aspect: {
+            width: 100,
+            height: 100
+        },
+        text: {
+            align: 'center',
+            size: 64,
+            content: '0',
+            fillColor: '#000000'
+        },
+        manager: manager
+    });
+
+    function myGamepad() {
+        if (eText.isReady) {
+            for (var name in input.gamepadMap.standard) {
+                if (input.gamepad(name)) {
+                    square.path.set({fillColor: '#ff0000'});
+                    eText.text.set({content: name})
+                    console.log(name);
+                }
+            }
+        }
+    }
+
+
 
     // register tick and frame functions
     loop.register(
         function(loop, time) { 
             //cursorMove();
             manager.clear(); // clear canvas
+            myGamepad();
             manager.draw(); // draw debug
             //manager.drawDebug(); // draw debug
-            manager.drawFps(time, 60);
+            manager.drawFps(time, 30);
         }, 
         function(loop, time) { 
             //manager.step(time);

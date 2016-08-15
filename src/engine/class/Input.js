@@ -62,13 +62,64 @@ function Input(elements) {
         left: 1,
         wheel: 2,
         right: 3
-    }
+    };
+
+    this.gamepadMap = {
+        standard: {
+            a: 0,
+            b: 1,
+            x: 2,
+            y: 3,
+            lb: 4,
+            rb: 5,
+            lt: 6,
+            rt: 7,
+            back: 8,
+            start: 9,
+            ls: 10,
+            rs: 11,
+            up: 12,
+            down: 13,
+            left: 14,
+            right: 15
+        },
+        other:{
+            x: 0,
+            a: 1,
+            b: 2,
+            y: 3,
+            lb: 4,
+            rb: 5,
+            lt: 6,
+            rt: 7,
+            back: 8,
+            start: 9,
+            ls: 10,
+            rs: 11
+        }
+    };
+    this.gamepadAxeValues = {
+        'up': -1.000,
+        'up,right': -0.7142,
+        'right': -0.4285,
+        'right,down': -0.1428,
+        'down': 0.1428,
+        'down,left': 0.4285,
+        'left': 0.7142,
+        'left,up': 1.0000,
+        'delta': 0.1
+    };
 
     if (elements.key) {
         this.enableKey(elements.key);
     }
     if (elements.mouse) {
         this.enableMouse(elements.mouse);
+    }
+    if (elements.gamepad) {
+        this.enableGamepad();
+    } else {
+       this.disableGamepad();
     }
 }
 
@@ -283,28 +334,6 @@ Input.prototype.disableMouse = function(element) {
 };
 
 
-/*
-Input.prototype.setCanvas = function(canvas) {
-    this.canvas = canvas;
-
-    var offsetLeft = 0;
-    var offsetTop = 0;
-    do {
-        if (!isNaN(canvas.offsetLeft)) {
-            offsetLeft += canvas.offsetLeft;
-        }
-        if (!isNaN(canvas.offsetTop)) {
-            offsetTop += canvas.offsetTop;
-        }
-    } while (canvas = canvas.offsetParent);
-    this.canvasOffset = {
-        x: offsetLeft, 
-        y: offsetTop
-    };
-    this.mouseDo();
-};
-*/
-
 Input.prototype.onMouse = function(e, b) {
 
 //console.log(e); 
@@ -343,20 +372,6 @@ Input.prototype.onMouse = function(e, b) {
 
 /**
  * Returns True if some mouse buttons are pressed for this frame.
- * If you want to trigger an event on a click, use input.on('click'), yespix.on('keydown'), yespix.on('keyup'). The operators
- * AND "-" and OR "|" can be used in the selector.
- * @param  {int|string} The selector or the key code of the character. Selector can be special keys ("shift", "ctrl" ...), multiple keys separated
- *         with operator AND "-" ("ctrl-a", "a-d-g") or operator OR "|" ("a|2", "g|h|j"). Operator AND "-" have the priority
- *         over "|", meaning "a|b-c" will be parsed like "a" || ("b" && "c"). If looking for keys "|" and "-", the characters
- *         must be escaped if there is more than one character in the selector, like "\|" and "\-".
- * @return {boolean} Returns True on success
- * @example input.key("w") return true if the keys "w" is hold
- * @example input.key("ctrl-d") return true if the keys "control" and "d" are hold together
- * @example input.key("a-z-e-r") return true if the keys "a", "z", "e" and "r" are hold together
- * @example input.key("a|r") return true if the keys "a" OR "r" are hold
- * @example input.key("\-|\|") return true if the key "-" or "|" are hold
- * @example input.key("a|z-e|r") return true if the keys "a" || ("z" && "e") || "r" are hold
- * @example input.key("a-z|e-r") return true if the keys ("a" || "z") && ("e" || "r") are hold
  */
 Input.prototype.mouse = function(s) {
     var t;
@@ -391,8 +406,119 @@ Input.prototype.mouseButton = function(s) {
     if (this.state.mouse[this.mouseMap[s.toLowerCase()]]) {
         return true;
     }
-    return !!this.state.mouse[this.mouseMap[s.toLowerCase()]];
+    return false;
 };
+
+
+
+
+/************************************************************************************************
+ * Gamepad functions
+ ************************************************************************************************/
+
+Input.prototype.enableGamepad = function() {
+    this.gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+};
+
+Input.prototype.disableGamepad = function() {
+    this.gamepads = [];
+};
+
+Input.prototype.gamepadCount = function() {
+    if (!this.gamepads || !this.gamepads.length) {
+        return 0;
+    }
+    var count = 0;
+    for (var t=0; t<this.gamepads.length; t++) {
+        if (this.gamepads[t]) count++;
+    }
+    return count;
+};
+
+
+
+Input.prototype.gamepad = function(s, n) {
+    
+    if (!n) n=0;
+
+    this.gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+    if (!this.gamepads[n] || !this.gamepads[n].buttons) {
+        return false;
+    }
+    var t;
+
+    if (yespix.isString(s)) {
+        s = s.toLowerCase();
+        if (s.indexOf('|') != -1 && s.charAt(s.indexOf('|') - 1) != '\\' && s.length > 1) {
+            var arr = s.split('|', 2);
+            for (t = 0; t < arr.length; t++)
+                if (this.gamepad(arr[t]), n) return true;
+            return false;
+        }
+        if (s.indexOf('-') != -1 && s.charAt(s.indexOf('-') - 1) != '\\' && s.length > 1) return this.gamepad(s.split('-'), n);
+        return this.gamepadButton(s, n);
+    }
+
+    if (yespix.isArray(s)) {
+        for (t = 0; t < s.length; t++)
+            if (!this.gamepad(s[t])) {
+                return false;
+            }
+        return true;
+    }
+    if (yespix.isInt(s)) {
+        return this.gamepads[n].buttons[s].pressed;
+    }
+    return false;
+};
+
+Input.prototype.gamepadButton = function(s, n) {
+    if (!n) {
+        n=0;
+    }
+    if (!this.gamepads[n] || !this.gamepads[n].buttons) {
+        return false;
+    }
+
+    var mapping = this.gamepads[n].mapping;
+    if (mapping == '') mapping = 'other';
+    if (mapping == 'other' && (s == 'left' || s == 'right' || s == 'up' || s == 'down')) {
+        //console.log(this.gamepads[n].buttons[this.gamepadMap[mapping][s.toLowerCase()]]);
+        if (this.gamepadDirections(n).indexOf(s) >= 0) return true;
+        return false;
+    }
+
+    if (yespix.isUndefined(this.gamepadMap[mapping]) || yespix.isUndefined(this.gamepadMap[mapping][s.toLowerCase()]) 
+        || yespix.isUndefined(this.gamepads[n].buttons[this.gamepadMap[mapping][s.toLowerCase()]])) {
+        return false;
+    }
+
+    if (this.gamepads[n].buttons[this.gamepadMap[mapping][s.toLowerCase()]].pressed) {
+        return true;
+    }
+    return false; //!!this.state.mouse[this.mouseMap[s.toLowerCase()]];
+};
+
+Input.prototype.gamepadAxes = function(n, axisIndex) {
+};
+
+// get 8 directions from last axe
+Input.prototype.gamepadDirections = function(n) {
+    if (!this.gamepads[n] || !this.gamepads[n].axes.length) {
+        return '';
+    }
+
+    var axeValue = this.gamepads[n].axes[this.gamepads[n].axes.length-1];
+    for (var dir in this.gamepadAxeValues) {
+        if (dir != 'delta' && axeValue >= this.gamepadAxeValues[dir] - this.gamepadAxeValues['delta'] && axeValue <= this.gamepadAxeValues[dir] + this.gamepadAxeValues['delta']) {
+            return dir;
+        }
+    }
+    return '';
+};
+
+
 
 
 
