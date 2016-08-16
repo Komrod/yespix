@@ -1,12 +1,15 @@
 
 TODO list:
-- check events in yespix (on, when, trigger, event, events)
 - make a tween class for base entity
 - make the player work
 - link player and physics engine
 - example with sounds
 - fill with linear and radial gradient for path
 - fill path with image
+- button entity
+- touch input
+- alpha mask
+- game class to encaspulate canvas, manager, debug and loop
 
 - Trace for next collision with a vector / line
 - start player on ground / detects ground
@@ -15,17 +18,16 @@ TODO list:
 - use collision in a level
 - parallax image move
 - texture entity (handled by the canvas)
-- Make a camera entity (zoom, )
+- Make a camera entity (zoom, move, turn)
 - Make a video entity
 
 - bug: sprite out of range selectedIndex cause the whole image to be drawn
-- input click, hold, mouse position
 - extends to reverse an animation
-- getTouchList must returns only fixtures that touches body and ground sensor
+- in physic engine, getTouchList must returns only fixtures that touches body and ground sensor
 - bold text
 - function to remove entities and collision object
 - light engine
-- set isChanged=false after the draw function
+- set isChanged = false after the draw function
 - make a flat render function for gfx (prerender)
 - optimize: use prerender for path
 - minimum speed for objects in physics engine
@@ -44,47 +46,31 @@ TODO list:
 - center position with position.align ("center left", "top right" ...)
 - fix position of followed entity in the center of entity
 - disable key capture on phones
-- phone mode: disable keys, set fullscreen
+- phone mode: detection, set fullscreen ...
 - stop and resume time
-- make movement relative to time, not frame
-- remove entity._instances array = obsolete
-- create moveOnGround() for actor, set position on ground on startUp
 - draw text based on letters from image
 - typewritter: text showing letter by letter with sound
-- container entity
-- button entity
+- GfxContainer entity
 - Separate the fall down / jump up animation of a character
 
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
 - make a debug panel where you can change variables and see entities
-- fix collision between entities
-- animate properties
-- draw polygon, line, elipse, star
+- elipse and star path
 - draw SVG image
-- duplicate, add, remove image
-- use Object.create in the mixin() function
-- function key() detects if any key is pressed
-- function keyCapture() stops the propagation of the pressed key
-- Bunch must concat, splice, push with arrays
-- create temporary class with space, not only with "," like yespix.spawn('rect move')
-- check if all YESPIX classes are fully loaded on first frame
-- Make a Raider game (platform indiana)
-- Add SVG entity
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
 - on actor entity, make walk animation speed progressive
 - slow time
 
-- debug pong game
+- make a pong game
 - make a basic Zombie Sim
 - make an Arkanoid game
 - make a Steel Sky game (raiden like)
 - make the Chuck game
+- Make a Raider game (platform indiana)
 
 
 Delayed:
 - polygon of any number of sides
-- gradient background color for path
-- star path with any number of branches
 
 
 DONE:
@@ -176,15 +162,7 @@ DONE:
 
 
 LATER:
-- line in path object must not override box content // TODO a line box and a fill box
-- the level follow changes the aimed position relative to the entity speed
-- smooth move on aimed position change for the level follow
 - make drawDebugImage(), drawDebugCollision(), drawDebugMove()
-- draw debug ignore general alpha value of entity
-- option collisionAtBorders that avoid entities to get out of the level
-- option stopAtBorders that makes the level follow stops at level border
-- bug with pixelSize level from 3 and up
-
 
 
 OLD_DONE:

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+	new yespix.entity.path({
+		aspect: {
+			width: yespix.randInt(1,10),
+			height: yespix.randInt(1,10),
+			alpha: 1.0
+		},
+		position: {
+			x: yespix.randInt(1,300),
+			y: yespix.randInt(1,600),
+			z: 10
+		},
+		path: {
+			type: 'line',
+			lineColor: '#ff0000',
+			lineWidth: 3,
+			fillColor: '',
+			points: {x: 10, y: 10}
+		},
+		manager: manager
+	});
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) {
+		}
+	).start();
+
+
+//console.log(manager.list);
+
+
+</script>
+
+</body>
+</html>

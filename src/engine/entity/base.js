@@ -25,6 +25,11 @@ yespix.defineEntity('base', {
         }
 
         this.event = new yespix.class.eventHandler();
+
+        if (this.tween) {
+            this.tween = new yespix.class.tween(this.tween, this);
+        }
+
         return true;
     },
 
