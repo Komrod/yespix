@@ -141,7 +141,6 @@
                 if (input.gamepad(name)) {
                     square.path.set({fillColor: '#ff0000'});
                     eText.text.set({content: name})
-                    console.log(name);
                 }
             }
         }
@@ -152,16 +151,12 @@
     // register tick and frame functions
     loop.register(
         function(loop, time) { 
-            //cursorMove();
             manager.clear(); // clear canvas
             myGamepad();
             manager.draw(); // draw debug
-            //manager.drawDebug(); // draw debug
-            manager.drawFps(time, 30);
+            manager.drawFps(time, 60);
         }, 
         function(loop, time) { 
-            //manager.step(time);
-            //manager.applyPhysics(time); // apply position from physics engine
         }
     ).start();
 

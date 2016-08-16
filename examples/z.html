@@ -69,13 +69,16 @@
 		manager: manager
 	});
 
-    var input = new yespix.class.input({canvas: canvas});
+    var input = new yespix.class.input({mouse: canvas});
+    var disabled = false;
 
-    function click() {
-		if (input.mouseState.clicked) {
-			var z = yespix.randInt(0,50);
-			green.position.z = z;
-console.log('z = ', z);
+    function checkClick() {
+		if (!disabled && input.mouseButton('left')) {
+			var value = yespix.randInt(0,100);
+			green.position.set({z: value});
+			console.log('Change z to ', value);
+			disabled = true;
+			setTimeout(function() { disabled = false; }, 100);
 		}
     }
 
@@ -83,8 +86,8 @@ console.log('z = ', z);
 	var loop = new yespix.class.loop(60);
 	loop.register(
 		function(loop, time) { 
-			click();
             manager.clear(); // clear canvas
+			checkClick();
             manager.draw(); // draw entities
             manager.drawFps(time, 60); // draw FPS
 		},

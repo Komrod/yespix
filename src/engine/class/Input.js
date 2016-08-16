@@ -540,16 +540,4 @@ Input.prototype.reset = function() {
 };
 
 
-/*
-Input.prototype.addState = function(entityName, keys) {
-    // keys = { 'jump': 'up', 'goLeft': 'left', 'goRight': 'right'}
-    this.states[entityName] = keys;
-};
-
-Input.prototype.state = function(entityName, actionName) {
-    return this.key(this.states[entityName][actionName]);
-};
-*/
-
-
 yespix.defineClass('input', Input);

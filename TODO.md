@@ -1,8 +1,6 @@
 
 TODO list:
-- check dynamical change of z position
 - check events in yespix (on, when, trigger, event, events)
-- add pad controler inputs
 - make a tween class for base entity
 - make the player work
 - link player and physics engine
@@ -90,6 +88,8 @@ Delayed:
 
 
 DONE:
+- check dynamical change of z position
+- add gamepad controler inputs
 - use event class to handle inputs
 - delete unused grunt folder
 - event class
