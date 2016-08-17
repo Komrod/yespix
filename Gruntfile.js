@@ -83,6 +83,8 @@ module.exports = function(grunt) {
                     './src/engine/class/video.js',
                     './src/engine/class/prerender.js',
                     './src/engine/class/eventHandler.js',
+                    './src/engine/class/tweenManager.js',
+                    './src/engine/class/tweenAnimation.js',
 
                     // classes with inheritance
                     './src/engine/class/actor.js',
