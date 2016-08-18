@@ -55,6 +55,8 @@ yespix.defineEntity('base', {
      * Trigger an event and pass it to the event handler
      */
     trigger: function(event) {
+        if (this.tween) this.tween.trigger(event);
+
         // execute functions linked to the event
         if (this.event) this.event.trigger(event);
 

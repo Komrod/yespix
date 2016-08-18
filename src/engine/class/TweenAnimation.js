@@ -1,32 +1,41 @@
 
 
 function TweenAnimation(properties, manager) {
-console.log('properties', properties);
-console.log('manager', manager);
-    /*
+    
     properties = properties || {};
     if (manager) {
         this.manager = manager;
         if (manager.entity) this.entity = manager.entity;
     }
-    */
+    
     this.from = {};
     this.to = {};
     this.state = {};
-console.log(this);
-    //this.timestamp = 0;
-    //this.position = 0;
+
+    this.properties = {};
+    this.copyObject(properties, this.properties);
+
+    this.timestamp = 0;
+    this.position = 0;
     this.delay = 0;
     this.duration = 0;
 
     this.defaultEasing = 'linear';
     this.defaultDuration = 1000;
+
+    this.isReady = false;
+    this.isRunning = false;
+
     
-    this.create(properties);
+    if (this.entity && this.entity.isReady) {
+console.log('TweenAnimation: entity READY');
+        this.start(properties);
+    }
+else console.log('TweenAnimation: entity NOT ready');
 }
 
 
-TweenAnimation.prototype.create = function(properties) {
+TweenAnimation.prototype.start = function(properties) {
 
     this.from = {};
     this.to = {};
@@ -36,8 +45,8 @@ TweenAnimation.prototype.create = function(properties) {
     // Init from and to
     this.copyObject(properties.from, this.from);
     this.copyObject(properties.to, this.to);
-    this.initFrom();
-
+    this.initFrom(this.from, this.to, this.entity);
+/*
     // Init from with default values of entity
     for (varclss in properties.to) {
         if (yespix.isObject(properties.to[clss])) {
@@ -56,7 +65,8 @@ TweenAnimation.prototype.create = function(properties) {
             }
         }
     }
-
+*/
+console.log(this);
     return false;
 
     // Init state
@@ -69,7 +79,7 @@ TweenAnimation.prototype.create = function(properties) {
         }
     }
 
-
+    //this.
 
     // Event
     if (this.manager) {
@@ -112,22 +122,33 @@ TweenAnimation.prototype.initFrom = function(from, to, entity) {
             if (yespix.isUndefined(from[name])) {
                 from[name] = {};
             }
+console.log('relaunch initFrom in '+name);
             if (entity) {
                 this.initFrom(from[name], to[name], entity[name]);
             } else {
-                
+                this.initFrom(from[name], to[name], false);
             }
         } else {
-            if (!this.entity || yespix.isUndefined(this.entity[name])) {
-                dest[name] = source[name];
+            if (!entity || yespix.isUndefined(entity[name])) {
+console.log('deleting to['+name+']');
+                delete(to[name]);
             } else {
-
+                from[name] = entity[name];
             }
         }
     }
 
     // @TODO delete empty objects in from
     
+};
+
+
+
+TweenManager.prototype.trigger = function(event) {
+console.log('trigger : event= ', event);
+    if (!this.isReady && !this.isRunning) {
+
+    }
 };
 
 

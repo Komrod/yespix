@@ -6,7 +6,6 @@ yespix.defineEntity('path', {
         properties = properties || {};
         this.super(properties);
         this.path = new yespix.class.path(this.path || {}, this);
-        this.isReady = true;
     },
 
     /**

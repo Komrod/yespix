@@ -26,6 +26,11 @@ TweenManager.prototype.add = function(properties) {
     
 };
 
+TweenManager.prototype.trigger = function(event) {
+    for (var t=0; t<this.list.length; t++) {
+        this.list[t].trigger(event);
+    }
+};
 
 yespix.defineClass('tweenManager', TweenManager);
 
