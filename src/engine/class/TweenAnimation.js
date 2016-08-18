@@ -28,15 +28,12 @@ function TweenAnimation(properties, manager) {
 
     
     if (this.entity && this.entity.isReady) {
-console.log('TweenAnimation: entity READY');
         this.start(properties);
     }
-else console.log('TweenAnimation: entity NOT ready');
 }
 
 
 TweenAnimation.prototype.start = function(properties) {
-
     this.from = {};
     this.to = {};
     this.state = {};
@@ -46,6 +43,11 @@ TweenAnimation.prototype.start = function(properties) {
     this.copyObject(properties.from, this.from);
     this.copyObject(properties.to, this.to);
     this.initFrom(this.from, this.to, this.entity);
+    this.copyObject(this.from, this.state);
+
+    if (this.entity) {
+        this.entity.set(this.state);
+    }
 /*
     // Init from with default values of entity
     for (varclss in properties.to) {
@@ -66,6 +68,7 @@ TweenAnimation.prototype.start = function(properties) {
         }
     }
 */
+    this.isReady = true;
 console.log(this);
     return false;
 
@@ -122,7 +125,7 @@ TweenAnimation.prototype.initFrom = function(from, to, entity) {
             if (yespix.isUndefined(from[name])) {
                 from[name] = {};
             }
-console.log('relaunch initFrom in '+name);
+//console.log('relaunch initFrom in '+name);
             if (entity) {
                 this.initFrom(from[name], to[name], entity[name]);
             } else {
@@ -130,7 +133,7 @@ console.log('relaunch initFrom in '+name);
             }
         } else {
             if (!entity || yespix.isUndefined(entity[name])) {
-console.log('deleting to['+name+']');
+//console.log('deleting to['+name+']');
                 delete(to[name]);
             } else {
                 from[name] = entity[name];
@@ -138,16 +141,19 @@ console.log('deleting to['+name+']');
         }
     }
 
-    // @TODO delete empty objects in from
+    // @TODO delete empty objects in from and to
     
 };
 
 
 
-TweenManager.prototype.trigger = function(event) {
-console.log('trigger : event= ', event);
-    if (!this.isReady && !this.isRunning) {
+TweenAnimation.prototype.trigger = function(event) {
+    if (event.from == this) return false;
 
+    if (!this.isReady && !this.isRunning) {
+        if (this.entity && this.entity.isReady) {
+            this.start(this.properties);
+        }
     }
 };
 

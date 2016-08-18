@@ -8,6 +8,8 @@ function TweenManager(properties, entity) {
     if (properties) {
         this.add(properties);
     }
+
+    this.isReady = true;
 }
 
 
@@ -20,10 +22,10 @@ TweenManager.prototype.add = function(properties) {
         }
         return true;
     }
-    var tween = new yespix.class.tweenAnimation(properties);
+    var tween = new yespix.class.tweenAnimation(properties, this);
     this.list.push(tween);
     return tween;
-    
+
 };
 
 

@@ -78,10 +78,12 @@ GfxManager.prototype.applyPhysics = function(time) {
     return true;
 };
 
+
 GfxManager.prototype.drawDebug = function() {
 	this.context.lineWidth = 1;
 	this.physics.drawDebug();
 };
+
 
 GfxManager.prototype.step = function(time) {
 	this.physics.world.Step(time/1000, 500, 50);
@@ -185,6 +187,7 @@ GfxManager.prototype.sort = function() {
     this.isZSorted = true;
 };
 
+
 /**
  * Find the z sort position of an entity
  * @param  {entity} The entity
@@ -193,6 +196,7 @@ GfxManager.prototype.sort = function() {
 GfxManager.prototype.findZSortPosition = function(entity) {
 	// @TODO
 };
+
 
 GfxManager.prototype.trigger = function(event) {
 	if (event.from == this) return false;
@@ -244,11 +248,13 @@ GfxManager.prototype.loadAssets = function(properties) {
 	this.loader.execute();
 };
 
+
 GfxManager.prototype.load = function() {
 	manager.each(function() { 
 		if (this.load) this.load(); 
 	});
 };
+
 
 GfxManager.prototype.each = function(fn) {
 	var len = this.list.length;
@@ -257,10 +263,12 @@ GfxManager.prototype.each = function(fn) {
 	}
 };
 
+
 GfxManager.prototype.clear = function() {
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	return true;
 };
+
 
 GfxManager.prototype.reset = function(canvas, list) {
 	// init
@@ -282,4 +290,6 @@ GfxManager.prototype.reset = function(canvas, list) {
 	return true;
 };
 
+
 yespix.defineClass('gfxManager', GfxManager);
+

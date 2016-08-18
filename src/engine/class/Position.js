@@ -23,10 +23,24 @@ function Position(properties, entity) {
 
     this.isZSorted = false;
     this.set(properties, varDefault);
+
+    this.isReady = true;
+    this.entity.trigger(
+        {
+            type: 'ready',
+            entity: this.entity,
+            from: this,
+            fromClass: 'Position',
+            properties: {
+                isReady: true
+            }
+        }
+    );
 }
 
 
 Position.prototype.set = function(properties, varDefault) {
+console.log('Position:set', properties);    
     if (!yespix.isUndefined(properties.z) && properties.z != this.z
         || !yespix.isUndefined(properties.globalZ) && properties.globalZ != this.globalZ)
     {
@@ -43,7 +57,7 @@ Position.prototype.set = function(properties, varDefault) {
             properties: properties
         }
     );
-}
+};
 
 
 yespix.defineClass('position', Position);

@@ -28,6 +28,7 @@ function Aspect(properties, entity) {
 
 Aspect.prototype.ready = function(bool) {
     if (bool) {
+        if (this.isReady) return false;
         this.isReady = true;
         this.entity.trigger(
             {
@@ -41,6 +42,7 @@ Aspect.prototype.ready = function(bool) {
             }
         );
     } else {
+        if (!this.isReady) return false;
         this.isReady = false;
         this.entity.trigger(
             {
