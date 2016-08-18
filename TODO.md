@@ -1,6 +1,7 @@
 
 TODO list:
 - make a tween class for base entity
+- more comments
 - make the player work
 - link player and physics engine
 - example with sounds
@@ -74,6 +75,7 @@ Delayed:
 
 
 DONE:
+- Adding ready and notReady events to all entities and classes
 - check dynamical change of z position
 - add gamepad controler inputs
 - use event class to handle inputs

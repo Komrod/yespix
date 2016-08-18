@@ -32,7 +32,7 @@ yespix.defineEntity('base', {
             this.tween = new yespix.class.tweenManager(false, this);
         }
 
-        return true;
+        this.checkReady();
     },
 
     
@@ -62,7 +62,79 @@ yespix.defineEntity('base', {
 
         // pass it to manager
         if (this.manager) this.manager.trigger(event);
+
+        // if a class switch to ready or notReady state
+        if ((event.type == 'ready' || event.type == 'notReady') && event.from !== this) {
+            this.checkReady();
+        }
+
     	return true;
+    },
+
+
+    /**
+     * Change the state of the entity to ready or not ready
+     * @param  {boolean} bool Ready or not
+     */
+    ready: function(bool) {
+        if (bool) {
+            this.isReady = true;
+            this.trigger(
+                {
+                    type: 'ready',
+                    from: this,
+                    fromClass: 'Entity',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: true
+                    }
+                }
+            );
+        } else {
+            this.isReady = false;
+            this.trigger(
+                {
+                    type: 'notReady',
+                    from: this,
+                    fromClass: 'Entity',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: false
+                    }
+                }
+            );
+        }
+    },
+
+
+    /**
+     * Check if the entity and classes are ready and launch an event if the ready state change
+     * @return {boolean} True if ready
+     */
+    checkReady: function() {
+        if (!this.isReady) {
+            if (this.checkReadyClasses()) {
+                this.ready(true);
+                return true;
+            }
+        } else {
+            if (!this.checkReadyClasses()) {
+                this.ready(false);
+                return false;
+            }
+        }
+        return this.isReady;
+    },
+
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.event && !this.event.isReady) return false;
+        if (this.tween && !this.tween.isReady) return false;
+        return true;
     },
 
 
@@ -70,6 +142,7 @@ yespix.defineEntity('base', {
         return [];
     },
     
+
     destroy: function() {
         if (this.manager) {
             this.manager.remove(this);

@@ -14,9 +14,21 @@ yespix.defineEntity('image', {
         }
         this.super(properties);
         this.image = new yespix.class.image(this.image, this);
+
+        this.checkReady();
     },
 
     
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.image && !this.image.isReady) return false;
+        return this.super();
+    },
+
+
     load: function(src) {
         this.image.load(src);
     },

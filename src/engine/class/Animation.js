@@ -50,11 +50,10 @@ Animation.prototype.set = function(properties, varDefault) {
 
 
 Animation.prototype.unload = function() {
-    this.isReady = false;
     if (this.entity) {
-        this.entity.isReady = false;
         this.entity.boundary = {};
     }
+    this.ready(false);
 };
 
 
@@ -70,6 +69,7 @@ Animation.prototype.load = function() {
 
 
 Animation.prototype.trigger = function(event) {
+    if (event.from == this) return false;
 
     if (event.type == 'ready' && event.fromClass == 'Image') {
         this.getSpritesReady();
@@ -87,27 +87,47 @@ Animation.prototype.getSpritesReady = function() {
         this.sprites[n].load();
         if (!this.sprites[n].isReady) return false;
     }
-    this.ready();
+    this.ready(true);
     return true;
 };
 
 
-Animation.prototype.ready = function() {
-    this.isLoading = false;
-    this.isReady = true;
+Animation.prototype.ready = function(bool) {
+    if (bool) {
+        this.isLoading = false;
+        this.isReady = true;
 
-    this.buildAnimations();
+        this.buildAnimations();
 
-    this.entity.isReady = true;
-
-    this.entity.trigger(
-        {
-            type: 'ready',
-            from: this,
-            fromClass: 'Animation',
-            entity: this.entity
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'ready',
+                    from: this,
+                    fromClass: 'Animation',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: true
+                    }
+                }
+            );
         }
-    );
+    } else {
+        this.isReady = false;
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'notReady',
+                    from: this,
+                    fromClass: 'Animation',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: false
+                    }
+                }
+            );
+        }
+    }
 };
 
 

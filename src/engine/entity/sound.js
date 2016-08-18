@@ -14,6 +14,17 @@ yespix.defineEntity('sound', {
         this.super(properties);
         this.sound = new yespix.class.sound(this.sound || {}, this);
 
+        this.checkReady();
+    },
+
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.sound && !this.sound.isReady) return false;
+        return this.super();
     },
 
 

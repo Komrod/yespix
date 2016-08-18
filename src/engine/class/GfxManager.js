@@ -5,6 +5,7 @@ function GfxManager(canvas, list) {
 	this.reset(canvas, list);
 	return;
 
+	/*
 	// init
 	this.canvas = null;
 	this.context = null;
@@ -18,7 +19,9 @@ function GfxManager(canvas, list) {
     this.event = new yespix.class.eventHandler();
     
     this.isZSorted = false;
-    this.isReady = true;
+
+    this.ready(true);
+    */
 }
 
 GfxManager.prototype.setPhysics = function(physics) {
@@ -26,6 +29,38 @@ GfxManager.prototype.setPhysics = function(physics) {
 	if (this.physics.setManager) {
 		physics.setManager(this);
 	}
+};
+
+
+
+GfxManager.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        this.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'GfxManager',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'GfxManager',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
 };
 
 
@@ -156,33 +191,37 @@ GfxManager.prototype.sort = function() {
  * @return {integer} Index position
  */
 GfxManager.prototype.findZSortPosition = function(entity) {
-
+	// @TODO
 };
 
 GfxManager.prototype.trigger = function(event) {
+	if (event.from == this) return false;
+
 	if (event.type == 'ready') {
-		if (this.getReady()) {
-			this.isReady = true;
-			this.trigger('ready', event);
-		}
-		return true;
+		this.getReady();
 	}
+
 	return true;
 };
 
 
-GfxManager.prototype.getReady = function() { 
+GfxManager.prototype.getReady = function() {
+
 	var len = this.list.length;
 	for (var t=0; t<len; t++) {
 		if (!this.list[t].isReady) {
+			this.ready(false);
 			return false;
 		}
 	}
+	
+	this.ready(true);
+
 	return true;
 };
 
 
-GfxManager.prototype.getAssets = function() { 
+GfxManager.prototype.getAssets = function() {
 	var len = this.list.length;
 	var assets = [];
 	for (var t=0; t<len; t++) {
@@ -237,7 +276,8 @@ GfxManager.prototype.reset = function(canvas, list) {
     this.event = new yespix.class.eventHandler();
 
     this.isZSorted = false;
-    this.isReady = true;
+
+    this.ready(true);
 
 	return true;
 };

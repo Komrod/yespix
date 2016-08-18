@@ -23,6 +23,8 @@ yespix.defineEntity('physics', {
         };
 
         this.set(properties, varDefault);
+
+        this.checkReady();
     },
 
 

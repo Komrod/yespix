@@ -11,6 +11,7 @@ yespix.defineEntity('animation', {
         this.super(properties);
         this.animation = new yespix.class.animation(this.animation, this);
 
+        this.checkReady();
     },
 
     load: function() {

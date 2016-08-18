@@ -6,7 +6,20 @@ yespix.defineEntity('path', {
         properties = properties || {};
         this.super(properties);
         this.path = new yespix.class.path(this.path || {}, this);
+        
+        this.checkReady();
     },
+
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (!this.path.isReady) return false;
+        return this.super();
+    },
+
 
     /**
      * Return True if something has changed (position, aspect ...)

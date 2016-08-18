@@ -12,7 +12,41 @@ function EventHandler(entity) {
 
     this.list = {};
     this.index = 0;
+
+    this.ready(true);
 }
+
+
+
+EventHandler.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        this.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'EventHandler',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'EventHandler',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
+};
 
 
 /**
@@ -73,6 +107,8 @@ EventHandler.prototype.create = function(type) {
 
 EventHandler.prototype.trigger = function(event, name) {
     
+    if (event.from == this) return false;
+
     if (!event || !event.type) {
         return false;
     }

@@ -121,7 +121,42 @@ function Input(elements) {
     } else {
        this.disableGamepad();
     }
+
+    this.ready(true);
+
 }
+
+
+
+Input.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        this.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'Input',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'Input',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
+};
 
 
 /************************************************************************************************
@@ -259,6 +294,7 @@ Input.prototype.specialKey = function(s) {
  ************************************************************************************************/
 
 Input.prototype.trigger = function(event, name) {
+    if (event.fromClass == 'Input') return false;
     this.event.trigger(event, name);
 };
 

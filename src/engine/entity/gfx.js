@@ -16,6 +16,8 @@ yespix.defineEntity('gfx', {
         this.boundary = this.boundary || {};
         this.prerender = this.prerender || null;
         this.manager = this.manager || null;
+
+        this.checkReady();
     },
 
     setManager: function(manager) {
@@ -24,6 +26,17 @@ yespix.defineEntity('gfx', {
             this.collision.setManager(manager);
         }
     },
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.position && !this.position.isReady) return false;
+        if (this.aspect && !this.aspect.isReady) return false;
+        return this.super();
+    },
+
 
     /**
      * Return True if something has changed (position, aspect ...)

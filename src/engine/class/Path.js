@@ -27,7 +27,44 @@ function Path(properties, entity) {
     if (this.points) {
         this.setPoints(this.points);
     }
+
+    this.ready(true);
 }
+
+
+Path.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'ready',
+                    from: this,
+                    fromClass: 'Path',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: true
+                    }
+                }
+            );
+        }
+    } else {
+        this.isReady = false;
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'notReady',
+                    from: this,
+                    fromClass: 'Path',
+                    entity: this.entity,
+                    properties: { 
+                        isReady: false
+                    }
+                }
+            );
+        }
+    }
+};
 
 
 Path.prototype.set = function(properties, varDefault) {

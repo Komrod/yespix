@@ -99,6 +99,7 @@ yespix.defineEntity('fps', {
 
         this.data = [];
 
+        this.checkReady();
     },
 
 

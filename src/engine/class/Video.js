@@ -29,6 +29,11 @@ function Video(properties, entity) {
 }
 
 
+Video.prototype.trigger = function(event) {
+    if (event.from == this) return false;
+};
+
+
 Video.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;

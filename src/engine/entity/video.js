@@ -13,6 +13,18 @@ yespix.defineEntity('video', {
         }
         this.super(properties);
         this.video = new yespix.class.video(this.video || {}, this);
+
+        this.checkReady();
+    },
+
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.video && !this.video.isReady) return false;
+        return this.super();
     },
 
 

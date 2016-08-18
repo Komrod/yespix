@@ -49,7 +49,20 @@ yespix.defineEntity('canvas', {
         if (this.element) {
             if (properties.autoAppend) this.append();
         }
+    
+        this.checkReady();
     },
+
+
+    /**
+     * Return true if all the classes of the entity are ready
+     * @return {boolean} Ready or not
+     */
+    checkReadyClasses: function() {
+        if (this.aspect && !this.aspect.isReady) return false;
+        return this.super();
+    },
+
 
     append: function(htmlElement) {
         if (!this.element) return false;

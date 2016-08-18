@@ -43,6 +43,42 @@ function Collision(properties, entity) {
 }
 
 
+Collision.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        this.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'Collision',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'Collision',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
+};
+
+
+Collision.prototype.trigger = function(event) {
+    if (event.from == this) return false;
+};
+
+
 Collision.prototype.setPhysics = function(physics) {
     this.physics = physics;
 };
@@ -82,7 +118,7 @@ Collision.prototype.create = function() {
     } else {
         this.body = this.physics.create(this);
     }
-    this.isReady = true;
+    this.ready(true);
 };
 
 

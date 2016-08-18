@@ -30,6 +30,53 @@ function Image(properties, entity) {
 }
 
 
+Image.prototype.ready = function(bool) {
+    if (bool) {
+        this.isLoading = false;
+        this.hasError = false;
+
+        this.element.isLoading = false;
+        this.element.isReady = true;
+        this.element.hasError = false;
+
+        if (this.entity.aspect) {
+            if (this.autoSize || this.entity.aspect.width == 0) {
+                this.entity.aspect.width = this.element.width;
+            }
+            if (this.autoSize || this.entity.aspect.height == 0) {
+                this.entity.aspect.height = this.element.height;
+            }
+        }
+
+        this.isReady = true;
+        this.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'Image',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'Image',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
+};
+
+
 Image.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
@@ -129,7 +176,7 @@ Image.prototype.initScale = function() {
     if (this.element) {
         this.linkElement('add');
         if (this.element.isReady) {
-            this.ready();
+            this.ready(true);
         }
         return true;
     }
@@ -137,7 +184,7 @@ Image.prototype.initScale = function() {
     this.element = this.resize(img, this.scale);
     this.linkElement('add');
     this.element.isReady = true;
-    this.ready();
+    this.ready(true);
 };
 
 
@@ -181,12 +228,13 @@ Image.prototype.unload = function() {
     this.linkElement('remove');
     this.element = null;
     this.isLoading = false;
-    this.isReady = false;
     this.hasError = false;
     if (this.entity) {
         this.entity.isReady = false;
         this.entity.boundary = {};
     }
+
+    this.ready(false);
 };
 
 
@@ -205,7 +253,7 @@ Image.prototype.load = function(src) {
     if (this.element) {
         this.linkElement('add');
         if (this.element.isReady) {
-            this.ready();
+            this.ready(true);
         }
         return true;
     }
@@ -240,7 +288,7 @@ Image.prototype.load = function(src) {
 
         var len = this.entities.length;
         for (var t=0; t<len; t++) {
-            this.entities[t].image.ready();
+            this.entities[t].image.ready(true);
         }
     };
 
@@ -259,13 +307,12 @@ Image.prototype.load = function(src) {
     this.element.hasError = false;
     
     this.isLoading = true;
-    this.isReady = false;
     this.hasError = false;
 
-    this.entity.isReady = false;
+    this.ready(false);
 };
 
-
+/*
 Image.prototype.ready = function() {
     this.isLoading = false;
     this.isReady = true;
@@ -296,7 +343,7 @@ Image.prototype.ready = function() {
         }
     );
 };
-
+*/
 
 Image.prototype.error = function() {
     this.isLoading = false;

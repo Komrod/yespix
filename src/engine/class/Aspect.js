@@ -22,7 +22,45 @@ function Aspect(properties, entity) {
     };
 
     this.set(properties, varDefault);
+
+    this.ready(true);
 }
+
+Aspect.prototype.ready = function(bool) {
+    if (bool) {
+        this.isReady = true;
+        this.entity.trigger(
+            {
+                type: 'ready',
+                from: this,
+                fromClass: 'Aspect',
+                entity: this.entity,
+                properties: { 
+                    isReady: true
+                }
+            }
+        );
+    } else {
+        this.isReady = false;
+        this.entity.trigger(
+            {
+                type: 'notReady',
+                from: this,
+                fromClass: 'Aspect',
+                entity: this.entity,
+                properties: { 
+                    isReady: false
+                }
+            }
+        );
+    }
+};
+
+
+Aspect.prototype.trigger = function(event) {
+    if (event.from == this) return false;
+};
+
 
 Aspect.prototype.set = function(properties, varDefault) {
     if (properties.width || properties.height) {
