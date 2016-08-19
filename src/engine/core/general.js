@@ -403,3 +403,21 @@ yespix.fn.radianToDegree = function(r) {
   return r * 180 / Math.PI;
 };
 
+
+yespix.fn.hexToRgb = function(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+};
+
+
+yespix.fn.rgbToHex = function(rgb) {
+    return "#" +
+        ("0" + parseInt(rgb.r, 10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb.g, 10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb.b, 10).toString(16)).slice(-2);
+};
+
