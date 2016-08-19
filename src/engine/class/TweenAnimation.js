@@ -24,8 +24,6 @@ function TweenAnimation(properties, manager) {
     this.defaultDuration = 1000;
 
     this.isReady = false;
-    this.isRunning = false;
-
     
     if (this.entity && this.entity.isReady) {
         this.start(properties);
@@ -43,46 +41,17 @@ TweenAnimation.prototype.start = function(properties) {
     this.copyObject(properties.from, this.from);
     this.copyObject(properties.to, this.to);
     this.initFrom(this.from, this.to, this.entity);
+
+    this.cleanObject(this.from);
+    this.cleanObject(this.to);
+
     this.copyObject(this.from, this.state);
+
+    this.isReady = true;
 
     if (this.entity) {
         this.entity.set(this.state);
     }
-/*
-    // Init from with default values of entity
-    for (varclss in properties.to) {
-        if (yespix.isObject(properties.to[clss])) {
-            this.to[clss] = {};
-            for (prop in properties.to[clss]) {
-                this.to[clss][prop] = properties.to[clss][prop];
-                if (!this.from[clss]) {
-                    this.from[clss] = {};
-                }
-                if (yespix.isUndefined(this.from[clss][prop])) {
-                    this.from[clss][prop] = getEntityValue(clss, prop);
-                    if (this.from[clss][prop] === null) {
-                        this.from[clss][prop] = properties.to[clss][prop];
-                    }
-                }
-            }
-        }
-    }
-*/
-    this.isReady = true;
-console.log(this);
-    return false;
-
-    // Init state
-    for (clss in properties.to) {
-        if (yespix.isObject(properties.to[clss])) {
-            this.to[clss] = {};
-            for (prop in properties.to[clss]) {
-                this.to[clss][prop] = properties.to[clss][prop];
-            }
-        }
-    }
-
-    //this.
 
     // Event
     if (this.manager) {
@@ -100,6 +69,8 @@ console.log(this);
             }
         );
     }
+
+    return false;
 };
 
 
@@ -116,6 +87,23 @@ TweenAnimation.prototype.copyObject = function(source, dest) {
             }
         }
     }
+};
+
+
+TweenAnimation.prototype.cleanObject = function(obj) {
+    var count = 0;
+    for (var name in obj) {
+        if (yespix.isObject(obj[name])) {
+            if (!this.cleanObject(obj[name])) {
+                delete(obj[name]);
+            } else {
+                count++;
+            }
+        } else {
+            count++;
+        }
+    }
+    return count > 0;
 };
 
 
@@ -141,7 +129,7 @@ TweenAnimation.prototype.initFrom = function(from, to, entity) {
         }
     }
 
-    // @TODO delete empty objects in from and to
+    // @TODO delete empty objects in this.from and this.to
     
 };
 
@@ -150,7 +138,7 @@ TweenAnimation.prototype.initFrom = function(from, to, entity) {
 TweenAnimation.prototype.trigger = function(event) {
     if (event.from == this) return false;
 
-    if (!this.isReady && !this.isRunning) {
+    if (!this.isReady) {
         if (this.entity && this.entity.isReady) {
             this.start(this.properties);
         }
