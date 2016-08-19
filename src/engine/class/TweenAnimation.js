@@ -15,13 +15,15 @@ function TweenAnimation(properties, manager) {
     this.properties = {};
     this.copyObject(properties, this.properties);
 
-    this.timestamp = 0;
+    this.time = 0;
     this.position = 0;
-    this.delay = 0;
+    this.factor = 0;
     this.duration = 0;
+    this.easing = 'linear';
 
     this.defaultEasing = 'linear';
     this.defaultDuration = 1000;
+    this.defaultDelay = 0;
 
     this.isReady = false;
     
@@ -35,8 +37,15 @@ TweenAnimation.prototype.start = function(properties) {
     this.from = {};
     this.to = {};
     this.state = {};
+    this.time = 0;
+    this.position = 0;
+    this.duration = this.properties.duration || this.defaultDuration;
+    this.easing = this.properties.easing || this.defaultEasing;
+    if (!yespix.easing[this.easing]) {
+        this.easing = this.defaultEasing;
+    }
 
-    // @TODO only for objects
+
     // Init from and to
     this.copyObject(properties.from, this.from);
     this.copyObject(properties.to, this.to);
@@ -57,7 +66,21 @@ TweenAnimation.prototype.start = function(properties) {
     if (this.manager) {
         this.manager.trigger(
             {
-                type: 'tween',
+                type: 'ready',
+                from: this,
+                fromClass: 'Tween',
+                entity: this.entity,
+                properties: properties,
+                tween: {
+                    from: this.from,
+                    to: this.to,
+                }
+            }
+        );
+    } else if (this.entity) {
+        this.entity.trigger(
+            {
+                type: 'ready',
                 from: this,
                 fromClass: 'Tween',
                 entity: this.entity,
@@ -69,8 +92,12 @@ TweenAnimation.prototype.start = function(properties) {
             }
         );
     }
-
+console.log(this);
     return false;
+};
+
+
+TweenAnimation.prototype.destroy = function() {
 };
 
 
@@ -113,26 +140,52 @@ TweenAnimation.prototype.initFrom = function(from, to, entity) {
             if (yespix.isUndefined(from[name])) {
                 from[name] = {};
             }
-//console.log('relaunch initFrom in '+name);
             if (entity) {
                 this.initFrom(from[name], to[name], entity[name]);
             } else {
                 this.initFrom(from[name], to[name], false);
             }
         } else {
-            if (!entity || yespix.isUndefined(entity[name])) {
-//console.log('deleting to['+name+']');
-                delete(to[name]);
-            } else {
-                from[name] = entity[name];
+            if (yespix.isUndefined(from[name])) {
+                if (!entity || yespix.isUndefined(entity[name])) {
+                    delete(to[name]);
+                } else {
+                    from[name] = entity[name];
+                }
             }
         }
     }
-
-    // @TODO delete empty objects in this.from and this.to
-    
 };
 
+
+/**
+ * Animate an object with factor
+ */
+TweenAnimation.prototype.animateObject = function(from, to, dest, factor) {
+    if (!from || !to || !dest) {
+        return false;
+    }
+    for (var name in from) {
+        if (yespix.isObject(from[name])) {
+            this.animateObject(from[name], to[name], dest[name], factor);
+        } else {
+            dest[name] = this.animateValue(from[name], to[name], factor);
+        }
+    }
+};
+
+
+TweenAnimation.prototype.animateValue = function(from, to, factor) {
+//console.log('animateValue', from, to, factor);
+    if (!yespix.isString(from)) {
+        var value = from + (to - from) * factor;
+//console.log('return calc '+value);
+        return value;
+    }
+    // @TODO animate hex color
+//console.log('return to '+value);
+    return to;
+};
 
 
 TweenAnimation.prototype.trigger = function(event) {
@@ -146,26 +199,35 @@ TweenAnimation.prototype.trigger = function(event) {
 };
 
 
-/*
-TweenAnimation.prototype.getEntityValue = function(clss, property) {
-    if (!this.entity || !this.entity[clss] || yespix.isUndefined(this.entity[clss][property])) {
-        return null;
+TweenAnimation.prototype.step = function(time) {
+    this.time += time;
+    if (this.time > this.duration) this.time = this.duration;
+    
+    if (this.duration > 0) {
+        this.position = this.time / this.duration;
+    } else {
+        this.position = 1.0;
+        this.time = 0;
     }
-    return this.entity[clss][property];
-};
 
-TweenAnimation.prototype.getDefaultByType = function(value) {
-    if (yespix.isInt(value)) {
-        return 0;
+    this.factor = yespix.easing[this.easing](this.position);
+    
+//console.log(this); aze;
+//console.log(this.position); aze;
+    if (this.position == 1) {
+        this.copyObject(this.to, this.state);
+    } else if (this.position == 0) {
+        this.copyObject(this.from, this.state)
+    } else {
+        this.animateObject(this.from, this.to, this.state, this.factor);
     }
-    return null;
+if (this.position<1) { console.log(this.position); console.log(this.state); }
+
+    if (this.entity) {
+        this.entity.set(this.state);
+    }
 };
 
-
-
-TweenAnimation.prototype.getState = function() {
-    return this.state;
-};
-*/
 
 yespix.defineClass('tweenAnimation', TweenAnimation);
+

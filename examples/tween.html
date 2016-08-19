@@ -15,42 +15,50 @@
 	yespix();
 	var manager = new yespix.class.gfxManager(canvas);
 
+
 	new yespix.entity.path({
 		aspect: {
 			width: yespix.randInt(10,100),
 			height: yespix.randInt(10,100),
-			alpha: 1.0
+			alpha: 0.5
 		},
 		position: {
 			x: yespix.randInt(100,300),
 			y: yespix.randInt(100,300),
 			z: 10
 		},
-		tween: {
-			delay: 2000,
-			from: {
-				position: {
-					y: 100
+		tween: [
+			{
+				duration: 2000,
+				easing: 'elastic',
+				from: {
+					position: {
+						y: 100
+					},
+				},
+				to: {
+					position: {
+						x: 600,
+						y: 200
+					}
 				}
 			},
-			to: {
-				aspect: {
-					alpha: 0.5
+			{
+				duration: 500,
+				from: {
+					aspect: { alpha: 0.0 },
 				},
-				position: {
-					x: 500,
-					y: 200
-				},
-				toast: {
-					x: 3
+				to: {
+					aspect: { alpha: 1.0 },
+					path : { fillColor: '#ff0000' }
 				}
-			}
-		},
+			},
+		],
 		path: {
 			type: 'rect',
 			lineColor: '#ff0000',
 			lineWidth: 3,
-			fillColor: '',
+			fillColor: '#ffffff',
 			points: {x: 10, y: 10}
 		},
 		manager: manager
@@ -63,9 +71,10 @@
 		function(loop, time) { 
             manager.clear(); // clear canvas
             manager.draw(); // draw
-            //manager.drawFps(time, 60);
+            manager.drawFps(time, 60);
 		}, 
 		function(loop, time) {
+            manager.step(time); // step
 		}
 	).start();
 

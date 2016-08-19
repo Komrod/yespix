@@ -79,6 +79,16 @@ GfxManager.prototype.applyPhysics = function(time) {
 };
 
 
+GfxManager.prototype.stepEntity = function(time) {
+    var length = this.list.length,
+    	t=0;
+    for (; t<length; t++) {
+    	if (this.list[t]) this.list[t].step(time);
+    }	
+    return true;
+};
+
+
 GfxManager.prototype.drawDebug = function() {
 	this.context.lineWidth = 1;
 	this.physics.drawDebug();
@@ -86,7 +96,11 @@ GfxManager.prototype.drawDebug = function() {
 
 
 GfxManager.prototype.step = function(time) {
-	this.physics.world.Step(time/1000, 500, 50);
+	if (this.physics && this.physics.world) {
+		this.physics.world.Step(time/1000, 500, 50);
+	}
+	this.applyPhysics(time);
+	this.stepEntity(time);
 };
 
 

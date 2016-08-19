@@ -93,3 +93,4 @@ Loop.prototype.register = function(frameFunction, stepFunction) {
 };
 
 yespix.defineClass('loop', Loop);
+

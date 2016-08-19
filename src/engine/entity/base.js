@@ -55,7 +55,7 @@ yespix.defineEntity('base', {
      * Trigger an event and pass it to the event handler
      */
     trigger: function(event) {
-console.log('base:trigger', event);
+//console.log('base:trigger', event);
         if (this.tween) {
             this.tween.trigger(event);
         }
@@ -134,9 +134,14 @@ console.log('base:trigger', event);
      * @return {boolean} Ready or not
      */
     checkReadyClasses: function() {
-        if (this.event && !this.event.isReady) return false;
-        if (this.tween && !this.tween.isReady) return false;
+        if (!this.event.isReady) return false;
+        if (!this.tween.isReady) return false;
         return true;
+    },
+
+
+    step: function(time) {
+        this.tween.step(time);
     },
 
 

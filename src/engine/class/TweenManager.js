@@ -14,8 +14,6 @@ function TweenManager(properties, entity) {
 
 
 TweenManager.prototype.add = function(properties) {
-
-    
     if (yespix.isArray(properties)) {
         for (var t = 0; t<properties.length; t++) {
             this.add(properties[t]);
@@ -29,11 +27,41 @@ TweenManager.prototype.add = function(properties) {
 };
 
 
+TweenManager.prototype.clear = function() {
+    this.list = [];
+};
+
+
 TweenManager.prototype.trigger = function(event) {
     if (event.from == this) return false;
 
     for (var t=0; t<this.list.length; t++) {
         this.list[t].trigger(event);
+    }
+};
+
+
+TweenManager.prototype.step = function(time) {
+    for (var t=0; t<this.list.length; t++) {
+        this.list[t].step(time);
+    }
+    for (var t=0; t<this.list.length; t++) {
+        if (this.list[t].position >= 1) {
+            if (this.entity) {
+                this.entity.trigger(
+                    {
+                        type: 'destroy',
+                        from: this.list[t],
+                        fromClass: 'Tween',
+                        entity: this.entity,
+                        properties: {}
+                    }
+                );
+                this.list[t].destroy();
+            }
+            this.list.splice(t, 1);
+            t--;
+        }
     }
 };
 

@@ -1,6 +1,6 @@
 
 TODO list:
-- make a tween class for base entity
+- add color tweening
 - more comments
 - make the player work
 - link player and physics engine
@@ -75,6 +75,7 @@ Delayed:
 
 
 DONE:
+- make a tween class for base entity
 - Adding ready and notReady events to all entities and classes
 - check dynamical change of z position
 - add gamepad controler inputs
