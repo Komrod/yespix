@@ -133,8 +133,8 @@ Path.prototype.draw = function(context) {
     if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
 
     var contextSaved = false;
-
-    if (this.entity.aspect.rotation != 0) {
+    
+    if (this.entity.position.rotation != 0) {
         var pivot = this.entity.getPivot();
         contextSaved = true;
         context.save();
@@ -142,6 +142,7 @@ Path.prototype.draw = function(context) {
         context.rotate(this.entity.position.rotation * Math.PI / 180);
         context.translate(-pivot.x, -pivot.y);
     }
+    
     switch (this.type) {
         case 'line':
             this.drawLine(context);

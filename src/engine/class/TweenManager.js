@@ -32,12 +32,22 @@ TweenManager.prototype.clear = function() {
 };
 
 
+TweenManager.prototype.stopProperties = function(properties) {
+    for (var t=0; t<this.list.length; t++) {
+        if (this.list[t].isRunning) {
+            this.list[t].stopProperties(properties);
+        }
+    }
+};
+
+
 TweenManager.prototype.trigger = function(event) {
     if (event.from == this) return false;
 
     for (var t=0; t<this.list.length; t++) {
         this.list[t].trigger(event);
     }
+
 };
 
 

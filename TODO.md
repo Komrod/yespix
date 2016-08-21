@@ -1,6 +1,7 @@
 
 TODO list:
-- add color tweening
+- stop tweening on some properties
+- tweening normal loop and 2 ways loop
 - more comments
 - make the player work
 - link player and physics engine
@@ -30,6 +31,7 @@ TODO list:
 - light engine
 - set isChanged = false after the draw function
 - make a flat render function for gfx (prerender)
+- optimize: set of the tweens of an entity as one set
 - optimize: use prerender for path
 - minimum speed for objects in physics engine
 - optimize: use typed arrays when possible
@@ -75,6 +77,8 @@ Delayed:
 
 
 DONE:
+- add delay to tweening
+- add color tweening
 - make a tween class for base entity
 - Adding ready and notReady events to all entities and classes
 - check dynamical change of z position

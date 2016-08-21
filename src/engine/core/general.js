@@ -169,6 +169,24 @@ yespix.fn.isObject = function(obj) {
 };
 
 /**
+ * Returns True if string is a hex color (#ffffff)
+ * @method isObject
+ */
+yespix.fn.isHex = function(hex) {
+    var isHex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return isHex ? true : false;
+};
+
+/**
+ * Returns True if string is a short hex color (#fff)
+ * @method isObject
+ */
+yespix.fn.isHexShort = function(hex) {
+    var isHexShort = /^#?([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})$/i.exec(hex);
+    return isHexShort ? true : false;
+};
+
+/**
  * Trim string left and right
  * @param  {string} str String to trim
  * @return {string} Result string
@@ -405,12 +423,18 @@ yespix.fn.radianToDegree = function(r) {
 
 
 yespix.fn.hexToRgb = function(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
     } : null;
+};
+
+
+yespix.fn.normalizeHex = function(hex) {
+    var result = /^#([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})$/i.exec(hex);
+    return result ? '#' + result[1] + result[1] + result[2] + result[2] + result[3] + result[3] : hex;
 };
 
 

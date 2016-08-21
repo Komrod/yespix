@@ -28,12 +28,12 @@ function TweenAnimation(properties, manager) {
     this.isReady = false;
     
     if (this.entity && this.entity.isReady) {
-        this.start(properties);
+        this.create(properties);
     }
 }
 
 
-TweenAnimation.prototype.start = function(properties) {
+TweenAnimation.prototype.create = function(properties) {
     this.from = {};
     this.to = {};
     this.state = {};
@@ -41,25 +41,20 @@ TweenAnimation.prototype.start = function(properties) {
     this.position = 0;
     this.duration = this.properties.duration || this.defaultDuration;
     this.easing = this.properties.easing || this.defaultEasing;
+    this.delay = this.properties.delay || this.defaultDelay;
+
+    if (this.delay<0) {
+        this.delay = 0;
+    }
     if (!yespix.easing[this.easing]) {
         this.easing = this.defaultEasing;
     }
 
-
-    // Init from and to
-    this.copyObject(properties.from, this.from);
-    this.copyObject(properties.to, this.to);
-    this.initFrom(this.from, this.to, this.entity);
-
-    this.cleanObject(this.from);
-    this.cleanObject(this.to);
-
-    this.copyObject(this.from, this.state);
-
     this.isReady = true;
+    this.isRunning = false;
 
-    if (this.entity) {
-        this.entity.set(this.state);
+    if (this.delay<=0) {
+        this.start();
     }
 
     // Event
@@ -92,12 +87,79 @@ TweenAnimation.prototype.start = function(properties) {
             }
         );
     }
-console.log(this);
-    return false;
+    return true;
+};
+
+
+TweenAnimation.prototype.start = function() {
+    this.isRunning = false;
+
+    // Init from and to
+    this.copyObject(this.properties.from, this.from);
+    this.copyObject(this.properties.to, this.to);
+    this.initFrom(this.from, this.to, this.entity);
+
+    this.cleanObject(this.from);
+    this.cleanObject(this.to);
+    this.copyObject(this.from, this.state);
+
+    if (this.entity) {
+        this.entity.set(this.state);
+    }
+
+    if (this.manager) {
+        this.manager.stopProperties(this.from);
+    }
+    this.isRunning = true;
+};
+
+
+TweenAnimation.prototype.stopProperties = function(properties) {
+//console.log('stopProperties', properties);
+    if (this.deleteProperties(properties, this.from, this.to, this.state)) {
+        this.cleanObject(this.from);
+        this.cleanObject(this.to);
+        this.cleanObject(this.state);
+    }
+};
+
+
+TweenAnimation.prototype.deleteProperties = function(properties, from, to, state) {
+    var deleted = false;
+    if (yespix.isUndefined(from) || yespix.isUndefined(to)) {
+        return false;
+    }
+    for (var name in properties) {
+        if (!yespix.isUndefined(from[name])) {
+            if (yespix.isObject(properties[name])) {
+                if (!state) {
+                    deleted = deleted || this.deleteProperties(properties[name], from[name], to[name], false);
+                } else {
+                    deleted = deleted || this.deleteProperties(properties[name], from[name], to[name], state[name]);
+                }
+            } else {
+                delete(from[name]);
+                delete(to[name]);
+                if (state) {
+                    delete(state[name]);
+                }
+                deleted = true;
+            }
+        }
+    }
+    return deleted;
 };
 
 
 TweenAnimation.prototype.destroy = function() {
+/*
+    this.from = {};
+    this.to = {};
+    this.state = {};
+    this.manager = null;
+    this.entity = null;
+    this.isRunning = false;
+*/
 };
 
 
@@ -107,7 +169,7 @@ TweenAnimation.prototype.copyObject = function(source, dest) {
             if (yespix.isUndefined(dest[name])) {
                 dest[name] = {};
             }
-            this.copyObject(source[name], dest[name], false);
+            this.copyObject(source[name], dest[name]);
         } else {
             if (yespix.isUndefined(dest[name])) {
                 dest[name] = source[name];
@@ -127,6 +189,11 @@ TweenAnimation.prototype.cleanObject = function(obj) {
                 count++;
             }
         } else {
+            if (yespix.isString(obj[name])) {
+                if (yespix.isHexShort(obj[name])) {
+                    obj[name]= yespix.normalizeHex(obj[name]);
+                }
+            }
             count++;
         }
     }
@@ -176,16 +243,23 @@ TweenAnimation.prototype.animateObject = function(from, to, dest, factor) {
 
 
 TweenAnimation.prototype.animateValue = function(from, to, factor) {
-//console.log('animateValue', from, to, factor);
     if (!yespix.isString(from)) {
         var value = from + (to - from) * factor;
-//console.log('return calc '+value);
         return value;
     }
-    // @TODO animate hex color
-//console.log('return to '+value);
+
+    if (yespix.isString(from) && yespix.isHex(from) && yespix.isString(to) && yespix.isHex(to)) {
+        from = yespix.hexToRgb(from);
+        to = yespix.hexToRgb(to);
+        return yespix.rgbToHex({
+            r: Math.round(from.r + (to.r - from.r) * factor),
+            g: Math.round(from.g + (to.g - from.g) * factor),
+            b: Math.round(from.b + (to.b - from.b) * factor)
+        });
+    }    
     return to;
 };
+
 
 
 TweenAnimation.prototype.trigger = function(event) {
@@ -193,7 +267,7 @@ TweenAnimation.prototype.trigger = function(event) {
 
     if (!this.isReady) {
         if (this.entity && this.entity.isReady) {
-            this.start(this.properties);
+            this.create(this.properties);
         }
     }
 };
@@ -201,19 +275,25 @@ TweenAnimation.prototype.trigger = function(event) {
 
 TweenAnimation.prototype.step = function(time) {
     this.time += time;
-    if (this.time > this.duration) this.time = this.duration;
+    if (this.time > this.duration + this.delay) this.time = this.duration + this.delay;
     
+    if (this.delay > 0 && this.time < this.delay) {
+        this.position = 0;
+        return false;
+    }
+
+    if (this.isRunning == false) {
+        this.start();
+    }
     if (this.duration > 0) {
-        this.position = this.time / this.duration;
+        this.position = (this.time - this.delay) / this.duration;
     } else {
         this.position = 1.0;
-        this.time = 0;
+        this.time = this.delay;
     }
 
     this.factor = yespix.easing[this.easing](this.position);
     
-//console.log(this); aze;
-//console.log(this.position); aze;
     if (this.position == 1) {
         this.copyObject(this.to, this.state);
     } else if (this.position == 0) {
@@ -221,11 +301,14 @@ TweenAnimation.prototype.step = function(time) {
     } else {
         this.animateObject(this.from, this.to, this.state, this.factor);
     }
-if (this.position<1) { console.log(this.position); console.log(this.state); }
-
     if (this.entity) {
         this.entity.set(this.state);
     }
+/*
+var temp = {};
+this.copyObject(this.state, temp)
+console.log('set to state = ', temp);
+*/
 };
 
 
