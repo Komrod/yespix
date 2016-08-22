@@ -56,12 +56,14 @@ yespix.defineEntity('base', {
      */
     trigger: function(event) {
 //console.log('base:trigger', event);
-        if (this.tween) {
+        if (this.tween && this.tween.isReady) {
             this.tween.trigger(event);
         }
 
         // execute functions linked to the event
-        if (this.event) this.event.trigger(event);
+        if (this.event && this.event.isReady) {
+            this.event.trigger(event);
+        }
 
         // pass it to manager
         if (this.manager) this.manager.trigger(event);

@@ -38,6 +38,9 @@
 						aspect: { width: yespix.randInt(10, 50), height: yespix.randInt(10, 50) },
 						position: { x: yespix.randInt(-50, 800), y: yespix.randInt(-50, 500) },
 						path : { fillColor: '#ffeb3b' }
+					},
+					onEnd: function() {
+						console.log('End');
 					}
 				},
 				{

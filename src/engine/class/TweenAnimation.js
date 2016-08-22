@@ -1,5 +1,13 @@
 
 
+/**
+ * Tween animation class
+ * Create an animation to an entity
+ * @events  create ready change
+ * @parent  entity manager 
+ */
+
+
 function TweenAnimation(properties, manager) {
     
     properties = properties || {};
@@ -30,10 +38,49 @@ function TweenAnimation(properties, manager) {
 
     this.isReady = false;
     
+    // quick events    
+    this.onStart = properties.onStart || function() {};
+    this.onEnd = properties.onEnd || function() {};
+    this.onLoop = properties.onLoop || function() {};
+
+    this.entityTrigger('create', properties);
+
     if (this.entity && this.entity.isReady) {
         this.create(properties);
     }
 }
+
+
+TweenAnimation.prototype.noop = function() {
+};
+
+
+TweenAnimation.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'TweenAnimation',
+                properties: properties
+            }
+        );
+    }
+    if (this.manager) {
+        properties = properties || {};
+        this.manager.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'TweenAnimation',
+                properties: properties
+            }
+        );
+    }
+};
 
 
 TweenAnimation.prototype.create = function(properties) {
@@ -58,40 +105,14 @@ TweenAnimation.prototype.create = function(properties) {
     this.isReady = true;
     this.isRunning = false;
 
+
     if (this.delay<=0) {
         this.start(this.properties.from, this.properties.to);
     }
 
     // Event
-    if (this.manager) {
-        this.manager.trigger(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'Tween',
-                entity: this.entity,
-                properties: properties,
-                tween: {
-                    from: this.from,
-                    to: this.to,
-                }
-            }
-        );
-    } else if (this.entity) {
-        this.entity.trigger(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'Tween',
-                entity: this.entity,
-                properties: properties,
-                tween: {
-                    from: this.from,
-                    to: this.to,
-                }
-            }
-        );
-    }
+    this.entityTrigger('ready', properties);
+
     return true;
 };
 
@@ -119,6 +140,9 @@ TweenAnimation.prototype.start = function(from, to) {
         this.manager.stopProperties(this.from);
     }
     this.isRunning = true;
+
+    this.onStart();
+
 };
 
 
@@ -127,6 +151,8 @@ TweenAnimation.prototype.stopProperties = function(properties) {
         this.cleanObject(this.from);
         this.cleanObject(this.to);
         this.cleanObject(this.state);
+
+        this.entityTrigger('change');
     }
 };
 
@@ -159,6 +185,8 @@ TweenAnimation.prototype.deleteProperties = function(properties, from, to, state
 
 
 TweenAnimation.prototype.destroy = function() {
+
+    this.onEnd();
 
     this.from = {};
     this.to = {};
@@ -312,6 +340,7 @@ TweenAnimation.prototype.step = function(time) {
         this.entity.set(this.state);
     }
 
+    // loop
     if (this.position == 1 && this.loop) {
         this.delay = 0;
         this.time = 0;
@@ -321,6 +350,7 @@ TweenAnimation.prototype.step = function(time) {
             this.to = this.from;
             this.from = temp;            
         }
+        this.loop();
     }
 };
 
