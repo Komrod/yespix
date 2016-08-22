@@ -1,5 +1,13 @@
 
 
+/**
+ * Sprite class
+ * Create and draw a sprite, each sprite have only one image
+ * @events  create ready change
+ * @parent  entity
+ */
+
+
 function Sprite(properties, entity) {
 
     properties = properties || {};
@@ -30,20 +38,31 @@ function Sprite(properties, entity) {
     if (!this.frames) {
         this.frames = [];
     }
+
+    this.entityTrigger('create', properties);
+
 }
+
+
+Sprite.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'Sprite',
+                properties: properties
+            }
+        );
+    }
+};
 
 
 Sprite.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
-    this.entity.trigger(
-        {
-            type: 'change',
-            entity: this.entity,
-            from: this,
-            fromClass: 'Sprite',
-            properties: properties
-        }
-    );
+    this.entityTrigger('change', properties);
 };
 
 
@@ -139,6 +158,7 @@ Sprite.prototype.load = function() {
 
     if (!this.entity.image.isReady) {
         this.entity.image.load();
+        this.entityTrigger('load');
         return false;
     }
 
@@ -151,6 +171,9 @@ Sprite.prototype.load = function() {
     }
     this.isReady = true;
 
+    this.entityTrigger('ready');
+
+    /*
     this.entity.trigger(
         {
             type: 'ready',
@@ -159,6 +182,7 @@ Sprite.prototype.load = function() {
             fromClass: 'Sprite'
         }
     );
+    */
     return true;
 };
 

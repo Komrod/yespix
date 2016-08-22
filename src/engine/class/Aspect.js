@@ -1,4 +1,13 @@
 
+
+/**
+ * Aspect class
+ * Control the aspect of the Gfx
+ * @events  create ready notReady change destroy
+ * @parent  entity
+ */
+
+
 function Aspect(properties, entity) {
 
     properties = properties || {};
@@ -26,35 +35,16 @@ function Aspect(properties, entity) {
     this.ready(true);
 }
 
+
 Aspect.prototype.ready = function(bool) {
     if (bool) {
         if (this.isReady) return false;
         this.isReady = true;
-        this.entity.trigger(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'Aspect',
-                entity: this.entity,
-                properties: { 
-                    isReady: true
-                }
-            }
-        );
+        this.entityTrigger('ready');
     } else {
         if (!this.isReady) return false;
         this.isReady = false;
-        this.entity.trigger(
-            {
-                type: 'notReady',
-                from: this,
-                fromClass: 'Aspect',
-                entity: this.entity,
-                properties: { 
-                    isReady: false
-                }
-            }
-        );
+        this.entityTrigger('notReady');
     }
 };
 
@@ -64,7 +54,24 @@ Aspect.prototype.trigger = function(event) {
 };
 
 
+Aspect.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'Aspect',
+                properties: properties
+            }
+        );
+    }
+};
+
+
 Aspect.prototype.set = function(properties, varDefault) {
+    // auto size from entity.image
     if (properties.width || properties.height) {
         if (this.entity && this.entity.image) {
             if (this.entity.image.set) {
@@ -85,15 +92,9 @@ Aspect.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     
     this.isChanged = true;
-    this.entity.trigger(
-        {
-            type: 'change',
-            from: this,
-            fromClass: 'Aspect',
-            entity: this.entity,
-            properties: properties
-        }
-    );
+    this.entityTrigger('change', properties);
 }
 
+
 yespix.defineClass('aspect', Aspect);
+

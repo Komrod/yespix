@@ -1,4 +1,12 @@
 
+
+/**
+ * Loader class
+ * Handle the load of external files
+ * @parent  no
+ */
+
+
 function Loader(properties, files) {
 
     // init the fileList
@@ -310,3 +318,4 @@ Loader.prototype.update = function() {
 
 
 yespix.defineClass('loader', Loader);
+

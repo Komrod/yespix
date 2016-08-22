@@ -1,4 +1,13 @@
 
+
+/**
+ * Animation class
+ * Controls the animation of sprites
+ * @events  create ready notReady load unload change destroy
+ * @parent  entity
+ */
+
+
 function Animation(properties, entity) {
     properties = properties || {};
     if (entity) this.entity = entity;
@@ -28,6 +37,8 @@ function Animation(properties, entity) {
     this.isReady =  false;
     this.nextTime = 0;
 
+    this.entityTrigger('create');
+
     if (this.autoLoad) {
         this.load();
     }
@@ -37,15 +48,7 @@ function Animation(properties, entity) {
 Animation.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    this.entity.trigger(
-        {
-            type: 'change',
-            entity: this.entity,
-            from: this,
-            fromClass: 'Animation',
-            properties: properties
-        }
-    );
+    this.entityTrigger('change', properties);
 };
 
 
@@ -53,6 +56,10 @@ Animation.prototype.unload = function() {
     if (this.entity) {
         this.entity.boundary = {};
     }
+
+    // @TODO
+
+    this.entityTrigger('unload', properties);
     this.ready(false);
 };
 
@@ -64,6 +71,8 @@ Animation.prototype.load = function() {
     for (var n in this.sprites) {
         this.sprites[n].load();
     }
+    this.entityTrigger('load');
+
     return this.getSpritesReady();
 };
 
@@ -77,6 +86,22 @@ Animation.prototype.trigger = function(event) {
     }
     return true;
 };
+
+
+Animation.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'Animation',
+                properties: properties
+            }
+        );
+    }
+};    
 
 
 Animation.prototype.getSpritesReady = function() {
@@ -99,34 +124,10 @@ Animation.prototype.ready = function(bool) {
 
         this.buildAnimations();
 
-        if (this.entity) {
-            this.entity.trigger(
-                {
-                    type: 'ready',
-                    from: this,
-                    fromClass: 'Animation',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: true
-                    }
-                }
-            );
-        }
+        this.entityTrigger('ready');
     } else {
         this.isReady = false;
-        if (this.entity) {
-            this.entity.trigger(
-                {
-                    type: 'notReady',
-                    from: this,
-                    fromClass: 'Animation',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: false
-                    }
-                }
-            );
-        }
+        this.entityTrigger('notReady');
     }
 };
 
@@ -294,6 +295,21 @@ Animation.prototype.nextFrame = function() {
     if (nextFrame != this.selectedFrame) {
         this.changeFrame(nextFrame);
     }
+    return true;
+};
+
+
+Animation.prototype.destroy = function() {
+    this.entity = null;
+    for (var t = 0; t < this.list.length; t++) {
+        this.list[t] = null;
+    }
+    for (var t = 0; t < this.sprites.length; t++) {
+        this.sprites[t] = null;
+    }
+
+
+    this.entityTrigger('destroy');
     return true;
 };
 

@@ -1,5 +1,13 @@
 
 
+/**
+ * Input class
+ * Get the input from keyboard, mouse, gamepad and touch screen
+ * @events  create ready notReady destroy
+ * @parent  no
+ */
+
+
 function Input(elements) {
 
     // init the properties
@@ -122,6 +130,14 @@ function Input(elements) {
        this.disableGamepad();
     }
 
+    this.trigger(
+        {
+            type: 'create',
+            from: this,
+            fromClass: 'Input'
+        }
+    );
+
     this.ready(true);
 
 }
@@ -135,11 +151,7 @@ Input.prototype.ready = function(bool) {
             {
                 type: 'ready',
                 from: this,
-                fromClass: 'Input',
-                entity: this.entity,
-                properties: { 
-                    isReady: true
-                }
+                fromClass: 'Input'
             }
         );
     } else {
@@ -148,11 +160,7 @@ Input.prototype.ready = function(bool) {
             {
                 type: 'notReady',
                 from: this,
-                fromClass: 'Input',
-                entity: this.entity,
-                properties: { 
-                    isReady: false
-                }
+                fromClass: 'Input'
             }
         );
     }
@@ -288,19 +296,21 @@ Input.prototype.specialKey = function(s) {
 };
 
 
-
 /************************************************************************************************
  * Events
  ************************************************************************************************/
+
 
 Input.prototype.trigger = function(event, name) {
     if (event.fromClass == 'Input') return false;
     this.event.trigger(event, name);
 };
 
+
 Input.prototype.when = function(eventName, fct, name) {
     this.event.link(eventName, fct, name);
 };
+
 
 Input.prototype.unlink = function(eventName, name) {
     this.event.unlink(eventName, name);
@@ -310,6 +320,7 @@ Input.prototype.unlink = function(eventName, name) {
 /************************************************************************************************
  * Mouse functions
  ************************************************************************************************/
+
 
 Input.prototype.enableMouse = function(element) {
     
@@ -355,6 +366,7 @@ Input.prototype.enableMouse = function(element) {
     };
 };
 
+
 Input.prototype.disableMouse = function(element) {
     
     this.mouseElement.onmousedown = function(e) {};
@@ -371,17 +383,11 @@ Input.prototype.disableMouse = function(element) {
 
 
 Input.prototype.onMouse = function(e, b) {
-
-//console.log(e); 
     if (e.stopPropagation) {
         e.stopPropagation();
     }
 
     e.cancelBubble = true;
-
-//if (e.type!="mousemove") console.log(e); 
-//return false;
-//        input.onMouse('move', {x: e.x - input.canvasOffset.x, y: e.y - input.canvasOffset.y});
 
     this.state.mouse.x = e.offsetX || e.layerX;
     this.state.mouse.y = e.offsetY || e.layerY;
@@ -392,7 +398,6 @@ Input.prototype.onMouse = function(e, b) {
     if (!yespix.isUndefined(b) && e.inputCode != 0) {
         this.state.mouse[parseInt(e.inputCode)] = b;
     }
-//console.log('onMouse: type='+e.type+', mouse['+e.inputCode+']='+b);
     this.trigger(e);
 
     if (e.type == 'mouseleave') {
@@ -438,6 +443,7 @@ Input.prototype.mouse = function(s) {
     return false;
 };
 
+
 Input.prototype.mouseButton = function(s) {
     if (this.state.mouse[this.mouseMap[s.toLowerCase()]]) {
         return true;
@@ -446,19 +452,20 @@ Input.prototype.mouseButton = function(s) {
 };
 
 
-
-
 /************************************************************************************************
  * Gamepad functions
  ************************************************************************************************/
+
 
 Input.prototype.enableGamepad = function() {
     this.gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 };
 
+
 Input.prototype.disableGamepad = function() {
     this.gamepads = [];
 };
+
 
 Input.prototype.gamepadCount = function() {
     if (!this.gamepads || !this.gamepads.length) {
@@ -470,7 +477,6 @@ Input.prototype.gamepadCount = function() {
     }
     return count;
 };
-
 
 
 Input.prototype.gamepad = function(s, n) {
@@ -509,6 +515,7 @@ Input.prototype.gamepad = function(s, n) {
     return false;
 };
 
+
 Input.prototype.gamepadButton = function(s, n) {
     if (!n) {
         n=0;
@@ -536,8 +543,10 @@ Input.prototype.gamepadButton = function(s, n) {
     return false; //!!this.state.mouse[this.mouseMap[s.toLowerCase()]];
 };
 
+
 Input.prototype.gamepadAxes = function(n, axisIndex) {
 };
+
 
 // get 8 directions from last axe
 Input.prototype.gamepadDirections = function(n) {
@@ -576,4 +585,20 @@ Input.prototype.reset = function() {
 };
 
 
+Input.prototype.destroy = function() {
+
+    // @TODO destroy events
+    
+    this.trigger(
+        {
+            type: 'destroy',
+            from: this,
+            fromClass: 'Input'
+        }
+    );
+    return true;
+};
+
+
 yespix.defineClass('input', Input);
+

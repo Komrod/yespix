@@ -1,10 +1,12 @@
 
 
 /**
- * Handle events 
- * @param {object} params  Parameters in an object
- * @param {object} entity Entity object
+ * Event handler
+ * Handle the list of events
+ * @parent  entity
  */
+
+
 function EventHandler(entity) {
     if (entity) {
         this.entity = entity;
@@ -17,7 +19,6 @@ function EventHandler(entity) {
 }
 
 
-
 EventHandler.prototype.ready = function(bool) {
     if (bool) {
         this.isReady = true;
@@ -26,10 +27,7 @@ EventHandler.prototype.ready = function(bool) {
                 type: 'ready',
                 from: this,
                 fromClass: 'EventHandler',
-                entity: this.entity,
-                properties: { 
-                    isReady: true
-                }
+                entity: this.entity
             }
         );
     } else {
@@ -39,10 +37,7 @@ EventHandler.prototype.ready = function(bool) {
                 type: 'notReady',
                 from: this,
                 fromClass: 'EventHandler',
-                entity: this.entity,
-                properties: { 
-                    isReady: false
-                }
+                entity: this.entity
             }
         );
     }
@@ -89,21 +84,6 @@ EventHandler.prototype.link = function(eventName, fct, name) {
     return name;
 };
 
-/*
-EventHandler.prototype.create = function(type) {
-    var event = {
-        propagation: true,
-        time: new Date().getTime(),
-        type: type
-    };
-
-    if (this.entity) {
-        event.entity = this.entity;
-    }
-
-    return event;
-};
-*/
 
 EventHandler.prototype.trigger = function(event, name) {
     
@@ -157,5 +137,5 @@ EventHandler.prototype.clear = function() {
 };
 
 
-
 yespix.defineClass('eventHandler', EventHandler);
+

@@ -16,7 +16,7 @@
 	var manager = new yespix.class.gfxManager(canvas);
 
 
-	for (var t=0; t<500; t++) {
+	for (var t=0; t<200; t++) {
 		new yespix.entity.path({
 			aspect: {
 				width: 0,
@@ -49,7 +49,7 @@
 					}
 				},
 				{
-					delay: 1000,
+					delay: 1200,
 					duration: 500,
 					to: {
 						aspect: { alpha: 1.0 },
@@ -237,12 +237,12 @@
 */
 
 	// create loop
-	var loop = new yespix.class.loop(100);
+	var loop = new yespix.class.loop(60);
 	loop.register(
 		function(loop, time) { 
             manager.clear(); // clear canvas
             manager.draw(); // draw
-            manager.drawFps(time, 100);
+            manager.drawFps(time, 60);
 		}, 
 		function(loop, time) {
             manager.step(time); // step

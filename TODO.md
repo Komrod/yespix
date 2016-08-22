@@ -1,7 +1,7 @@
 
 TODO list:
 - add events start, end tween
-- more comments
+- Animation must work with event tick
 - make the player work
 - link player and physics engine
 - example with sounds
@@ -76,6 +76,7 @@ Delayed:
 
 
 DONE:
+- more comments
 - tweening normal loop and 2 ways loop
 - stop tweening on some properties
 - add delay to tweening

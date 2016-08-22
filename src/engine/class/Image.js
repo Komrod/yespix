@@ -1,5 +1,13 @@
 
 
+/**
+ * Image class
+ * Load and control one or multiple images
+ * @events  create ready notReady change load unload destroy
+ * @parent  entity
+ */
+
+
 function Image(properties, entity) {
     
     properties = properties || {};
@@ -24,10 +32,28 @@ function Image(properties, entity) {
     this.hasError = false;
     this.element = null;
 
+    this.entityTrigger('create');
+
     if (this.autoLoad) {
         this.load();
     }
 }
+
+
+Image.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'Image',
+                properties: properties
+            }
+        );
+    }
+};
 
 
 Image.prototype.ready = function(bool) {
@@ -49,30 +75,10 @@ Image.prototype.ready = function(bool) {
         }
 
         this.isReady = true;
-        this.trigger(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'Image',
-                entity: this.entity,
-                properties: { 
-                    isReady: true
-                }
-            }
-        );
+        this.entityTrigger('ready');
     } else {
         this.isReady = false;
-        this.trigger(
-            {
-                type: 'notReady',
-                from: this,
-                fromClass: 'Image',
-                entity: this.entity,
-                properties: { 
-                    isReady: false
-                }
-            }
-        );
+        this.entityTrigger('notReady');
     }
 };
 
@@ -85,15 +91,7 @@ Image.prototype.set = function(properties, varDefault) {
             this.load(this.element.source);
         }
     }
-    this.entity.trigger(
-        {
-            type: 'change',
-            entity: this.entity,
-            from: this,
-            fromClass: 'Image',
-            properties: properties
-        }
-    );
+    this.entityTrigger('change', properties);
 };
 
 
@@ -234,6 +232,7 @@ Image.prototype.unload = function() {
         this.entity.boundary = {};
     }
 
+    this.entityTrigger('unload');
     this.ready(false);
 };
 
@@ -309,6 +308,7 @@ Image.prototype.load = function(src) {
     this.isLoading = true;
     this.hasError = false;
 
+    this.entityTrigger('load');
     this.ready(false);
 };
 
@@ -357,6 +357,8 @@ Image.prototype.error = function() {
     this.element.isReady = false;
     this.element.hasError = true;
 
+    this.entityTrigger('error');
+    /*
     this.entity.trigger(
         {
             type: 'error',
@@ -365,6 +367,7 @@ Image.prototype.error = function() {
             entity: this.entity
         }
     );
+    */
 };
 
 
@@ -442,6 +445,14 @@ Image.prototype.getBoundaryClip = function() {
 
     return clip;
 };
+
+
+Image.prototype.destroy = function() {
+
+    this.entityTrigger('destroy');
+    return true;
+};
+
 
 yespix.defineClass('image', Image);
 

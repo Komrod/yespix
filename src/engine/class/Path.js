@@ -1,5 +1,13 @@
 
 
+/**
+ * Path class
+ * Create and draw path, circle and rectangles
+ * @events  create ready notReady change destroy
+ * @parent  entity
+ */
+
+
 function Path(properties, entity) {
 
     properties = properties || {};
@@ -28,6 +36,8 @@ function Path(properties, entity) {
         this.setPoints(this.points);
     }
 
+    this.entityTrigger('create');
+
     this.ready(true);
 }
 
@@ -35,34 +45,10 @@ function Path(properties, entity) {
 Path.prototype.ready = function(bool) {
     if (bool) {
         this.isReady = true;
-        if (this.entity) {
-            this.entity.trigger(
-                {
-                    type: 'ready',
-                    from: this,
-                    fromClass: 'Path',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: true
-                    }
-                }
-            );
-        }
+        this.entityTrigger('ready');
     } else {
         this.isReady = false;
-        if (this.entity) {
-            this.entity.trigger(
-                {
-                    type: 'notReady',
-                    from: this,
-                    fromClass: 'Path',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: false
-                    }
-                }
-            );
-        }
+        this.entityTrigger('notReady');
     }
 };
 
@@ -70,15 +56,7 @@ Path.prototype.ready = function(bool) {
 Path.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
-    this.entity.trigger(
-        {
-            type: 'change',
-            entity: this.entity,
-            from: this,
-            fromClass: 'Path',
-            properties: properties
-        }
-    );
+    this.entityTrigger('change', properties);
 };
 
 
@@ -452,6 +430,27 @@ Path.prototype.drawEllipse = function(context) {
         }
     }
 
+};
+
+
+Path.prototype.entityTrigger = function(type, properties) {
+    if (this.entity) {
+        properties = properties || {};
+        this.entity.trigger(
+            {
+                type: type,
+                entity: this.entity,
+                from: this,
+                fromClass: 'Path',
+                properties: properties
+            }
+        );
+    }
+};
+
+
+Path.prototype.destroy = function() {
+    // @TODO
 };
 
 

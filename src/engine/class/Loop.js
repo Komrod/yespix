@@ -1,4 +1,10 @@
 
+/**
+ * Loop class
+ * Handle the draw loop
+ * @parent  no
+ */
+
 
 function Loop(fps) {
     this.frame = 0;         // frame index starting at 0
@@ -91,6 +97,7 @@ Loop.prototype.register = function(frameFunction, stepFunction) {
     if (stepFunction) this.stepFunction = stepFunction;
     return this;
 };
+
 
 yespix.defineClass('loop', Loop);
 

@@ -1,7 +1,16 @@
 
 
+/**
+ * Gfx manager class
+ * Handle the list of Gfx entities
+ * @parent  no
+ */
+
+
 function GfxManager(canvas, list) {
 	
+	// @TODO pass one variable properties with canvas, list in it
+
 	this.reset(canvas, list);
 	return;
 
@@ -24,13 +33,13 @@ function GfxManager(canvas, list) {
     */
 }
 
+
 GfxManager.prototype.setPhysics = function(physics) {
 	this.physics = physics;
 	if (this.physics.setManager) {
 		physics.setManager(this);
 	}
 };
-
 
 
 GfxManager.prototype.ready = function(bool) {
