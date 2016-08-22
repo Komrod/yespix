@@ -1,7 +1,6 @@
 
 TODO list:
-- stop tweening on some properties
-- tweening normal loop and 2 ways loop
+- add events start, end tween
 - more comments
 - make the player work
 - link player and physics engine
@@ -77,6 +76,8 @@ Delayed:
 
 
 DONE:
+- tweening normal loop and 2 ways loop
+- stop tweening on some properties
 - add delay to tweening
 - add color tweening
 - make a tween class for base entity

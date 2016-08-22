@@ -20,10 +20,13 @@ function TweenAnimation(properties, manager) {
     this.factor = 0;
     this.duration = 0;
     this.easing = 'linear';
+    this.delay = 0;
 
     this.defaultEasing = 'linear';
     this.defaultDuration = 1000;
     this.defaultDelay = 0;
+    this.defaultLoop = false;
+    this.defaultLoop2ways = false;
 
     this.isReady = false;
     
@@ -39,9 +42,11 @@ TweenAnimation.prototype.create = function(properties) {
     this.state = {};
     this.time = 0;
     this.position = 0;
-    this.duration = this.properties.duration || this.defaultDuration;
+
     this.easing = this.properties.easing || this.defaultEasing;
-    this.delay = this.properties.delay || this.defaultDelay;
+    this.duration = yespix.isUndefined(this.properties.duration) ? this.defaultDuration : this.properties.duration;
+    this.loop = yespix.isUndefined(this.properties.loop) ? this.defaultLoop : this.properties.loop;
+    this.loop2ways = yespix.isUndefined(this.properties.loop2ways) ? this.defaultLoop2ways : this.properties.loop2ways;
 
     if (this.delay<0) {
         this.delay = 0;
@@ -54,7 +59,7 @@ TweenAnimation.prototype.create = function(properties) {
     this.isRunning = false;
 
     if (this.delay<=0) {
-        this.start();
+        this.start(this.properties.from, this.properties.to);
     }
 
     // Event
@@ -91,17 +96,20 @@ TweenAnimation.prototype.create = function(properties) {
 };
 
 
-TweenAnimation.prototype.start = function() {
+TweenAnimation.prototype.start = function(from, to) {
     this.isRunning = false;
+    this.position = 0;
 
     // Init from and to
-    this.copyObject(this.properties.from, this.from);
-    this.copyObject(this.properties.to, this.to);
+    this.copyObject(from, this.from);
+    this.copyObject(to, this.to);
     this.initFrom(this.from, this.to, this.entity);
 
     this.cleanObject(this.from);
     this.cleanObject(this.to);
     this.copyObject(this.from, this.state);
+
+    this.isReady = true;
 
     if (this.entity) {
         this.entity.set(this.state);
@@ -115,7 +123,6 @@ TweenAnimation.prototype.start = function() {
 
 
 TweenAnimation.prototype.stopProperties = function(properties) {
-//console.log('stopProperties', properties);
     if (this.deleteProperties(properties, this.from, this.to, this.state)) {
         this.cleanObject(this.from);
         this.cleanObject(this.to);
@@ -152,14 +159,14 @@ TweenAnimation.prototype.deleteProperties = function(properties, from, to, state
 
 
 TweenAnimation.prototype.destroy = function() {
-/*
+
     this.from = {};
     this.to = {};
     this.state = {};
     this.manager = null;
     this.entity = null;
     this.isRunning = false;
-*/
+
 };
 
 
@@ -283,7 +290,8 @@ TweenAnimation.prototype.step = function(time) {
     }
 
     if (this.isRunning == false) {
-        this.start();
+
+        this.start(this.properties.from, this.properties.to);
     }
     if (this.duration > 0) {
         this.position = (this.time - this.delay) / this.duration;
@@ -291,7 +299,6 @@ TweenAnimation.prototype.step = function(time) {
         this.position = 1.0;
         this.time = this.delay;
     }
-
     this.factor = yespix.easing[this.easing](this.position);
     
     if (this.position == 1) {
@@ -304,11 +311,17 @@ TweenAnimation.prototype.step = function(time) {
     if (this.entity) {
         this.entity.set(this.state);
     }
-/*
-var temp = {};
-this.copyObject(this.state, temp)
-console.log('set to state = ', temp);
-*/
+
+    if (this.position == 1 && this.loop) {
+        this.delay = 0;
+        this.time = 0;
+        this.position = 0;
+        if (this.loop2ways) {
+            var temp = this.to;
+            this.to = this.from;
+            this.from = temp;            
+        }
+    }
 };
 
 

@@ -16,7 +16,7 @@
 	var manager = new yespix.class.gfxManager(canvas);
 
 
-	for (var t=0; t<200; t++) {
+	for (var t=0; t<500; t++) {
 		new yespix.entity.path({
 			aspect: {
 				width: 0,
@@ -104,7 +104,7 @@
 		},
 		manager: manager
 	});
-*/
+
 
 
 	new yespix.entity.path({
@@ -146,13 +146,103 @@
 	});
 
 
+
+	new yespix.entity.path({
+		aspect: {
+			width: 50,
+			height: 50,
+		},
+		position: {
+			x: 100,
+			y: 100,
+			z: 10,
+		},
+		tween: [
+			{
+				duration: 1000,
+				easing: 'easeInOutSine',
+				to: {
+					position: { x: 600 },
+					path : { fillColor: '#00ff00' }
+				}
+			}
+		],
+		path: {
+			type: 'rect',
+			lineColor: '',
+			lineWidth: 3,
+			fillColor: '#ff0000'
+		},
+		manager: manager
+	});
+	new yespix.entity.path({
+		aspect: {
+			width: 50,
+			height: 50,
+		},
+		position: {
+			x: 100,
+			y: 200,
+			z: 10,
+		},
+		tween: [
+			{
+				loop: true,
+				duration: 1000,
+				easing: 'easeInOutSine',
+				to: {
+					position: { x: 600 },
+					path : { fillColor: '#00ff00' }
+				}
+			}
+		],
+		path: {
+			type: 'rect',
+			lineColor: '',
+			lineWidth: 3,
+			fillColor: '#ff0000'
+		},
+		manager: manager
+	});
+	new yespix.entity.path({
+		aspect: {
+			width: 50,
+			height: 50,
+		},
+		position: {
+			x: 100,
+			y: 300,
+			z: 10,
+		},
+		tween: [
+			{
+				loop: true,
+				loop2ways: true,
+				duration: 1000,
+				easing: 'easeInOutSine',
+				to: {
+					position: { x: 600 },
+					path : { fillColor: '#00ff00' }
+				}
+			}
+		],
+		path: {
+			type: 'rect',
+			lineColor: '',
+			lineWidth: 3,
+			fillColor: '#ff0000'
+		},
+		manager: manager
+	});
+*/
+
 	// create loop
-	var loop = new yespix.class.loop(60);
+	var loop = new yespix.class.loop(100);
 	loop.register(
 		function(loop, time) { 
             manager.clear(); // clear canvas
             manager.draw(); // draw
-            manager.drawFps(time, 60);
+            manager.drawFps(time, 100);
 		}, 
 		function(loop, time) {
             manager.step(time); // step
