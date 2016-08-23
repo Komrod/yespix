@@ -15,6 +15,8 @@ yespix.defineEntity('sound', {
         this.sound = new yespix.class.sound(properties.sound || {}, this);
 
         this.checkReady();
+
+        // @TODO restart tween when restart sound
     },
 
 

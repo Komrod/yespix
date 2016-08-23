@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+
+	var s = [];
+
+	s[0] = new yespix.entity.sound('zardoz/sound/land.ogg');
+
+	s[1] = new yespix.entity.sound(
+	{
+		sound: 'zardoz/sound/woosh.ogg',
+		tween : {
+			from: { sound: { volume: 1.0 } },
+			to: { sound: { volume: 0.0 } },
+			duration: 1000
+		}
+	});
+	
+	s[2] = new yespix.entity.sound(
+	{
+		sound: 'zardoz/sound/zardoz.ogg'
+	});
+
+	s[3] = new yespix.entity.sound(
+	{
+		sound: 'zardoz/sound/speaks.ogg'
+	});
+
+
+
+	new yespix.entity.sound(
+	{
+		sound: {
+			src: 'zardoz/music/credit.ogg'
+		},
+		tween : {
+			from: { sound: { volume: 0.5 } },
+			to: { sound: { volume: 0.0 } },
+			duration: 10000
+		}
+	}).play();
+	
+	
+	var input = new yespix.class.input({mouse: canvas});
+	var selected = 0;
+	
+	
+	input.when('click',
+		function(event) {
+			console.log('click Left', event);
+			s[3].setVolume(1.0);
+			s[selected].play();
+			selected++;
+			if (selected>=s.length) selected=0;
+		}
+	);
+	input.when('contextmenu',
+		function(event) {
+			console.log('click Right', event);
+			s[0].stop();
+			s[1].stop();
+			s[2].stop();
+			s[3].stop();
+		}
+	);
+	
+/*
+setInterval(function() {
+	console.log('volume='+s4.sound.volume);
+}, 50);
+*/
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) {
+			s[3].step(time);
+		}
+	).start();
+
+
+</script>
+
+</body>
+</html>

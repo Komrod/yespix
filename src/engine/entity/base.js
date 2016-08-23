@@ -55,7 +55,6 @@ yespix.defineEntity('base', {
      * Trigger an event and pass it to the event handler
      */
     trigger: function(event) {
-//console.log('base:trigger', event);
         if (this.tween && this.tween.isReady) {
             this.tween.trigger(event);
         }
@@ -143,7 +142,7 @@ yespix.defineEntity('base', {
 
 
     step: function(time) {
-        this.tween.step(time);
+        this.tween.step(time);    
     },
 
 

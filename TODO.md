@@ -1,6 +1,5 @@
 
 TODO list:
-- Animation must work with event tick
 - make example for sound
 - link player and physics engine
 - example with sounds
@@ -77,6 +76,7 @@ Delayed:
 
 
 DONE:
+- Animation must work with step time
 - add events start, end tween
 - more comments
 - tweening normal loop and 2 ways loop

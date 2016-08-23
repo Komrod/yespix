@@ -314,10 +314,6 @@ TweenAnimation.prototype.step = function(time) {
         this.start(this.properties.from, this.properties.to);
     }
 
-    if (!this.isRunning) {
-        return false;
-    }
-
     if (this.duration > 0) {
         this.position = (this.time - this.delay) / this.duration;
     } else {
@@ -335,7 +331,7 @@ TweenAnimation.prototype.step = function(time) {
     } else {
         this.animateObject(this.from, this.to, this.state, this.factor);
     }
-    
+
     if (this.entity) {
         this.entity.set(this.state);
     }
