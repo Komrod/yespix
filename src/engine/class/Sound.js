@@ -13,6 +13,7 @@ function Sound(properties, entity) {
         autoPlay: false,
         loop: false,
         src: '',
+        volume: 1.0
     };
 
     this.set(properties, varDefault);
@@ -36,6 +37,9 @@ function Sound(properties, entity) {
 Sound.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
+    if (!yespix.isUndefined(properties.volume)) {
+        this.setVolume(properties.volume);
+    }
     this.entity.trigger(
         {
             type: 'change',
@@ -197,6 +201,7 @@ Sound.prototype.stop = function() {
 
 Sound.prototype.setVolume = function(n) {
     if (!this.element) return false;
+    this.volume = n;
     this.element.volume = this.volume;
     return true;
 };
