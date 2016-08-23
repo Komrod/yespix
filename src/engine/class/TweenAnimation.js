@@ -327,12 +327,15 @@ TweenAnimation.prototype.step = function(time) {
     this.factor = yespix.easing[this.easing](this.position);
     
     if (this.position == 1) {
+        this.state = {};
         this.copyObject(this.to, this.state);
     } else if (this.position == 0) {
+        this.state = {};
         this.copyObject(this.from, this.state)
     } else {
         this.animateObject(this.from, this.to, this.state, this.factor);
     }
+    
     if (this.entity) {
         this.entity.set(this.state);
     }
