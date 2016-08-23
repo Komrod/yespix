@@ -25,6 +25,14 @@ yespix.defineEntity('animation', {
         return this.super(event);
     },
 
+    step: function(time) {
+        this.super(time);
+
+        if (this.animation) {
+            this.animation.step(time);
+        }
+    },
+
     drawRender: function(context) {
         if (this.animation) {
             this.animation.checkFrame();

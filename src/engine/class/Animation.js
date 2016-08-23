@@ -33,9 +33,11 @@ function Animation(properties, entity) {
             properties.sprites[n].aspect = this.entity.aspect;
         }
     };
+
     this.set(properties, varDefault);
     this.isReady =  false;
     this.nextTime = 0;
+    this.time = 0;
 
     this.entityTrigger('create');
 
@@ -254,7 +256,7 @@ Animation.prototype.changeFrame = function(frame, force) {
     if (this.selectedFrame != frame || force) {
         this.selectedFrame = frame;
         this.selectedSprite = this.list[this.selectedAnimation].frames[frame].sprite;
-        this.nextTime = yespix.getTime() + this.list[this.selectedAnimation].frames[frame].duration;
+        this.nextTime = this.time + this.list[this.selectedAnimation].frames[frame].duration;
 
         // select 
         this.entity.boundary = {};
@@ -268,8 +270,13 @@ Animation.prototype.changeFrame = function(frame, force) {
 };
 
 
+Animation.prototype.step = function(time) {
+    this.time += time;
+};
+
+
 Animation.prototype.checkFrame = function() {
-    if (this.nextTime <= yespix.getTime()) {
+    if (this.nextTime <= this.time) {
         this.nextFrame();
         return true;
     }

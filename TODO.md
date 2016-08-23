@@ -1,16 +1,17 @@
 
 TODO list:
-- add events start, end tween
 - Animation must work with event tick
-- make the player work
+- make example for sound
 - link player and physics engine
 - example with sounds
+- make the player work
 - fill with linear and radial gradient for path
 - fill path with image
 - button entity
 - touch input
 - alpha mask
 - game class to encaspulate canvas, manager, debug and loop
+- check if destroying an entity really dumps it
 
 - Trace for next collision with a vector / line
 - start player on ground / detects ground
@@ -76,6 +77,7 @@ Delayed:
 
 
 DONE:
+- add events start, end tween
 - more comments
 - tweening normal loop and 2 ways loop
 - stop tweening on some properties
