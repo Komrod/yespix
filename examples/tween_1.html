@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456; margin: 0; padding: 0; min-height: 100%; overflow: hidden;">
+
+<canvas width="800" height="600" id="canvas" style="padding: 0; margin: 0;"></canvas>
+
+<script type="text/javascript">
+	
+	var height = document.body.clientHeight;
+	var width = document.body.clientWidth;
+
+	document.getElementById('canvas').width = width;
+	document.getElementById('canvas').height = height;
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+	for (var t=0; t<500; t++) {
+		new yespix.entity.path({
+			aspect: {
+				width: 0,
+				height: 0,
+				alpha: 0
+			},
+			position: {
+				x: width / 2,
+				y: height /2,
+			},
+			tween: [
+				{
+					delay: 1000 + yespix.randInt(0,200),
+					duration: 1000 + yespix.randInt(0, 2000),
+					easing: 'easeOutBounce',
+					to: {
+						aspect: { width: yespix.randInt(10, 50), height: yespix.randInt(10, 50) },
+						position: { x: yespix.randInt(-50, width), y: yespix.randInt(-50, height) },
+						path : { fillColor: '#ffeb3b' }
+					}
+				},
+				{
+					delay: 1000,
+					duration: 1200,
+					easing: 'easeInOutCubic',
+					to: {
+						position: { rotation: yespix.randInt(-360, 360) },
+					}
+				},
+				{
+					delay: 1200,
+					duration: 500,
+					to: {
+						aspect: { alpha: 1.0 },
+					}
+				},
+			],
+			path: {
+				type: 'rect',
+				lineWidth: 0,
+				fillColor: '#ff0000'
+			},
+			manager: manager
+		});
+	}
+
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) {
+            manager.step(time); // step
+		}
+	).start();
+
+
+//console.log(manager.list);
+
+
+</script>
+
+</body>
+</html>

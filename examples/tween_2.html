@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456; margin: 0; padding: 0; min-height: 100%; overflow: hidden;">
+
+<canvas width="800" height="600" id="canvas" style="padding: 0; margin: 0;"></canvas>
+
+<script type="text/javascript">
+	
+	var height = document.body.clientHeight;
+	var width = document.body.clientWidth;
+
+	document.getElementById('canvas').width = width;
+	document.getElementById('canvas').height = height;
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+	new yespix.entity.path({
+		aspect: {
+			width: 100,
+			height: 100,
+		},
+		position: {
+			x: 100,
+			y: 200
+		},
+		tween: [
+			{
+				duration: 5000,
+				easing: 'linear',
+				to: {
+					position: { x: 600 }, 
+					path : { fillColor: '#00ff00' }
+				}
+			},
+			{
+				delay: 2500,
+				duration: 1000,
+				easing: 'linear',
+				to: {
+					position: { x: 100, y: 100 }
+				}
+			}
+		],
+		path: {
+			type: 'rect',
+			lineColor: '',
+			lineWidth: 3,
+			fillColor: '#ff0000'
+		},
+		manager: manager
+	});
+
+
+
+
+
+	new yespix.entity.path({
+		aspect: {
+			width: 100,
+			height: 100,
+		},
+		position: {
+			x: 100,
+			y: 400,
+			z: 10,
+		},
+		tween: [
+			{
+				delay: 1000,
+				duration: 1000,
+				easing: 'linear',
+				to: {
+					position: { x: 600 },
+					path : { fillColor: '#00ff00' }
+				}
+			},
+			{
+				delay: 4000,
+				duration: 1000,
+				easing: 'linear',
+				to: {
+					position: { x: 300, y: 100 }
+				}
+			}
+		],
+		path: {
+			type: 'rect',
+			lineColor: '',
+			lineWidth: 3,
+			fillColor: '#ff0000'
+		},
+		manager: manager
+	});
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) {
+            manager.step(time); // step
+		}
+	).start();
+
+
+//console.log(manager.list);
+
+
+</script>
+
+</body>
+</html>
