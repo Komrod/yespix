@@ -22,49 +22,46 @@ TweenManager.prototype.add = function(properties) {
     }
     var tween = new yespix.class.tweenAnimation(properties, this);
     this.list.push(tween);
+
     return tween;
 
 };
 
-(function(yespix) 
-{
-    TweenManager.prototype.clear = function() {
-        this.list = [];
-    };
+
+TweenManager.prototype.clear = function() {
+    this.list = [];
+};
 
 
-    TweenManager.prototype.stopProperties = function(properties) {
-        for (var t=0; t<this.list.length; t++) {
-            if (this.list[t].isRunning) {
-                this.list[t].stopProperties(properties);
-            }
+TweenManager.prototype.stopProperties = function(properties) {
+    for (var t=0; t<this.list.length; t++) {
+        if (this.list[t].isRunning) {
+            this.list[t].stopProperties(properties);
         }
-    };
+    }
+};
 
 
-    TweenManager.prototype.trigger = function(event) {
-        if (event.from == this) return false;
+TweenManager.prototype.trigger = function(event) {
+    if (event.from == this) return false;
+    for (var t=0; t<this.list.length; t++) {
+        this.list[t].trigger(event);
+    }
 
-        for (var t=0; t<this.list.length; t++) {
-            this.list[t].trigger(event);
+};
+
+
+TweenManager.prototype.step = function(time) {
+    for (var t=0; t<this.list.length; t++) {
+        this.list[t].step(time);
+    }
+    for (var t=0; t<this.list.length; t++) {
+        if (this.list[t].isDeleted) {
+            this.list.splice(t, 1);
+            t--;
         }
-
-    };
-
-
-    TweenManager.prototype.step = function(time) {
-        for (var t=0; t<this.list.length; t++) {
-            this.list[t].step(time);
-        }
-        for (var t=0; t<this.list.length; t++) {
-            if (this.list[t].isDeleted) {
-                this.list.splice(t, 1);
-                t--;
-            }
-        }
-    };
+    }
+};
 
 
-    yespix.defineClass('tweenManager', TweenManager);
-
-})(yespix);
+yespix.defineClass('tweenManager', TweenManager);
