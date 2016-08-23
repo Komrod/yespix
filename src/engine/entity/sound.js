@@ -12,7 +12,7 @@ yespix.defineEntity('sound', {
             properties = {sound: {src: properties}};
         }
         this.super(properties);
-        this.sound = new yespix.class.sound(this.sound || {}, this);
+        this.sound = new yespix.class.sound(properties.sound || {}, this);
 
         this.checkReady();
     },
