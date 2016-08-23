@@ -51,10 +51,6 @@ function TweenAnimation(properties, manager) {
 }
 
 
-TweenAnimation.prototype.noop = function() {
-};
-
-
 TweenAnimation.prototype.entityTrigger = function(type, properties) {
     if (this.entity) {
         properties = properties || {};
@@ -94,6 +90,7 @@ TweenAnimation.prototype.create = function(properties) {
     this.duration = yespix.isUndefined(this.properties.duration) ? this.defaultDuration : this.properties.duration;
     this.loop = yespix.isUndefined(this.properties.loop) ? this.defaultLoop : this.properties.loop;
     this.loop2ways = yespix.isUndefined(this.properties.loop2ways) ? this.defaultLoop2ways : this.properties.loop2ways;
+    this.delay = yespix.isUndefined(this.properties.delay) ? this.defaultDelay : this.properties.delay;
 
     if (this.delay<0) {
         this.delay = 0;
@@ -193,8 +190,7 @@ TweenAnimation.prototype.destroy = function() {
     this.state = {};
     this.manager = null;
     this.entity = null;
-    this.isRunning = false;
-
+    this.isDeleted = true;
 };
 
 
@@ -350,7 +346,9 @@ TweenAnimation.prototype.step = function(time) {
             this.to = this.from;
             this.from = temp;            
         }
-        this.loop();
+        this.onLoop();
+    } else if (this.position == 1) {
+        this.destroy();
     }
 };
 
