@@ -104,6 +104,7 @@ module.exports = function(grunt) {
                     './src/engine/entity/video.js',
                     './src/engine/entity/animation.js',
                     './src/engine/entity/fps.js',
+                    './src/engine/entity/combo.js',
 
                     // entities end
                     './src/engine/template/entities_end.js',

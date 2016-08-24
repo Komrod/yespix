@@ -301,7 +301,6 @@ TweenAnimation.prototype.trigger = function(event) {
 
 
 TweenAnimation.prototype.step = function(time) {
-
     this.time += time;
     if (this.time > this.duration + this.delay) this.time = this.duration + this.delay;
     

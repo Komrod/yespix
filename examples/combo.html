@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var canvas = document.getElementById('canvas');
+	yespix();
+	var manager = new yespix.class.gfxManager(canvas);
+
+
+	// line
+	var combo = new yespix.entity.combo(
+	{
+		position: {
+			x: 150,
+			y: 150
+		},
+		aspect: {
+			width: 200,
+			height: 200
+		},
+		tween: {
+			duration: 2500,
+			loop: true,
+			from: {
+				position: {
+					rotation: 0
+				}
+			},
+			to: {
+				position: {
+					rotation: 360
+				}
+			}
+		},
+		list: [
+			new yespix.entity.path({
+				position: {
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				aspect: {
+					width: 50,
+					height: 50
+				},
+				path: {
+					type: 'rect',
+					lineWidth: 1,
+					lineColor: '#000000',
+					fillColor: '#ff0000',
+					borderRadius: 8
+				}
+			}),
+			new yespix.entity.path({
+				position: {
+					x: 6,
+					y: 6,
+					z: 10
+				},
+				aspect: {
+					width: 38,
+					height: 38
+				},
+				path: {
+					type: 'rect',
+					lineWidth: 0,
+					fillColor: '#999',
+					borderRadius: 6
+				}
+			}),
+			new yespix.entity.path({
+				position: {
+					x: 0,
+					y: 0,
+					z: -10
+				},
+				aspect: {
+					width: 200,
+					height: 200
+				},
+				path: {
+					type: 'rect',
+					lineWidth: 0,
+					fillColor: '#678',
+				}
+			})
+		],
+		manager: manager
+	});
+
+	// create loop
+	var loop = new yespix.class.loop(60);
+	var tween = new yespix.class.tweenAnimation({
+		duration: 10000,
+		loop: true,
+		loop2ways: true,
+		easing: 'easeInOutQuad',
+		from: {
+			factor: 1.0
+		},
+		to: {
+			factor: 0.01
+		}
+	});
+
+	loop.register(
+		function(loop, time) { 
+            manager.clear(); // clear canvas
+            manager.draw(); // draw debug
+            manager.drawFps(time, 60);
+		}, 
+		function(loop, time) { 
+			tween.step(time);
+//console.log(tween); aze;
+
+			manager.step(time*tween.state.factor);
+		}
+	).start();
+
+
+</script>
+
+</body>
+</html>

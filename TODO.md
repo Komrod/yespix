@@ -1,8 +1,10 @@
 
 TODO list:
-- make example for sound
+- Tweenable for entity
+- draw a pixel in path
+- composite draw for gfx
+- fullscreen mode
 - link player and physics engine
-- example with sounds
 - make the player work
 - fill with linear and radial gradient for path
 - fill path with image
@@ -76,6 +78,7 @@ Delayed:
 
 
 DONE:
+- make example for sound // 24-08-2016
 - Animation must work with step time
 - add events start, end tween
 - more comments

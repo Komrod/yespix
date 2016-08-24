@@ -377,7 +377,7 @@ Image.prototype.draw = function(context) {
     }
 
     var contextSaved = false;
-    if (this.entity.aspect.rotation != 0) {
+    if (this.entity.position.rotation != 0) {
         var pivot = this.entity.getPivot();
         contextSaved = true;
         context.save();
