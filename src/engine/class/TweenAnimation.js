@@ -183,7 +183,6 @@ TweenAnimation.prototype.destroy = function() {
 
     this.from = {};
     this.to = {};
-    this.state = {};
     this.manager = null;
     this.entity = null;
     this.isDeleted = true;
@@ -331,10 +330,12 @@ TweenAnimation.prototype.step = function(time) {
         this.animateObject(this.from, this.to, this.state, this.factor);
     }
 
+    /*
     if (this.entity) {
         this.entity.set(this.state);
     }
-
+    */
+    
     // loop
     if (this.position == 1 && this.loop) {
         this.delay = 0;

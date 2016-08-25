@@ -1,8 +1,5 @@
 
 TODO list:
-- Tweenable for entity
-- draw a pixel in path
-- composite draw for gfx
 - fullscreen mode
 - link player and physics engine
 - make the player work
@@ -78,6 +75,8 @@ Delayed:
 
 
 DONE:
+- combo draw for gfx
+- disable tween and event at start
 - make example for sound // 24-08-2016
 - Animation must work with step time
 - add events start, end tween
@@ -177,6 +176,8 @@ DONE:
 
 LATER:
 - make drawDebugImage(), drawDebugCollision(), drawDebugMove()
+- draw a pixel in path
+- filter draw for gfx // filters are very slow 
 
 
 OLD_DONE:

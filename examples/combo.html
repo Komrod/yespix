@@ -16,7 +16,7 @@
 	var manager = new yespix.class.gfxManager(canvas);
 
 
-	// line
+	// combo
 	var combo = new yespix.entity.combo(
 	{
 		position: {
@@ -43,11 +43,6 @@
 		},
 		list: [
 			new yespix.entity.path({
-				position: {
-					x: 0,
-					y: 0,
-					z: 0
-				},
 				aspect: {
 					width: 50,
 					height: 50
@@ -97,19 +92,48 @@
 		manager: manager
 	});
 
+	new yespix.entity.path(
+	{
+		position: {
+			y: 400
+		},
+		aspect: {
+			width: 88,
+			height: 50
+		},
+		path: {
+			type: 'rect',
+			fillColor: '#741'
+		},
+		tween: {
+			duration: 77,
+			loop: true,
+			loop2ways: true,
+			from: {
+				position: {
+					x: 50
+				}
+			},
+			to: {
+				position: {
+					x: 700
+				}
+			}
+		},
+		manager: manager
+	});
+
 	// create loop
 	var loop = new yespix.class.loop(60);
+
+	//
 	var tween = new yespix.class.tweenAnimation({
 		duration: 10000,
 		loop: true,
 		loop2ways: true,
 		easing: 'easeInOutQuad',
-		from: {
-			factor: 1.0
-		},
-		to: {
-			factor: 0.01
-		}
+		from: { factor: 1.0 },
+		to: { factor: 0.01 }
 	});
 
 	loop.register(

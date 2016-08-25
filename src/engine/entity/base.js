@@ -24,18 +24,55 @@ yespix.defineEntity('base', {
             this.manager.add(this);
         }
 
-        this.event = new yespix.class.eventHandler();
-
-        if (this.tween) {
-            this.tween = new yespix.class.tweenManager(this.tween, this);
-        } else {
-            this.tween = new yespix.class.tweenManager(false, this);
-        }
+        this.enable(['tween', 'event'], properties);
 
         this.checkReady();
+//console.log(this);        
     },
 
     
+    enable: function(list, properties) {
+        for (var t=0; t<list.length; t++) {
+//console.log('enable: t='+t+', list='+list[t]);
+            switch (list[t]) {
+                case 'tween':
+                    if (!this.tween) break;
+                    if (this.tween !== false && !(this.tween instanceof yespix.class.tweenManager)) this.tween = new yespix.class.tweenManager(properties.tween, this);
+                    else this.disable(['tween']);
+                    break;
+                case 'event':
+                    if (!this.event) break;
+                    if (this.event !== false && !(this.event instanceof yespix.class.eventHandler)) this.event = new yespix.class.eventHandler(this);
+                    else this.disable(['event']);
+                    break;
+            }
+        }
+    },
+
+
+    disable: function(list) {
+        if (!list) {
+            if (this.tween.destroy) this.tween.destroy();
+            this.tween = null;
+            if (!this.event.destroy) this.event.destroy();
+            this.event = null;
+        } else for (var t=0; t<list.length; t++) {
+            switch (list[t]) {
+                case 'tween':
+                    if (!this.tween) break;
+                    if (this.tween.destroy) this.tween.destroy();
+                    this.tween = null;
+                    break;
+                case 'event':
+                    if (!this.event) break;
+                    if (!this.event.destroy) this.event.destroy();
+                    this.event = null;
+                    break;
+            }
+        }
+    },
+
+
     set: function(properties) {
     	for (n in properties) {
     		if (yespix.isObject(this[n]) && yespix.isObject(properties[n])) {
@@ -135,14 +172,16 @@ yespix.defineEntity('base', {
      * @return {boolean} Ready or not
      */
     checkReadyClasses: function() {
-        if (!this.event.isReady) return false;
-        if (!this.tween.isReady) return false;
+        if (this.event && !this.event.isReady) return false;
+        if (this.tween && !this.tween.isReady) return false;
         return true;
     },
 
 
     step: function(time) {
-        this.tween.step(time);    
+        if (this.tween) {
+            this.tween.step(time);
+        }
     },
 
 
