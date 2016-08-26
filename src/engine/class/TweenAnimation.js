@@ -337,7 +337,7 @@ TweenAnimation.prototype.step = function(time) {
     */
     
     // loop
-    if (this.position == 1 && this.loop) {
+    if (this.position == 1 && (this.loop || this.loop2ways)) {
         this.delay = 0;
         this.time = 0;
         this.position = 0;

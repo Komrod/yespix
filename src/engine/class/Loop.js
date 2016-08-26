@@ -9,7 +9,7 @@
 function Loop(fps) {
     this.frame = 0;         // frame index starting at 0
     this.ms = 1;            // minimum theorical milliSecPerFrame
-    this.requestId = null;  // requestId to stop the loop
+//    this.requestId = null;  // requestId to stop the loop
     this.tick = null;       // fonction to call for each tick
     this.tickNext = (new Date()).getTime();  // nextGameTick
 
@@ -22,6 +22,8 @@ function Loop(fps) {
 
     this.stepTime = 0;
     this.frameTime = 0;
+
+    this.isPlaying = false;
 }
 
 
@@ -35,6 +37,7 @@ Loop.prototype.start = function() {
 
     this.stepTime = yespix.getTime();
     this.frameTime = yespix.getTime();
+    this.isPlaying = true;
     this.tick();
     return this;
 };
@@ -44,7 +47,9 @@ Loop.prototype.setFps = function(fps) {
 //console.log('setFps: '+fps);    
     this.fps = fps;
     this.ms = 1000 / this.fps;
-    if (!this.request) this.request = (function() {
+
+    //if (!this.request) 
+    this.request = (function() {
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -59,14 +64,15 @@ Loop.prototype.setFps = function(fps) {
 
 
 Loop.prototype.stop = function() {
-    // Cancel the setInterval
-    clearInterval(this.requestId);
-    this.tick = null;
+    this.isPlaying = false;
     return this;
 };
 
 
 Loop.prototype.step = function() {
+    if (!this.isPlaying) {
+        return false;
+    }
 
     var loops = false; // set to true if frame loop is called at least once
 

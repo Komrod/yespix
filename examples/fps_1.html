@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #DBC1B1;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #9CB0A8;"></canvas>
+
+<script type="text/javascript">
+	
+	var game = new yespix.class.game({
+		fps: 60,	
+		canvas: 'canvas',
+		debug: true
+	});
+
+	var fpsEntity = game.getFpsEntity();
+	fpsEntity.set({
+		position: {
+			x: 100,
+			y: 100,
+		},
+		aspect: {
+			width: 600,
+			height: 200
+		}
+	});
+
+	for (var t=0; t<500; t++)	{
+		new yespix.entity.path({
+			aspect: {
+				width: 50,
+				height: 50
+			},
+			position: {
+				x: 50,
+				y: yespix.randInt(0, 400)
+			},
+			path: {
+				type: 'rect',
+				lineColor: '#1B9D9C',
+				lineWidth: 1,
+				fillColor: yespix.rgbToHex({r: yespix.randInt(0,255), g: yespix.randInt(0,255), b: yespix.randInt(0,255)})
+			},
+			tween: {
+				duration: 2000 + yespix.randInt(0, 2000),
+				loop: true,
+				loop2ways: true,
+				to: { position: { x: 700 }}
+			},
+			manager: game.gfxManager
+		});
+	}
+
+	function changeFps() {
+		game.setFps(parseInt(document.getElementById('fps').value));
+	}
+
+
+</script>
+
+<br/>
+<input type="text" value="60" style="float: left;" size="3" id="fps" /><button style="float: left;" onclick="changeFps();">Change FPS</button>
+</body>
+</html>

@@ -150,12 +150,14 @@ yespix.defineEntity('gfx', {
 
 
     trigger: function(event) {
-        switch (event.type+':'+event.fromClass) {
-            case 'change:Position':
-                if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {
-                    this.manager.isZSorted = false;
-                }
-                break;
+        if (this.manager) {
+            switch (event.type+':'+event.fromClass) {
+                case 'change:Position':
+                    if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {
+                        this.manager.isZSorted = false;
+                    }
+                    break;
+            }
         }
         return this.super(event);
     },

@@ -68,6 +68,7 @@ module.exports = function(grunt) {
                     './src/engine/class/aspect.js',
                     './src/engine/class/collision.js',
                     './src/engine/class/elementList.js',
+                    './src/engine/class/game.js',
                     './src/engine/class/gfxManager.js',
                     './src/engine/class/image.js',
                     './src/engine/class/input.js',

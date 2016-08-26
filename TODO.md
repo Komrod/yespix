@@ -1,14 +1,15 @@
 
 TODO list:
-- fullscreen mode
 - link player and physics engine
 - make the player work
+- add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
 - fill path with image
+- make a flat prerender function for gfx entities
+- click entity detection on canvas
 - button entity
 - touch input
 - alpha mask
-- game class to encaspulate canvas, manager, debug and loop
 - check if destroying an entity really dumps it
 
 - Trace for next collision with a vector / line
@@ -17,7 +18,7 @@ TODO list:
 - pass rotation of an object to collision object at init
 - use collision in a level
 - parallax image move
-- texture entity (handled by the canvas)
+- texture entity (handled by the canvas)tween
 - Make a camera entity (zoom, move, turn)
 - Make a video entity
 
@@ -26,9 +27,7 @@ TODO list:
 - in physic engine, getTouchList must returns only fixtures that touches body and ground sensor
 - bold text
 - function to remove entities and collision object
-- light engine
 - set isChanged = false after the draw function
-- make a flat render function for gfx (prerender)
 - optimize: set of the tweens of an entity as one set
 - optimize: use prerender for path
 - minimum speed for objects in physics engine
@@ -51,11 +50,10 @@ TODO list:
 - stop and resume time
 - draw text based on letters from image
 - typewritter: text showing letter by letter with sound
-- GfxContainer entity
 - Separate the fall down / jump up animation of a character
 
 - make layer a general empty drawable canvas (view), put the old layer level build on the level entity
-- make a debug panel where you can change variables and see entities
+- make a HTML debug panel where you can change variables and see entities
 - elipse and star path
 - draw SVG image
 - Add eyefx entity to add webGL effects filters to the canvas (with glfx.js)
@@ -70,11 +68,18 @@ TODO list:
 - Make a Raider game (platform indiana)
 
 
-Delayed:
+Postponed:
 - polygon of any number of sides
+- light engine
 
 
 DONE:
+- detect resize window on fullscreen mode
+- loop2ways alone will loop in a tween
+- fullscreen mode
+- customize fps width and height
+- dynamicaly change FPS
+- game class to encaspulate canvas, manager, debug and loop
 - combo draw for gfx
 - disable tween and event at start
 - make example for sound // 24-08-2016

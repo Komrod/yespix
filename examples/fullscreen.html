@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #DBC1B1;">
+<canvas id="canvas"></canvas>
+<script type="text/javascript">
+	
+
+	var game = new yespix.class.game({
+		fps: 60,	
+		canvas: 'canvas',
+		fullscreen: true
+	});
+
+
+	for (var t=0; t<50; t++)	{
+		new yespix.entity.path({
+			aspect: {
+				width: 50,
+				height: 50
+			},
+			position: {
+				x: -50,
+				y: yespix.randInt(-50, game.canvas.height)
+			},
+			path: {
+				type: 'rect',
+				lineColor: '#1B9D9C',
+				lineWidth: 1,
+				fillColor: yespix.rgbToHex({r: yespix.randInt(0,255), g: yespix.randInt(0,255), b: yespix.randInt(0,255)})
+			},
+			tween: {
+				duration: 2000 + yespix.randInt(0, 2000),
+				loop2ways: true,
+				to: { position: { x: game.canvas.width }}
+			},
+			manager: game.gfxManager
+		});
+	}
+
+</script>
+</body>
+</html>

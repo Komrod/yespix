@@ -51,7 +51,7 @@ yespix.defineEntity('fps', {
                 },
                 path: {
                     lineColor: '#ffffff',
-                    fillColor: '#000000',
+                    fillColor: '#333333',
                     fillAlpha: 0.5,
                     borderRadius: 4,
                 }
@@ -61,8 +61,8 @@ yespix.defineEntity('fps', {
         if (this.textFps !== false) {
             this.textFps = new yespix.entity.text({
                 position:{
-                    x: this.position.x + 5,
-                    y: this.position.y + 5,
+                    x: this.position.x + 10,
+                    y: this.position.y + 10,
                 },
                 text: {
                     fillColor: '#000000',
@@ -74,8 +74,8 @@ yespix.defineEntity('fps', {
         if (this.textMinMax !== false) {
             this.textMinMax = new yespix.entity.text({
                 position:{
-                    x: this.position.x + 5,
-                    y: this.position.y + 17,
+                    x: this.position.x + 10,
+                    y: this.position.y + 22,
                 },
                 text: {
                     fillColor: '#000000',
@@ -87,8 +87,8 @@ yespix.defineEntity('fps', {
         if (this.textAvg !== false) {
             this.textAvg = new yespix.entity.text({
                 position:{
-                    x: this.position.x + 5,
-                    y: this.position.y + 29,
+                    x: this.position.x + 10,
+                    y: this.position.y + 34,
                 },
                 text: {
                     fillColor: '#000000',
@@ -162,6 +162,7 @@ yespix.defineEntity('fps', {
                 count++;
             }
         }
+        context.globalAlpha = 0.99;
 
         context.lineWidth = 1;
         context.strokeStyle = '#ff0000';
@@ -228,6 +229,51 @@ yespix.defineEntity('fps', {
         if (this.text.time + this.updateTime < +new Date()) {
             this.text = null;
         }
+    },
+
+    set: function(properties) {
+        this.super(properties);     
+
+        if (this.background !== false) {
+            this.background.set({
+                position:{
+                    x: this.position.x,
+                    y: this.position.y,
+                },
+                aspect: {
+                    width: this.aspect.width,
+                    height: this.aspect.height
+                }
+            });
+        }
+
+        if (this.textFps !== false) {
+            this.textFps.set({
+                position:{
+                    x: this.position.x + 10,
+                    y: this.position.y + 10,
+                }
+            });
+        }
+
+        if (this.textMinMax !== false) {
+            this.textMinMax.set({
+                position:{
+                    x: this.position.x + 10,
+                    y: this.position.y + 22,
+                }
+            });
+        }
+
+        if (this.textAvg !== false) {
+            this.textAvg.set({
+                position:{
+                    x: this.position.x + 10,
+                    y: this.position.y + 34,
+                }
+            });
+        }
+
     }
 
 
