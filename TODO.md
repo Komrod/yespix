@@ -1,7 +1,8 @@
 
 TODO list:
-- link player and physics engine
 - make the player work
+- link player and physics engine
+- initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
 - fill path with image
@@ -10,7 +11,9 @@ TODO list:
 - button entity
 - touch input
 - alpha mask
+- pause and resume game when window is not selected
 - check if destroying an entity really dumps it
+- when function on entity enable events
 
 - Trace for next collision with a vector / line
 - start player on ground / detects ground
@@ -74,6 +77,8 @@ Postponed:
 
 
 DONE:
+- change speed of animation
+- bug with flipX flipY in image
 - detect resize window on fullscreen mode
 - loop2ways alone will loop in a tween
 - fullscreen mode
