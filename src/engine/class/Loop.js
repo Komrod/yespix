@@ -44,7 +44,6 @@ Loop.prototype.start = function() {
 
 
 Loop.prototype.setFps = function(fps) {
-//console.log('setFps: '+fps);    
     this.fps = fps;
     this.ms = 1000 / this.fps;
 

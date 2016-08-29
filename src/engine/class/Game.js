@@ -35,21 +35,73 @@ function Game(properties) {
         this.gfxManager = new yespix.class.gfxManager(this.canvas);
     }
 
-    this.loop = new yespix.class.loop();
-
+    this.loop = new yespix.class.loop(this.fps);
+    this.loop.game = this;
     
     (function(game) {
+        var onFrame, onStep;
+
+        if (yespix.isUndefined(properties.onFrame)) {
+            onFrame = function(loop, time) { 
+                if (game.physics) {
+                    game.physics.drawDebug();
+                    game.physics.world.ClearForces();
+                }
+                game.render(time);
+            };
+        } else {
+            onFrame = properties.onFrame;
+        }
+        if (yespix.isUndefined(properties.onStep)) {
+            properties.onStep = function(loop, time) {
+                if (game.physics) {
+                    game.physics.step(time);
+                }
+                game.step(time);
+            };
+        } else {
+            onStep = properties.onStep;
+        }
+
+        game.loop.register(onFrame, onStep);
+
+        /*
         game.loop.register(
             function(loop, time) { 
+                if (game.physics) {
+                    game.physics.drawDebug();
+                    game.physics.world.ClearForces();
+                }
                 game.render(time);
             }, 
             function(loop, time) {
+                if (game.physics) {
+                    game.physics.step(time);
+                }
                 game.step(time);
             }
         );
-
+        */
     })(this);
 
+    if (properties.physics === true) {
+        this.physics = new yespix.class.physicsBox2d({manager: this.gfxManager, debug: this.debug});
+        if (this.gfxManager) {
+            this.gfxManager.setPhysics(this.physics);
+        }
+//console.log(this);        
+    }
+
+    if (properties.input) {
+        if (properties.input === true) {
+            properties.input = {
+                key: document,
+                mouse: this.canvas,
+                gamepad: true
+            };
+        }
+        this.input = new yespix.class.input(properties.input);
+    }
 
     if (properties.autostart !== false) {
         this.loop.start();
