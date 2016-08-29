@@ -17,6 +17,11 @@ yespix.defineEntity('gfx', {
         this.prerender = this.prerender || null;
         this.manager = this.manager || null;
 
+        if (this.collision) {
+
+            this.collision = new yespix.class.collision(this.collision, this);
+        }
+
         this.checkReady();
     },
 
@@ -55,6 +60,15 @@ yespix.defineEntity('gfx', {
     draw: function(context) {
         // if cannot draw, exit now
         if (!this.canDraw(context)) return false;
+
+        this.trigger(
+            {
+                type: 'render',
+                from: this,
+                fromClass: 'Entity',
+                entity: this
+            }
+        );
 
         // get the draw box
         if (this.position.isChanged || this.aspect.isChanged) {
@@ -162,4 +176,12 @@ yespix.defineEntity('gfx', {
         return this.super(event);
     },
 
+
+    destroy: function() {
+        this.super();
+        if (this.collision) {
+            this.collision.destroy();
+            this.collision = null;
+        }
+    }
 });

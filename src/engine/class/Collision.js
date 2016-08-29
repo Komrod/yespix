@@ -46,30 +46,28 @@ function Collision(properties, entity) {
 Collision.prototype.ready = function(bool) {
     if (bool) {
         this.isReady = true;
-        this.trigger(
-            {
-                type: 'ready',
-                from: this,
-                fromClass: 'Collision',
-                entity: this.entity,
-                properties: { 
-                    isReady: true
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'ready',
+                    from: this,
+                    fromClass: 'Collision',
+                    entity: this.entity
                 }
-            }
-        );
+            );
+        }
     } else {
         this.isReady = false;
-        this.trigger(
-            {
-                type: 'notReady',
-                from: this,
-                fromClass: 'Collision',
-                entity: this.entity,
-                properties: { 
-                    isReady: false
+        if (this.entity) {
+            this.entity.trigger(
+                {
+                    type: 'notReady',
+                    from: this,
+                    fromClass: 'Collision',
+                    entity: this.entity
                 }
-            }
-        );
+            );
+        }
     }
 };
 
@@ -92,15 +90,17 @@ Collision.prototype.set = function(properties, varDefault) {
     }
 
     this.isChanged = true;
-    this.entity.trigger(
-        {
-            type: 'change',
-            entity: this.entity,
-            from: this,
-            fromClass: 'Collision',
-            properties: properties
-        }
-    );
+    if (this.entity) {
+        this.entity.trigger(
+            {
+                type: 'change',
+                entity: this.entity,
+                from: this,
+                fromClass: 'Collision',
+                properties: properties
+            }
+        );
+    }
 };
 
 
@@ -245,6 +245,11 @@ Collision.prototype.getUserData = function(fixture) {
 
 Collision.prototype.vec2 = function(x, y) {
     return this.physics.vec2(x, y);
+};
+
+
+Collision.prototype.destroy = function() {
+    return this.physics.destroyBody(this.body);
 };
 
 

@@ -32,8 +32,18 @@ function PhysicsBox2d(properties) {
 	this.fixDef.restitution = this.restitution;
 	this.fixDef.isSensor = this.isSensor;
 
+	if (this.manager) {
+		this.setManager(this.manager);
+	}
 }
 
+/*
+PhysicsBox2d.prototype.step = function(time) {
+	if (this.world) {
+		this.world.Step(time/1000, 10, 10);
+	}
+};
+*/
 
 PhysicsBox2d.prototype.setManager = function(manager) {
     this.manager = manager;
@@ -54,7 +64,7 @@ PhysicsBox2d.prototype.initDebug = function() {
 	this.debugDraw = new Box2D.Dynamics.b2DebugDraw();
 	this.debugDraw.SetSprite(this.context);
 	this.debugDraw.SetDrawScale(this.scale);
-	this.debugDraw.SetFillAlpha(0.1);
+	this.debugDraw.SetFillAlpha(0.5);
 	this.debugDraw.SetLineThickness(1.0);
 	this.debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit | Box2D.Dynamics.b2DebugDraw.e_jointBit);
 	this.world.SetDebugDraw(this.debugDraw);
@@ -84,6 +94,12 @@ PhysicsBox2d.prototype.createRect = function(x, y, width, height, collision) {
 };
 
 
+PhysicsBox2d.prototype.destroyBody = function(body) {
+console.log('physics:destroyBody');
+	this.world.DestroyBody(body);
+};
+
+
 PhysicsBox2d.prototype.createBody = function(x, y, width, height, collision) {
 	collision = collision || {};
 	this.setBody(collision);
@@ -104,7 +120,7 @@ PhysicsBox2d.prototype.createBody = function(x, y, width, height, collision) {
 	if (collision.entity) {
 		body.SetUserData({collision: collision, entity: collision.entity});
 	}
-
+console.log(body);
 	return body;
 };
 
