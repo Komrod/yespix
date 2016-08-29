@@ -2,7 +2,6 @@
 <html>
 <head>
 	<script type="text/javascript" src="../build/yespix.js"></script>
-    <script type="text/javascript" src="lib/shifty.min.js"></script>
 </head>
 <body style="background-color: #456;">
 
@@ -12,94 +11,24 @@
 <script type="text/javascript">
 
 	
-//var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-//if (gamepads) console.log(gamepads); else console.log('no');
-//setInterval(function() { console.log(input.gamepads); }, 2000);
 
 
 
-    var canvas = document.getElementById('canvas');
-    yespix();
-    var manager = new yespix.class.gfxManager(canvas);
-
-
-    var circle = new yespix.entity.path({
-        position: {
-            x: 400,
-            y: 300
-        },
-        aspect: {
-            alpha: 0.1,
-            width: 20,
-            height: 20
-        },
-        path: {
-            type: 'circle'
-        },
-        manager: manager
-    });
-
-    var position = {};
-
-    var input = new yespix.class.input({key: document, mouse: canvas, gamepad: true});
-    input.when('mousemove', function(e) {
-        cursorMove(e);
-    });
-    input.when('mousedown', function(e) {
-        cursorClick(e);
-    });
-    input.when('keydown', function(e) {
-        console.log('key '+e.inputCode);
-    });
-
-    // create loop
-    var loop = new yespix.class.loop(60);
-
-    var list = [];
-    var index = 0;
-
-    function cursorMove(e) {
-        circle.position.set({
-            x: e.offsetX-10,
-            y: e.offsetY-10
-        });
-        if (input.mouse('left')) {
-            cursorClick(e);
+    var game = new yespix.class.game({
+        fps: 60,
+        canvas: 'canvas',
+        debug: true,
+        input: true,
+        onFrame: function(loop, time) {
+//console.log(this);            
+            this.game.gfxManager.clear(); // clear canvas
+            myGamepad(this.game);
+            this.game.gfxManager.draw(); // draw debug
         }
-    }
+    });
 
-    function cursorClick(e) {
-        if (yespix.isUndefined(position.x)) {
-            position = {
-                x: e.offsetX,
-                y: e.offsetY
-            };
-        } else {
-            list.push(new yespix.entity.path({
-                position: {
-                    x: e.offsetX,
-                    y: e.offsetY
-                },
-                aspect: {
-                    alpha: 1.0
-                },
-                path: {
-                    type: 'line',
-                    lineColor: '#123456',
-                    lineWidth: 10,
-                    lineCap: 'round',
-                    points: {x: position.x-e.offsetX, y: position.y-e.offsetY}
-                },
-                manager: manager
-            }));
-            position = {
-                x: e.offsetX,
-                y: e.offsetY
-            };
-        }
-    }
-
-    var square = new yespix.entity.path({
+    game.entities = {};
+    game.entities.square = new yespix.entity.path({
         position: {
             x: 100,
             y: 100
@@ -114,9 +43,9 @@
             lineWidth: 1,
             fillColor: '#990000'
         },
-        manager: manager
+        manager: game.gfxManager
     });
-    var eText = new yespix.entity.text({
+    game.entities.eText = new yespix.entity.text({
         position: {
             x: 130,
             y: 110,
@@ -132,22 +61,97 @@
             content: '0',
             fillColor: '#000000'
         },
-        manager: manager
+        manager: game.gfxManager
     });
 
-    function myGamepad() {
-        if (eText.isReady) {
-            for (var name in input.gamepadMap.standard) {
-                if (input.gamepad(name)) {
-                    square.path.set({fillColor: '#ff0000'});
-                    eText.text.set({content: name})
+    var circle = new yespix.entity.path({
+        position: {
+            x: 400,
+            y: 300
+        },
+        aspect: {
+            alpha: 0.1,
+            width: 20,
+            height: 20
+        },
+        path: {
+            type: 'circle'
+        },
+        manager: game.gfxManager
+    });
+
+    var position = {};
+
+    game.input.when('mousemove', function(e) {
+        cursorMove(e);
+    });
+    game.input.when('mousedown', function(e) {
+        cursorClick(e);
+    });
+    game.input.when('keydown', function(e) {
+        console.log('key '+e.inputCode);
+    });
+
+
+    function cursorMove(e) {
+        circle.position.set({
+            x: e.offsetX-10,
+            y: e.offsetY-10
+        });
+        if (game.input.mouse('left')) {
+            cursorClick(e);
+        }
+    }
+
+    function cursorClick(e) {
+        if (yespix.isUndefined(position.x)) {
+            position = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        } else {
+            new yespix.entity.path({
+                position: {
+                    x: e.offsetX,
+                    y: e.offsetY
+                },
+                path: {
+                    type: 'line',
+                    lineColor: '#123456',
+                    lineWidth: 10,
+                    lineCap: 'round',
+                    points: {x: position.x-e.offsetX, y: position.y-e.offsetY}
+                },
+                manager: game.gfxManager
+            });
+            position = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        }
+    }
+
+
+
+    function myGamepad(game) {
+//console.log(game);
+if (!game.entities) console.log('no');
+//else console.log(game.entities.eText);
+
+        if (game.entities && game.entities.eText.isReady) {
+//console.log(game.input);
+            for (var name in game.input.gamepadMap.standard) {
+console.log(name);                
+                if (game.input.gamepad(name)) {
+                    game.entities.square.path.set({fillColor: '#ff0000'});
+                    game.entities.eText.text.set({content: name})
                 }
             }
         }
     }
 
 
-
+/*
     // register tick and frame functions
     loop.register(
         function(loop, time) { 
@@ -159,7 +163,7 @@
         function(loop, time) { 
         }
     ).start();
-
+*/
 
    
  
