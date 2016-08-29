@@ -22,6 +22,8 @@ function Animation(properties, entity) {
         selectedAnimation: '',
         selectedSprite: '',
 
+        speed: 1.0,
+
         autoLoad: true
     };
 
@@ -271,7 +273,7 @@ Animation.prototype.changeFrame = function(frame, force) {
 
 
 Animation.prototype.step = function(time) {
-    this.time += time;
+    this.time += time * this.speed;
 };
 
 
