@@ -31,19 +31,19 @@ function PhysicsBox2d(properties) {
 	this.fixDef.friction = this.friction;
 	this.fixDef.restitution = this.restitution;
 	this.fixDef.isSensor = this.isSensor;
-
+console.log(this);
 	if (this.manager) {
 		this.setManager(this.manager);
 	}
 }
 
-/*
+
 PhysicsBox2d.prototype.step = function(time) {
 	if (this.world) {
 		this.world.Step(time/1000, 10, 10);
 	}
 };
-*/
+
 
 PhysicsBox2d.prototype.setManager = function(manager) {
     this.manager = manager;
@@ -84,6 +84,7 @@ PhysicsBox2d.prototype.create = function(collision) {
 		var size = collision.getSize();
 		return this.createRect(position.x, position.y, size.width, size.height, collision);
 	}
+	// @TODO circle
 };
 
 
@@ -95,7 +96,6 @@ PhysicsBox2d.prototype.createRect = function(x, y, width, height, collision) {
 
 
 PhysicsBox2d.prototype.destroyBody = function(body) {
-console.log('physics:destroyBody');
 	this.world.DestroyBody(body);
 };
 
@@ -120,7 +120,6 @@ PhysicsBox2d.prototype.createBody = function(x, y, width, height, collision) {
 	if (collision.entity) {
 		body.SetUserData({collision: collision, entity: collision.entity});
 	}
-console.log(body);
 	return body;
 };
 
