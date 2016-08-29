@@ -27,9 +27,9 @@ function Collision(properties, entity) {
         shape: 'rect', // "rect"
 
         density: 0.1,
-        friction: 0.1,
-        restitution: 0.0,
-        linearDamping: 0.2,
+        friction: 0.2,
+        restitution: 0.1,
+        linearDamping: 1.0,
 
         isSensor: false,
         fixedRotation: false,

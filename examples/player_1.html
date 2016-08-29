@@ -11,7 +11,7 @@
 <script type="text/javascript">
 	
 	var game = new yespix.class.game({
-		fps: 6,	
+		fps: 30,	
 		canvas: 'canvas',
 		debug: true,
 		physics: true,
@@ -21,7 +21,7 @@
 
 	new yespix.entity.player2w({
 		aspect: {
-			alpha: 0.1
+			alpha: 1.0
 		},
 		position: {
 			x: 400,
@@ -29,8 +29,10 @@
 		},
 		input: game.input,
 		collision: {
-			width: 64,
+			offsetX: 18,
+			width: 30,
 			height: 80,
+			fixedRotation: true,
 			physics: game.physics
 		},
         image: {

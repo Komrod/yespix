@@ -1,5 +1,5 @@
 
-
+/*
 function Player2w(properties, entity) {
     properties = properties || {};
     if (entity) this.entity = entity;
@@ -131,6 +131,6 @@ Player.prototype.actorPostSolve = function(contact, myFixture, otherBody, otherF
 
 
 yespix.defineClass('player2w', Player2w);
-
+*/
 
 

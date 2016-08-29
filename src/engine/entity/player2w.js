@@ -11,7 +11,6 @@ yespix.defineEntity('player2w', {
         this.super(properties);
 
         this.actor = new yespix.class.player2w(properties.actor, this);
-console.log(this);        
     },
 
 

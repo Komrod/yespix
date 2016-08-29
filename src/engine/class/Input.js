@@ -527,7 +527,6 @@ Input.prototype.gamepadButton = function(s, n) {
     var mapping = this.gamepads[n].mapping;
     if (mapping == '') mapping = 'other';
     if (mapping == 'other' && (s == 'left' || s == 'right' || s == 'up' || s == 'down')) {
-        //console.log(this.gamepads[n].buttons[this.gamepadMap[mapping][s.toLowerCase()]]);
         if (this.gamepadDirections(n).indexOf(s) >= 0) return true;
         return false;
     }
@@ -550,13 +549,16 @@ Input.prototype.gamepadAxes = function(n, axisIndex) {
 
 // get 8 directions from last axe
 Input.prototype.gamepadDirections = function(n) {
+//console.log(this.gamepads[n]);     aze;
     if (!this.gamepads[n] || !this.gamepads[n].axes.length) {
         return '';
     }
 
     var axeValue = this.gamepads[n].axes[this.gamepads[n].axes.length-1];
+//console.log('gamepadDirections: axeValue='+axeValue);    
     for (var dir in this.gamepadAxeValues) {
         if (dir != 'delta' && axeValue >= this.gamepadAxeValues[dir] - this.gamepadAxeValues['delta'] && axeValue <= this.gamepadAxeValues[dir] + this.gamepadAxeValues['delta']) {
+
             return dir;
         }
     }
