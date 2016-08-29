@@ -308,12 +308,12 @@ Input.prototype.trigger = function(event, name) {
 
 
 Input.prototype.when = function(eventName, fct, name) {
-    this.event.link(eventName, fct, name);
+    this.event.when(eventName, fct, name);
 };
 
 
 Input.prototype.unlink = function(eventName, name) {
-    this.event.unlink(eventName, name);
+    this.event.delete(eventName, name);
 };
 
 

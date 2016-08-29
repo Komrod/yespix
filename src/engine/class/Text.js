@@ -25,6 +25,8 @@ function Text(properties, entity) {
     };
 
     this.set(properties, varDefault);
+
+    this.isReady = true;
 }
 
 

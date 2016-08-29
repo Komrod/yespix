@@ -36,12 +36,10 @@ yespix.defineEntity('base', {
 //console.log('enable: t='+t+', list='+list[t]);
             switch (list[t]) {
                 case 'tween':
-                    if (!this.tween) break;
                     if (this.tween !== false && !(this.tween instanceof yespix.class.tweenManager)) this.tween = new yespix.class.tweenManager(properties.tween, this);
                     else this.disable(['tween']);
                     break;
                 case 'event':
-                    if (!this.event) break;
                     if (this.event !== false && !(this.event instanceof yespix.class.eventHandler)) this.event = new yespix.class.eventHandler(this);
                     else this.disable(['event']);
                     break;
@@ -88,6 +86,17 @@ yespix.defineEntity('base', {
     },
 
 
+    when: function(eventName, fct, name){
+        if (!this.event) {
+            this.enable(['event']);
+        }
+        if (this.event) {
+            return this.event.when(eventName, fct, name);
+        }
+        return false;
+    },
+
+
     /**
      * Trigger an event and pass it to the event handler
      */
@@ -125,10 +134,7 @@ yespix.defineEntity('base', {
                     type: 'ready',
                     from: this,
                     fromClass: 'Entity',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: true
-                    }
+                    entity: this.entity
                 }
             );
         } else {
@@ -138,10 +144,7 @@ yespix.defineEntity('base', {
                     type: 'notReady',
                     from: this,
                     fromClass: 'Entity',
-                    entity: this.entity,
-                    properties: { 
-                        isReady: false
-                    }
+                    entity: this.entity
                 }
             );
         }
@@ -179,9 +182,10 @@ yespix.defineEntity('base', {
 
 
     step: function(time) {
-        if (this.tween) {
+        if (this.tween && this.tween.step) {
             this.tween.step(time);
         }
+else { console.log(this);        aze; }
     },
 
 
