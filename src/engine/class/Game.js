@@ -41,31 +41,6 @@ function Game(properties) {
     (function(game) {
         var onFrame, onStep;
 
-        if (yespix.isUndefined(properties.onFrame)) {
-            onFrame = function(loop, time) { 
-                if (game.physics) {
-                    game.physics.drawDebug();
-                    game.physics.world.ClearForces();
-                }
-                game.render(time);
-            };
-        } else {
-            onFrame = properties.onFrame;
-        }
-        if (yespix.isUndefined(properties.onStep)) {
-            properties.onStep = function(loop, time) {
-                if (game.physics) {
-                    game.physics.step(time);
-                }
-                game.step(time);
-            };
-        } else {
-            onStep = properties.onStep;
-        }
-
-        game.loop.register(onFrame, onStep);
-
-        /*
         game.loop.register(
             function(loop, time) { 
                 if (game.physics) {
@@ -81,15 +56,17 @@ function Game(properties) {
                 game.step(time);
             }
         );
-        */
     })(this);
 
     if (properties.physics === true) {
         this.physics = new yespix.class.physicsBox2d({manager: this.gfxManager, debug: this.debug});
-        if (this.gfxManager) {
-            this.gfxManager.setPhysics(this.physics);
-        }
-//console.log(this);        
+    } else {
+        properties.physics.manager = this.gfxManager;
+        properties.physics.debug = this.debug;
+        this.physics = new yespix.class.physicsBox2d(properties.physics);
+    }
+    if (this.gfxManager) {
+        this.gfxManager.setPhysics(this.physics);
     }
 
     if (properties.input) {

@@ -21,16 +21,17 @@
 
 	new yespix.entity.text({
 		position: {
-			x: 100,
-			y: 100
+			x: 200,
+			y: 30
 		},
 		text: {
 			content: 'ok',
-			fillColor: '#000'
+			fillColor: '#000',
+			size: 30
 		},
 		manager: game.gfxManager
 	}).when('render', function(event) {
-		event.entity.text.content = game.gfxManager.list.length;
+		event.entity.text.content = 'Entity count: '+game.gfxManager.list.length;
 	});
 
 
@@ -58,11 +59,8 @@
 			},
 			manager: game.gfxManager
 		}).when('change', function(event) {
-//console.log(this);
-//console.log(event);
 			if (event.entity.position.y>500) {
 				event.entity.destroy();
-console.log('destroy');				
 			}
 		});
 
