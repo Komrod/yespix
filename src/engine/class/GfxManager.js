@@ -77,12 +77,10 @@ GfxManager.prototype.applyPhysics = function(time) {
 	if (!this.physics) {
 		return false;
 	}
-
     var length = this.list.length,
     	t=0;
     for (; t<length; t++) {
-    	if (this.list[t].actor) this.list[t].actor.step(time);
-    	if (this.list[t].collision) this.list[t].collision.applyPhysics();
+    	if (this.list[t] && this.list[t].collision) this.list[t].collision.applyPhysics();
     }
     return true;
 };
@@ -107,8 +105,8 @@ GfxManager.prototype.drawDebug = function() {
 GfxManager.prototype.step = function(time) {
 	if (this.physics && this.physics.world) {
 		this.physics.world.Step(time/1000, 500, 50);
+		this.applyPhysics(time);
 	}
-	this.applyPhysics(time);
 	this.stepEntity(time);
 };
 
@@ -312,6 +310,7 @@ GfxManager.prototype.reset = function(canvas, list) {
 
 	return true;
 };
+
 
 
 yespix.defineClass('gfxManager', GfxManager);
