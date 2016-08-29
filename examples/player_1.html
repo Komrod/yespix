@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/Box2d.min.js"></script>
+</head>
+<body style="background-color: #DBC1B1;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #9CB0A8;"></canvas>
+
+<script type="text/javascript">
+	
+	var game = new yespix.class.game({
+		fps: 6,	
+		canvas: 'canvas',
+		debug: true,
+		physics: true,
+		input: true
+	});
+
+
+	new yespix.entity.player2w({
+		aspect: {
+			alpha: 0.1
+		},
+		position: {
+			x: 400,
+			y: 200
+		},
+		input: game.input,
+		collision: {
+			width: 64,
+			height: 80,
+			physics: game.physics
+		},
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'idleleft',
+            defaultSprite: 'perso',
+            defaultDuration: 100,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                idleright: { from: 0, length: 7},
+                idleleft: { extends: 'idleright', flipX: true}
+            }
+        },
+		manager: game.gfxManager
+	});
+
+
+
+
+	new yespix.entity.path({
+		aspect: {
+			
+			width: 700,
+			height: 10
+		},
+		position: {
+			x: 50,
+			y: 450
+		},
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			fillColor: '#000',
+			fillAlpha: 0.5
+		},
+		collision: {
+			type: 'static',
+			width: 700,
+			height: 10,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+
+
+
+</script>
+</body>
+</html>

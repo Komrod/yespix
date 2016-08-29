@@ -67,7 +67,7 @@ module.exports = function(grunt) {
                     './src/engine/class/animation.js',
                     './src/engine/class/aspect.js',
                     './src/engine/class/collision.js',
-                    './src/engine/class/elementList.js',
+//                    './src/engine/class/elementList.js',
                     './src/engine/class/game.js',
                     './src/engine/class/gfxManager.js',
                     './src/engine/class/image.js',
@@ -86,12 +86,12 @@ module.exports = function(grunt) {
                     './src/engine/class/eventHandler.js',
                     './src/engine/class/tweenManager.js',
                     './src/engine/class/tweenAnimation.js',
+                    './src/engine/class/player2w.js',
 
                     // classes with inheritance
-                    './src/engine/class/actor.js',
-                    './src/engine/class/actor2w.js',
-                    './src/engine/class/player2w.js',
-                    './src/engine/class/actorPlatform.js',
+//                    './src/engine/class/actor.js',
+//                    './src/engine/class/actor2w.js',
+//                    './src/engine/class/actorPlatform.js',
 
                     // entities
                     './src/engine/entity/base.js',
@@ -106,6 +106,7 @@ module.exports = function(grunt) {
                     './src/engine/entity/animation.js',
                     './src/engine/entity/fps.js',
                     './src/engine/entity/combo.js',
+                    './src/engine/entity/player2w.js',
 
                     // entities end
                     './src/engine/template/entities_end.js',

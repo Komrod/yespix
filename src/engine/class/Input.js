@@ -215,8 +215,8 @@ Input.prototype.onKey = function(e, b) {
     e = e || window.event;
 
     // get the key code
-//    e.inputCode = e.which || e.keyCode || e.charCode || e.key.charCodeAt(0);
-    e.inputCode = e.key.toLowerCase().charCodeAt(0);
+    e.inputCode = e.which || e.keyCode || e.charCode || e.key.toLowerCase().charCodeAt(0);
+    //e.inputCode = e.key.toLowerCase().charCodeAt(0);
 
     // main key 
     this.state.key[parseInt(e.inputCode)] = b;
@@ -270,7 +270,7 @@ Input.prototype.key = function(s) {
 
     if (yespix.isArray(s)) {
         for (t = 0; t < s.length; t++)
-            if (!this.key(s[t])) {
+            if (!this.key(s[t])) {                
                 return false;
             }
         return true;

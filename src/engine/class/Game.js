@@ -58,17 +58,19 @@ function Game(properties) {
         );
     })(this);
 
-    if (properties.physics === true) {
-        this.physics = new yespix.class.physicsBox2d({manager: this.gfxManager, debug: this.debug});
-    } else {
-        properties.physics.manager = this.gfxManager;
-        properties.physics.debug = this.debug;
-        this.physics = new yespix.class.physicsBox2d(properties.physics);
+    if (properties.physics) {
+        if (properties.physics === true) {
+            this.physics = new yespix.class.physicsBox2d({manager: this.gfxManager, debug: this.debug});
+        } else {
+            properties.physics.manager = this.gfxManager;
+            properties.physics.debug = this.debug;
+            this.physics = new yespix.class.physicsBox2d(properties.physics);
+        }
+        if (this.gfxManager) {
+            this.gfxManager.setPhysics(this.physics);
+        }
     }
-    if (this.gfxManager) {
-        this.gfxManager.setPhysics(this.physics);
-    }
-
+    
     if (properties.input) {
         if (properties.input === true) {
             properties.input = {

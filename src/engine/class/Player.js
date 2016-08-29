@@ -1,6 +1,6 @@
 
-/*
-function Actor(properties, entity) {
+
+function Player2w(properties, entity) {
     properties = properties || {};
     if (entity) this.entity = entity;
 
@@ -39,6 +39,9 @@ function Actor(properties, entity) {
 
         'ladder': true,
 
+        'waterswim': true,
+        'wateridle': true,
+
         'throw': true,
         'attack': true,
         'use': true,
@@ -46,9 +49,7 @@ function Actor(properties, entity) {
         'default': 'idle',
     };
 
-            actorSpeedJump: 1.1,
-            actorGravity: true,
-            actorDirection: 'right',
+    this.direction = 'right';
 
     this.anims: {
         'idleright': 'idleright',
@@ -56,6 +57,12 @@ function Actor(properties, entity) {
 
         'walkright': 'walkright',
         'walkleft': 'walkleft',
+
+        'stealthright': 'stealthright',
+        'stealthleft': 'stealthleft',
+
+        'runright': 'runright',
+        'runleft': 'runleft',
 
         'lookup': 'lookup',
         'lookdown': 'lookdown',
@@ -81,7 +88,7 @@ function Actor(properties, entity) {
 }
 
 
-Actor.prototype.set = function() {
+Player.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
 
     this.entity.trigger(
@@ -96,34 +103,34 @@ Actor.prototype.set = function() {
 };
 
 
-Actor.prototype.trigger = function() {
+Player.prototype.trigger = function() {
 };
 
 
-Actor.prototype.step = function(time) {
+Player.prototype.step = function(time) {
 };
 
 
-Actor.prototype.actorBeginContact = function(contact, myFixture, otherBody, otherFixture) {
+Player.prototype.actorBeginContact = function(contact, myFixture, otherBody, otherFixture) {
 };
 
 
-Actor.prototype.actorEndContact = function(contact, myFixture, otherBody, otherFixture) {
+Player.prototype.actorEndContact = function(contact, myFixture, otherBody, otherFixture) {
 };
 
 
-Actor.prototype.actorPreSolve = function(contact, myFixture, otherBody, otherFixture, old) {
+Player.prototype.actorPreSolve = function(contact, myFixture, otherBody, otherFixture, old) {
 };
 
 
-Actor.prototype.actorPostSolve = function(contact, myFixture, otherBody, otherFixture, impact) {
+Player.prototype.actorPostSolve = function(contact, myFixture, otherBody, otherFixture, impact) {
 };
 
 
 
 
 
-yespix.defineClass('actor', Actor);
+yespix.defineClass('player2w', Player2w);
 
-*/
+
 

@@ -105,7 +105,7 @@ Animation.prototype.entityTrigger = function(type, properties) {
             }
         );
     }
-};    
+};
 
 
 Animation.prototype.getSpritesReady = function() {

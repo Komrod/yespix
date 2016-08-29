@@ -139,6 +139,6 @@ yespix.fn.define = function(name, properties, type) { //, inheritClass, extendCl
     } else if (type == 'entity') {
         this.entity[name] = newClass;
     }
-//console.log('define: end properties = ', properties);
+
     return newClass;
 };
