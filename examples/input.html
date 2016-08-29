@@ -18,17 +18,24 @@
         fps: 60,
         canvas: 'canvas',
         debug: true,
-        input: true,
-        onFrame: function(loop, time) {
-//console.log(this);            
-            this.game.gfxManager.clear(); // clear canvas
-            myGamepad(this.game);
-            this.game.gfxManager.draw(); // draw debug
-        }
+        input: true
     });
 
-    game.entities = {};
-    game.entities.square = new yespix.entity.path({
+
+    // register new frame and step functions
+    game.loop.register(
+        function(loop, time) { 
+            game.gfxManager.clear();            // clear canvas
+            myGamepad(game);                    // check gamepad
+            game.gfxManager.draw();             // draw
+            game.gfxManager.drawFps(time, 60);  // debug
+        }, 
+        function(loop, time) { 
+        }
+    );
+
+
+    var square = new yespix.entity.path({
         position: {
             x: 100,
             y: 100
@@ -45,7 +52,8 @@
         },
         manager: game.gfxManager
     });
-    game.entities.eText = new yespix.entity.text({
+    
+    var eText = new yespix.entity.text({
         position: {
             x: 130,
             y: 110,
@@ -134,36 +142,19 @@
 
 
     function myGamepad(game) {
-//console.log(game);
-if (!game.entities) console.log('no');
-//else console.log(game.entities.eText);
-
-        if (game.entities && game.entities.eText.isReady) {
-//console.log(game.input);
+        if (eText.isReady) {
             for (var name in game.input.gamepadMap.standard) {
-console.log(name);                
                 if (game.input.gamepad(name)) {
-                    game.entities.square.path.set({fillColor: '#ff0000'});
-                    game.entities.eText.text.set({content: name})
+                    square.path.set({fillColor: '#ff0000'});
+                    eText.text.set({content: name})
                 }
             }
         }
     }
 
 
-/*
-    // register tick and frame functions
-    loop.register(
-        function(loop, time) { 
-            manager.clear(); // clear canvas
-            myGamepad();
-            manager.draw(); // draw debug
-            manager.drawFps(time, 60);
-        }, 
-        function(loop, time) { 
-        }
-    ).start();
-*/
+    
+    
 
    
  
