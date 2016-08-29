@@ -62,7 +62,8 @@ EventHandler.prototype.getList = function(eventName) {
  * @param {int|string} params Index as integer or string
  * @param {int|string} index Optional, index of the element as integer or string
  */
-EventHandler.prototype.link = function(eventName, fct, name) {
+EventHandler.prototype.when = function(eventName, fct, name) {
+//console.log('EventHandler: when eventName='+eventName);            
 
     if (!this.list[eventName]) {
         this.list[eventName] = {};
@@ -80,6 +81,7 @@ EventHandler.prototype.link = function(eventName, fct, name) {
     }
 
     this.list[eventName][name] = fct;
+//console.log('EventHandler: when name='+name);            
 
     return name;
 };
@@ -108,7 +110,7 @@ EventHandler.prototype.trigger = function(event, name) {
 };
 
 
-EventHandler.prototype.unlink = function(eventName, name) {
+EventHandler.prototype.delete = function(eventName, name) {
 
     if (!this.list[eventName]) {
         return false;
