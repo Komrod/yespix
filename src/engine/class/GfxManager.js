@@ -13,24 +13,6 @@ function GfxManager(canvas, list) {
 
 	this.reset(canvas, list);
 	return;
-
-	/*
-	// init
-	this.canvas = null;
-	this.context = null;
-
-	// set the canvas
-	if (canvas === true) this.setCanvas(yespix.createCanvas(true));
-	else if (canvas) this.setCanvas(canvas);
-
-	// set the list
-    this.list = list || [];
-    this.event = new yespix.class.eventHandler();
-    
-    this.isZSorted = false;
-
-    this.ready(true);
-    */
 }
 
 
@@ -103,8 +85,8 @@ GfxManager.prototype.drawDebug = function() {
 
 
 GfxManager.prototype.step = function(time) {
-	if (this.physics && this.physics.world) {
-		this.physics.world.Step(time/1000, 500, 50);
+	if (this.physics && this.physics.step) {
+		this.physics.step(time);
 		this.applyPhysics(time);
 	}
 	this.stepEntity(time);
