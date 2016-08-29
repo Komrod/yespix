@@ -386,10 +386,10 @@ Image.prototype.draw = function(context) {
         context.translate(-pivot.x, -pivot.y);
     }
     if (this.entity.aspect.flipX || this.entity.aspect.flipY) {
-        contextSaved = true;
         if (!contextSaved) {
             context.save();
         }
+        contextSaved = true;
         context.scale( (this.entity.aspect.flipX ? -1 : 1), (this.entity.aspect.flipY ? -1 : 1) );
     }
 
