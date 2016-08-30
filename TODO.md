@@ -1,7 +1,5 @@
 
 TODO list:
-- make the player work
-- link player and physics engine
 - initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
@@ -77,6 +75,9 @@ Postponed:
 
 
 DONE:
+- change player animation speed from velocity
+- make the player work
+- link player and physics engine
 - change speed of animation
 - bug with flipX flipY in image
 - detect resize window on fullscreen mode

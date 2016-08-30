@@ -10,6 +10,7 @@
 
 <script type="text/javascript">
 	
+
 	var game = new yespix.class.game({
 		fps: 30,	
 		canvas: 'canvas',
@@ -21,7 +22,7 @@
 
 	new yespix.entity.player2w({
 		aspect: {
-			alpha: 1.0
+			alpha: 0.1
 		},
 		position: {
 			x: 400,
@@ -33,6 +34,10 @@
 			width: 30,
 			height: 80,
 			fixedRotation: true,
+	        density: 0.15,
+	        friction: 0.2,
+	        restitution: 0.1,
+	        linearDamping: 0.5,
 			physics: game.physics
 		},
         image: {
@@ -51,18 +56,17 @@
             },
             list: {
                 idleright: { from: 0, length: 7},
-                idleleft: { extends: 'idleright', flipX: true}
+                idleleft: { extends: 'idleright', flipX: true},
+                walkright: { from: 24, length: 8},
+                walkleft: { extends: 'walkright', flipX: true}
             }
         },
 		manager: game.gfxManager
 	});
 
 
-
-
 	new yespix.entity.path({
 		aspect: {
-			
 			width: 700,
 			height: 10
 		},
@@ -85,7 +89,6 @@
 		},
 		manager: game.gfxManager
 	});
-
 
 
 </script>

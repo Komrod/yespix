@@ -8,9 +8,10 @@ yespix.defineEntity('player2w', {
 
     init: function(properties) {
         properties = properties || {};
-        this.super(properties);
 
         this.actor = new yespix.class.player2w(properties.actor, this);
+
+        this.super(properties);
     },
 
 

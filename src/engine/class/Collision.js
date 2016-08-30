@@ -27,7 +27,7 @@ function Collision(properties, entity) {
         shape: 'rect', // "rect"
 
         density: 0.1,
-        friction: 0.2,
+        friction: 0.3,
         restitution: 0.1,
         linearDamping: 1.0,
 
@@ -113,11 +113,13 @@ Collision.prototype.create = function() {
         // TODO delete previous body
     }
 
+//    this.body = this.physics.create(this);
     if (this.entity.actor) {
         this.body = this.entity.actor.createPhysics(this);
     } else {
         this.body = this.physics.create(this);
     }
+    
     this.ready(true);
 };
 

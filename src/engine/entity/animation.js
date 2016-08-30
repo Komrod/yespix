@@ -19,7 +19,7 @@ yespix.defineEntity('animation', {
     },
     
     trigger: function(event) {
-        if (this.animation.trigger) {
+        if (this.animation && this.animation.trigger) {
             this.animation.trigger(event);    
         }
         return this.super(event);

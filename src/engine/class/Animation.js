@@ -235,17 +235,14 @@ Animation.prototype.play = function(name, frame, force) {
     force = force || false;
 
     if (!this.list[name]) {
-console.log('no exists name '+name);        
         return false;
     }
 
     if (this.selectedAnimation != name || force) {
-console.log('change to name '+name);        
         this.selectedAnimation = name;
         this.changeFrame(frame, force);
         return true;
     }
-console.log('do nothing for name '+name);        
     return false;
 };
 
