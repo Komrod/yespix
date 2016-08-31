@@ -1,5 +1,6 @@
 
 TODO list:
+- add jump animation
 - initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
@@ -75,6 +76,8 @@ Postponed:
 
 
 DONE:
+- prevent player to slow down when landing
+- change friction when jumping
 - change player animation speed from velocity
 - make the player work
 - link player and physics engine

@@ -93,12 +93,14 @@ function Player2w(properties, entity) {
         ground: {
             walk: 10,
             jump: 100,
+            friction: 0.3
 
         },
         air: {
             walk: 2,
             jump: 16,
-            jumpStop: 0.5
+            jumpStop: 1.5,
+            friction: 0.05
         }
     };
 
@@ -202,6 +204,8 @@ Player2w.prototype.step = function(time) {
             lv.y = -this.speed.ground.jump*80/1000;
             this.entity.collision.setLinearVelocity(lv);
 
+            this.entity.collision.setFriction(this.speed.air.friction);
+
             this.isOnGround = false;
             this.isFalling = false;
             this.jumpTime = yespix.getTime();
@@ -259,10 +263,10 @@ Player2w.prototype.changeDirection = function(dir) {
 
 
 Player2w.prototype.changeAction = function(action) {
-    var lv = this.entity.collision.getLinearVelocity();
     this.action = action;
 
     if (action == 'walk') {
+        var lv = this.entity.collision.getLinearVelocity();
         this.entity.animation.speed = Math.abs(lv.x) / this.speed.max.walk * 1.5 + 0.3;
     } else {
         this.entity.animation.speed = 1.0;
@@ -274,6 +278,15 @@ Player2w.prototype.changeAction = function(action) {
 Player2w.prototype.land = function() {
     if (this.isOnGround) return false;
 
+    // @test
+    // push player at 25% of vl.x to prevent slow down when landing
+    var lv = this.entity.collision.getLinearVelocity();
+console.log(lv);    
+    if (lv) {
+        lv.x = lv.x * 1.75;
+        this.entity.collision.setLinearVelocity(lv);
+    }
+    this.entity.collision.setFriction(this.speed.ground.friction);
     this.isOnGround = true;
     this.isFalling = false;
 };
