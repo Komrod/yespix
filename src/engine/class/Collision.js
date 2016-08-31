@@ -18,6 +18,7 @@ function Collision(properties, entity) {
             }
         }
     }
+    
     var varDefault = {
         offsetX: 0,
         offsetY: 0,

@@ -1,9 +1,7 @@
 
 TODO list:
-- add jump animation
-- add platforms and moving objects
+- add platforms and moving objects in examples
 - set an offset of an animation
-- bug: first jump go higher
 - initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
@@ -79,6 +77,9 @@ Postponed:
 
 
 DONE:
+- double jump
+- add jump animation
+- bug: first jump go higher
 - prevent player to slow down when landing
 - change friction when jumping
 - change player animation speed from velocity

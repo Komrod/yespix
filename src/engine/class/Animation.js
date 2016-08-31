@@ -216,6 +216,7 @@ Animation.prototype.buildAnimations = function() {
         }
     }
     this.play(this.defaultAnimation, 0, true);
+//console.log(this);    
 };
 
 
@@ -237,10 +238,10 @@ Animation.prototype.play = function(name, frame, force) {
     if (!this.list[name]) {
         return false;
     }
-
     if (this.selectedAnimation != name || force) {
+//console.log('Animation.play: change animation to = '+name);
         this.selectedAnimation = name;
-        this.changeFrame(frame, force);
+        this.changeFrame(frame, true);
         return true;
     }
     return false;
@@ -251,13 +252,15 @@ Animation.prototype.changeFrame = function(frame, force) {
     frame = frame || 0;
     force = force || false;
 
-    if (!this.list[this.selectedAnimation] || !this.list[this.selectedAnimation].frames[frame]) {
+    if (!this.list[this.selectedAnimation] || !this.list[this.selectedAnimation].frames || !this.list[this.selectedAnimation].frames[frame]) {
         return false;
     }
 
     if (this.selectedFrame != frame || force) {
+//console.log('Animation.changeFrame: animation = '+this.selectedAnimation+', frame = '+frame);
         this.selectedFrame = frame;
         this.selectedSprite = this.list[this.selectedAnimation].frames[frame].sprite;
+//console.log('Animation.changeFrame: sprite = '+this.selectedSprite);        
         this.nextTime = this.time + this.list[this.selectedAnimation].frames[frame].duration;
 
         // select 

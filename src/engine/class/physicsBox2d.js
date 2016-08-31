@@ -5,7 +5,7 @@ function PhysicsBox2d(properties) {
 
 	var varDefault = {
 		gravity: 20,
-		allowSleep: true,
+		allowSleep: false,
 		scale: 30,
 		fixedRotation: false,
 		linearDamping: 0.1,

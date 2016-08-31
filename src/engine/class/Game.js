@@ -52,6 +52,7 @@ function Game(properties) {
             function(loop, time) {
                 if (game.physics) {
                     game.physics.step(time);
+                    game.physics.world.ClearForces();
                 }
                 game.step(time);
             }

@@ -399,7 +399,7 @@ Image.prototype.draw = function(context) {
     if (!this.entity.boundary.clip || this.isChanged || this.entity.aspect.isChanged) {
         this.entity.boundary.clip = this.getBoundaryClip();
     }
-
+//console.log('Image.render: clip.x = '+this.entity.boundary.clip.x+', clip.y = '+this.entity.boundary.clip.y);
     context.globalAlpha = this.entity.aspect.alpha;
     context.drawImage(this.element, //image element
         this.entity.boundary.clip.x, // x position on image
