@@ -12,7 +12,7 @@
 	
 
 	var game = new yespix.class.game({
-		fps: 30,	
+		fps: 60,	
 		canvas: 'canvas',
 		debug: true,
 		physics: true,
@@ -26,7 +26,8 @@
 		},
 		position: {
 			x: 400,
-			y: 200
+			y: 200,
+			z: 100
 		},
 		input: game.input,
 		collision: {
@@ -36,7 +37,7 @@
 			fixedRotation: true,
 	        density: 0.15,
 	        friction: 0.2,
-	        restitution: 0.1,
+	        restitution: 0.0,
 	        linearDamping: 0.5,
 			physics: game.physics
 		},
@@ -53,9 +54,9 @@
             },
             list: {
                 idleright: { from: 0, length: 7},
-                idleleft: { extends: 'idleright', flipX: true},
+                idleleft: { extends: 'idleright', flipX: true, offsetX: -10},
                 walkright: { from: 24, length: 8},
-                walkleft: { extends: 'walkright', flipX: true}
+                walkleft: { extends: 'walkright', flipX: true, offsetX: -10}
             }
         },
 		manager: game.gfxManager
@@ -63,14 +64,7 @@
 
 
 	new yespix.entity.path({
-		aspect: {
-			width: 700,
-			height: 10
-		},
-		position: {
-			x: 50,
-			y: 450
-		},
+		aspect: { width: 700, height: 10 }, position: { x: 50, y: 450 },
 		path: {
 			type: 'rect',
 			lineColor: '#000',
@@ -82,6 +76,44 @@
 			type: 'static',
 			width: 700,
 			height: 10,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+
+	new yespix.entity.path({
+		aspect: { width: 128, height: 32 },
+		position: { x: 500, y: 386 },
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			fillColor: '#000',
+			fillAlpha: 0.5
+		},
+		collision: {
+			type: 'static',
+			width: 128,
+			height: 32,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+
+	new yespix.entity.path({
+		aspect: { width: 128, height: 32 },
+		position: { x: 596, y: 290 },
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			fillColor: '#000',
+			fillAlpha: 0.5
+		},
+		collision: {
+			type: 'static',
+			width: 128,
+			height: 32,
 			physics: game.physics
 		},
 		manager: game.gfxManager

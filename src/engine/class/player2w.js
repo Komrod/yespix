@@ -88,18 +88,18 @@ function Player2w(properties, entity) {
     this.speed = {
         max: {
             walk: 4,
-            air: 6
+            air: 10
         },
         ground: {
-            walk: 10,
+            walk: 20,
             jump: 100,
             friction: 0.3
 
         },
         air: {
-            walk: 2,
-            jump: 16,
-            jumpStop: 1.5,
+            walk: 4,
+            jump: 15,
+            jumpStop: 1.0,
             friction: 0.05
         }
     };
@@ -186,7 +186,7 @@ Player2w.prototype.step = function(time) {
         jump = this.entity.input.gamepad('a') || this.entity.input.key('up'),
         fire = this.entity.input.gamepad('x'),
         lv = this.entity.collision.getLinearVelocity();
-
+if (!this.isOnGround) console.log('lv=', lv);
     if (!this.isOnGround && lv.y>0) this.isFalling = true;
 
     if (right) {
@@ -201,8 +201,12 @@ Player2w.prototype.step = function(time) {
 
     if (jump) {
         if (this.isOnGround && this.jumpTime < yespix.getTime() - 100) {
+//console.log('jump: avant lv=', lv);     
+            //var factor = 0;
+            //if (Math.abs(lv.y)<0.1) factor = 0.9;
             lv.y = -this.speed.ground.jump*80/1000;
             this.entity.collision.setLinearVelocity(lv);
+//console.log('jump: lv=', lv);                
 
             this.entity.collision.setFriction(this.speed.air.friction);
 
@@ -210,8 +214,11 @@ Player2w.prototype.step = function(time) {
             this.isFalling = false;
             this.jumpTime = yespix.getTime();
         } else {
-            if (!this.isFalling && lv.y < -1) {
-                this.entity.collision.impulse(270, this.speed.air.jump*time/1000);
+            if (!this.isFalling && lv.y < -this.speed.air.jumpStop) {
+                var factor = ((-lv.y)-this.speed.air.jumpStop)/this.speed.max.air + 0.5;
+//console.log('time='+time+', lv=', lv);                
+//console.log('factor='+factor);
+                this.entity.collision.impulse(270, this.speed.air.jump*time/1000*factor);
             }
         }
     }
@@ -226,6 +233,7 @@ Player2w.prototype.step = function(time) {
         if (newLv.x != lv.x || newLv.x != lv.x) {
             this.entity.collision.setLinearVelocity(newLv);
         }
+//console.log('limit reached: lv=', lv);                
     } else {
         var newLv = this.entity.collision.vec2(lv.x, lv.y);
         if (newLv.x > this.speed.max.air) newLv.x = this.speed.max.air;
@@ -235,7 +243,9 @@ Player2w.prototype.step = function(time) {
         if (newLv.x != lv.x || newLv.x != lv.x) {
             this.entity.collision.setLinearVelocity(newLv);
         }
+//console.log('limit reached: lv=', lv);                
     }
+
 
     // anim walk
     if (this.isOnGround) {
@@ -277,15 +287,16 @@ Player2w.prototype.changeAction = function(action) {
 
 Player2w.prototype.land = function() {
     if (this.isOnGround) return false;
-
+console.log('land');
     // @test
     // push player at 25% of vl.x to prevent slow down when landing
+    /*
     var lv = this.entity.collision.getLinearVelocity();
-console.log(lv);    
     if (lv) {
         lv.x = lv.x * 1.75;
         this.entity.collision.setLinearVelocity(lv);
     }
+    */
     this.entity.collision.setFriction(this.speed.ground.friction);
     this.isOnGround = true;
     this.isFalling = false;
