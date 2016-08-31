@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/Box2d.min.js"></script>
+</head>
+<body style="background-color: #DBC1B1;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #9CB0A8;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var game = new yespix.class.game({
+		fps: 60,	
+		canvas: 'canvas',
+		debug: true,
+		physics: true,
+		input: true
+	});
+
+
+	var alpha = 0.1;
+
+	new yespix.entity.player2w({
+		aspect: {
+			alpha: alpha
+		},
+		position: {
+			x: 400,
+			y: 200,
+			z: 100
+		},
+		input: game.input,
+		collision: {
+			offsetX: 18,
+			offsetY: 16,
+			width: 30,
+			height: 64,
+			fixedRotation: true,
+	        density: 0.15,
+	        friction: 0.2,
+	        restitution: 0.0,
+	        linearDamping: 0.5,
+			physics: game.physics
+		},
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'idleleft',
+            defaultSprite: 'perso',
+            defaultDuration: 100,
+            sprites: { 
+            	perso: { width: 32, height: 40 }
+            },
+            list: {
+                idleright: { from: 0, length: 7 },
+                idleleft: { extends: 'idleright', flipX: true },
+                walkright: { from: 24, length: 8 },
+                walkleft: { extends: 'walkright', flipX: true },
+                jumpright: { from: 32, length: 2 },
+                jumpleft: { extends: 'jumpright', flipX: true },
+                airright: { from: 34, length: 2 },
+                airleft: { extends: 'airright', flipX: true },
+                landright: { frames: [33, 32] },
+                landleft: { extends: 'landright', flipX: true }
+            }
+        },
+		manager: game.gfxManager
+	});
+
+
+	new yespix.entity.path({
+		aspect: { width: 700, height: 10 }, position: { x: 50, y: 450 },
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			lineAlpha: alpha*0.5,
+			fillColor: '#000',
+			fillAlpha: alpha*0.5
+		},
+		collision: {
+			type: 'static',
+			width: 700,
+			height: 10,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+
+	var p = new yespix.entity.path({
+		aspect: { width: 128, height: 32 },
+		position: { x: 500, y: 386 },
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			lineAlpha: alpha*0.5,
+			fillColor: '#000',
+			fillAlpha: alpha*0.5
+		},
+		collision: {
+			type: 'kinetic',
+			width: 128,
+			height: 32,
+			density: 0,
+			linearDamping: 100,
+			friction: 0,
+			physics: game.physics
+		},
+		tween: {
+			from: { position: { x: 500 }},
+			to: { position: { x: 600 }},
+			duration: 5000,
+			loop2ways: true,
+			onStep: function(time) {
+console.log('onStep');				
+				this.entity.collision.setPosition(this.entity.position.x, this.entity.position.y);
+			}
+		},
+		manager: game.gfxManager
+	});
+
+
+</script>
+</body>
+</html>

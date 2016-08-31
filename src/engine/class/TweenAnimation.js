@@ -42,6 +42,7 @@ function TweenAnimation(properties, manager) {
     this.onStart = properties.onStart || function() {};
     this.onEnd = properties.onEnd || function() {};
     this.onLoop = properties.onLoop || function() {};
+    this.onStep = properties.onStep || function() {};
 
     this.entityTrigger('create', properties);
 
@@ -335,7 +336,8 @@ TweenAnimation.prototype.step = function(time) {
         this.entity.set(this.state);
     }
     */
-    
+    this.onStep(time);
+
     // loop
     if (this.position == 1 && (this.loop || this.loop2ways)) {
         this.delay = 0;

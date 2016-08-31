@@ -31,7 +31,6 @@ function PhysicsBox2d(properties) {
 	this.fixDef.friction = this.friction;
 	this.fixDef.restitution = this.restitution;
 	this.fixDef.isSensor = this.isSensor;
-console.log(this);
 	if (this.manager) {
 		this.setManager(this.manager);
 	}

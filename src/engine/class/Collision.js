@@ -133,6 +133,11 @@ Collision.prototype.getPosition = function() {
 };
 
 
+Collision.prototype.setPosition = function(x, y) {
+    this.body.SetTransform(this.vec2(x ,y), this.physics.getAngleDegree(this.body));
+};
+
+
 Collision.prototype.getSize = function() {
     return {
         width: this.width || this.entity.aspect.width,
