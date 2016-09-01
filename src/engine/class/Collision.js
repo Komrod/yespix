@@ -35,6 +35,7 @@ function Collision(properties, entity) {
         isSensor: false,
         fixedRotation: false,
         isBullet: false,
+        isSync: true
     };
 
     this.set(properties, varDefault);
@@ -134,7 +135,41 @@ Collision.prototype.getPosition = function() {
 
 
 Collision.prototype.setPosition = function(x, y) {
-    this.body.SetTransform(this.vec2(x ,y), this.physics.getAngleDegree(this.body));
+    usePhysics = !yespix.isUndefined(usePhysics) ? usePhysics : true;
+    var size = this.getSize();
+
+    // transform canvas x,y to physic x,y
+    x = (x + this.offsetX) / this.physics.scale + size.width / 2 / this.physics.scale;
+    y = (y + this.offsetY) / this.physics.scale + size.height / 2 / this.physics.scale;
+    this.body.SetPosition(this.vec2(x ,y));
+};
+
+
+Collision.prototype.distance = function(sx, sy, dx, dy) {
+    return Math.sqrt((dx-=sx)*dx + (dy-=sy)*dy);
+};
+
+
+Collision.prototype.positionMagnet = function(x, y, power) {
+    power = !yespix.isUndefined(power) ? power : 1.0;
+    var pos = this.physics.getPosition(this.body);
+    var size = this.getSize();
+
+    // transform canvas x,y to physic x,y
+    x = (x + this.offsetX) / this.physics.scale + size.width / 2 / this.physics.scale;
+    y = (y + this.offsetY) / this.physics.scale + size.height / 2 / this.physics.scale;
+
+    var distance = this.distance(x, y, pos.x, pos.y);
+    var factor = distance * power * 10.0;
+    var damping = factor / distance * 0.5;
+
+    x = (x-pos.x)*factor;
+    y = (y-pos.y)*factor;
+//console.log('factor='+factor+', distance='+distance+', damping='+damping+', x='+x+', y='+y);
+
+
+    this.body.SetLinearDamping(damping);
+    this.setLinearVelocity(this.vec2(x ,y));
 };
 
 
@@ -167,7 +202,7 @@ Collision.prototype.force = function(degrees, power, linear) {
 
 
 Collision.prototype.applyPhysics = function() {
-    if (!this.body) {
+    if (!this.body || !this.isSync) {
         return false;
     }
     var position = this.physics.getPosition(this.body);
@@ -262,3 +297,4 @@ Collision.prototype.destroy = function() {
 
 
 yespix.defineClass('collision', Collision);
+
