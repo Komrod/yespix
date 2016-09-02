@@ -217,6 +217,8 @@ Player2w.prototype.step = function(time) {
 
             // prevent double jump right after jump
             this.state.holdJump = true;
+
+            this.fpsAddEvent('jump');
         } else {
             if (this.actions.longjump && !this.isFalling && this.state.lv.y < -this.speed.air.jumpStop) {
                 var factor = ((-this.state.lv.y)-this.speed.air.jumpStop)/this.speed.max.air + 0.5;
@@ -260,6 +262,13 @@ Player2w.prototype.step = function(time) {
     }
 
     this.stepAnimation();
+};
+
+
+Player2w.prototype.fpsAddEvent = function(name) {
+    if (this.entity && this.entity.manager && this.entity.manager.fps) {
+        this.entity.manager.fps.addEvent(name);
+    }
 };
 
 
@@ -341,6 +350,7 @@ Player2w.prototype.land = function() {
 
     this.stepAnimation();
 
+    this.fpsAddEvent('land');
 };
 
 

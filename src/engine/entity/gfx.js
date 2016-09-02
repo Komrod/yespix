@@ -150,8 +150,20 @@ yespix.defineEntity('gfx', {
 
 
     getBoundaryDraw: function() {
+        var rad = yespix.degreeToRadian(this.position.rotation);
+        var width = Math.abs(Math.cos(rad))*this.aspect.width + Math.abs(Math.sin(rad))*this.aspect.height;
+        var height = Math.abs(Math.cos(rad))*this.aspect.height + Math.abs(Math.sin(rad))*this.aspect.width;
+        var pivot = this.getPivot();
+        var x = pivot.x - this.position.x;
+        var y = pivot.y - this.position.y;
+console.log('getBoundaryDraw: rad: '+rad+', height: '+height+', width: '+width);
+console.log('getBoundaryDraw: rad: '+rad+', x: '+x+', y: '+y);
+aze;
         return {
-
+            x: x,
+            y: y,
+            width: width,
+            height: height
         };
     },
 

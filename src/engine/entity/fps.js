@@ -114,11 +114,16 @@ yespix.defineEntity('fps', {
 
 
     addRecord: function(ms) {
-        this.data.push(1000 / ms);
+        this.data.push({ms: 1000 / ms});
         if (this.data.length > this.recordMax) {
             this.data.shift();
         }
 
+    },
+
+    addEvent: function(name) {
+        var obj = this.data.pop();
+        this.data.push({ms: parseFloat(obj.ms), eventName: name});
     },
 
     limitFps: function(fps) {
@@ -151,19 +156,18 @@ yespix.defineEntity('fps', {
             height = this.aspect.height - 10;
 
         for (var t = 0; t<this.data.length; t++) {
-            if (this.data[t] > 0) {
-                if (this.data[t] < min || min == 0) {
-                    min = this.data[t];
+            if (this.data[t].ms > 0) {
+                if (this.data[t].ms < min || min == 0) {
+                    min = this.data[t].ms;
                 }
-                if (this.data[t] > max) {
-                    max = this.limitFps(this.data[t]);
+                if (this.data[t].ms > max) {
+                    max = this.limitFps(this.data[t].ms);
                 }
-                total += this.data[t];
+                total += this.data[t].ms;
                 count++;
             }
         }
-        context.globalAlpha = 0.99;
-
+        context.globalAlpha = 0.5;
         context.lineWidth = 1;
         context.strokeStyle = '#ff0000';
 
@@ -185,9 +189,32 @@ yespix.defineEntity('fps', {
             for (t = 0; t < this.data.length; t++) {
                 stats.lineWidth += width / this.recordMax;
                 stats.count++;
-                stats.total += this.limitFps(this.data[t]) / max;
+                stats.total += this.limitFps(this.data[t].ms) / max;
 
                 if (stats.lineWidth >= 0.1) {
+
+                    // event
+                    if (this.data[t].eventName) {
+                        context.globalAlpha = 0.8;
+                        context.lineWidth = 1;
+                        if (this.data[t].eventName == 'jump') {
+                            context.strokeStyle = '#0099ff';
+                        } else if (this.data[t].eventName == 'land') {
+                            context.strokeStyle = '#33cc33';
+                        } else if (this.data[t].eventName == 'fire') {
+                            context.strokeStyle = '#ff9900';
+                        } else {
+                            context.strokeStyle = '#ffffff';
+                        }
+                        context.beginPath();
+                        context.moveTo(x, y + 5);
+                        context.lineTo(x, y - (height * (stats.total / stats.count)) - 5);
+                        context.stroke();
+
+                        context.globalAlpha = 0.5;
+                        context.lineWidth = 1;
+                        context.strokeStyle = '#ff0000';
+                    }
                     context.lineWidth = stats.lineWidth;
                     context.beginPath();
                     context.moveTo(x, y);

@@ -1,8 +1,8 @@
 
 TODO list:
-- add lines to fps for events (like jumping for player or any other)
+- calculate real boundaries of gfx entities
 - fill with linear and radial gradient for path
-- fill path with image
+- fill path with image (texturing)
 - make a flat prerender function for gfx entities
 - click entity detection on canvas
 - button entity
@@ -74,6 +74,7 @@ Postponed:
 
 
 DONE:
+- add lines to fps for events (like jumping for player or any other)
 - initialise collision with aspect width and height
 - set an offset of an animation
 - calculate speed relative to ground for player
