@@ -57,15 +57,15 @@
             },
             list: {
                 idleright: { from: 0, length: 7 },
-                idleleft: { extends: 'idleright', flipX: true },
+                idleleft: { extends: 'idleright', flipX: true, offsetX: -2 },
                 walkright: { from: 24, length: 8 },
-                walkleft: { extends: 'walkright', flipX: true },
+                walkleft: { extends: 'walkright', flipX: true, offsetX: -2 },
                 jumpright: { from: 32, length: 2 },
-                jumpleft: { extends: 'jumpright', flipX: true },
+                jumpleft: { extends: 'jumpright', flipX: true, offsetX: -2 },
                 airright: { from: 34, length: 2 },
-                airleft: { extends: 'airright', flipX: true },
+                airleft: { extends: 'airright', flipX: true, offsetX: -2 },
                 landright: { frames: [33, 32] },
-                landleft: { extends: 'landright', flipX: true }
+                landleft: { extends: 'landright', flipX: true, offsetX: -2 }
             }
         },
 		manager: game.gfxManager

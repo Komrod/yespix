@@ -162,6 +162,12 @@ Animation.prototype.buildAnimations = function() {
         if (yespix.isUndefined(this.list[n].flipY)) {
             this.list[n].flipY = false;
         }
+        if (yespix.isUndefined(this.list[n].offsetX)) {
+            this.list[n].offsetX = 0;
+        }
+        if (yespix.isUndefined(this.list[n].offsetY)) {
+            this.list[n].offsetY = 0;
+        }
         if (!this.list[n].frames) {
             this.list[n].frames = [];
         }
@@ -190,7 +196,9 @@ Animation.prototype.buildAnimations = function() {
                     duration: this.list[n].duration,
                     priority: this.list[n].priority,
                     flipX: this.list[n].flipX,
-                    flipY: this.list[n].flipY
+                    flipY: this.list[n].flipY,
+                    offsetX: this.list[n].offsetX,
+                    offsetY: this.list[n].offsetY
                 };
             } else {
                 if (yespix.isUndefined(this.list[n].frames[i].sprite)) {
@@ -211,12 +219,17 @@ Animation.prototype.buildAnimations = function() {
                 if (yespix.isUndefined(this.list[n].frames[i].flipY)) {
                     this.list[n].frames[i].flipY = this.list[n].flipY;
                 }
+                if (yespix.isUndefined(this.list[n].frames[i].offsetX)) {
+                    this.list[n].frames[i].offsetX = this.list[n].offsetX;
+                }
+                if (yespix.isUndefined(this.list[n].frames[i].offsetY)) {
+                    this.list[n].frames[i].offsetY = this.list[n].offsetY;
+                }
             }
 
         }
     }
     this.play(this.defaultAnimation, 0, true);
-//console.log(this);    
 };
 
 
@@ -239,7 +252,6 @@ Animation.prototype.play = function(name, frame, force) {
         return false;
     }
     if (this.selectedAnimation != name || force) {
-//console.log('Animation.play: change animation to = '+name);
         this.selectedAnimation = name;
         this.changeFrame(frame, true);
         return true;
@@ -257,10 +269,8 @@ Animation.prototype.changeFrame = function(frame, force) {
     }
 
     if (this.selectedFrame != frame || force) {
-//console.log('Animation.changeFrame: animation = '+this.selectedAnimation+', frame = '+frame);
         this.selectedFrame = frame;
         this.selectedSprite = this.list[this.selectedAnimation].frames[frame].sprite;
-//console.log('Animation.changeFrame: sprite = '+this.selectedSprite);        
         this.nextTime = this.time + this.list[this.selectedAnimation].frames[frame].duration;
 
         // select 
@@ -269,6 +279,8 @@ Animation.prototype.changeFrame = function(frame, force) {
         this.entity.image = this.sprites[this.selectedSprite].image;
         this.entity.aspect.flipX = this.list[this.selectedAnimation].frames[frame].flipX;
         this.entity.aspect.flipY = this.list[this.selectedAnimation].frames[frame].flipY;
+        this.entity.image.offsetX = this.list[this.selectedAnimation].frames[frame].offsetX;
+        this.entity.image.offsetY = this.list[this.selectedAnimation].frames[frame].offsetY;
         return true;
     }
     return false;
