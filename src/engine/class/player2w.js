@@ -184,6 +184,13 @@ Player2w.prototype.step = function(time) {
 
     if (!this.isOnGround && this.state.lv.y>0) this.isFalling = true;
 
+    // prevent flying on ground
+    if (!this.isOnGround) {
+        if (this.entity.collision.getTouchList(this.groundFixture).length > 0) {
+            this.land();
+        }
+    }
+
     // walk action
     if (this.actions.walk) {
         if (this.state.right) {
@@ -271,10 +278,12 @@ Player2w.prototype.updateState = function() {
 Player2w.prototype.stepAnimation = function() {
     // anim walk
     if (this.isOnGround) {
+        var speed = this.groundSpeed();
+//console.log(speed); aze;
         // #start isOnGround
-        if (this.action == 'air' && Math.abs(this.state.lv.x) > 0.01 || this.state.right || this.state.left) {
+        if (this.action == 'air' && speed > 0.01 || this.state.right || this.state.left) {
             this.changeAction('walk', true);
-        } else if (this.action == 'air' || Math.abs(this.state.lv.x) < 0.01) {
+        } else if (this.action == 'air' || speed < 0.01) {
             this.changeAction('idle', true);
         }
         // #end isOnGround
@@ -285,6 +294,22 @@ Player2w.prototype.stepAnimation = function() {
         // #end !isOnGround
     }
 
+};
+
+
+Player2w.prototype.groundSpeed = function() {
+    var list = this.entity.collision.getTouchList(this.groundFixture);
+    if (!list || list.length == 0) {
+        return Math.abs(this.state.lv.x);
+    }
+    if (!this.isOnGround) {
+        this.land();
+    }
+    if (this.entity.collision && this.entity.collision.physics && this.entity.collision.physics.getUserData(list[0].body)) {
+        var groundSpeed = this.entity.collision.physics.getUserData(list[0].body).collision.getLinearVelocity();
+        return Math.abs(groundSpeed.x - this.state.lv.x);
+    }
+    return Math.abs(this.state.lv.x);
 };
 
 
@@ -299,8 +324,7 @@ Player2w.prototype.changeAction = function(action, force) {
 
     this.action = action;
     if (action == 'walk') {
-        var lv = this.entity.collision.getLinearVelocity();
-        this.entity.animation.speed = Math.abs(lv.x) / this.speed.max.walk * 1.5 + 0.3;
+        this.entity.animation.speed = this.groundSpeed() / this.speed.max.walk * 1.5 + 0.3;
     } else {
         this.entity.animation.speed = 1.0;
     }
@@ -314,7 +338,18 @@ Player2w.prototype.land = function() {
     this.isOnGround = true;
     this.isFalling = false;
     this.doubleJump = false;
-//console.log('land');
+
+    this.stepAnimation();
+
+};
+
+
+Player2w.prototype.fall = function() {
+    if (!this.isOnGround) return false;
+    this.entity.collision.setFriction(this.speed.air.friction);
+    this.isOnGround = false;
+    this.isFalling = false;
+    this.doubleJump = false;
 
     this.stepAnimation();
 
@@ -326,13 +361,21 @@ Player2w.prototype.destroy = function() {
 
 
 Player2w.prototype.actorBeginContact = function(contact, myFixture, otherBody, otherFixture) {
-    if (myFixture && myFixture.m_userData && myFixture.m_userData.type == 'ground') { // @TODO use getUserData
-        this.land();
+    if (!this.isOnGround) {
+        if (myFixture && myFixture.m_userData && myFixture.m_userData.type == 'ground') { // @TODO use getUserData
+            this.land();
+        }
     }
 };
 
 
 Player2w.prototype.actorEndContact = function(contact, myFixture, otherBody, otherFixture) {
+    // prevent flying on ground
+    if (this.isOnGround) {
+        if (this.entity.collision.getTouchList(this.groundFixture).length == 0) {
+            this.fall();
+        }
+    }
 };
 
 

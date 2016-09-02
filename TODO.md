@@ -1,7 +1,5 @@
 
 TODO list:
-- calculate speed relative to ground for player
-- bug: no ground detection when jumping in platform sometimes
 - set an offset of an animation
 - initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
@@ -78,6 +76,8 @@ Postponed:
 
 
 DONE:
+- calculate speed relative to ground for player
+- bug: no ground detection when jumping in platform sometimes
 - add platforms and moving objects in examples
 - double jump
 - add jump animation
