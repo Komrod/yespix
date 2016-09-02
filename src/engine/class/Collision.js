@@ -42,6 +42,16 @@ function Collision(properties, entity) {
     if (this.physics) {
         this.create();
     }
+
+    if (this.entity) {
+        if (this.width == 0) {
+            this.width = this.entity.aspect.width;
+        }
+        if (this.height == 0) {
+            this.height = this.entity.aspect.height;
+        }
+    }
+    
 }
 
 

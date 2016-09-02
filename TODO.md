@@ -1,6 +1,5 @@
 
 TODO list:
-- initialise collision with aspect width and height
 - add lines to fps for events (like jumping for player or any other)
 - fill with linear and radial gradient for path
 - fill path with image
@@ -75,6 +74,7 @@ Postponed:
 
 
 DONE:
+- initialise collision with aspect width and height
 - set an offset of an animation
 - calculate speed relative to ground for player
 - bug: no ground detection when jumping in platform sometimes

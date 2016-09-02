@@ -84,15 +84,13 @@
 		},
 		collision: {
 			type: 'static',
-			width: 700,
-			height: 10,
 			physics: game.physics
 		},
 		manager: game.gfxManager
 	});
 
 
-	var p = new yespix.entity.path({
+	new yespix.entity.path({
 		aspect: { width: 128, height: 32 },
 		position: { x: 500, y: 386 },
 		path: {
@@ -105,8 +103,6 @@
 		},
 		collision: {
 			type: 'kinematic',
-			width: 128,
-			height: 32,
 			density: 10,
 			friction: 1.0,
 			physics: game.physics
@@ -125,7 +121,7 @@
 	});
 
 
-	var p = new yespix.entity.path({
+	new yespix.entity.path({
 		aspect: { width: 128, height: 32 },
 		position: { x: 100, y: 386 },
 		path: {
@@ -138,8 +134,6 @@
 		},
 		collision: {
 			type: 'kinematic',
-			width: 128,
-			height: 32,
 			density: 10,
 			friction: 1.0,
 			physics: game.physics
