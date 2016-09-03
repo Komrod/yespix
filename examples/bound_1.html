@@ -12,16 +12,16 @@
 	
 
 	var game = new yespix.class.game({
-		fps: 3,	
+		fps: 60,	
 		canvas: 'canvas',
 		debug: true
 	});
 
-
+/*
 	new yespix.entity.path({
 		aspect: {
 			width: 100,
-			height: 30
+			height: 10
 		},
 		position: {
 			x: 100,
@@ -37,22 +37,14 @@
 		debug: true,
 		manager: game.gfxManager
 	});
+*/
 
-/*
-	new yespix.entity.path({
-		aspect: {
-			width: 100,
-			height: 30
-		},
+	new yespix.entity.image({
 		position: {
 			x: 300,
-			y: 200,
-			pivotX: 30,
-			pivotY: 20
+			y: 200
 		},
-		path: {
-
-		},
+		image: 'zardoz/image/zardoz_small.png',
 		tween: {
 			from: {position: {rotation: 0}},
 			to: {position: {rotation: 360}},
@@ -62,7 +54,7 @@
 		debug: true,
 		manager: game.gfxManager
 	});
-*/
+
 
 
 

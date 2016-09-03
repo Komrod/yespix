@@ -51,6 +51,9 @@ yespix.defineEntity('image', {
         if (this.image) {
             this.image.draw(context);
         }
+        if (this.debug) {
+            this.drawDebug(context);
+        }
     },
 
 

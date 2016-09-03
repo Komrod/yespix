@@ -1,8 +1,5 @@
 
 TODO list:
-- calculate real boundaries of gfx entities
-- fill with linear and radial gradient for path
-- fill path with image (texturing)
 - make a flat prerender function for gfx entities
 - click entity detection on canvas
 - button entity
@@ -69,11 +66,14 @@ TODO list:
 
 
 Postponed:
+- fill with linear and radial gradient for path
+- fill path with image (texturing)
 - polygon of any number of sides
 - light engine
 
 
 DONE:
+- calculate real boundaries of gfx entities
 - add lines to fps for events (like jumping for player or any other)
 - initialise collision with aspect width and height
 - set an offset of an animation

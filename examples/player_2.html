@@ -21,7 +21,7 @@
 
 	//game.getFpsEntity().set({aspect: {width: 750}});
 	
-	var alpha = 0.1;
+	var alpha = 1;
 
 	new yespix.entity.player2w({
 		aspect: {
@@ -69,6 +69,7 @@
                 landleft: { extends: 'landright', flipX: true, offsetX: -2 }
             }
         },
+        debug: true,
 		manager: game.gfxManager
 	});
 

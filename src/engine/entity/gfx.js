@@ -149,16 +149,50 @@ yespix.defineEntity('gfx', {
     },
 
 
+    drawDebug: function(context) {
+        if (this.debug) {
+            context.beginPath();
+            context.rect(this.boundary.draw.x, this.boundary.draw.y, this.boundary.draw.width, this.boundary.draw.height);
+            context.globalAlpha = 1.0;
+            context.lineWidth = 1.0;
+            context.strokeStyle = '#ff3300';
+            context.stroke();
+
+            context.beginPath();
+            context.strokeStyle = '#0033ff';
+            context.moveTo(this.position.x - 5, this.position.y - 5);
+            context.lineTo(this.position.x + 5, this.position.y + 5);
+            context.stroke();
+            context.moveTo(this.position.x + 5, this.position.y - 5);
+            context.lineTo(this.position.x - 5, this.position.y + 5);
+            context.stroke();
+
+            if (this.position.rotation != 0) {
+                context.beginPath();
+                context.strokeStyle = '#993399';
+                var pivot = this.getPivot();
+                context.moveTo(pivot.x - 5, pivot.y - 5);
+                context.lineTo(pivot.x + 5, pivot.y + 5);
+                context.stroke();
+                context.moveTo(pivot.x + 5, pivot.y - 5);
+                context.lineTo(pivot.x - 5, pivot.y + 5);
+                context.stroke();
+            }
+        }
+    },
+
+
     getBoundaryDraw: function() {
         var rad = yespix.degreeToRadian(this.position.rotation);
         var width = Math.abs(Math.cos(rad))*this.aspect.width + Math.abs(Math.sin(rad))*this.aspect.height;
         var height = Math.abs(Math.cos(rad))*this.aspect.height + Math.abs(Math.sin(rad))*this.aspect.width;
+
+        // @TODO only works if pivot is at the center of the object
         var pivot = this.getPivot();
-        var x = pivot.x - this.position.x;
-        var y = pivot.y - this.position.y;
-console.log('getBoundaryDraw: rad: '+rad+', height: '+height+', width: '+width);
-console.log('getBoundaryDraw: rad: '+rad+', x: '+x+', y: '+y);
-aze;
+
+        var x = this.position.x - width / 2 + this.aspect.width / 2; //     + (pivot.x - this.aspect.width / 2) * Math.cos(rad) - width * Math.cos(rad);
+        var y = this.position.y - height / 2 + this.aspect.height / 2; //   + (pivot.y - this.aspect.height / 2) * Math.sin(rad) - height * Math.sin(rad);
+        
         return {
             x: x,
             y: y,

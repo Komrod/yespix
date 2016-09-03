@@ -35,6 +35,10 @@ yespix.defineEntity('path', {
         if (this.path) {
             this.path.draw(context);
         }
-    }
+        if (this.debug) {
+            this.drawDebug(context);
+        }
+    },
+
 
 });
