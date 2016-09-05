@@ -31,6 +31,7 @@ yespix.defineEntity('path', {
         return false;
     },
 
+
     drawRender: function(context) {
         if (this.path) {
             this.path.draw(context);
@@ -38,6 +39,26 @@ yespix.defineEntity('path', {
         if (this.debug) {
             this.drawDebug(context);
         }
+    },
+
+
+    getBoundaryDraw: function() {
+        
+        var boundaryDraw = this.super();
+        var lineWidth = this.path.lineWidth;
+
+        if (this.path.lineAlign == 'center') {
+            lineWidth *= 0.5;
+        } else if (this.path.lineAlign == 'inside') {
+            lineWidth = 0;
+        }
+
+        return {
+            x: boundaryDraw.x - lineWidth,
+            y: boundaryDraw.y - lineWidth,
+            width: boundaryDraw.width + lineWidth * 2,
+            height: boundaryDraw.height + lineWidth * 2
+        };
     },
 
 

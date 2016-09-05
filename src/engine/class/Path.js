@@ -109,7 +109,6 @@ Path.prototype.drawFill = function(context) {
 
 Path.prototype.draw = function(context) {
     if (!this.entity || !this.entity.aspect || !this.entity.position) return false;
-
     var contextSaved = false;
     
     if (this.entity.position.rotation != 0) {
@@ -346,6 +345,10 @@ Path.prototype.drawCircle = function(context) {
     }
     this._radius = this.entity.aspect.width / 2;
 
+    if (this._radius + this._pathPosition < 0) {
+        this._pathPosition = this._radius;
+    }
+    
     // draw path
     if (this.lineLayer == 'bottom') {
         if (this.lineColor != '' && this.lineWidth > 0) {
@@ -371,6 +374,7 @@ Path.prototype.drawCircle = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             if (!this._pathSame || !this._pathDrawn) {
                 context.beginPath();
+console.log(this);                
                 context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
                 this._pathDrawn = true;
             }

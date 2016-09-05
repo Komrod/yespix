@@ -14,12 +14,15 @@ yespix.defineEntity('gfx', {
         this.position = new yespix.class.position(this.position || {}, this);
         this.aspect = new yespix.class.aspect(this.aspect || {}, this);
         this.boundary = this.boundary || {};
-        this.prerender = this.prerender || null;
         this.manager = this.manager || null;
 
         if (this.collision) {
 
             this.collision = new yespix.class.collision(this.collision, this);
+        }
+
+        if (properties.prerender !== false) {
+            this.prerender = new yespix.class.prerender(this.prerender, this);
         }
 
         this.checkReady();
@@ -78,9 +81,9 @@ yespix.defineEntity('gfx', {
         // if cannot draw from this draw box
         //if (!this.canDrawBox(context)) return false;
 
-        // pre render on canvas
+        // prerender on canvas
         if (this.prerender) {
-            if (this.prerender.use()) {
+            if (this.prerender.use(context)) {
                 return true;
             }
         }
@@ -201,6 +204,7 @@ yespix.defineEntity('gfx', {
         };
     },
 
+
     getPivot: function() {
         return {
             x: this.position.x + this.aspect.width / 2 + this.position.pivotX,
@@ -219,6 +223,11 @@ yespix.defineEntity('gfx', {
                     break;
             }
         }
+        
+        if (this.prerender) {
+            this.prerender.trigger(event);
+        }
+
         return this.super(event);
     },
 
