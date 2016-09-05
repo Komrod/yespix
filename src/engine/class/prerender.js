@@ -41,7 +41,7 @@ Prerender.prototype.set = function(properties, varDefault) {
 
 Prerender.prototype.updateCanvasSize = function() {
     if (!this.entity.boundary.draw) {
-        this.entity.boundary.draw = this.entity.getBoundaryDraw();
+        this.entity.boundary.draw = this.getBoundaryDraw();
     }
     if (this.entity.boundary.draw) {
 		if (this.entity.boundary.draw.width) {
@@ -95,13 +95,14 @@ Prerender.prototype.update = function() {
     
     this.entity.aspect.width = this.boundary.width;
     this.entity.aspect.height = this.boundary.height;
+    this.entity.aspect.alpha = 1.0;
 
-    this.entity.position.x = 0;
-    this.entity.position.y = 0;
+    this.entity.position.x = this.entity.boundary.draw.x - this.entity.position.x;
+    this.entity.position.y = this.entity.boundary.draw.y - this.entity.position.y;
     this.entity.position.rotation = 0;
 
 	this.entity.drawRender(this.context);
-console.log(this.entity); aze;
+//console.log(this.entity); aze;
 
 
     this.entity.boundary.image.x = this.boundary.imageX;
@@ -116,6 +117,7 @@ console.log(this.entity); aze;
     
     this.entity.aspect.width = this.boundary.width;
     this.entity.aspect.height = this.boundary.height;
+    this.entity.aspect.alpha = this.boundary.alpha;
 
     this.entity.position.x = this.boundary.x;
     this.entity.position.y = this.boundary.y;
@@ -184,10 +186,13 @@ Prerender.prototype.getBoundaryClip = function(context) {
 
 Prerender.prototype.getBoundaryPrerender = function(context) {
     if (!this.entity.boundary.clip) {
-        this.entity.boundary.clip = this.getBoundaryClip();
+        this.entity.boundary.clip = this.entity.getBoundaryClip();
     }
     if (!this.entity.boundary.image) {
-        this.entity.boundary.image = this.getBoundaryImage();
+        this.entity.boundary.image = this.entity.getBoundaryImage();
+    }
+    if (!this.entity.boundary.render) {
+        this.entity.boundary.render = this.entity.getBoundaryRender();
     }
 
     return {
@@ -203,6 +208,7 @@ Prerender.prototype.getBoundaryPrerender = function(context) {
         y: this.entity.position.y,
         width: this.entity.aspect.width,
         height: this.entity.aspect.height,
+        alpha: this.entity.aspect.alpha,
         rotation: this.entity.position.rotation
     };
 };

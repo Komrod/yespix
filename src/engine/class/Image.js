@@ -416,7 +416,7 @@ Image.prototype.draw = function(context) {
     }
 };
 
-
+/*
 Image.prototype.getBoundaryImage = function() {
     var pos = {
         x: (this.entity.position.x + this.offsetX ) * (this.entity.aspect.flipX ? -1 : 1) + (this.entity.aspect.flipX ? -this.entity.aspect.width : 0),
@@ -445,7 +445,7 @@ Image.prototype.getBoundaryClip = function() {
 
     return clip;
 };
-
+*/
 
 Image.prototype.destroy = function() {
 

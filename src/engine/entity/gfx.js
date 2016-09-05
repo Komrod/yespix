@@ -2,7 +2,10 @@
  * @class entity.gfx
  */
 yespix.defineEntity('gfx', {
+    
+
     inheritClass: 'base',
+
 
     init: function(properties) {
         properties = properties || {};
@@ -28,12 +31,14 @@ yespix.defineEntity('gfx', {
         this.checkReady();
     },
 
+
     setManager: function(manager) {
         this.manager = manager;
         if (this.collision) {
             this.collision.setManager(manager);
         }
     },
+
 
     /**
      * Return true if all the classes of the entity are ready
@@ -55,6 +60,7 @@ yespix.defineEntity('gfx', {
         if (this.aspect && this.aspect.isChanged) return true;
         return false;
     },
+
 
     /**
      * Try to draw the gfx entity on a context
@@ -115,6 +121,7 @@ yespix.defineEntity('gfx', {
         // exit
         return true;
     },
+
 
     /**
      * Returns true if the entity can be drawn, get this information from basic properties of the entity
@@ -185,6 +192,9 @@ yespix.defineEntity('gfx', {
     },
 
 
+    /**
+     * Boundary when gfx drawn on final canvas
+     */
     getBoundaryDraw: function() {
         var rad = yespix.degreeToRadian(this.position.rotation);
         var width = Math.abs(Math.cos(rad))*this.aspect.width + Math.abs(Math.sin(rad))*this.aspect.height;
@@ -201,6 +211,34 @@ yespix.defineEntity('gfx', {
             y: y,
             width: width,
             height: height
+        };
+    },
+
+
+    getBoundaryClip: function() {
+        var clip = {
+            x: this.entity.aspect.clipX,
+            y: this.entity.aspect.clipY,
+            width: this.entity.aspect.clipWidth,
+            height: this.entity.aspect.clipHeight
+        };
+        
+        if (!clip.width) clip.width = this.aspect.width;
+        if (!clip.height) clip.height = this.aspect.height;
+
+        return clip;
+    },
+
+
+    /**
+     * Boundary of gfx without rotation
+     */
+    getBoundaryRender: function() {
+        return {
+            x: 0,
+            y: 0,
+            width: this.aspect.width,
+            height: this.aspect.height
         };
     },
 

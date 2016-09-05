@@ -17,11 +17,12 @@
 		debug: true
 	});
 
-/*
+
 	new yespix.entity.path({
 		aspect: {
 			width: 100,
-			height: 10
+			height: 10,
+			alpha: 0.1
 		},
 		position: {
 			x: 100,
@@ -37,9 +38,12 @@
 		debug: true,
 		manager: game.gfxManager
 	});
-*/
+
 
 	new yespix.entity.image({
+		aspect: {
+			alpha: 0.1
+		},
 		position: {
 			x: 300,
 			y: 200

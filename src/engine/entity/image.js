@@ -33,10 +33,12 @@ yespix.defineEntity('image', {
         this.image.load(src);
     },
 
+
     unload: function() {
         this.image.unload();
     },
     
+
     /**
      * Return True if something has changed (position, aspect ...)
      * @return {bool} 
@@ -47,6 +49,7 @@ yespix.defineEntity('image', {
         return false;
     },
 
+
     drawRender: function(context) {
         if (this.image) {
             this.image.draw(context);
@@ -56,6 +59,16 @@ yespix.defineEntity('image', {
         }
     },
 
+/*
+    getBoundaryImage: function() {
+        return this.image.getBoundaryImage();
+    },
+
+
+    getBoundaryClip: function() {
+        return this.image.getBoundaryClip();
+    },
+*/
 
     getAssets: function() {
         var list = this.super();

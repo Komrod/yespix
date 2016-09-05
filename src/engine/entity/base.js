@@ -185,7 +185,6 @@ yespix.defineEntity('base', {
         if (this.tween && this.tween.step) {
             this.tween.step(time);
         }
-else { console.log(this);        aze; }
     },
 
 
