@@ -217,10 +217,10 @@ yespix.defineEntity('gfx', {
 
     getBoundaryClip: function() {
         var clip = {
-            x: this.entity.aspect.clipX,
-            y: this.entity.aspect.clipY,
-            width: this.entity.aspect.clipWidth,
-            height: this.entity.aspect.clipHeight
+            x: this.aspect.clipX,
+            y: this.aspect.clipY,
+            width: this.aspect.clipWidth,
+            height: this.aspect.clipHeight
         };
         
         if (!clip.width) clip.width = this.aspect.width;

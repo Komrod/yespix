@@ -40,8 +40,8 @@ Prerender.prototype.set = function(properties, varDefault) {
 
 
 Prerender.prototype.updateCanvasSize = function() {
-    if (!this.entity.boundary.draw) {
-        this.entity.boundary.draw = this.getBoundaryDraw();
+    if (!this.entity.boundary.image) {
+        this.entity.boundary.image = this.entity.getBoundaryDraw();
     }
     if (this.entity.boundary.draw) {
 		if (this.entity.boundary.draw.width) {
@@ -81,7 +81,7 @@ Prerender.prototype.trigger = function(event) {
 
 Prerender.prototype.update = function() {
     this.updateCanvasSize();
-    this.boundary = this.getBoundaryPrerender();
+    this.boundary = this.getPrerender();
 
     this.entity.boundary.image.x = 0;
     this.entity.boundary.image.y = 0;
@@ -163,7 +163,7 @@ Prerender.prototype.draw = function(context) {
     }
 };
 
-
+/*
 Prerender.prototype.getBoundaryImage = function(context) {
     return {
         x: this.entity.position.x,
@@ -182,17 +182,14 @@ Prerender.prototype.getBoundaryClip = function(context) {
         height: this.canvas.height
     }
 };
+*/
 
-
-Prerender.prototype.getBoundaryPrerender = function(context) {
+Prerender.prototype.getPrerender = function(context) {
     if (!this.entity.boundary.clip) {
         this.entity.boundary.clip = this.entity.getBoundaryClip();
     }
     if (!this.entity.boundary.image) {
         this.entity.boundary.image = this.entity.getBoundaryImage();
-    }
-    if (!this.entity.boundary.render) {
-        this.entity.boundary.render = this.entity.getBoundaryRender();
     }
 
     return {

@@ -394,10 +394,10 @@ Image.prototype.draw = function(context) {
     }
 
     if (!this.entity.boundary.image || this.isChanged || this.entity.aspect.isChanged) {
-        this.entity.boundary.image = this.getBoundaryImage();        
+        this.entity.boundary.image = this.entity.getBoundaryImage();        
     }
     if (!this.entity.boundary.clip || this.isChanged || this.entity.aspect.isChanged) {
-        this.entity.boundary.clip = this.getBoundaryClip();
+        this.entity.boundary.clip = this.entity.getBoundaryClip();
     }
 //console.log('Image.render: clip.x = '+this.entity.boundary.clip.x+', clip.y = '+this.entity.boundary.clip.y);
     context.globalAlpha = this.entity.aspect.alpha;
@@ -416,7 +416,7 @@ Image.prototype.draw = function(context) {
     }
 };
 
-/*
+
 Image.prototype.getBoundaryImage = function() {
     var pos = {
         x: (this.entity.position.x + this.offsetX ) * (this.entity.aspect.flipX ? -1 : 1) + (this.entity.aspect.flipX ? -this.entity.aspect.width : 0),
@@ -430,7 +430,7 @@ Image.prototype.getBoundaryImage = function() {
     }
     return pos;
 };
-
+/*
 
 Image.prototype.getBoundaryClip = function() {
     var clip = {

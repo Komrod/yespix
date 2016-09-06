@@ -12,6 +12,9 @@ yespix.defineEntity('image', {
         if (yespix.isString(properties)) {
             properties = {image: {src: properties}};
         }
+        
+        properties.prerender = false;
+
         this.super(properties);
         this.image = new yespix.class.image(this.image, this);
 
@@ -59,12 +62,12 @@ yespix.defineEntity('image', {
         }
     },
 
-/*
+
     getBoundaryImage: function() {
         return this.image.getBoundaryImage();
     },
 
-
+/*
     getBoundaryClip: function() {
         return this.image.getBoundaryClip();
     },
