@@ -18,8 +18,8 @@ function Prerender(properties, entity) {
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.updateCanvasSize();
-this.canvas.style.cssText = 'border: 5px solid #995511;';    
-document.body.appendChild(this.canvas);
+//this.canvas.style.cssText = 'border: 5px solid #995511;';    
+//document.body.appendChild(this.canvas);
     this.isReady = false;
 }
 
@@ -40,15 +40,19 @@ Prerender.prototype.set = function(properties, varDefault) {
 
 
 Prerender.prototype.updateCanvasSize = function() {
-    if (!this.entity.boundary.image) {
-        this.entity.boundary.image = this.entity.getBoundaryDraw();
+    if (!this.entity.isReady) {
+        return false;
     }
-    if (this.entity.boundary.draw) {
-		if (this.entity.boundary.draw.width) {
-			this.canvas.width = this.entity.boundary.draw.width;
+
+    if (!this.entity.boundary.render) {
+        this.entity.boundary.render = this.entity.getBoundaryRender();
+    }
+    if (this.entity.boundary.render) {
+		if (this.entity.boundary.render.width) {
+			this.canvas.width = this.entity.boundary.render.width;
 		}
-		if (this.entity.aspect.height) {
-			this.canvas.height = this.entity.boundary.draw.height;
+		if (this.entity.boundary.render.height) {
+			this.canvas.height = this.entity.boundary.render.height;
 		}
 	}
 
@@ -83,27 +87,25 @@ Prerender.prototype.update = function() {
     this.updateCanvasSize();
     this.boundary = this.getPrerender();
 
-    this.entity.boundary.image.x = 0;
-    this.entity.boundary.image.y = 0;
+    this.entity.boundary.image.x = this.entity.boundary.render.x;
+    this.entity.boundary.image.y = this.entity.boundary.render.y;
     this.entity.boundary.image.width = this.boundary.imageWidth;
     this.entity.boundary.image.height = this.boundary.imageHeight;
     
-    this.entity.boundary.clip.x = 0;
-    this.entity.boundary.clip.y = 0;
-    this.entity.boundary.clip.width = this.boundary.clipWidth;
-    this.entity.boundary.clip.height = this.boundary.clipHeight;
+    this.entity.boundary.clip.x = this.boundary.imageX;
+    this.entity.boundary.clip.y = this.boundary.imageX;
+    this.entity.boundary.clip.width = this.boundary.imageWidth;
+    this.entity.boundary.clip.height = this.boundary.imageHeight;
     
     this.entity.aspect.width = this.boundary.width;
     this.entity.aspect.height = this.boundary.height;
     this.entity.aspect.alpha = 1.0;
 
-    this.entity.position.x = this.entity.boundary.draw.x - this.entity.position.x;
-    this.entity.position.y = this.entity.boundary.draw.y - this.entity.position.y;
+    this.entity.position.x = this.entity.boundary.image.x;
+    this.entity.position.y = this.entity.boundary.image.y;
     this.entity.position.rotation = 0;
 
 	this.entity.drawRender(this.context);
-//console.log(this.entity); aze;
-
 
     this.entity.boundary.image.x = this.boundary.imageX;
     this.entity.boundary.image.y = this.boundary.imageY;
@@ -124,11 +126,11 @@ Prerender.prototype.update = function() {
     this.entity.position.rotation = this.boundary.rotation;
 
     this.isReady = true;
+//console.log('update', this);    
 };
 
 
 Prerender.prototype.draw = function(context) {
-
     var contextSaved = false;
     if (this.entity.position.rotation != 0) {
         var pivot = this.entity.getPivot();
@@ -157,7 +159,6 @@ Prerender.prototype.draw = function(context) {
         this.entity.boundary.image.width, // width on canvas
         this.entity.boundary.image.height // height on canvas
     );
-
     if (contextSaved) {
         context.restore();
     }
@@ -191,7 +192,10 @@ Prerender.prototype.getPrerender = function(context) {
     if (!this.entity.boundary.image) {
         this.entity.boundary.image = this.entity.getBoundaryImage();
     }
-
+    if (!this.entity.boundary.render) {
+        this.entity.boundary.render = this.entity.getBoundaryRender();
+    }
+//console.log(this); aze;    
     return {
         imageX: this.entity.boundary.image.x,
         imageY: this.entity.boundary.image.y,

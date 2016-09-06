@@ -215,6 +215,32 @@ yespix.defineEntity('gfx', {
     },
 
 
+    /**
+     * Boundary on image
+     */
+    getBoundaryImage: function() {
+        return {
+            x: this.position.x,
+            y: this.position.y,
+            width: this.aspect.width,
+            height: this.aspect.height
+        };
+    },
+
+
+    /**
+     * Boundary on image
+     */
+    getBoundaryRender: function() {
+        return {
+            x: 0,
+            y: 0,
+            width: this.aspect.width,
+            height: this.aspect.height
+        };
+    },
+
+
     getBoundaryClip: function() {
         var clip = {
             x: this.aspect.clipX,
@@ -227,19 +253,6 @@ yespix.defineEntity('gfx', {
         if (!clip.height) clip.height = this.aspect.height;
 
         return clip;
-    },
-
-
-    /**
-     * Boundary of gfx without rotation
-     */
-    getBoundaryRender: function() {
-        return {
-            x: 0,
-            y: 0,
-            width: this.aspect.width,
-            height: this.aspect.height
-        };
     },
 
 

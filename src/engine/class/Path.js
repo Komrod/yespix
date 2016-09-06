@@ -453,6 +453,37 @@ Path.prototype.entityTrigger = function(type, properties) {
 };
 
 
+Path.prototype.getBoundaryImage = function() {
+    return {
+        x: this.entity.position.x,
+        y: this.entity.position.y,
+        width: this.entity.aspect.width + 2 * this.lineWidth,
+        height: this.entity.aspect.height + 2 * this.lineWidth
+    };
+};
+
+
+Path.prototype.getBoundaryRender = function() {
+    return {
+        x: this.lineWidth,
+        y: this.lineWidth,
+        width: this.entity.aspect.width + 2 * this.lineWidth,
+        height: this.entity.aspect.height + 2 * this.lineWidth
+    };
+console.log(this); aze;    
+};
+
+
+Path.prototype.getBoundaryClip = function() {
+    return {
+        x: 0,
+        y: 0,
+        width: this.entity.aspect.width + 2 * this.lineWidth,
+        height: this.entity.aspect.height + 2 * this.lineWidth
+    };
+};
+
+
 Path.prototype.destroy = function() {
     // @TODO
 };

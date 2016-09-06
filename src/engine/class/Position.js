@@ -61,6 +61,12 @@ Position.prototype.set = function(properties, varDefault) {
         this.isZSorted = false;
     }
     yespix.copy(properties, this, varDefault);
+
+    if (this.entity.boundary) {
+        this.entity.boundary.image = null;
+        this.entity.boundary.draw = null;
+    }
+    
     this.isChanged = true;
     this.entityTrigger('change', properties);
 };

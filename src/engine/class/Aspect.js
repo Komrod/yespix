@@ -73,6 +73,13 @@ Aspect.prototype.entityTrigger = function(type, properties) {
 Aspect.prototype.set = function(properties, varDefault) {
     // auto size from entity.image
     if (properties.width || properties.height) {
+        
+        if (this.entity.boundary) {
+            this.entity.boundary.draw = null;
+            this.entity.boundary.image = null;
+            this.entity.boundary.render = null;
+        }
+
         if (this.entity && this.entity.image) {
             if (this.entity.image.set) {
                 this.entity.image.set({autoSize: false});

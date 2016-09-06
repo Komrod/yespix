@@ -20,7 +20,7 @@
 	var width = game.canvas.width;
 	var height = game.canvas.height;
 
-	for (var t=0; t<1; t++) {
+	for (var t=0; t<500; t++) {
 		var obj = new yespix.entity.path({
 			aspect: {
 				width: 0,
@@ -31,7 +31,6 @@
 				x: width / 2,
 				y: height /2,
 			},
-			event: false,
 			tween: [
 				{
 					delay: 1000 + yespix.randInt(0,200),
@@ -59,6 +58,7 @@
 					}
 				},
 			],
+			prerender: false,
 			path: {
 				type: 'rect',
 				lineWidth: 0,

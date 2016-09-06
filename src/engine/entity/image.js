@@ -9,11 +9,14 @@ yespix.defineEntity('image', {
     init: function(properties) {
 //console.log('isString properties = ', yespix.isString(properties), properties);        
         properties = properties || {};
+        
+        // disable prerender for image
+        properties.prerender = false;
+
         if (yespix.isString(properties)) {
             properties = {image: {src: properties}};
         }
         
-        properties.prerender = false;
 
         this.super(properties);
         this.image = new yespix.class.image(this.image, this);

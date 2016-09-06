@@ -430,8 +430,8 @@ Image.prototype.getBoundaryImage = function() {
     }
     return pos;
 };
-/*
 
+/*
 Image.prototype.getBoundaryClip = function() {
     var clip = {
         x: this.entity.aspect.clipX,
