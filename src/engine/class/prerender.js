@@ -10,7 +10,8 @@ function Prerender(properties, entity) {
         updateOnReady: true,
         updateOnSize: true,
         updateOnRotation: false,
-        enabled: true
+        enabled: true,
+
     };
 
     this.set(properties, varDefault);
@@ -18,9 +19,8 @@ function Prerender(properties, entity) {
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.updateCanvasSize();
-//this.canvas.style.cssText = 'border: 5px solid #995511;';    
-//document.body.appendChild(this.canvas);
     this.isReady = false;
+    this.isChangedLastFrame = false;
 }
 
 
@@ -60,14 +60,22 @@ Prerender.prototype.updateCanvasSize = function() {
 
 
 Prerender.prototype.use = function(context) {
-//return false;
     if (!this.enabled) {
+        this.isChangedLastFrame = this.entity.getChanged();
         return false;
     }
+
+    if (this.isChangedLastFrame) {
+        this.isChangedLastFrame = this.entity.getChanged();
+        return false;
+    }
+
     if (!this.isReady) {
+        this.isChangedLastFrame = true;
         this.update();
     }
     this.draw(context);
+    this.isChangedLastFrame = this.entity.getChanged();
     return true;
 };
 

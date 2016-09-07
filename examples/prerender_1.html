@@ -14,9 +14,7 @@
 	var game = new yespix.class.game({
 		fps: 60,
 		canvas: 'canvas',
-		debug: true,
-		physics: true,
-		input: true
+		debug: true
 	});
 
 	//game.getFpsEntity().set({aspect: {width: 750}});
@@ -26,7 +24,7 @@
 
 	var r1 = new yespix.entity.path({
 		aspect: { width: 50, height: 100 }, 
-		position: { x: 50, y: 200 },
+		position: { x: 250, y: 200 },
 		path: {
 			type: 'rect',
 			lineAlpha: alpha,
@@ -47,7 +45,7 @@
 
 	var r2 = new yespix.entity.path({
 		aspect: { width: 50, height: 100 }, 
-		position: { x: 250, y: 200 },
+		position: { x: 450, y: 200 },
 		path: {
 			type: 'rect',
 			lineAlpha: alpha,

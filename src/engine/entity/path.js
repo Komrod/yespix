@@ -33,6 +33,11 @@ yespix.defineEntity('path', {
         return false;
     },
 
+    setChanged: function(b) {
+        this.super(b);
+        if (this.path) this.path.isChanged = b;
+    },
+
 
     drawRender: function(context) {
 //if (!this.boundary.image) console.log('drawRender: no image'); else console.log('drawRender: width = '+this.boundary.image.width);        

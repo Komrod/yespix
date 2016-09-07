@@ -1,6 +1,10 @@
 
 TODO list:
-- make a flat prerender function for gfx entities
+- bug: image render
+- boundary draw for polygon
+- prerender for polygon
+- render only when gfx is on canvas based on boundary.draw
+- rotation pivot change the boundary.draw
 - click entity detection on canvas
 - button entity
 - touch input
@@ -73,6 +77,8 @@ Postponed:
 
 
 DONE:
+- make a flat prerender function for gfx entities
+- disable prerender when gfx is changed for 2 consecutive frames
 - calculate real boundaries of gfx entities
 - add lines to fps for events (like jumping for player or any other)
 - initialise collision with aspect width and height

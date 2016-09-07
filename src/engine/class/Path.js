@@ -374,7 +374,7 @@ Path.prototype.drawCircle = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             if (!this._pathSame || !this._pathDrawn) {
                 context.beginPath();
-console.log(this);                
+//console.log(this);                
                 context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
                 this._pathDrawn = true;
             }
@@ -470,7 +470,6 @@ Path.prototype.getBoundaryRender = function() {
         width: this.entity.aspect.width + 2 * this.lineWidth,
         height: this.entity.aspect.height + 2 * this.lineWidth
     };
-console.log(this); aze;    
 };
 
 

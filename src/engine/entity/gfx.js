@@ -10,6 +10,9 @@ yespix.defineEntity('gfx', {
     init: function(properties) {
         properties = properties || {};
 
+        if (properties.prerender == true) {
+            delete(properties.prerender);
+        }
         this.super(properties);
 
         this.isReady = false;
@@ -63,6 +66,15 @@ yespix.defineEntity('gfx', {
 
 
     /**
+     * Set changed state
+     */
+    setChanged: function(b) {
+        if (this.position) this.position.isChanged = b;
+        if (this.aspect) this.aspect.isChanged = b;
+    },
+
+
+    /**
      * Try to draw the gfx entity on a context
      * @return {bool} True if drawn
      */
@@ -90,29 +102,14 @@ yespix.defineEntity('gfx', {
         // prerender on canvas
         if (this.prerender) {
             if (this.prerender.use(context)) {
+                this.setChanged(false);
                 return true;
             }
         }
 
-        /*if (this.prerender && this.prerenderCanvas && this.prerenderCanvas.width > 0) {
-
-            // if changed, update the pre render canvas
-            if (this.getChanged()) this.prerenderUpdate(context);
-
-            // use the pre render canvas
-            this.prerenderUse(context);
-
-            // draw debug
-            if (this.debug) this.drawDebug(context);
-
-            // exit
-            return this.drawExit(true);
-        }*/
-
         this.drawRender(context);
 
-        this.position.isChanged = false;
-        this.aspect.isChanged = false;
+        this.setChanged(false);
         
         // draw debug
         /*

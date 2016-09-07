@@ -56,6 +56,12 @@ yespix.defineEntity('image', {
     },
 
 
+    setChanged: function(b) {
+        this.super(b);
+        if (this.image) this.image.isChanged = b;
+    },
+
+
     drawRender: function(context) {
         if (this.image) {
             this.image.draw(context);
