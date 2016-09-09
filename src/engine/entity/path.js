@@ -3,13 +3,11 @@ yespix.defineEntity('path', {
     inheritClass: 'gfx',
 
     init: function(properties) {
-//if (!this.boundary) console.log('init: no boundary'); else console.log('init: boundary = '+this.boundary);        
         properties = properties || {};
         this.super(properties);
         this.path = new yespix.class.path(this.path || {}, this);
         
         this.checkReady();
-//if (!this.boundary.image) console.log('init: no image'); else console.log('init: width = '+this.boundary.image.width);        
     },
 
 
@@ -40,7 +38,6 @@ yespix.defineEntity('path', {
 
 
     drawRender: function(context) {
-//if (!this.boundary.image) console.log('drawRender: no image'); else console.log('drawRender: width = '+this.boundary.image.width);        
         if (this.path) {
             this.path.draw(context);
         }
@@ -51,7 +48,6 @@ yespix.defineEntity('path', {
 
 
     getBoundaryImage: function() {
-//console.log('path.getBoundaryImage ', this.path);        
         return this.path.getBoundaryImage();
     },
 

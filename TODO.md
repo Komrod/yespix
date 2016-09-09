@@ -1,10 +1,10 @@
 
 TODO list:
+- include debug in draw function, not drawRender
 - bug: image render
 - boundary draw for polygon
 - prerender for polygon
 - render only when gfx is on canvas based on boundary.draw
-- rotation pivot change the boundary.draw
 - click entity detection on canvas
 - button entity
 - touch input
@@ -13,6 +13,7 @@ TODO list:
 - check if destroying an entity really dumps it
 - when function on entity enable events
 
+- rotation pivot change the boundary.draw
 - Trace for next collision with a vector / line
 - start player on ground / detects ground
 - make a level entity
@@ -77,7 +78,8 @@ Postponed:
 
 
 DONE:
-- make a flat prerender function for gfx entities
+- debug for animation
+- make a flat prerender function for gfx entities // 2016-09-08
 - disable prerender when gfx is changed for 2 consecutive frames
 - calculate real boundaries of gfx entities
 - add lines to fps for events (like jumping for player or any other)

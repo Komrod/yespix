@@ -416,9 +416,18 @@ yespix.fn.degreeToRadian = function(d) {
   return d * Math.PI / 180;
 };
  
+
 // Converts from radian to degree
 yespix.fn.radianToDegree = function(r) {
   return r * 180 / Math.PI;
+};
+
+
+yespix.fn.normalize = function(x, y) {
+    var length = Math.sqrt(x*x + y*y);
+    x /= length;
+    y /= length;
+    return {x: x, y: y, force: length};
 };
 
 

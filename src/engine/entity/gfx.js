@@ -157,34 +157,35 @@ yespix.defineEntity('gfx', {
 
 
     drawDebug: function(context) {
-        if (this.debug) {
-            context.beginPath();
-            context.rect(this.boundary.draw.x, this.boundary.draw.y, this.boundary.draw.width, this.boundary.draw.height);
-            context.globalAlpha = 1.0;
-            context.lineWidth = 1.0;
-            context.strokeStyle = '#ff3300';
-            context.stroke();
+        if (!this.boundary.draw) {
+            this.boundary.draw = this.getBoundaryDraw();
+        }
+        context.beginPath();
+        context.rect(this.boundary.draw.x, this.boundary.draw.y, this.boundary.draw.width, this.boundary.draw.height);
+        context.globalAlpha = 1.0;
+        context.lineWidth = 1.0;
+        context.strokeStyle = '#ff3300';
+        context.stroke();
 
-            context.beginPath();
-            context.strokeStyle = '#0033ff';
-            context.moveTo(this.position.x - 5, this.position.y - 5);
-            context.lineTo(this.position.x + 5, this.position.y + 5);
-            context.stroke();
-            context.moveTo(this.position.x + 5, this.position.y - 5);
-            context.lineTo(this.position.x - 5, this.position.y + 5);
-            context.stroke();
+        context.beginPath();
+        context.strokeStyle = '#0033ff';
+        context.moveTo(this.position.x - 5, this.position.y - 5);
+        context.lineTo(this.position.x + 5, this.position.y + 5);
+        context.stroke();
+        context.moveTo(this.position.x + 5, this.position.y - 5);
+        context.lineTo(this.position.x - 5, this.position.y + 5);
+        context.stroke();
 
-            if (this.position.rotation != 0) {
-                context.beginPath();
-                context.strokeStyle = '#993399';
-                var pivot = this.getPivot();
-                context.moveTo(pivot.x - 5, pivot.y - 5);
-                context.lineTo(pivot.x + 5, pivot.y + 5);
-                context.stroke();
-                context.moveTo(pivot.x + 5, pivot.y - 5);
-                context.lineTo(pivot.x - 5, pivot.y + 5);
-                context.stroke();
-            }
+        if (this.position.rotation != 0) {
+            context.beginPath();
+            context.strokeStyle = '#993399';
+            var pivot = this.getPivot();
+            context.moveTo(pivot.x - 5, pivot.y - 5);
+            context.lineTo(pivot.x + 5, pivot.y + 5);
+            context.stroke();
+            context.moveTo(pivot.x + 5, pivot.y - 5);
+            context.lineTo(pivot.x - 5, pivot.y + 5);
+            context.stroke();
         }
     },
 
@@ -200,9 +201,20 @@ yespix.defineEntity('gfx', {
         // @TODO only works if pivot is at the center of the object
         var pivot = this.getPivot();
 
-        var x = this.position.x - width / 2 + this.aspect.width / 2; //     + (pivot.x - this.aspect.width / 2) * Math.cos(rad) - width * Math.cos(rad);
-        var y = this.position.y - height / 2 + this.aspect.height / 2; //   + (pivot.y - this.aspect.height / 2) * Math.sin(rad) - height * Math.sin(rad);
-        
+/*        
+        // NOT WORKING
+        var dx = this.position.pivotX - this.aspect.width / 2;
+        var dy = this.position.pivotY - this.aspect.height / 2;
+        var h = Math.sqrt(dx*dx+dy*dy);
+        var da = rad + Math.asin(dx/h);
+        var x = pivot.x + this.aspect.width / 2 - width / 2 - h * Math.cos(da);
+        var y = pivot.y + this.aspect.height / 2 - height / 2 - h * Math.sin(da);
+console.log(dx, dy, h, da, rad, x, y);
+*/
+
+        var x = pivot.x - width / 2;
+        var y = pivot.y - height / 2;
+
         return {
             x: x,
             y: y,
@@ -210,6 +222,7 @@ yespix.defineEntity('gfx', {
             height: height
         };
     },
+
 
 
     /**
