@@ -187,12 +187,81 @@ yespix.defineEntity('gfx', {
             context.lineTo(pivot.x - 5, pivot.y + 5);
             context.stroke();
         }
+
+        if (this.boundary.draw && this.boundary.draw.points) {
+console.log(this.boundary.draw.points);                
+            for (var t=0; t<1; t++) {
+                context.beginPath();
+                context.strokeStyle = '#ffff00';
+                var x = this.boundary.draw.points[t*2],
+                    y = this.boundary.draw.points[t*2+1];
+                context.moveTo(x - 5, y);
+                context.lineTo(x + 5, y);
+                context.stroke();
+                context.moveTo(x, y - 5);
+                context.lineTo(x, y + 5);
+                context.stroke();
+            }
+        }
     },
 
+
+    rotatePoint(x, y, px, py, a) {
+        var cos = Math.cos,
+            sin = Math.sin,
+
+            a = a * Math.PI / 180, // Convert to radians because that is what
+                                   // JavaScript likes
+
+            // Subtract midpoints, so that midpoint is translated to origin
+            // and add it in the end again
+            xr = (x - xm) * cos(a) - (y - ym) * sin(a)   + xm,
+            yr = (x - xm) * sin(a) + (y - ym) * cos(a)   + ym;
+
+        return [xr, yr];
+    }
+
+    //function getImageBounds(img, x, y, cx, cy, sx, sy, ang) {
+    
+    getBoundaryDraw: function() {
+        var rad = yespix.degreeToRadian(this.position.rotation);
+
+        // axis
+        var xdx = Math.cos(rad) * this.aspect.width; // x axis
+        var xdy = Math.sin(rad) * this.aspect.width;
+        var ydx = -Math.sin(rad) * this.aspect.height; // y axis
+        var ydy = Math.cos(rad) * this.aspect.height;
+
+        var p = [// the 4 corner points [x,y,x,y...
+            -this.position.pivotX * xdx + (-this.position.pivotY * ydy * 2) + this.position.x,
+            this.position.pivotY * xdy + (-this.position.pivotX * ydx * 2) + this.position.y
+/*            r * xdx + (-this.position.pivotY * ydx) + this.position.x,
+            r * xdy + (-this.position.pivotY * ydy) + this.position.y,
+            r * xdx + ydx + b * this.position.x,
+            r * xdy + ydy + b * this.position.y,
+            -this.position.pivotX * xdx + b * ydx + this.position.x,
+            -this.position.pivotX * xdy + b * ydy + this.position.y*/
+        ];
+
+        return {
+            points: p,
+            x: Math.min(p[0], p[2], p[4], p[6]),
+            y: Math.min(p[1], p[3], p[5], p[7]),
+            width: Math.abs(Math.cos(rad))*this.aspect.width + Math.abs(Math.sin(rad))*this.aspect.height,
+            height: Math.abs(Math.cos(rad))*this.aspect.height + Math.abs(Math.sin(rad))*this.aspect.width
+        };
+
+        //extent.right = Math.max(extent.right, p[0], p[2], p[4], p[6]);
+        //extent.bottom = Math.max(extent.bottom, p[1], p[3], p[5], p[7]);
+        //extent.width = extent.right - extent.left;
+        //extent.height = extent.bottom - extent.top;
+        //return extent;
+    },
 
     /**
      * Boundary when gfx drawn on final canvas
      */
+/*
     getBoundaryDraw: function() {
         var rad = yespix.degreeToRadian(this.position.rotation);
         var width = Math.abs(Math.cos(rad))*this.aspect.width + Math.abs(Math.sin(rad))*this.aspect.height;
@@ -200,7 +269,7 @@ yespix.defineEntity('gfx', {
 
         // @TODO only works if pivot is at the center of the object
         var pivot = this.getPivot();
-
+*/
 /*        
         // NOT WORKING
         var dx = this.position.pivotX - this.aspect.width / 2;
@@ -211,7 +280,7 @@ yespix.defineEntity('gfx', {
         var y = pivot.y + this.aspect.height / 2 - height / 2 - h * Math.sin(da);
 console.log(dx, dy, h, da, rad, x, y);
 */
-
+/*
         var x = pivot.x - width / 2;
         var y = pivot.y - height / 2;
 
@@ -222,7 +291,7 @@ console.log(dx, dy, h, da, rad, x, y);
             height: height
         };
     },
-
+*/
 
 
     /**
