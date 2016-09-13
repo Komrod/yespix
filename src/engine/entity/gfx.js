@@ -97,25 +97,25 @@ yespix.defineEntity('gfx', {
         }
 
         // if cannot draw from this draw box
-        //if (!this.canDrawBox(context)) return false;
+        if (!this.canDraw(context)) {
+            return false;
+        }
 
         // prerender on canvas
         if (this.prerender) {
-            if (this.prerender.use(context)) {
-                this.setChanged(false);
-                return true;
+            if (!this.prerender.use(context)) {
+                this.drawRender(context);
             }
+        } else {
+            this.drawRender(context);
         }
 
-        this.drawRender(context);
+        if (this.debug) {
+            this.drawDebug(context);
+        }
 
         this.setChanged(false);
         
-        // draw debug
-        /*
-        if (this.debug) this.debug.draw(context);
-		*/
-        // exit
         return true;
     },
 
@@ -128,27 +128,31 @@ yespix.defineEntity('gfx', {
         if (!context || !this.aspect || !this.aspect.isVisible || this.aspect.alpha <= 0) {
             return false;
         }
+        if (this.boundary.draw && !this.canDrawBoundaryDraw(context)) {
+            return false;
+        }
         return true;
     },
 
 
     /**
-     * Return true if the entity can be drawn on context, get this information from the box coordinates.
+     * Return true if the entity can be drawn on context, get this information from the boundary coordinates.
      * @return {bool} True if can be drawn
      */
-    /*
     canDrawBoundaryDraw: function(context) {
 
-        if (this.box.draw.x >= context.canvas.clientWidth || this.box.draw.y >= context.canvas.clientHeight || this.box.draw.x + this.box.draw.width < 0 || this.box.draw.y + this.box.draw.height < 0)
+        if (this.boundary.draw.x >= context.canvas.clientWidth 
+            || this.boundary.draw.y >= context.canvas.clientHeight 
+            || this.boundary.draw.x + this.boundary.draw.width < 0 
+            || this.boundary.draw.y + this.boundary.draw.height < 0)
             return false;
         return true;
     },
-    */
+
 
     /**
-     * Render the entity on the context with coordinates from the box
+     * Render the entity on the context with coordinates from the boundary
      * @param {object} context Context object
-     * @param {object} box Box object with the coordinates
      */
     drawRender: function(context) {
         // Empty. 
@@ -160,12 +164,6 @@ yespix.defineEntity('gfx', {
         if (!this.boundary.draw) {
             this.boundary.draw = this.getBoundaryDraw();
         }
-        context.beginPath();
-        context.rect(this.boundary.draw.x, this.boundary.draw.y, this.boundary.draw.width, this.boundary.draw.height);
-        context.globalAlpha = 1.0;
-        context.lineWidth = 1.0;
-        context.strokeStyle = '#ff3300';
-        context.stroke();
 
         context.beginPath();
         context.strokeStyle = '#0033ff';
@@ -174,6 +172,13 @@ yespix.defineEntity('gfx', {
         context.stroke();
         context.moveTo(this.position.x + 5, this.position.y - 5);
         context.lineTo(this.position.x - 5, this.position.y + 5);
+        context.stroke();
+
+        context.beginPath();
+        context.rect(this.boundary.draw.x, this.boundary.draw.y, this.boundary.draw.width, this.boundary.draw.height);
+        context.globalAlpha = 1.0;
+        context.lineWidth = 1.0;
+        context.strokeStyle = '#ff3300';
         context.stroke();
 
         if (this.position.rotation != 0) {

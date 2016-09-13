@@ -41,9 +41,6 @@ yespix.defineEntity('path', {
         if (this.path) {
             this.path.draw(context);
         }
-        if (this.debug) {
-            this.drawDebug(context);
-        }
     },
 
 
@@ -63,7 +60,12 @@ yespix.defineEntity('path', {
 
 
     getBoundaryDraw: function() {
-        var boundaryDraw = this.super();
+        if (this.path && this.path.type != 'polygon') {
+            var boundaryDraw = this.super();
+        } else {
+            var boundaryDraw = this.path.getBoundaryDrawPloygon();
+        }
+
         var lineWidth = this.path.lineWidth;
 
         if (this.path.lineAlign == 'center') {
@@ -72,12 +74,12 @@ yespix.defineEntity('path', {
             lineWidth = 0;
         }
 
-        return {
-            x: boundaryDraw.x - lineWidth,
-            y: boundaryDraw.y - lineWidth,
-            width: boundaryDraw.width + lineWidth * 2,
-            height: boundaryDraw.height + lineWidth * 2
-        };
+        boundaryDraw.x -= lineWidth;
+        boundaryDraw.y -= lineWidth;
+        boundaryDraw.width += lineWidth;
+        boundaryDraw.height += lineWidth;
+
+        return boundaryDraw;
     },
 
 

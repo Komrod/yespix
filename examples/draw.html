@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+    <script type="text/javascript" src="lib/shifty.min.js"></script>
+</head>
+<body style="background-color: #456;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #123;"></canvas>
+
+<script type="text/javascript">
+	
+
+    var game = new yespix.class.game({
+        fps: 60,
+        canvas: 'canvas',
+        debug: true
+    });
+
+
+    new yespix.entity.image({
+        image: {
+            src: 'zardoz/image/zardoz_small.png',
+            scale: 3.0
+        },
+        position: {
+            x: -300,
+            y: 100
+        },
+        tween: {
+            from: {position: { rotation: 0}},
+            to: {position: {x: 1200, rotation: 1788}},
+            duration: 10000,
+            loop2ways: true
+        },
+        debug: true,
+        manager: game.gfxManager
+    });
+
+
+    var x = 0, y = 0, count = 0;
+
+    for (var t=0; t<4000; t++) {
+
+        while (x>-100 && x<1000 && y>-100 && y<1000) {
+            x = yespix.randInt(-1500, 2000);
+            y = yespix.randInt(-1500, 2000);
+        }
+
+        new yespix.entity.image({
+            image: {
+                src: 'zardoz/image/zardoz_small.png',
+                scale: 1.0
+            },
+            position: {
+                x: x,
+                y: y
+            },
+            manager: game.gfxManager
+        });
+        count++;
+    }
+
+    console.log('count='+count);
+
+
+
+</script>
+</body>
+</html>

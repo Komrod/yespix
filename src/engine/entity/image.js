@@ -66,9 +66,6 @@ yespix.defineEntity('image', {
         if (this.image) {
             this.image.draw(context);
         }
-        if (this.debug) {
-            this.drawDebug(context);
-        }
     },
 
 
@@ -76,11 +73,11 @@ yespix.defineEntity('image', {
         return this.image.getBoundaryImage();
     },
 
-/*
+
     getBoundaryClip: function() {
         return this.image.getBoundaryClip();
     },
-*/
+
 
     getAssets: function() {
         var list = this.super();
