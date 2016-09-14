@@ -1,15 +1,15 @@
 
 TODO list:
-- render only when gfx is on canvas based on boundary.draw
-- directly do not draw if didnt draw last frame and nothing changed
 - click entity detection on canvas
 - button entity
 - touch input
 - alpha mask
+- stop, restart, pause and resume game
 - pause and resume game when window is not selected
 - check if destroying an entity really dumps it
 - when function on entity enable events
 
+- dont draw on combo when draw is out of range
 - prerender for polygon
 - rotation pivot change the boundary.draw
 - Trace for next collision with a vector / line
@@ -76,6 +76,7 @@ Postponed:
 
 
 DONE:
+- render only when gfx is on canvas based on boundary.draw
 - bug: image render with width and height
 - boundary draw for polygon
 - include debug in draw function, not drawRender
@@ -310,6 +311,7 @@ v0.1.0.0
 
 
 CANCELED:
+- directly do not draw if didnt draw last frame and nothing changed // actually slower than expected
 
 
 PENDING:

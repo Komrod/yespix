@@ -71,6 +71,11 @@ yespix.defineEntity('gfx', {
     setChanged: function(b) {
         if (this.position) this.position.isChanged = b;
         if (this.aspect) this.aspect.isChanged = b;
+
+        // if the entity is unchanged, it is Z sorted
+        if (!b) {
+            this.position.isZSorted = true;
+        }
     },
 
 
@@ -79,9 +84,8 @@ yespix.defineEntity('gfx', {
      * @return {bool} True if drawn
      */
     draw: function(context) {
-        // if cannot draw, exit now
-        if (!this.canDraw(context)) return false;
-
+        
+        // @TODO not used
         this.trigger(
             {
                 type: 'render',
@@ -90,14 +94,11 @@ yespix.defineEntity('gfx', {
                 entity: this
             }
         );
-
-        // get the draw box
-        if (this.position.isChanged || this.aspect.isChanged) {
-            this.boundary.draw = this.getBoundaryDraw();
-        }
-
+        
+       
         // if cannot draw from this draw box
         if (!this.canDraw(context)) {
+            this.setChanged(false);
             return false;
         }
 
@@ -114,7 +115,9 @@ yespix.defineEntity('gfx', {
             this.drawDebug(context);
         }
 
-        this.setChanged(false);
+        if (this.isChanged) {
+            this.setChanged(false);
+        }
         
         return true;
     },
@@ -127,6 +130,9 @@ yespix.defineEntity('gfx', {
     canDraw: function(context) {
         if (!context || !this.aspect || !this.aspect.isVisible || this.aspect.alpha <= 0) {
             return false;
+        }
+        if (this.getChanged()) {
+            this.boundary.draw = this.getBoundaryDraw();
         }
         if (this.boundary.draw && !this.canDrawBoundaryDraw(context)) {
             return false;
@@ -322,14 +328,9 @@ yespix.defineEntity('gfx', {
 
 
     trigger: function(event) {
-        if (this.manager) {
-            switch (event.type+':'+event.fromClass) {
-                case 'change:Position':
-                    if (event.entity && event.entity.position && event.entity.position.isZSorted == false) {
-                        this.manager.isZSorted = false;
-                    }
-                    break;
-            }
+        if (this.manager && event.type == 'change' && event.fromClass == 'Position'
+            && event.entity.position.isZSorted == false) {
+            this.manager.isZSorted = false;
         }
         
         if (this.prerender) {

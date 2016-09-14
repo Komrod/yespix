@@ -32,8 +32,8 @@ yespix.defineEntity('base', {
 
     
     enable: function(list, properties) {
-        for (var t=0; t<list.length; t++) {
-//console.log('enable: t='+t+', list='+list[t]);
+        var t = 0, length = list.length;
+        for (; t<length; t++) {
             switch (list[t]) {
                 case 'tween':
                     if (this.tween !== false && !(this.tween instanceof yespix.class.tweenManager)) this.tween = new yespix.class.tweenManager(properties.tween, this);
@@ -54,18 +54,21 @@ yespix.defineEntity('base', {
             this.tween = null;
             if (!this.event.destroy) this.event.destroy();
             this.event = null;
-        } else for (var t=0; t<list.length; t++) {
-            switch (list[t]) {
-                case 'tween':
-                    if (!this.tween) break;
-                    if (this.tween.destroy) this.tween.destroy();
-                    this.tween = null;
-                    break;
-                case 'event':
-                    if (!this.event) break;
-                    if (!this.event.destroy) this.event.destroy();
-                    this.event = null;
-                    break;
+        } else {
+            var t = 0, length = list.length;
+            for (; t<length; t++) {
+                switch (list[t]) {
+                    case 'tween':
+                        if (!this.tween) break;
+                        if (this.tween.destroy) this.tween.destroy();
+                        this.tween = null;
+                        break;
+                    case 'event':
+                        if (!this.event) break;
+                        if (!this.event.destroy) this.event.destroy();
+                        this.event = null;
+                        break;
+                }
             }
         }
     },
@@ -111,10 +114,12 @@ yespix.defineEntity('base', {
         }
 
         // pass it to manager
-        if (this.manager) this.manager.trigger(event);
+        // @TODO not used right now
+        //if (this.manager) this.manager.trigger(event);
 
         // if a class switch to ready or notReady state
         if ((event.type == 'ready' || event.type == 'notReady') && event.from !== this) {
+            // try to change the ready state of the entity
             this.checkReady();
         }
 

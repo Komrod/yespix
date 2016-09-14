@@ -82,12 +82,10 @@ Prerender.prototype.use = function(context) {
 
 
 Prerender.prototype.trigger = function(event) {
-
 	if (event.fromClass != 'prerender' && (event.type == 'change' || event.type == 'ready' || event.type == 'notReady'))
 	{
 		this.isReady = false;
 	}
-
 };
 
 

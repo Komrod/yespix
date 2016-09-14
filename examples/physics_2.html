@@ -6,7 +6,7 @@
 </head>
 <body style="background-color: #DBC1B1;">
 
-<canvas width="800" height="500" id="canvas" style="border: 10px solid #9CB0A8;"></canvas>
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #ff0000;"></canvas>
 
 <script type="text/javascript">
 	
@@ -38,7 +38,7 @@
 
 	game.input.when('click', function(e) {
 		for (var t=0; t<20; t++) {
-			var size = yespix.randInt(10,50);
+			var size = yespix.randInt(5,20);
 			new yespix.entity.path({
 				aspect: {
 					
@@ -46,8 +46,8 @@
 					height: size
 				},
 				position: {
-					x: yespix.randInt(0, 800),
-					y: yespix.randInt(-200, 400)
+					x: yespix.randInt(100, 650),
+					y: yespix.randInt(-20, 400)
 				},
 				path: {
 					type: 'rect',
@@ -68,17 +68,12 @@
 				}
 			});
 		}
-		new yespix.class.tweenAnimation({
-			from: {f: 0.01},
-			to: {f: 1.0},
-			duration: 5000
-		});
 	});
 
 
 	new yespix.entity.path({
 		aspect: {
-			
+			alpha: 1.0,
 			width: 700,
 			height: 10
 		},
@@ -91,12 +86,59 @@
 			lineColor: '#000',
 			lineWidth: 1,
 			fillColor: '#000',
-			fillAlpha: 0.5
 		},
 		collision: {
 			type: 'static',
 			width: 700,
 			height: 10,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+	new yespix.entity.path({
+		aspect: {
+			width: 10,
+			height: 400
+		},
+		position: {
+			x: 50,
+			y: 50
+		},
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			fillColor: '#000',
+			fillAlpha: 1 // 0.5
+		},
+		collision: {
+			type: 'static',
+			width: 10,
+			height: 450,
+			physics: game.physics
+		},
+		manager: game.gfxManager
+	});
+	new yespix.entity.path({
+		aspect: {
+			width: 10,
+			height: 400
+		},
+		position: {
+			x: 740,
+			y: 50
+		},
+		path: {
+			type: 'rect',
+			lineColor: '#000',
+			lineWidth: 1,
+			fillColor: '#000',
+			fillAlpha: 1 // 0.5
+		},
+		collision: {
+			type: 'static',
+			width: 10,
+			height: 450,
 			physics: game.physics
 		},
 		manager: game.gfxManager

@@ -54,7 +54,6 @@ Position.prototype.entityTrigger = function(type, properties) {
 
 
 Position.prototype.set = function(properties, varDefault) {
-//console.log('Position:set', properties);    
     if (!yespix.isUndefined(properties.z) && properties.z != this.z
         || !yespix.isUndefined(properties.globalZ) && properties.globalZ != this.globalZ)
     {

@@ -19,9 +19,12 @@
 
 
     new yespix.entity.image({
+        aspect: {
+            alpha: 0.05
+        },
         image: {
             src: 'zardoz/image/zardoz_small.png',
-            scale: 3.0
+            scale: 0.3
         },
         position: {
             x: -300,
@@ -40,7 +43,7 @@
 
     var x = 0, y = 0, count = 0;
 
-    for (var t=0; t<4000; t++) {
+    for (var t=0; t<15000; t++) {
 
         while (x>-100 && x<1000 && y>-100 && y<1000) {
             x = yespix.randInt(-1500, 2000);

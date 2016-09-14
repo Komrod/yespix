@@ -15,7 +15,7 @@ function EventHandler(entity) {
     this.list = {};
     this.index = 0;
 
-    this.ready(true);
+    //this.ready(true);
 }
 
 
@@ -63,7 +63,6 @@ EventHandler.prototype.getList = function(eventName) {
  * @param {int|string} index Optional, index of the element as integer or string
  */
 EventHandler.prototype.when = function(eventName, fct, name) {
-//console.log('EventHandler: when eventName='+eventName);            
 
     if (!this.list[eventName]) {
         this.list[eventName] = {};
@@ -81,7 +80,10 @@ EventHandler.prototype.when = function(eventName, fct, name) {
     }
 
     this.list[eventName][name] = fct;
-//console.log('EventHandler: when name='+name);            
+
+    if (!this.isReady) {
+        this.ready(true);
+    }
 
     return name;
 };
@@ -89,9 +91,16 @@ EventHandler.prototype.when = function(eventName, fct, name) {
 
 EventHandler.prototype.trigger = function(event, name) {
     
-    if (event.from == this) return false;
+    
+    /*if (event.from == this) {
+      return false;
+    }*/
 
-    if (!event || !event.type) {
+    /*if (!event || !event.type) {
+        return false;
+    }*/
+    
+    if (!this.isReady) {
         return false;
     }
 
@@ -105,7 +114,7 @@ EventHandler.prototype.trigger = function(event, name) {
                 this.list[event.type][n](event);
             }
         }
-
+//console.log(this.list); aze;
     }
 };
 

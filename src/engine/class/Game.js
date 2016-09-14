@@ -43,17 +43,9 @@ function Game(properties) {
 
         game.loop.register(
             function(loop, time) { 
-                if (game.physics) {
-                    game.physics.drawDebug();
-                    game.physics.world.ClearForces();
-                }
                 game.render(time);
             }, 
             function(loop, time) {
-                if (game.physics) {
-                    game.physics.step(time);
-                    game.physics.world.ClearForces();
-                }
                 game.step(time);
             }
         );
@@ -146,6 +138,10 @@ Game.prototype.setFps = function(fps) {
 
 
 Game.prototype.step = function(time) {
+    if (this.physics) {
+        this.physics.step(time);
+        this.physics.world.ClearForces();
+    }
     this.gfxManager.step(time);
 };
 
@@ -160,6 +156,12 @@ Game.prototype.render = function(time) {
     this.gfxManager.draw(); // draw debug
     if (this.debug) {
         this.gfxManager.drawFps(time, this.fps);
+        /*
+        if (this.physics) {
+            this.physics.drawDebug();
+            //this.physics.world.ClearForces();
+        }
+        */
     }
 };
 

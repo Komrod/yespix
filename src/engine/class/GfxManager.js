@@ -104,10 +104,8 @@ GfxManager.prototype.setCanvas = function(canvas) {
 };
 
 
-GfxManager.prototype.draw = function(context) {
-	if (context) {
-		this.context = context;
-	} else if (!this.context) {
+GfxManager.prototype.draw = function() {
+	if (!this.context) {
 		return false;
 	}
 
@@ -142,7 +140,8 @@ GfxManager.prototype.drawFps = function(ms, max) {
 
 
 GfxManager.prototype.add = function() {
-	for (var t = 0; t < arguments.length; t++) {
+    var t = 0, length = arguments.length;
+	for (; t < length; t++) {
 
 		arguments[t].manager = this;
 
@@ -186,7 +185,6 @@ GfxManager.prototype.sort = function() {
 		}
 		return false;
 	});
-	
     this.isZSorted = true;
 };
 
@@ -268,6 +266,7 @@ GfxManager.prototype.each = function(fn) {
 
 
 GfxManager.prototype.clear = function() {
+	//this.canvas.width = this.canvas.width;
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	return true;
 };
