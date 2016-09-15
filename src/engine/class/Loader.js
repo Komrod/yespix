@@ -2,7 +2,7 @@
 
 /**
  * Loader class
- * Handle the load of external files
+ * Handle the load of external resources
  * @parent  no
  */
 
