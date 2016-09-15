@@ -30,6 +30,12 @@ TweenManager.prototype.add = function(properties) {
 
 
 TweenManager.prototype.clear = function() {
+    var t = 0, length = this.list.length;
+
+    for (; t<length; t++) {
+        this.list[t].destroy();
+    }
+
     this.list = [];
 };
 
@@ -103,6 +109,11 @@ TweenManager.prototype.step = function(time) {
             }
         }
     }
+};
+
+
+TweenManager.prototype.stop = function() {
+    this.clear();
 };
 
 
