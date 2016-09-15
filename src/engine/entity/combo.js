@@ -23,8 +23,8 @@ yespix.defineEntity('combo', {
     },
 
     
-    add: function() {
-        return this.handler.add(arguments);
+    add: function(entity) {
+        return this.handler.add(entity);
     },
 
 
@@ -62,7 +62,11 @@ yespix.defineEntity('combo', {
         if (!this.isReady) {
             return false;
         }
+        
+        // @TODO clear only if something changed
+        this.handler.clear();
 
+        // TODO optimize draw on offccanvas entity
         this.handler.draw(this.context);
 
         var contextSaved = false;

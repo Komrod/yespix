@@ -76,6 +76,7 @@ Postponed:
 
 
 DONE:
+- fix combo render
 - render only when gfx is on canvas based on boundary.draw
 - bug: image render with width and height
 - boundary draw for polygon

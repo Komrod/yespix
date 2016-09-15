@@ -30,7 +30,7 @@
 			height: 200
 		},
 		tween: {
-			duration: 2500,
+			duration: 10000,
 			loop: true,
 			from: {
 				position: {
@@ -39,6 +39,7 @@
 			},
 			to: {
 				position: {
+					x: 1500,
 					rotation: 360
 				}
 			}
@@ -52,7 +53,7 @@
 				position: {
 					x: 50,
 					y: 50
-				}
+				},
 				path: {
 					type: 'rect',
 					lineWidth: 1,
@@ -72,34 +73,23 @@
 	});
 
 
-	new yespix.entity.path(
-	{
-		position: {
-			y: 400
-		},
-		aspect: {
-			width: 88,
-			height: 50
-		},
-		path: {
-			type: 'rect',
-			fillColor: '#741'
-		},
-		tween: {
-			duration: 1777,
-			loop2ways: true,
-			from: {
-				position: {
-					x: 50
-				}
+	for (var t=0; t<5000; t++) {
+		combo.add(new yespix.entity.path(
+		{
+			position: {
+				x: -100,
+				y: -100
 			},
-			to: {
-				position: {
-					x: 700
-				}
+			aspect: {
+				width: 10,
+				height: 10
+			},
+			path: {
+				type: 'rect',
+				fillColor: '#741'
 			}
-		},
-	});
+		}));
+	}
 
 
 </script>
