@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="../build/yespix.js"></script>
+	<script type="text/javascript" src="lib/Box2d.min.js"></script>
+</head>
+<body style="background-color: #DBC1B1;">
+
+<canvas width="800" height="500" id="canvas" style="border: 10px solid #9CB0A8;"></canvas>
+
+<script type="text/javascript">
+	
+
+	var game = new yespix.class.game({
+		fps: 60,	
+		canvas: 'canvas',
+		debug: true
+	});
+
+
+	new yespix.entity.path({
+		aspect: {
+			width: 100,
+			height: 50
+		},
+		position: {
+			x: 100,
+			y: 200
+		},
+		path: true,
+		tween: {
+			from: {position: {rotation: 0}},
+			to: {position: {rotation: 360}},
+			duration: 10000,
+			loop: true
+		},
+		mask: {
+			
+		},
+		manager: game.gfxManager
+	});
+
+/*
+	new yespix.entity.image({
+		aspect: {
+			alpha: 0.1
+		},
+		position: {
+			x: 300,
+			y: 200
+		},
+		image: 'zardoz/image/zardoz_small.png',
+		tween: {
+			from: {position: {rotation: 0}},
+			to: {position: {rotation: 360}},
+			duration: 10000,
+			loop: true
+		},
+		manager: game.gfxManager
+	});
+
+
+    new yespix.entity.animation({
+		aspect: {
+			alpha: 0.1
+		},
+        position: {
+            x: 600,
+            y: 200
+        },
+        image: {
+            src: 'chuck/player.png',
+            scale: 2.0,
+        },
+        animation: {
+            defaultAnimation: 'idle',
+            defaultSprite: 'perso',
+            defaultDuration: 150,
+            sprites: {
+                perso: {
+                    width: 32,
+                    height: 40,
+                }
+            },
+            list: {
+                idle: {
+                    frames: [0, 1, 2, 3, 4, 5, 6]
+                }
+            },
+        },
+		tween: {
+			from: {position: {rotation: 0}},
+			to: {position: {rotation: 360}},
+			duration: 10000,
+			loop: true
+		},
+        manager: game.gfxManager
+    });
+*/
+
+</script>
+</body>
+</html>

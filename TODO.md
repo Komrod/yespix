@@ -1,14 +1,16 @@
 
 TODO list:
+- alpha mask
 - click entity detection on canvas
 - button entity
 - touch input
-- alpha mask
 - stop, restart, pause and resume game
 - pause and resume game when window is not selected
 - check if destroying an entity really dumps it
 - when function on entity enable events
-
+- debug for combo
+- optimize combo (offcanvas)
+- set default path=true in path entity
 - dont draw on combo when draw is out of range
 - prerender for polygon
 - rotation pivot change the boundary.draw
