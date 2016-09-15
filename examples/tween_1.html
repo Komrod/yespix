@@ -34,11 +34,11 @@
 			tween: [
 				{
 					delay: 1000 + yespix.randInt(0,200),
-					duration: 1000 + yespix.randInt(0, 2000),
+					duration: 1500 + yespix.randInt(0, 2000),
 					easing: 'easeOutBounce',
 					to: {
 						aspect: { width: yespix.randInt(10, 50), height: yespix.randInt(10, 50) },
-						position: { x: yespix.randInt(-50, width), y: yespix.randInt(-50, height) },
+						position: { x: yespix.randInt(-50, width), y: yespix.randInt(-50, height), rotation: yespix.randInt(-360, 360) },
 						path : { fillColor: '#ffeb3b' }
 					}
 				},

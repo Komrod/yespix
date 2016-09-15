@@ -49,51 +49,21 @@
 					width: 50,
 					height: 50
 				},
+				position: {
+					x: 50,
+					y: 50
+				}
 				path: {
 					type: 'rect',
 					lineWidth: 1,
 					lineColor: '#000000',
 					fillColor: '#ff0000',
 					borderRadius: 8
-				}
-			}),
-			new yespix.entity.path({
-				position: {
-					x: 6,
-					y: 6,
-					z: 10
-				},
-				aspect: {
-					width: 38,
-					height: 38
-				},
-				path: {
-					type: 'rect',
-					lineWidth: 0,
-					fillColor: '#999',
-					borderRadius: 6
 				},
 				tween: {
 					to: { position: { x: 170, y: 170}},
 					duration: 3000,
 					loop2ways: true
-				}
-			}),
-			new yespix.entity.path({
-				name: "c",
-				position: {
-					x: 0,
-					y: 0,
-					z: -10
-				},
-				aspect: {
-					width: 200,
-					height: 200
-				},
-				path: {
-					type: 'rect',
-					lineWidth: 0,
-					fillColor: '#678',
 				}
 			})
 		],
@@ -129,7 +99,6 @@
 				}
 			}
 		},
-		manager: game.gfxManager
 	});
 
 

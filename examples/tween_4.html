@@ -11,10 +11,13 @@
 <script type="text/javascript">
 	
 
-	var canvas = document.getElementById('canvas');
-	yespix();
-	var manager = new yespix.class.gfxManager(canvas);
-
+	var game = new yespix.class.game({
+		fps: 60,	
+		canvas: 'canvas',
+		debug: true,
+		fullscreen: true,
+		input: true
+	});
 
 
 	new yespix.entity.path({
@@ -51,9 +54,11 @@
 			lineWidth: 3,
 			fillColor: '#ff0000'
 		},
-		manager: manager
+		manager: game.gfxManager
 	});
-	new yespix.entity.path({
+	
+	
+	var loopingEntity = new yespix.entity.path({
 		aspect: {
 			width: 50,
 			height: 50,
@@ -79,6 +84,9 @@
 				},
 				onLoop: function() {
 					console.log('Loop');
+				},
+				onEnd: function() {
+					console.log('Stop');
 				}
 			}
 		],
@@ -88,24 +96,13 @@
 			lineWidth: 3,
 			fillColor: '#ff0000'
 		},
-		manager: manager
+		manager: game.gfxManager
 	});
 
-	// create loop
-	var loop = new yespix.class.loop(60);
-	loop.register(
-		function(loop, time) { 
-            manager.clear(); // clear canvas
-            manager.draw(); // draw
-            manager.drawFps(time, 60);
-		}, 
-		function(loop, time) {
-            manager.step(time); // step
-		}
-	).start();
 
-
-//console.log(manager.list);
+	game.input.when('click', function() {
+		loopingEntity.tween.stop();
+	});
 
 
 </script>
