@@ -283,6 +283,12 @@ GfxManager.prototype.reset = function(canvas, list) {
 
 	// set the list
     this.list = list || [];
+
+    var t = 0, length = this.list.length;
+    for (; t<length; t++) {
+    	this.list[t].setManager(this);
+    }
+
     this.event = new yespix.class.eventHandler();
 
     this.isZSorted = false;
@@ -291,7 +297,6 @@ GfxManager.prototype.reset = function(canvas, list) {
 
 	return true;
 };
-
 
 
 yespix.defineClass('gfxManager', GfxManager);

@@ -146,11 +146,10 @@ yespix.defineEntity('gfx', {
      * @return {bool} True if can be drawn
      */
     canDrawBoundaryDraw: function(context) {
-
-        if (this.boundary.draw.x >= context.canvas.clientWidth 
-            || this.boundary.draw.y >= context.canvas.clientHeight 
-            || this.boundary.draw.x + this.boundary.draw.width < 0 
-            || this.boundary.draw.y + this.boundary.draw.height < 0)
+        if (this.boundary.draw.x >= context.canvas.width 
+            || this.boundary.draw.y >= context.canvas.height 
+            || this.boundary.draw.x + this.boundary.draw.width <= 0 
+            || this.boundary.draw.y + this.boundary.draw.height <= 0)
             return false;
         return true;
     },

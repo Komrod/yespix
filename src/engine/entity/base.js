@@ -180,7 +180,8 @@ yespix.defineEntity('base', {
      * @return {boolean} Ready or not
      */
     checkReadyClasses: function() {
-        if (this.event && !this.event.isReady) return false;
+        // @TODO event not necessarily ready
+        //if (this.event && !this.event.isReady) return false;
         if (this.tween && !this.tween.isReady) return false;
         return true;
     },

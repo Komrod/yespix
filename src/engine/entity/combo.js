@@ -22,6 +22,11 @@ yespix.defineEntity('combo', {
         this.checkReady();
     },
 
+    
+    add: function() {
+        return this.handler.add(arguments);
+    },
+
 
     createCanvas: function() {
         if (!this.aspect || !this.aspect.width || !this.aspect.height) {
@@ -32,6 +37,7 @@ yespix.defineEntity('combo', {
         this.canvas.width  = this.aspect.width;
         this.canvas.height = this.aspect.height;
         this.context = this.canvas.getContext('2d');
+        this.context.canvas = this.canvas;
     },
 
 
@@ -58,7 +64,7 @@ yespix.defineEntity('combo', {
         }
 
         this.handler.draw(this.context);
-//return false;
+
         var contextSaved = false;
         if (this.position.rotation != 0) {
             var pivot = this.getPivot();

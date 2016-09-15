@@ -39,7 +39,6 @@ function Path(properties, entity) {
     this.entityTrigger('create');
 
     this.boundaryPolygon = null;
-
     this.ready(true);
 }
 
@@ -243,6 +242,7 @@ Path.prototype.draw = function(context) {
         //context.translate(0, 0);
     }
 };
+
 
 Path.prototype.drawLine = function(context) {
     if (this.lineColor != '' && this.lineWidth > 0) {
@@ -467,7 +467,6 @@ Path.prototype.drawCircle = function(context) {
         if (this.lineColor != '' && this.lineWidth > 0) {
             if (!this._pathSame || !this._pathDrawn) {
                 context.beginPath();
-//console.log(this);                
                 context.arc(this.entity.position.x + this._radius, this.entity.position.y + this._radius, this._radius + this._pathPosition, 0, 2 * Math.PI, false);
                 this._pathDrawn = true;
             }
