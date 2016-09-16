@@ -30,6 +30,9 @@ yespix.defineEntity('gfx', {
         if (properties.prerender !== false) {
             this.prerender = new yespix.class.prerender(this.prerender, this);
         }
+        if (properties.mask) {
+            this.mask = new yespix.class.mask(this.mask, this);
+        }
 
         this.checkReady();
     },
@@ -102,6 +105,10 @@ yespix.defineEntity('gfx', {
             return false;
         }
 
+        if (this.mask) {
+            this.mask.prepare(context);
+        }
+
         // prerender on canvas
         if (this.prerender) {
             if (!this.prerender.use(context)) {
@@ -109,6 +116,10 @@ yespix.defineEntity('gfx', {
             }
         } else {
             this.drawRender(context);
+        }
+
+        if (this.mask) {
+            this.mask.restore(context);
         }
 
         if (this.debug) {

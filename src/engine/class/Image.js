@@ -273,7 +273,9 @@ Image.prototype.load = function(src) {
     // load image at scale 1
     this.element = document.createElement('img');
     this.element.entities = new Array();
-    this.element.entities.push(this.entity);
+    if (this.entity) {
+        this.element.entities.push(this.entity);
+    }
     this.element.source = src;
     yespix.setCache('img:'+src+':1', this.element);
     

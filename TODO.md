@@ -5,6 +5,7 @@ TODO list:
 - button entity
 - touch input
 - stop, restart, pause and resume game
+- rename entityTrigger to emit
 - pause and resume game when window is not selected
 - check if destroying an entity really dumps it
 - when function on entity enable events

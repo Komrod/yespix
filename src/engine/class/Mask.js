@@ -11,9 +11,23 @@
 function Mask(properties, entity) {
     
     properties = properties || {};
+    if (entity) this.entity = entity;
+    if (yespix.isString(properties)) {
+        properties = {src: properties};
+    }
+    
+    var varDefault = {
+        src: '',  // source and params of the images
+    };
+
+    this.set(properties, varDefault);
 
     this.isReady =  false;
+console.log('properties', properties);
+console.log('yespix.class', yespix.class);
+    this.image = new yespix.class.image(properties.src);
 
+console.log('mask', this);    
     this.entityTrigger('create');
 
 }
@@ -57,6 +71,16 @@ Mask.prototype.destroy = function() {
 
     this.entityTrigger('destroy');
     return true;
+};
+
+
+Mask.prototype.use = function(context) {
+    
+};
+
+
+Mask.prototype.load = function(src) {
+    
 };
 
 
