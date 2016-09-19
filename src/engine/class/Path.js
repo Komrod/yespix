@@ -58,6 +58,9 @@ Path.prototype.set = function(properties, varDefault) {
     yespix.copy(properties, this, varDefault);
     this.isChanged = true;
     this.entityTrigger('change', properties);
+
+    // aspect is changed
+    this.entity.aspect.isChanged = true;
 };
 
 

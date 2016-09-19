@@ -1,6 +1,9 @@
 
 TODO list:
+- bug: prerender with path line
+- bug: path polygon render
 - alpha mask
+- get the resource from mask
 - click entity detection on canvas
 - button entity
 - touch input
@@ -79,6 +82,8 @@ Postponed:
 
 
 DONE:
+- bug: tweening color dosnt work with prerender
+- fix pivot on path with big line width
 - fix combo render
 - render only when gfx is on canvas based on boundary.draw
 - bug: image render with width and height

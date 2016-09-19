@@ -98,29 +98,27 @@ yespix.defineEntity('gfx', {
             }
         );
         
-       
-        // if cannot draw from this draw box
+        // if cannot draw from this draw boundaries
         if (!this.canDraw(context)) {
             this.setChanged(false);
             return false;
         }
 
-        if (this.mask) {
-            this.mask.prepare(context);
-        }
+        var drawRender = this.drawRender;
 
-        // prerender on canvas
+        // prerender for canvas
         if (this.prerender) {
-            if (!this.prerender.use(context)) {
-                this.drawRender(context);
-            }
-        } else {
-            this.drawRender(context);
+            drawRender = this.prerender.use(drawRender);
         }
 
+/*
+        // mask on canvas
         if (this.mask) {
-            this.mask.restore(context);
+            this.mask.use();
         }
+*/
+
+        drawRender.call(this, context);
 
         if (this.debug) {
             this.drawDebug(context);
