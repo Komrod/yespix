@@ -23,7 +23,10 @@ function Prerender(properties, entity) {
     this.isReady = false;
     this.isChangedLastFrame = false;
 
-
+    if (this.entity.debug) {
+        this.canvas.style.cssText = 'margin: 10px; border: 10px solid #ff4000;';
+        document.body.appendChild(this.canvas);
+    }
 }
 
 
@@ -64,16 +67,12 @@ Prerender.prototype.updateCanvasSize = function() {
 
 Prerender.prototype.use = function(fct) {
     if (!this.enabled) {
-        this.isChangedLastFrame = true; //this.entity.aspect.isChanged;
-//        this.isChangedLastFrame = this.entity.getChanged();
-console.log('Prerender.use: enabled = false');
+        this.isChangedLastFrame = true;
         return fct;
     }
 
     if (!this.isChangedLastFrame) {
         this.isChangedLastFrame = this.entity.aspect.isChanged;
-//        this.isChangedLastFrame = this.entity.getChanged();
-//console.log('Prerender.use: isChangedLastFrame');
         return fct;
         return this.drawRender;
     }
@@ -82,8 +81,6 @@ console.log('Prerender.use: enabled = false');
         this.isChangedLastFrame = true;
         this.update();
     }
-//    this.isChangedLastFrame = this.entity.aspect.isChanged;
-//    this.isChangedLastFrame = this.entity.getChanged();
 
     return this.drawRender;
 };
@@ -103,7 +100,6 @@ Prerender.prototype.trigger = function(event) {
 
 
 Prerender.prototype.update = function() {
-//console.log('Prerender.update');
     this.updateCanvasSize();
     this.boundary = this.getPrerender();
 
@@ -144,7 +140,6 @@ Prerender.prototype.update = function() {
     this.entity.position.x = this.boundary.x;
     this.entity.position.y = this.boundary.y;
     this.entity.position.rotation = this.boundary.rotation;
-//console.log('prerender.boundary = ', this.boundary);
     this.isReady = true;
 };
 

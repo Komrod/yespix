@@ -89,96 +89,6 @@ Path.prototype.addPoint = function(point) {
 };
 
 
-Path.prototype.getBoundaryImagePloygon = function() {
-
-    if (this.points.length < 1) {
-        return false;
-    }
-
-    var minX, minY, maxX, maxY;
-
-    for (var t=0; t<this.points.length; t++) {
-        if (this.points[t]) {
-            if (yespix.isUndefined(minX) || minX > this.points[t].x) minX = this.points[t].x;
-            if (yespix.isUndefined(maxX) || maxX < this.points[t].x) maxX = this.points[t].x;
-            if (yespix.isUndefined(minY) || minY > this.points[t].y) minY = this.points[t].y;
-            if (yespix.isUndefined(maxY) || maxY < this.points[t].y) maxY = this.points[t].y;
-        }
-    }
-
-    if (minX === null) {
-        return false;
-    }
-
-    this.boundaryPolygon = {
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY
-    };
-
-    return {
-        x: this.boundaryPolygon.x + this.entity.position.x,
-        y: this.boundaryPolygon.y + this.entity.position.y,
-        width: this.boundaryPolygon.width,
-        height: this.boundaryPolygon.height
-    };
-};
-
-
-Path.prototype.getBoundaryDrawPloygon = function() {
-
-    if (!this.entity.boundary.image) {
-        this.entity.boundary.image = this.getBoundaryImagePloygon();
-    }
-
-    if (!this.entity.boundary.image) {
-        return false;
-    }
-
-    var pivot = this.entity.getPivot();
-    var points = [
-        this.entity.rotatePoint(
-            this.entity.boundary.image.x, 
-            this.entity.boundary.image.y, 
-            pivot.x, 
-            pivot.y, 
-            this.entity.position.rotation),
-
-        this.entity.rotatePoint(
-            this.entity.boundary.image.x + this.entity.boundary.image.width, 
-            this.entity.boundary.image.y, 
-            pivot.x, 
-            pivot.y, 
-            this.entity.position.rotation),
-
-        this.entity.rotatePoint(
-            this.entity.boundary.image.x, 
-            this.entity.boundary.image.y + this.entity.boundary.image.height, 
-            pivot.x, 
-            pivot.y, 
-            this.entity.position.rotation),
-
-        this.entity.rotatePoint(
-            this.entity.boundary.image.x + this.entity.boundary.image.width, 
-            this.entity.boundary.image.y + this.entity.boundary.image.height, 
-            pivot.x, 
-            pivot.y, 
-            this.entity.position.rotation)
-    ];
-
-    var rad = this.entity.position.rotation * Math.PI / 180;
-
-    return {
-        points: points,
-        x: Math.min(points[0].x, points[1].x, points[2].x, points[3].x),
-        y: Math.min(points[0].y, points[1].y, points[2].y, points[3].y),
-        width: Math.abs(Math.cos(rad))*this.entity.boundary.image.width + Math.abs(Math.sin(rad))*this.entity.boundary.image.height,
-        height: Math.abs(Math.cos(rad))*this.entity.boundary.image.height + Math.abs(Math.sin(rad))*this.entity.boundary.image.width
-    };
-};
-
-
 Path.prototype.getBorderRadius = function() {
     if (this.entity.aspect.width >= this.borderRadius * 2 && this.entity.aspect.height >= this.borderRadius * 2) return this.borderRadius;
     if (this.entity.aspect.height < this.entity.aspect.width) return this.entity.aspect.height / 2;
@@ -549,6 +459,16 @@ Path.prototype.entityTrigger = function(type, properties) {
 
 
 Path.prototype.getBoundaryImage = function() {
+    if (this.type == 'line' || this.type == 'polygon') {
+        var b = this.getBoundaryImagePloygon();
+        return {
+            x: b.x,
+            y: b.y,
+            width: b.width + 2 * this.lineWidth,
+            height: b.height + 2 * this.lineWidth
+        };
+    }
+
     return {
         x: this.entity.position.x,
         y: this.entity.position.y,
@@ -559,6 +479,15 @@ Path.prototype.getBoundaryImage = function() {
 
 
 Path.prototype.getBoundaryRender = function() {
+    if (this.type == 'line' || this.type == 'polygon') {
+        var b = this.getBoundaryImagePloygon();
+        return {
+            x: b.x + this.lineWidth,
+            y: b.y + this.lineWidth,
+            width: b.width + 2 * this.lineWidth,
+            height: b.height + 2 * this.lineWidth
+        };
+    }
     return {
         x: this.lineWidth,
         y: this.lineWidth,
@@ -569,11 +498,111 @@ Path.prototype.getBoundaryRender = function() {
 
 
 Path.prototype.getBoundaryClip = function() {
+    if (this.type == 'line' || this.type == 'polygon') {
+        var b = this.getBoundaryImagePloygon();
+console.log('getBoundaryClip', this);        
+        return {
+            x: b.x,
+            y: b.y,
+            width: b.width + 2 * this.lineWidth,
+            height: b.height + 2 * this.lineWidth
+        };
+    }
     return {
         x: 0,
         y: 0,
         width: this.entity.aspect.width + 2 * this.lineWidth,
         height: this.entity.aspect.height + 2 * this.lineWidth
+    };
+};
+
+
+Path.prototype.getBoundaryImagePloygon = function() {
+
+    if (this.points.length < 1) {
+        return false;
+    }
+
+    var minX, minY, maxX, maxY;
+
+    for (var t=0; t<this.points.length; t++) {
+        if (this.points[t]) {
+            if (yespix.isUndefined(minX) || minX > this.points[t].x) minX = this.points[t].x;
+            if (yespix.isUndefined(maxX) || maxX < this.points[t].x) maxX = this.points[t].x;
+            if (yespix.isUndefined(minY) || minY > this.points[t].y) minY = this.points[t].y;
+            if (yespix.isUndefined(maxY) || maxY < this.points[t].y) maxY = this.points[t].y;
+        }
+    }
+
+    if (minX === null) {
+        return false;
+    }
+
+    this.boundaryPolygon = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+    };
+
+    return {
+        x: this.boundaryPolygon.x + this.entity.position.x,
+        y: this.boundaryPolygon.y + this.entity.position.y,
+        width: this.boundaryPolygon.width,
+        height: this.boundaryPolygon.height
+    };
+};
+
+
+Path.prototype.getBoundaryDrawPloygon = function() {
+
+    if (!this.entity.boundary.image) {
+        this.entity.boundary.image = this.getBoundaryImagePloygon();
+    }
+
+    if (!this.entity.boundary.image) {
+        return false;
+    }
+
+    var pivot = this.entity.getPivot();
+    var points = [
+        this.entity.rotatePoint(
+            this.entity.boundary.image.x, 
+            this.entity.boundary.image.y, 
+            pivot.x, 
+            pivot.y, 
+            this.entity.position.rotation),
+
+        this.entity.rotatePoint(
+            this.entity.boundary.image.x + this.entity.boundary.image.width, 
+            this.entity.boundary.image.y, 
+            pivot.x, 
+            pivot.y, 
+            this.entity.position.rotation),
+
+        this.entity.rotatePoint(
+            this.entity.boundary.image.x, 
+            this.entity.boundary.image.y + this.entity.boundary.image.height, 
+            pivot.x, 
+            pivot.y, 
+            this.entity.position.rotation),
+
+        this.entity.rotatePoint(
+            this.entity.boundary.image.x + this.entity.boundary.image.width, 
+            this.entity.boundary.image.y + this.entity.boundary.image.height, 
+            pivot.x, 
+            pivot.y, 
+            this.entity.position.rotation)
+    ];
+
+    var rad = this.entity.position.rotation * Math.PI / 180;
+
+    return {
+        points: points,
+        x: Math.min(points[0].x, points[1].x, points[2].x, points[3].x),
+        y: Math.min(points[0].y, points[1].y, points[2].y, points[3].y),
+        width: Math.abs(Math.cos(rad))*this.entity.boundary.image.width + Math.abs(Math.sin(rad))*this.entity.boundary.image.height,
+        height: Math.abs(Math.cos(rad))*this.entity.boundary.image.height + Math.abs(Math.sin(rad))*this.entity.boundary.image.width
     };
 };
 
