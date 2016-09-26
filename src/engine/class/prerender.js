@@ -176,14 +176,14 @@ Prerender.prototype.drawRender = function(context) {
     if (!this.boundary.image) {
         this.boundary.image = this.getBoundaryImage();
     }
-/*
+
 console.log('using prerender.drawRender: x='+this.boundary.image.x+', y='
     +this.boundary.image.y+', width='+this.boundary.image.width+', height='
     +this.boundary.image.height);
 console.log('using prerender.drawRender: x='+this.boundary.clip.x+', y='
     +this.boundary.clip.y+', width='+this.boundary.clip.width+', height='
     +this.boundary.clip.height);
-*/
+
     context.globalAlpha = this.aspect.alpha;
     context.drawImage(this.prerender.canvas, //image element
         this.boundary.clip.x, // x position on image
