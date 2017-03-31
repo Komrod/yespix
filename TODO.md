@@ -24,9 +24,10 @@ TODO list:
 - pass rotation of an object to collision object at init
 - use collision in a level
 - parallax image move
-- texture entity (handled by the canvas)tween
+- texture entity (handled by the canvas) tween
 - Make a camera entity (zoom, move, turn)
 - Make a video entity
+- Make a visible entity list and invisible entity list (loop on visible when draw)
 
 - bug: sprite out of range selectedIndex cause the whole image to be drawn
 - extends to reverse an animation
